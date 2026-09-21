@@ -1,13 +1,34 @@
 /*
  * Tasarım belirteçleri — tek kaynak.
  * Vant (mobile/styles/theme.css) ve Element Plus (desktop/styles/theme.css) bunlardan beslenir;
- * marka rengini değiştirmek için yalnızca burayı değiştirmek yeter.
+ * bir rengi değiştirmek için yalnızca burayı değiştirmek yeter.
+ *
+ * Kızılkan Şantiye renk kuralları:
+ * - Lacivert ana renktir: butonlar, aktif sekme, bağlantılar.
+ * - Baret sarısı imzadır ve YALNIZCA koyu zeminde kullanılır; beyaz zeminde kontrastı 1.5:1.
+ * - Kırmızı, amber ve yeşil yalnızca durum içindir; marka rengi olarak kullanılmaz.
+ *   Sorun etiketlerinin bir bakışta fark edilmesi buna bağlı.
+ * - Renk tek başına anlam taşımaz: her durumda yazı da bulunur (renk körlüğü).
  */
 :root {
-  /* Şantiye turuncusu. Beyaz yazıyla kontrastı 5.2:1, erişilebilirlik (WCAG AA) sınırının üstünde. */
-  --brand-primary: #c2410c;
+  /* Marka */
+  --brand-primary: #1e40af; /* lacivert; beyaz yazıyla 8.7:1 */
   --brand-on-primary: #ffffff;
+  --brand-deep: #172554; /* başlık çubukları */
+  --brand-on-deep: #ffffff;
+  --brand-signature: #facc15; /* baret sarısı; yalnızca koyu zeminde */
 
+  /* Durum: anlam renkleri. Kontrast değerleri kendi açık zeminleri üzerindedir. */
+  --status-danger: #b91c1c; /* açık sorun, 5.7:1 */
+  --status-danger-bg: #fdecec;
+  --status-warning: #b45309; /* dikkat, haber yok, 4.6:1 */
+  --status-warning-bg: #fff4e0;
+  --status-success: #166534; /* çözüldü, 6.4:1 */
+  --status-success-bg: #e7f6ec;
+  --status-neutral: #59636e; /* nötr, 5.4:1 */
+  --status-neutral-bg: #eef0f2;
+
+  /* Metin ve yüzey */
   --text-strong: #1f2328;
   --text-muted: #59636e;
   --surface: #ffffff;

@@ -1,4 +1,4 @@
-# Atalay Şantiye
+# Kızılkan Şantiye
 
 Müteahhitlerin birden fazla şantiyeyi WhatsApp yerine tek yerden takip ettiği web uygulaması.
 Telefonda sade bir saha arayüzü, bilgisayarda yönetim paneli.

@@ -7,7 +7,7 @@ import BrandLogo from '@/shared/atoms/BrandLogo.vue'
   <el-config-provider :locale="tr">
     <el-container class="desktop-shell">
       <el-header class="desktop-shell__header">
-        <BrandLogo />
+        <BrandLogo surface="dark" />
       </el-header>
       <el-main>
         <RouterView />
@@ -24,7 +24,6 @@ import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 .desktop-shell__header {
   display: flex;
   align-items: center;
-  background: var(--surface);
-  border-bottom: 1px solid var(--el-border-color-light);
+  background: var(--brand-deep);
 }
 </style>

@@ -1,7 +1,12 @@
+<script setup lang="ts">
+// Sarı imza beyaz zeminde okunmadığı için işaretin renkleri üzerinde durduğu zemine göre değişir.
+const { surface = 'light' } = defineProps<{ surface?: 'light' | 'dark' }>()
+</script>
+
 <template>
-  <span class="brand-logo">
-    <span class="brand-logo__mark" aria-hidden="true">AŞ</span>
-    <span>Atalay Şantiye</span>
+  <span class="brand-logo" :class="`brand-logo--on-${surface}`">
+    <span class="brand-logo__mark" aria-hidden="true">KŞ</span>
+    <span>Kızılkan Şantiye</span>
   </span>
 </template>
 
@@ -11,7 +16,6 @@
   align-items: center;
   gap: var(--space-2);
   font-weight: 700;
-  color: var(--text-strong);
 }
 
 .brand-logo__mark {
@@ -20,8 +24,24 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background: var(--brand-primary);
-  color: var(--brand-on-primary);
   font-size: 13px;
+}
+
+.brand-logo--on-light {
+  color: var(--text-strong);
+}
+
+.brand-logo--on-light .brand-logo__mark {
+  background: var(--brand-deep);
+  color: var(--brand-signature);
+}
+
+.brand-logo--on-dark {
+  color: var(--brand-on-deep);
+}
+
+.brand-logo--on-dark .brand-logo__mark {
+  background: var(--brand-signature);
+  color: var(--brand-deep);
 }
 </style>

@@ -1,4 +1,4 @@
-# Atalay Şantiye — Proje Anayasası
+# Kızılkan Şantiye — Proje Anayasası
 
 Bu dosya projenin temel kurallarıdır. Kod yazan herkes (insan ya da yapay zekâ) buna uyar.
 Kurallar yalnızca proje sahibinin kararıyla değişir ve değişiklik bu dosyada yapılır.
