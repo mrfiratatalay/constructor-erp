@@ -1,0 +1,25 @@
+# Yalnızca local geliştirme veritabanı.
+# Backend ve frontend Docker dışında çalışır: hızlı yeniden başlatma ve kolay debug için.
+name: atalay-santiye
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: santiye-postgres
+    environment:
+      POSTGRES_DB: santiye
+      POSTGRES_USER: santiye
+      POSTGRES_PASSWORD: santiye # yalnızca local; production şifresi ortam değişkeninden gelir
+    ports:
+      - "5432:5432"
+    volumes:
+      # PG 18+ imajı veriyi /var/lib/postgresql altında sürüme göre tutar; /data'ya bağlanmaz
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U santiye -d santiye"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres_data:

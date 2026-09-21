@@ -1,0 +1,23 @@
+/*
+ * Tasarım belirteçleri — tek kaynak.
+ * Vant (mobile/styles/theme.css) ve Element Plus (desktop/styles/theme.css) bunlardan beslenir;
+ * marka rengini değiştirmek için yalnızca burayı değiştirmek yeter.
+ */
+:root {
+  /* Şantiye turuncusu. Beyaz yazıyla kontrastı 5.2:1, erişilebilirlik (WCAG AA) sınırının üstünde. */
+  --brand-primary: #c2410c;
+  --brand-on-primary: #ffffff;
+
+  --text-strong: #1f2328;
+  --text-muted: #59636e;
+  --surface: #ffffff;
+  --surface-muted: #f6f7f9;
+
+  --radius-md: 8px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}

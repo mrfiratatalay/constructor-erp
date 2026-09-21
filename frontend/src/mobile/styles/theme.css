@@ -1,0 +1,8 @@
+/* Vant'ı marka belirteçlerine bağlar. `html:root`, Vant'ın `:root` tanımından daha özgül olduğu için
+   CSS dosyaları hangi sırayla yüklenirse yüklensin bizim değerimiz kazanır. */
+html:root {
+  --van-primary-color: var(--brand-primary);
+  --van-radius-md: var(--radius-md);
+  /* Kenar boşluğunu sayfa verir; inset grupların ikinci bir boşluk eklemesini kapatıyoruz. */
+  --van-cell-group-inset-padding: 0;
+}

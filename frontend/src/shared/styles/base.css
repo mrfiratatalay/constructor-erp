@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-strong);
+  background: var(--surface-muted);
+  -webkit-font-smoothing: antialiased;
+}

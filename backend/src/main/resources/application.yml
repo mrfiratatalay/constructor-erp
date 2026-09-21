@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: santiye-api
+
+  # Local değerler varsayılan; production'da ortam değişkenleri bunları ezer (Madde 5).
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/santiye}
+    username: ${DB_USERNAME:santiye}
+    password: ${DB_PASSWORD:santiye}
+
+  jpa:
+    # Şemanın sahibi Flyway. Hibernate yalnızca entity'lerin şemayla uyuştuğunu doğrular.
+    hibernate:
+      ddl-auto: validate
+    # Kapalı: aksi halde sayfa/JSON oluşturulurken fark edilmeden ek sorgular atılır.
+    open-in-view: false
+
+  mvc:
+    # Hatalar RFC 9457 standart formatında döner; kendi hata formatımızı icat etmiyoruz.
+    problemdetails:
+      enabled: true
+
+  threads:
+    # Java 21+ sanal thread'ler: fotoğraf yükleme gibi bekleme ağırlıklı işlerde ucuz eşzamanlılık.
+    virtual:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# API dokümanı localde açık; production'da API_DOCS_ENABLED=false ile kapatılır
+# (açık bırakılırsa tüm endpoint haritası herkese görünür).
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:true}
+    path: /swagger-ui.html

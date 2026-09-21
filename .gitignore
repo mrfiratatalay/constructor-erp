@@ -1,0 +1,11 @@
+# İşletim sistemi ve editörler
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+
+# Gizli ayarlar
+.env
+.env.*
+!.env.example

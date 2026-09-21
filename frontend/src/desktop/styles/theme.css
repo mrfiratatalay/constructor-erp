@@ -1,0 +1,13 @@
+/* Element Plus'ı marka belirteçlerine bağlar (özgüllük gerekçesi: mobile/styles/theme.css).
+   Element Plus hover ve basılı tonlarını ayrı değişkenlerde tutar; hepsini ana renkten türetiyoruz
+   ki tek bir renk değişikliği tüm tonları güncellesin. */
+html:root {
+  --el-color-primary: var(--brand-primary);
+  --el-color-primary-light-3: color-mix(in srgb, var(--brand-primary), #fff 30%);
+  --el-color-primary-light-5: color-mix(in srgb, var(--brand-primary), #fff 50%);
+  --el-color-primary-light-7: color-mix(in srgb, var(--brand-primary), #fff 70%);
+  --el-color-primary-light-8: color-mix(in srgb, var(--brand-primary), #fff 80%);
+  --el-color-primary-light-9: color-mix(in srgb, var(--brand-primary), #fff 90%);
+  --el-color-primary-dark-2: color-mix(in srgb, var(--brand-primary), #000 20%);
+  --el-border-radius-base: var(--radius-md);
+}
