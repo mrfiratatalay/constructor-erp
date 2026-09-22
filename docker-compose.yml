@@ -1,26 +1,86 @@
-# Yalnızca local geliştirme veritabanı.
-# Backend ve frontend Docker dışında çalışır: hızlı yeniden başlatma ve kolay debug için.
+# Kızılkan Şantiye — iki kip:
+#
+#   docker compose up -d                  yalnızca veritabanı (geliştirme: backend ve frontend elde çalışır)
+#   docker compose --profile app up -d    bütün sistem (veritabanı + backend + arayüz), ./scripts/start.sh
+#
+# Ayarlar .env ile değiştirilir; .env yoksa aşağıdaki varsayılanlar geçerlidir: depo klonlanır klonlanmaz çalışır.
 name: atalay-santiye
 
 services:
   postgres:
     image: postgres:18-alpine
-    container_name: santiye-postgres
+    # Kaplara sabit ad verilmez: Compose projeye göre adlandırır, böylece aynı sistemin ikinci bir kopyası
+    # (ör. ayrı portlarda deneme kurulumu) ad çakışması olmadan yan yana çalışabilir.
     environment:
       POSTGRES_DB: santiye
-      POSTGRES_USER: santiye
-      POSTGRES_PASSWORD: santiye # yalnızca local; production şifresi ortam değişkeninden gelir
+      POSTGRES_USER: ${DB_USERNAME:-santiye}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-santiye} # yalnızca local; production şifresi ortam değişkeninden gelir
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       # PG 18+ imajı veriyi /var/lib/postgresql altında sürüme göre tutar; /data'ya bağlanmaz
       - postgres_data:/var/lib/postgresql
       - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U santiye -d santiye"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-santiye} -d santiye"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      # local profil: http çerezleri ve ilk yönetici hesabı (application-local.yml).
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      DB_URL: jdbc:postgresql://postgres:5432/santiye
+      DB_USERNAME: ${DB_USERNAME:-santiye}
+      DB_PASSWORD: ${DB_PASSWORD:-santiye}
+      MEDIA_ROOT: /data/media
+      FFMPEG_PATH: /usr/bin/ffmpeg
+      FFPROBE_PATH: /usr/bin/ffprobe
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-false}
+      # Davet linkleri bu adresle üretilir: kullanıcının tarayıcıda açtığı adres olmalı.
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5173}
+      APP_BOOTSTRAP_COMPANY_NAME: ${COMPANY_NAME:-Kızılkan İnşaat}
+      APP_BOOTSTRAP_OWNER_NAME: ${OWNER_NAME:-Patron}
+      APP_BOOTSTRAP_OWNER_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
+      APP_BOOTSTRAP_OWNER_PASSWORD: ${OWNER_PASSWORD:-patron123}
+      TZ: Europe/Istanbul
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      # Fotoğraf, video ve sesler: kap silinse de kalır.
+      - media_data:/data/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # 127.0.0.1, localhost değil: kap içinde localhost önce IPv6'ya çözülür, sunucular IPv4'te dinler.
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 40s
+
+  web:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 10
 
 volumes:
   postgres_data:
+  media_data:

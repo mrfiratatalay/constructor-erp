@@ -1,0 +1,14 @@
+# Derleme bağlamına girmeyecekler: imajlar küçük kalır, derleme hızlanır.
+.git
+.github
+**/node_modules
+backend/target
+frontend/dist
+frontend/test-results
+frontend/playwright-report
+frontend/.eslintcache
+.data
+*.log
+.env
+.env.*
+!.env.example
