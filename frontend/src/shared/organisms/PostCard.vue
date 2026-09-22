@@ -1,25 +1,30 @@
 <script setup lang="ts">
 import { TriangleAlert } from 'lucide-vue-next'
 import type { PostView } from '@/core/api/generated/model'
+import DeletedPostNote from '@/shared/molecules/DeletedPostNote.vue'
 import IssueFooter from '@/shared/molecules/IssueFooter.vue'
 import PostHeader from '@/shared/molecules/PostHeader.vue'
 import PostMedia from '@/shared/molecules/PostMedia.vue'
 
 /**
  * Ürüne özel kart; kütüphaneden bağımsızdır (iki kabukta birebir aynı görünür).
- * Açık sorundaki "çözüldü" düğmesi kabuktan gelir: mobilde van-button, masaüstünde el-button (action slot).
+ * Kabuğa ait parçalar yuvadan gelir: "çözüldü" düğmesi (action) ve masaüstündeki ⋯ menüsü (menu).
+ * Silinen gönderi yerinde yalnızca izini bırakır.
  */
 const { post, showSite = true } = defineProps<{ post: PostView; showSite?: boolean }>()
 const emit = defineEmits<{ openSite: [siteId: string]; openPhotos: [urls: string[], index: number] }>()
 </script>
 
 <template>
-  <article class="post-card" :class="{ 'post-card--open-issue': post.issue && !post.resolution }">
+  <DeletedPostNote v-if="post.deletion" :deletion="post.deletion" :issue="post.issue" />
+  <article v-else class="post-card" :class="{ 'post-card--open-issue': post.issue && !post.resolution }">
     <!-- Açık sorun kartın tepesinde: akışta kaydırırken gözden kaçmaz. -->
     <p v-if="post.issue && !post.resolution" class="post-card__flag">
       <TriangleAlert :size="15" />Açık sorun
     </p>
-    <PostHeader :post="post" :show-site="showSite" @open-site="emit('openSite', $event)" />
+    <PostHeader :post="post" :show-site="showSite" @open-site="emit('openSite', $event)">
+      <template v-if="$slots.menu" #menu><slot name="menu" /></template>
+    </PostHeader>
     <p v-if="post.body" class="post-card__body">{{ post.body }}</p>
     <PostMedia :media="post.media" @open-photos="(urls, index) => emit('openPhotos', urls, index)" />
     <IssueFooter :post="post" />

@@ -44,7 +44,7 @@ class SiteViews {
         List<SiteLead> siteLeads = leadIds.stream()
             .map(leads::get)
             .filter(user -> user != null)
-            .map(user -> new SiteLead(user.getId(), user.getFullName()))
+            .map(user -> new SiteLead(user.getId(), user.getFullName(), user.getPhone()))
             .toList();
         return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), siteLeads);
     }

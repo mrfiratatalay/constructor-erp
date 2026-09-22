@@ -25,7 +25,7 @@ public class MediaViews {
             .collect(Collectors.groupingBy(Media::getPostId, Collectors.mapping(MediaViews::toView, Collectors.toList())));
     }
 
-    private static MediaView toView(Media item) {
+    static MediaView toView(Media item) {
         boolean ready = item.getStatus() == MediaStatus.READY;
         String base = "/api/media/" + item.getId();
         String url = ready ? base : null;

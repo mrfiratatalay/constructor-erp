@@ -61,8 +61,7 @@ public class PostService {
 
     private void announceIfIssue(Post post, Site site, CurrentUser author) {
         if (post.isIssue()) {
-            events.publishEvent(new IssueReported(post.getId(), post.getCompanyId(), site.getId(), site.getName(),
-                author.userId(), author.fullName(), post.getBody()));
+            events.publishEvent(IssueReported.of(post, site, author));
         }
     }
 

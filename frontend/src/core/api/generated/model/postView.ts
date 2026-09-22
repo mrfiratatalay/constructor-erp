@@ -7,6 +7,7 @@
 import type { IssueResolution } from './issueResolution'
 import type { MediaView } from './mediaView'
 import type { PostAuthorRef } from './postAuthorRef'
+import type { PostDeletion } from './postDeletion'
 import type { PostSiteRef } from './postSiteRef'
 
 export interface PostView {
@@ -19,4 +20,7 @@ export interface PostView {
   createdAt: string
   media: MediaView[]
   resolution?: IssueResolution
+  /** @nullable */
+  editedAt?: string | null
+  deletion?: PostDeletion
 }

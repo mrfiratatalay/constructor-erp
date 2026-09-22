@@ -1,119 +1,152 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { ChevronsUpDown } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-vue-next'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { useLogout } from '@/core/auth/useLogout'
-import { switchPlatform } from '@/core/platform'
+import { useNavCollapse } from '@/core/navigation/navCollapse'
+import type { RouteName } from '@/core/navigation/routeTable'
 import { ROLE_LABELS } from '@/core/team/roles'
-import { navItemsFor } from '@/shared/navigation/navItems'
+import UserPanel from '@/desktop/organisms/UserPanel.vue'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 import BrandMark from '@/shared/molecules/BrandMark.vue'
+import { mainNavItems, manageNavItems, navRouteOf } from '@/shared/navigation/navItems'
 
+/**
+ * Sol menü. Element Plus'ın daralma özelliğiyle ikonlara iner (64px); daralmışken ikonun üstünde ad
+ * ipucu olarak çıkar. Tercih hatırlanır. En altta kullanıcı düğmesi Hesabım panelini açar.
+ */
+const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
-const { logout } = useLogout()
+const { collapsed, toggle } = useNavCollapse()
 
-const items = computed(() => (user.value ? navItemsFor(user.value.role, 'desktop') : []))
-const primary = computed(() => items.value.find((item) => item.primary))
-const links = computed(() => items.value.filter((item) => !item.primary))
-
-function onCommand(command: 'profile' | 'mobile' | 'logout') {
-  if (command === 'profile') void router.push({ name: 'profile' })
-  else if (command === 'mobile') switchPlatform('mobile')
-  else logout()
-}
+const main = computed(() => (user.value ? mainNavItems(user.value.role, 'desktop') : []))
+const manage = computed(() => (user.value ? manageNavItems(user.value.role) : []))
+/** Seçili menü adresten gelir: şantiye sayfası "Şantiyeler", çözülenler "Sorunlar" altındadır. */
+const active = computed(() => navRouteOf(route.name as RouteName))
 </script>
 
 <template>
-  <aside class="side-nav blueprint">
-    <BrandMark />
-    <el-button v-if="primary" class="side-nav__primary" size="large" @click="router.push({ name: primary.route })">
-      <component :is="primary.icon" :size="18" />
-      <span>Gönderi ekle</span>
-    </el-button>
-    <nav class="side-nav__links">
-      <RouterLink v-for="item in links" :key="item.route" class="side-nav__link" :to="{ name: item.route }">
-        <component :is="item.icon" :size="18" />
-        {{ item.label }}
-      </RouterLink>
-    </nav>
-    <el-dropdown trigger="click" placement="top-start" @command="onCommand">
-      <button class="side-nav__user" type="button">
-        <UserAvatar v-if="user" :name="user.fullName" :size="36" />
-        <span class="side-nav__who">
-          <strong>{{ user?.fullName }}</strong>
-          <span>{{ user ? ROLE_LABELS[user.role] : '' }}</span>
-        </span>
-        <ChevronsUpDown :size="16" />
-      </button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="profile">Hesabım ve bildirimler</el-dropdown-item>
-          <el-dropdown-item command="mobile">Mobil görünüme geç</el-dropdown-item>
-          <el-dropdown-item command="logout" divided>Çıkış yap</el-dropdown-item>
-        </el-dropdown-menu>
+  <aside class="side-nav blueprint" :class="{ 'side-nav--collapsed': collapsed }">
+    <header class="side-nav__top">
+      <BrandMark :compact="collapsed" />
+      <el-button text circle class="side-nav__toggle" :aria-label="collapsed ? 'Menüyü aç' : 'Menüyü daralt'"
+        @click="toggle">
+        <PanelLeftOpen v-if="collapsed" :size="18" />
+        <PanelLeftClose v-else :size="18" />
+      </el-button>
+    </header>
+    <el-menu :default-active="active" :collapse="collapsed" :collapse-transition="false" class="side-nav__menu"
+      @select="(name: string) => router.push({ name })">
+      <el-menu-item v-for="item in main" :key="item.route" :index="item.route">
+        <el-icon :size="18"><component :is="item.icon" /></el-icon>
+        <template #title>{{ item.label }}</template>
+      </el-menu-item>
+      <!-- Ayda bir yapılan işler günlük menüden ayrı bir grupta durur. -->
+      <el-menu-item-group v-if="manage.length" class="side-nav__group">
+        <template #title>{{ collapsed ? '' : 'Yönetim' }}</template>
+        <el-menu-item v-for="item in manage" :key="item.route" :index="item.route">
+          <el-icon :size="18"><component :is="item.icon" /></el-icon>
+          <template #title>{{ item.label }}</template>
+        </el-menu-item>
+      </el-menu-item-group>
+    </el-menu>
+    <el-popover trigger="click" placement="right-end" :width="300">
+      <template #reference>
+        <button class="side-nav__user" type="button" aria-label="Hesabım">
+          <UserAvatar v-if="user" :name="user.fullName" :size="36" />
+          <span v-if="!collapsed" class="side-nav__who">
+            <strong>{{ user?.fullName }}</strong>
+            <span>{{ user ? ROLE_LABELS[user.role] : '' }}</span>
+          </span>
+        </button>
       </template>
-    </el-dropdown>
+      <UserPanel />
+    </el-popover>
   </aside>
 </template>
 
 <style scoped>
 .side-nav {
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
   gap: var(--space-5);
+  width: 232px;
   height: 100vh;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-5) var(--space-3);
 }
 
-/* Element Plus düğmesi, markanın imza sarısıyla: görünüm aynı, davranış kütüphaneden. */
-.side-nav__primary {
-  width: 100%;
-  border: 0;
+.side-nav--collapsed {
+  width: 72px;
+}
+
+.side-nav__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-left: var(--space-1);
+}
+
+.side-nav--collapsed .side-nav__top {
+  flex-direction: column;
+  padding-left: 0;
+}
+
+.side-nav__toggle {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.side-nav__toggle:hover {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--brand-on-deep);
+}
+
+/* Element Plus menüsü koyu lacivert zeminde: renkler kütüphanenin kendi değişkenlerinden verilir. */
+.side-nav__menu {
+  --el-menu-bg-color: transparent;
+  --el-menu-hover-bg-color: rgb(255 255 255 / 0.08);
+  --el-menu-text-color: rgb(255 255 255 / 0.72);
+  --el-menu-active-color: var(--brand-deep);
+  --el-menu-item-height: 44px;
+  --el-menu-item-font-size: var(--text-base);
+  --el-menu-base-level-padding: var(--space-3);
+  --el-menu-border-color: transparent;
+  align-content: start;
+  border-right: 0;
+}
+
+.side-nav__menu :deep(.el-menu-item) {
+  margin-bottom: 4px;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+}
+
+/*
+ * Seçili menü baret sarısıyla dolu: "neredeyim" tek bakışta. Yazı lacivert, beyaz değil: sarı üstünde beyaz
+ * ~1,5:1 kontrastla okunmaz, lacivert ~11:1. Logodaki KŞ rozetiyle aynı ikili (sarı zemin, lacivert harf).
+ */
+.side-nav__menu :deep(.el-menu-item.is-active),
+.side-nav__menu :deep(.el-menu-item.is-active:hover) {
   background: var(--brand-signature);
-  color: var(--brand-deep);
   font-weight: var(--weight-bold);
 }
 
-/* Element Plus düğmesi içindeki ikonla yazı arasına boşluk. */
-.side-nav__primary :deep(svg) {
-  margin-right: var(--space-2);
+.side-nav__menu :deep(.el-menu-item-group__title) {
+  padding: var(--space-5) var(--space-3) var(--space-2);
+  color: rgb(255 255 255 / 0.45);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.side-nav__primary:hover {
-  background: color-mix(in srgb, var(--brand-signature), #fff 18%);
-  color: var(--brand-deep);
-}
-
-.side-nav__links {
-  display: grid;
-  gap: 4px;
-  align-content: start;
-}
-
-.side-nav__link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 11px var(--space-3);
-  border-radius: var(--radius-md);
-  color: rgb(255 255 255 / 0.72);
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  text-decoration: none;
-  transition: background 0.15s, color 0.15s;
-}
-
-.side-nav__link:hover {
-  background: rgb(255 255 255 / 0.08);
-  color: var(--brand-on-deep);
-}
-
-.side-nav__link.router-link-active {
+/* Daralmışken grup başlığı yerine ince bir ayraç. */
+.side-nav--collapsed .side-nav__menu :deep(.el-menu-item-group__title) {
+  height: 1px;
+  margin: var(--space-4) var(--space-2);
+  padding: 0;
   background: rgb(255 255 255 / 0.14);
-  color: var(--brand-on-deep);
-  box-shadow: inset 3px 0 0 var(--brand-signature);
 }
 
 .side-nav__user {
@@ -131,6 +164,13 @@ function onCommand(command: 'profile' | 'mobile' | 'logout') {
   cursor: pointer;
 }
 
+.side-nav--collapsed .side-nav__user {
+  justify-content: center;
+  padding: var(--space-1);
+  border-color: transparent;
+  background: transparent;
+}
+
 .side-nav__who {
   display: grid;
   flex: 1;
@@ -138,9 +178,9 @@ function onCommand(command: 'profile' | 'mobile' | 'logout') {
 }
 
 .side-nav__who strong {
+  overflow: hidden;
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

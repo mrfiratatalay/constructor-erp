@@ -3,8 +3,6 @@ package com.atalay.santiye.post;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.post.dto.PostView;
-import com.atalay.santiye.site.Site;
-import com.atalay.santiye.site.SiteAccess;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
@@ -20,22 +18,20 @@ public class IssueService {
     private static final int RECENTLY_RESOLVED = 50;
 
     private final PostRepository posts;
-    private final SiteAccess siteAccess;
+    private final VisiblePosts visible;
     private final PostViews views;
     private final Clock clock;
 
-    IssueService(PostRepository posts, SiteAccess siteAccess, PostViews views, Clock clock) {
+    IssueService(PostRepository posts, VisiblePosts visible, PostViews views, Clock clock) {
         this.posts = posts;
-        this.siteAccess = siteAccess;
+        this.visible = visible;
         this.views = views;
         this.clock = clock;
     }
 
     @Transactional(readOnly = true)
     public List<PostView> listIssues(CurrentUser user, boolean open, UUID siteId) {
-        List<UUID> siteIds = siteId != null
-            ? List.of(siteAccess.requireVisible(user, siteId).getId())
-            : siteAccess.visibleSites(user).stream().map(Site::getId).toList();
+        List<UUID> siteIds = visible.siteIds(user, siteId);
         if (siteIds.isEmpty()) {
             return List.of();
         }
@@ -47,10 +43,7 @@ public class IssueService {
 
     @Transactional
     public PostView resolveIssue(CurrentUser user, UUID postId, String note) {
-        Post post = posts.findById(postId)
-            .filter(candidate -> candidate.getCompanyId().equals(user.companyId()))
-            .orElseThrow(() -> ApiException.notFound("Gönderi bulunamadı."));
-        siteAccess.requireVisible(user, post.getSiteId());
+        Post post = visible.require(user, postId).post();
         if (!post.isOpenIssue()) {
             throw ApiException.conflict("Bu sorun zaten çözülmüş ya da gönderi bir sorun değil.");
         }

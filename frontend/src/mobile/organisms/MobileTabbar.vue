@@ -1,46 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { navItemsFor } from '@/shared/navigation/navItems'
+import type { RouteName } from '@/core/navigation/routeTable'
+import { useTabbarVisible } from '@/core/navigation/useTabbarVisible'
+import { mainNavItems, navRouteOf } from '@/shared/navigation/navItems'
 
+const route = useRoute()
 const { data: user } = useCurrentUser()
-const items = computed(() => (user.value ? navItemsFor(user.value.role, 'mobile') : []))
+const visible = useTabbarVisible()
+const items = computed(() => (user.value ? mainNavItems(user.value.role, 'mobile') : []))
+/** Seçili sekme adresten gelir: şantiye sayfası "Şantiyeler", çözülenler "Sorunlar" sekmesinin altındadır. */
+const active = computed(() => navRouteOf(route.name as RouteName))
 </script>
 
 <template>
-  <van-tabbar v-if="items.length" route safe-area-inset-bottom>
-    <van-tabbar-item v-for="item in items" :key="item.route" :to="{ name: item.route }">
-      <template #icon="{ active }">
-        <!-- Ana eylem ortada, yükseltilmiş ve marka renginde: başparmak ilk ona gider. -->
-        <span v-if="item.primary" class="tabbar-plus" :class="{ 'tabbar-plus--active': active }">
-          <component :is="item.icon" :size="26" />
-        </span>
-        <component :is="item.icon" v-else :size="22" />
-      </template>
-      <span :class="{ 'tabbar-label--hidden': item.primary }">{{ item.label }}</span>
+  <van-tabbar v-if="visible && items.length" :model-value="active" safe-area-inset-bottom>
+    <van-tabbar-item v-for="item in items" :key="item.route" :name="item.route" :to="{ name: item.route }">
+      <template #icon><component :is="item.icon" :size="22" /></template>
+      {{ item.label }}
     </van-tabbar-item>
   </van-tabbar>
 </template>
-
-<style scoped>
-.tabbar-plus {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  margin-top: -22px;
-  border: 4px solid var(--surface);
-  border-radius: 18px;
-  background: var(--brand-primary);
-  color: var(--brand-on-primary);
-  box-shadow: var(--shadow-deep);
-}
-
-.tabbar-plus--active {
-  background: var(--brand-deep);
-}
-
-.tabbar-label--hidden {
-  display: none;
-}
-</style>

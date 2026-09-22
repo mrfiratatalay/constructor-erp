@@ -1,52 +1,66 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import type { PostView } from '@/core/api/generated/model'
+import { nextIssueId } from '@/core/issues/nextIssue'
+import { lastResolvedText, NO_OPEN_ISSUES, resolvedLinkText } from '@/core/issues/resolvedSummary'
 import { useIssues } from '@/core/issues/useIssues'
-import { useSites } from '@/core/sites/useSites'
-import SiteFilter from '@/desktop/molecules/SiteFilter.vue'
-import { useResolvePrompt } from '@/desktop/resolvePrompt'
-import DesktopPage from '@/desktop/templates/DesktopPage.vue'
-import PostCard from '@/shared/organisms/PostCard.vue'
+import ListHeader from '@/desktop/molecules/ListHeader.vue'
+import IssueDetail from '@/desktop/organisms/IssueDetail.vue'
+import IssueList from '@/desktop/organisms/IssueList.vue'
+import SplitView from '@/desktop/templates/SplitView.vue'
 
-const router = useRouter()
-const { sites } = useSites()
-const tab = ref('Açık')
-const siteId = ref<string | undefined>()
-const { issues, isLoading } = useIssues(() => tab.value === 'Açık', siteId)
-const promptResolve = useResolvePrompt()
-const viewer = ref<{ urls: string[]; index: number } | null>(null)
+/**
+ * Sorunlar bir iş kuyruğu (e-posta kutusu gibi): solda en uzun bekleyen en üstte, sağda seçili sorun.
+ * Açılışta en eskisi seçili gelir (seçmek yan etki yaratmaz); "Çözüldü" deyince sıradaki açılır.
+ */
+const { issues, isLoading } = useIssues(true, undefined)
+const { issues: resolved } = useIssues(false, undefined)
+const chosenId = ref<string | null>(null)
 
-const emptyText = computed(() =>
-  tab.value === 'Açık' ? 'Açık sorun yok. Şu an bekleyen bir iş görünmüyor.' : 'Henüz çözülen sorun yok.',
+const selected = computed(
+  () => issues.value?.find((issue) => issue.id === chosenId.value) ?? issues.value?.[0] ?? null,
 )
+
+function onResolved(post: PostView) {
+  chosenId.value = nextIssueId(issues.value ?? [], post.id)
+}
 </script>
 
 <template>
-  <DesktopPage title="Sorunlar" subtitle="Açık sorunlar çözülene kadar burada kalır.">
-    <template #actions>
-      <el-segmented v-model="tab" :options="['Açık', 'Çözülen']" />
-      <SiteFilter v-if="(sites?.length ?? 0) > 1" v-model="siteId" :sites="sites ?? []" />
+  <SplitView>
+    <template #list-header>
+      <ListHeader title="Sorunlar" :meta="issues ? `${issues.length} açık` : undefined" />
     </template>
-    <div class="issues__list">
-      <el-skeleton v-if="isLoading" :rows="5" animated />
-      <el-empty v-else-if="!issues?.length" :description="emptyText" />
-      <PostCard v-for="post in issues" v-else :key="post.id" :post="post" :show-site="!siteId"
-        @open-site="router.push({ name: 'siteFeed', params: { siteId: $event } })"
-        @open-photos="(urls, index) => (viewer = { urls, index })">
-        <template #action>
-          <el-button type="success" plain @click="promptResolve(post)">Çözüldü olarak işaretle</el-button>
-        </template>
-      </PostCard>
-    </div>
-    <el-image-viewer v-if="viewer" :url-list="viewer.urls" :initial-index="viewer.index" teleported
-      @close="viewer = null" />
-  </DesktopPage>
+    <template #list>
+      <el-skeleton v-if="isLoading" :rows="5" animated class="issues__skeleton" />
+      <IssueList v-else :issues="issues ?? []" :selected-id="selected?.id ?? null" @select="chosenId = $event" />
+      <RouterLink v-if="resolved?.length" :to="{ name: 'resolvedIssues' }" class="issues__resolved">
+        {{ resolvedLinkText(resolved) }} ›
+      </RouterLink>
+    </template>
+    <template #detail>
+      <IssueDetail v-if="selected" :key="selected.id" :post="selected" @resolved="onResolved" />
+      <el-result v-else-if="!isLoading" icon="success" :title="NO_OPEN_ISSUES"
+        :sub-title="lastResolvedText(resolved) ?? undefined" class="issues__done" />
+    </template>
+  </SplitView>
 </template>
 
 <style scoped>
-.issues__list {
-  display: grid;
-  gap: var(--space-3);
-  max-width: 680px;
+.issues__skeleton {
+  padding: var(--space-4);
+}
+
+.issues__resolved {
+  display: block;
+  padding: var(--space-4);
+  color: var(--brand-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.issues__done {
+  margin: auto;
 }
 </style>

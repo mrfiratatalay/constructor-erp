@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useLogout } from '@/core/auth/useLogout'
 import { switchPlatform } from '@/core/platform'
@@ -8,10 +9,12 @@ import { ROLE_LABELS } from '@/core/team/roles'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 import InstallGuide from '@/shared/molecules/InstallGuide.vue'
+import { manageNavItems } from '@/shared/navigation/navItems'
 
 const { data: user } = useCurrentUser()
 const { logout, isPending } = useLogout()
 const push = usePush()
+const manage = computed(() => (user.value ? manageNavItems(user.value.role) : []))
 
 function togglePush(on: boolean) {
   void (on ? push.enable() : push.disable())
@@ -40,10 +43,9 @@ function togglePush(on: boolean) {
       </van-cell>
     </van-cell-group>
 
-    <!-- Alt menüde yer yok: patron yönetim sayfalarına buradan ulaşır. -->
-    <van-cell-group v-if="user?.role === 'OWNER'" inset title="Yönetim">
-      <van-cell title="Şantiyeler" is-link :to="{ name: 'sites' }" />
-      <van-cell title="Ekip" is-link :to="{ name: 'team' }" />
+    <!-- Ayda bir yapılan işler günlük sekmeleri işgal etmez: patron yönetim sayfalarına buradan ulaşır. -->
+    <van-cell-group v-if="manage.length" inset title="Yönetim">
+      <van-cell v-for="item in manage" :key="item.route" :title="item.label" is-link :to="{ name: item.route }" />
     </van-cell-group>
 
     <van-cell-group inset>

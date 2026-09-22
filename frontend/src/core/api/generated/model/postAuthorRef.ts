@@ -8,4 +8,6 @@
 export interface PostAuthorRef {
   id: string
   fullName: string
+  /** @nullable */
+  phone?: string | null
 }

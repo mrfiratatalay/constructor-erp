@@ -55,7 +55,7 @@ class DailyReminders {
             for (Site site : silent) {
                 notifier.deliver(leads.getOrDefault(site.getId(), List.of()), new NotificationContent(
                     "Bugün henüz gönderi yok", site.getName() + " için bugünün durumunu gönder.",
-                    "/gonder?site=" + site.getId()));
+                    "/santiyeler/" + site.getId()));
             }
         }
     }
@@ -70,7 +70,7 @@ class DailyReminders {
             List<UUID> owners = users.findByCompanyIdAndRoleAndActiveTrue(company.getId(), UserRole.OWNER).stream()
                 .map(AppUser::getId).toList();
             String names = silent.stream().map(Site::getName).collect(Collectors.joining(", "));
-            notifier.deliver(owners, new NotificationContent("Bugün haber gelmeyen şantiyeler", names, "/bugun"));
+            notifier.deliver(owners, new NotificationContent("Bugün haber gelmeyen şantiyeler", names, "/santiyeler"));
         }
     }
 

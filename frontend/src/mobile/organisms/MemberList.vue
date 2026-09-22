@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { MemberView, SiteView } from '@/core/api/generated/model'
 import { siteNames } from '@/core/sites/siteNames'
-import { lastSeenText, memberStatus } from '@/core/team/memberStatus'
+import { lastSeenText, memberFlag } from '@/core/team/memberStatus'
 import { ROLE_LABELS } from '@/core/team/roles'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
 
+/** Tek etiket "Linki açmadı" ya da "Pasif": uygulamayı kullanan kişi etiketsizdir (iyi haber sessizdir). */
 const { members, sites, loading } = defineProps<{ members: MemberView[]; sites: SiteView[]; loading: boolean }>()
 const emit = defineEmits<{ select: [member: MemberView] }>()
 </script>
@@ -16,7 +17,7 @@ const emit = defineEmits<{ select: [member: MemberView] }>()
       <template #title>
         <span class="member-list__head">
           <span class="member-list__name">{{ member.fullName }}</span>
-          <StatusTag :tone="memberStatus(member).tone">{{ memberStatus(member).label }}</StatusTag>
+          <StatusTag v-if="memberFlag(member)" :tone="memberFlag(member)!.tone">{{ memberFlag(member)!.label }}</StatusTag>
         </span>
       </template>
       <template #label>

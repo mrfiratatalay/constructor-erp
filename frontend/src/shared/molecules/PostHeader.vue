@@ -4,6 +4,7 @@ import type { PostView } from '@/core/api/generated/model'
 import { clockTime } from '@/core/format/dates'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
+/** menu yuvası: masaüstünde saatin yanında ⋯ menüsü. Düzeltilen gönderide saatin altında "düzenlendi" izi. */
 const { post, showSite } = defineProps<{ post: PostView; showSite: boolean }>()
 const emit = defineEmits<{ openSite: [siteId: string] }>()
 </script>
@@ -17,7 +18,11 @@ const emit = defineEmits<{ openSite: [siteId: string] }>()
         <MapPin :size="13" />{{ post.site.name }}
       </button>
     </div>
-    <time class="post-header__time" :datetime="post.createdAt">{{ clockTime(post.createdAt) }}</time>
+    <span class="post-header__when">
+      <time :datetime="post.createdAt">{{ clockTime(post.createdAt) }}</time>
+      <span v-if="post.editedAt" class="post-header__edited">düzenlendi</span>
+    </span>
+    <slot name="menu" />
   </header>
 </template>
 
@@ -61,10 +66,17 @@ const emit = defineEmits<{ openSite: [siteId: string] }>()
   white-space: nowrap;
 }
 
-.post-header__time {
+.post-header__when {
+  display: grid;
   align-self: flex-start;
+  justify-items: end;
   color: var(--text-subtle);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
+}
+
+.post-header__edited {
+  font-size: var(--text-xs);
+  font-style: italic;
 }
 </style>

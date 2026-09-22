@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { CirclePlus, HardHat, LayoutDashboard, Newspaper, TriangleAlert, UserRound, Users } from 'lucide-vue-next'
+import { HardHat, TriangleAlert, UserRound, Users } from 'lucide-vue-next'
 import type { CurrentUserResponseRole } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
 
@@ -7,35 +7,37 @@ export interface NavItem {
   route: RouteName
   label: string
   icon: Component
-  /** Ana eylem: mobilde ortada büyük düğme, masaüstünde menünün üstünde düğme. */
-  primary?: boolean
 }
 
-const ITEMS: Partial<Record<RouteName, Omit<NavItem, 'route'>>> = {
-  today: { label: 'Bugün', icon: LayoutDashboard },
-  feed: { label: 'Akış', icon: Newspaper },
-  compose: { label: 'Gönder', icon: CirclePlus, primary: true },
+/** Patronun birden çok şantiyesi var; şantiye sorumlusu çoğunlukla tek şantiyeye bakar. */
+const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyeler', SITE_LEAD: 'Şantiyem' }
+
+const ITEMS: Record<'issues' | 'profile' | 'team', Omit<NavItem, 'route'>> = {
   issues: { label: 'Sorunlar', icon: TriangleAlert },
-  sites: { label: 'Şantiyeler', icon: HardHat },
-  team: { label: 'Ekip', icon: Users },
   profile: { label: 'Ben', icon: UserRound },
+  team: { label: 'Ekip', icon: Users },
+}
+
+const item = (route: keyof typeof ITEMS): NavItem => ({ route, ...ITEMS[route] })
+
+/** Günlük iş: iki rolde de aynı üç sekme. Gönderme ayrı bir sekme değildir, şantiyenin içindedir. */
+export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
+  const sites: NavItem = { route: 'sites', label: SITES_LABEL[role], icon: HardHat }
+  // Masaüstünde "Ben" sol menünün altındaki kullanıcı düğmesindedir.
+  return platform === 'mobile' ? [sites, item('issues'), item('profile')] : [sites, item('issues')]
 }
 
 /**
- * Mobilde en fazla beş sekme (başparmakla rahat kullanım): patron Şantiyeler ve Ekip'e "Ben"den ulaşır.
- * Masaüstünde yer bol; hepsi sol menüde. Yetki yine adres korumasıyla denetlenir, burası yalnızca görünüm.
+ * Ayda bir yapılan işler günlük sekmeleri işgal etmez: mobilde "Ben" altında, masaüstünde ayrı grupta.
+ * Şantiye ayarları burada değil, şantiyenin kendisinde (ekle: listede ＋, düzenle: ⓘ).
  */
-const MENUS: Record<'mobile' | 'desktop', Record<CurrentUserResponseRole, RouteName[]>> = {
-  mobile: {
-    OWNER: ['today', 'feed', 'compose', 'issues', 'profile'],
-    SITE_LEAD: ['feed', 'sites', 'compose', 'issues', 'profile'],
-  },
-  desktop: {
-    OWNER: ['compose', 'today', 'feed', 'issues', 'sites', 'team'],
-    SITE_LEAD: ['compose', 'feed', 'issues', 'sites'],
-  },
+export function manageNavItems(role: CurrentUserResponseRole): NavItem[] {
+  return role === 'OWNER' ? [item('team')] : []
 }
 
-export function navItemsFor(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
-  return MENUS[platform][role].map((route) => ({ route, ...ITEMS[route]! }))
+/** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
+const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', resolvedIssues: 'issues' }
+
+export function navRouteOf(route: RouteName): RouteName {
+  return PARENT_ROUTE[route] ?? route
 }

@@ -33,6 +33,26 @@ export function clockTime(isoDate: string): string {
   return dayjs(isoDate).format('HH:mm')
 }
 
+/** Listedeki son haber zamanı (WhatsApp gibi): "14:20", "Dün 17:40", "Pzt 11:30", "12 Eyl". */
+export function listMoment(isoDate: string): string {
+  const moment = dayjs(isoDate)
+  const today = dayjs()
+  if (moment.isSame(today, 'day')) return moment.format('HH:mm')
+  if (moment.isSame(today.subtract(1, 'day'), 'day')) return `Dün ${moment.format('HH:mm')}`
+  if (moment.isAfter(today.subtract(7, 'day'))) return moment.format('ddd HH:mm')
+  return moment.format('D MMM')
+}
+
+/** Kaç takvim günü önce: bugün 0, dün 1. Saat farkı değil gün farkı sayılır. */
+export function daysAgo(isoDate: string): number {
+  return dayjs().startOf('day').diff(dayjs(isoDate).startOf('day'), 'day')
+}
+
+/** Günün saati (0-23): sabah saatlerinde "haber yok" uyarısını susturmak için. */
+export function currentHour(): number {
+  return dayjs().hour()
+}
+
 /** Ses ve video süresi: "0:45", "2:05". */
 export function durationLabel(seconds: number): string {
   const whole = Math.max(0, Math.round(seconds))

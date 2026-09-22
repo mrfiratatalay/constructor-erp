@@ -20,7 +20,13 @@ import type {
 import { computed, toValue, unref } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 
-import type { CreatePostForm, ListPostsParams, PostPage, PostView } from '../model'
+import type {
+  CorrectPostRequest,
+  CreatePostForm,
+  ListPostsParams,
+  PostPage,
+  PostView,
+} from '../model'
 
 import { apiRequest } from '../../http'
 
@@ -239,4 +245,154 @@ export function useGetPost<TData = Awaited<ReturnType<typeof getPost>>, TError =
   query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
 
   return query
+}
+
+export const deletePost = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<PostView>({ url: `/api/posts/${postId}`, method: 'DELETE', signal }, options)
+}
+
+export const getDeletePostMutationKey = () => ['deletePost'] as const
+
+export const getDeletePostMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deletePost>>,
+    TError,
+    DeletePostMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deletePost>>,
+  TError,
+  DeletePostMutationVariables,
+  TContext
+> => {
+  const mutationKey = getDeletePostMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deletePost>>,
+    DeletePostMutationVariables
+  > = (props) => {
+    const { postId } = props ?? {}
+
+    return deletePost(postId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeletePostMutationResult = NonNullable<Awaited<ReturnType<typeof deletePost>>>
+
+export type DeletePostMutationError = unknown
+export type DeletePostMutationVariables = { postId: string }
+
+export const useDeletePost = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deletePost>>,
+      TError,
+      DeletePostMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof deletePost>>,
+  TError,
+  DeletePostMutationVariables,
+  TContext
+> => {
+  return useMutation(getDeletePostMutationOptions(options), queryClient)
+}
+export const correctPost = (
+  postId: MaybeRefOrGetter<string>,
+  correctPostRequest: MaybeRefOrGetter<CorrectPostRequest>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+  correctPostRequest = toValue(correctPostRequest)
+
+  return apiRequest<PostView>(
+    {
+      url: `/api/posts/${postId}`,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      data: correctPostRequest,
+      signal,
+    },
+    options,
+  )
+}
+
+export const getCorrectPostMutationKey = () => ['correctPost'] as const
+
+export const getCorrectPostMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof correctPost>>,
+    TError,
+    CorrectPostMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof correctPost>>,
+  TError,
+  CorrectPostMutationVariables,
+  TContext
+> => {
+  const mutationKey = getCorrectPostMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof correctPost>>,
+    CorrectPostMutationVariables
+  > = (props) => {
+    const { postId, data } = props ?? {}
+
+    return correctPost(postId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type CorrectPostMutationResult = NonNullable<Awaited<ReturnType<typeof correctPost>>>
+export type CorrectPostMutationBody = CorrectPostRequest
+export type CorrectPostMutationError = unknown
+export type CorrectPostMutationVariables = { postId: string; data: CorrectPostRequest }
+
+export const useCorrectPost = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof correctPost>>,
+      TError,
+      CorrectPostMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof correctPost>>,
+  TError,
+  CorrectPostMutationVariables,
+  TContext
+> => {
+  return useMutation(getCorrectPostMutationOptions(options), queryClient)
 }

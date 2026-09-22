@@ -9,8 +9,9 @@ const route = useRoute()
 <template>
   <el-config-provider :locale="tr">
     <RouterView v-if="route.meta.public" />
+    <!-- Tam ekran uygulama çerçevesi (WhatsApp Masaüstü gibi): sayfa kaymaz, ekranlar kendi içinde kayar. -->
     <div v-else class="desktop-shell">
-      <SideNav class="desktop-shell__side" />
+      <SideNav />
       <main class="desktop-shell__main">
         <RouterView />
       </main>
@@ -21,18 +22,15 @@ const route = useRoute()
 <style scoped>
 .desktop-shell {
   display: grid;
-  grid-template-columns: 248px 1fr;
-  min-height: 100vh;
+  grid-template-columns: auto minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
   background: var(--canvas);
 }
 
-.desktop-shell__side {
-  position: sticky;
-  top: 0;
-}
-
 .desktop-shell__main {
-  padding: var(--space-8) clamp(var(--space-6), 3vw, var(--space-10));
-  overflow-x: hidden;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 </style>

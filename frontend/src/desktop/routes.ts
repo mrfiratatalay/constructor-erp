@@ -1,14 +1,17 @@
 import { buildRoutes } from '@/core/navigation/routeTable'
 
+// Liste ve seçili şantiye tek ekrandır (solda liste, sağda defter): iki adres aynı sayfayı açar,
+// böylece satıra tıklayınca liste yerinde kalır, yalnızca sağ taraf değişir.
+const sitesPage = () => import('./pages/SitesPage.vue')
+
 export const routes = buildRoutes({
   login: () => import('./pages/LoginPage.vue'),
   invite: () => import('./pages/InviteAcceptPage.vue'),
-  today: () => import('./pages/TodayPage.vue'),
-  feed: () => import('./pages/FeedPage.vue'),
+  sites: sitesPage,
+  siteFeed: sitesPage,
   issues: () => import('./pages/IssuesPage.vue'),
-  sites: () => import('./pages/SitesPage.vue'),
-  siteFeed: () => import('./pages/SiteFeedPage.vue'),
-  compose: () => import('./pages/ComposePage.vue'),
+  resolvedIssues: () => import('./pages/ResolvedIssuesPage.vue'),
   team: () => import('./pages/TeamPage.vue'),
-  profile: () => import('./pages/ProfilePage.vue'),
+  // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
+  profile: { redirectTo: 'sites' },
 })

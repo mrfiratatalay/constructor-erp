@@ -22,6 +22,11 @@ public class ApiException extends ErrorResponseException {
         return new ApiException(HttpStatus.UNAUTHORIZED, detail);
     }
 
+    /** Kaydı görebiliyor ama bu işi yapmaya yetkisi yok (ör. başkasının gönderisini düzeltmek). */
+    public static ApiException forbidden(String detail) {
+        return new ApiException(HttpStatus.FORBIDDEN, detail);
+    }
+
     /** Başka firmanın kaydı da "bulunamadı" döner: varlığını bile belli etmeyiz. */
     public static ApiException notFound(String detail) {
         return new ApiException(HttpStatus.NOT_FOUND, detail);

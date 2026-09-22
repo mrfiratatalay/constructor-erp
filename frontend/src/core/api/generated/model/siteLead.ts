@@ -8,4 +8,6 @@
 export interface SiteLead {
   id: string
   fullName: string
+  /** @nullable */
+  phone?: string | null
 }

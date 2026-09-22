@@ -10,6 +10,8 @@ declare module 'vue-router' {
     ownerOnly?: boolean
     /** Adres gösterilmez; kullanıcı rolüne göre kendi ana sayfasına yönlendirilir. */
     resolveHome?: boolean
+    /** Bir listenin içindeki detay sayfası: mobilde alt sekmeler gizlenir (WhatsApp'ta sohbetin içi gibi). */
+    detail?: boolean
     title?: string
   }
 }

@@ -1,63 +1,50 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showImagePreview } from 'vant'
 import { CircleCheck } from 'lucide-vue-next'
 import type { PostView } from '@/core/api/generated/model'
+import { useCurrentUser } from '@/core/auth/currentUser'
+import { lastResolvedText, NO_OPEN_ISSUES, resolvedLinkText } from '@/core/issues/resolvedSummary'
 import { useIssues } from '@/core/issues/useIssues'
-import { useSites } from '@/core/sites/useSites'
-import SiteFilter from '@/mobile/molecules/SiteFilter.vue'
+import IssueCard from '@/mobile/organisms/IssueCard.vue'
 import ResolveIssueSheet from '@/mobile/organisms/ResolveIssueSheet.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
-import PostCard from '@/shared/organisms/PostCard.vue'
 
+/** Bir iş listesi: sekme ve süzgeç yok, en uzun bekleyen en üstte. Çözülenler en altta tek bir bağlantı. */
 const router = useRouter()
-const { sites } = useSites()
-const tab = ref(0)
-const siteId = ref<string | undefined>()
-const { issues, isLoading } = useIssues(() => tab.value === 0, siteId)
+const { data: user } = useCurrentUser()
+const { issues, isLoading } = useIssues(true, undefined)
+const { issues: resolved } = useIssues(false, undefined)
 const resolving = ref<PostView | null>(null)
-
-const emptyText = computed(() =>
-  tab.value === 0 ? 'Açık sorun yok. Şu an bekleyen bir iş görünmüyor.' : 'Henüz çözülen sorun yok.',
-)
 </script>
 
 <template>
   <MobilePage title="Sorunlar">
-    <!-- Sekme ve süzgeç tek bir başlık kartı: aralarındaki boşluk kopukluk gibi duruyordu. -->
-    <div class="issues__filters">
-      <van-tabs v-model:active="tab" shrink>
-        <van-tab title="Açık" />
-        <van-tab title="Çözülen" />
-      </van-tabs>
-      <SiteFilter v-if="(sites?.length ?? 0) > 1" v-model="siteId" :sites="sites ?? []" />
-    </div>
-    <van-skeleton v-if="isLoading" :row="5" avatar />
-    <van-empty v-else-if="!issues?.length" :description="emptyText">
+    <van-skeleton v-if="isLoading" :row="5" />
+    <van-empty v-else-if="!issues?.length" :description="NO_OPEN_ISSUES">
       <template #image><CircleCheck :size="48" class="issues__empty-icon" /></template>
+      <p v-if="lastResolvedText(resolved)" class="issues__empty-detail">{{ lastResolvedText(resolved) }}</p>
     </van-empty>
-    <PostCard v-for="post in issues" v-else :key="post.id" :post="post" :show-site="!siteId"
-      @open-site="router.push({ name: 'siteFeed', params: { siteId: $event } })"
-      @open-photos="(urls, index) => showImagePreview({ images: urls, startPosition: index, closeable: true })">
-      <template #action>
-        <van-button type="success" size="small" round block plain @click="resolving = post">
-          Çözüldü olarak işaretle
-        </van-button>
-      </template>
-    </PostCard>
+    <IssueCard v-for="post in issues" v-else :key="post.id" :post="post" :viewer-id="user?.id"
+      @resolve="resolving = $event" @open-site="router.push({ name: 'siteFeed', params: { siteId: $event } })"
+      @open-photos="(urls, index) => showImagePreview({ images: urls, startPosition: index, closeable: true })" />
+    <van-cell-group v-if="resolved?.length" inset>
+      <van-cell :title="resolvedLinkText(resolved)" is-link :to="{ name: 'resolvedIssues' }" />
+    </van-cell-group>
     <ResolveIssueSheet v-model="resolving" />
   </MobilePage>
 </template>
 
 <style scoped>
-.issues__filters {
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  background: var(--surface);
-}
-
 .issues__empty-icon {
   color: var(--status-success);
+}
+
+.issues__empty-detail {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
 }
 </style>

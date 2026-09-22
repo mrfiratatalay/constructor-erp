@@ -1,12 +1,16 @@
 <script setup lang="ts">
-/** Koyu zeminde marka imzası: sarı kare içinde KŞ, yanında ad ve isteğe bağlı slogan. */
-const { size = 'md', tagline } = defineProps<{ size?: 'md' | 'lg'; tagline?: string }>()
+/** Koyu zeminde marka imzası: sarı kare içinde KŞ, yanında ad ve isteğe bağlı slogan. compact: yalnızca kare. */
+const {
+  size = 'md',
+  tagline,
+  compact = false,
+} = defineProps<{ size?: 'md' | 'lg'; tagline?: string; compact?: boolean }>()
 </script>
 
 <template>
   <div class="brand-mark" :class="`brand-mark--${size}`">
     <span class="brand-mark__badge" aria-hidden="true">KŞ</span>
-    <div class="brand-mark__text">
+    <div v-if="!compact" class="brand-mark__text">
       <strong>Kızılkan Şantiye</strong>
       <span v-if="tagline">{{ tagline }}</span>
     </div>

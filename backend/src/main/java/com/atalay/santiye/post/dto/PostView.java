@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+/** editedAt: düzeltildiyse ne zaman. deletion: silindiyse iz; yazı ve medya o zaman boştur. */
 public record PostView(
     UUID id,
     PostSiteRef site,
@@ -14,5 +15,7 @@ public record PostView(
     boolean issue,
     Instant createdAt,
     List<MediaView> media,
-    @Nullable IssueResolution resolution) {
+    @Nullable IssueResolution resolution,
+    @Nullable Instant editedAt,
+    @Nullable PostDeletion deletion) {
 }

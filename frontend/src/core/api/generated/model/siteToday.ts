@@ -4,6 +4,7 @@
  * Kızılkan Şantiye API
  * OpenAPI spec version: 1.0
  */
+import type { PostView } from './postView'
 import type { SiteLead } from './siteLead'
 
 export interface SiteToday {
@@ -12,10 +13,13 @@ export interface SiteToday {
   leads: SiteLead[]
   /** @nullable */
   lastPostAt?: string | null
+  latestPost?: PostView
   postsToday: number
   photosToday: number
+  unreadPosts: number
   openIssues: number
-  noNewsToday: boolean
   /** @nullable */
-  latestPhotoUrl?: string | null
+  oldestOpenIssueAt?: string | null
+  noNewsToday: boolean
+  recentPhotoUrls: string[]
 }

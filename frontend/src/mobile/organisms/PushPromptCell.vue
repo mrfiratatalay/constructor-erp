@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { BellRing } from 'lucide-vue-next'
-import { PUSH_STATE_TEXT } from '@/core/push/pushStateText'
 import { usePush } from '@/core/push/usePush'
 import InstallGuide from '@/shared/molecules/InstallGuide.vue'
 
-/** Bildirimler kapalıysa nazik hatırlatma; açıksa ya da desteklenmiyorsa hiç görünmez. */
+/**
+ * Bildirimler kapalıysa tek satırlık nazik hatırlatma; açıksa ya da desteklenmiyorsa hiç görünmez.
+ * Ana içeriğin önüne geçmez: sayfanın sonunda durur, kurulum adımları yalnızca istenince açılır.
+ */
 const { message } = defineProps<{ message: string }>()
 const { state, busy, enable } = usePush()
 const guideOpen = ref(false)
@@ -13,8 +15,8 @@ const guideOpen = ref(false)
 
 <template>
   <van-cell-group v-if="state === 'off' || state === 'installFirst'" inset>
-    <van-cell center :title="message" :label="PUSH_STATE_TEXT[state]">
-      <template #icon><BellRing :size="20" class="push-cell__icon" /></template>
+    <van-cell center :title="message">
+      <template #icon><BellRing :size="18" class="push-cell__icon" /></template>
       <template #value>
         <van-button v-if="state === 'off'" type="primary" size="small" round :loading="busy" @click="enable">
           Aç
@@ -28,6 +30,7 @@ const guideOpen = ref(false)
 
 <style scoped>
 .push-cell__icon {
+  flex: none;
   margin-right: var(--space-3);
   color: var(--brand-primary);
 }

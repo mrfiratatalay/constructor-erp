@@ -1,39 +1,34 @@
 package com.atalay.santiye.post;
 
 import com.atalay.santiye.auth.CurrentUser;
-import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.post.dto.PostPage;
 import com.atalay.santiye.post.dto.PostView;
-import com.atalay.santiye.site.Site;
-import com.atalay.santiye.site.SiteAccess;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Akış: kişinin görebildiği şantiyelerin gönderileri, en yeniden eskiye. */
+/** Akış: kişinin görebildiği şantiyelerin gönderileri, en yeniden eskiye. Silinenler iz olarak yerinde durur. */
 @Service
 public class PostFeed {
 
     private static final int MAX_PAGE_SIZE = 50;
 
     private final PostRepository posts;
-    private final SiteAccess siteAccess;
+    private final VisiblePosts visible;
     private final PostViews views;
 
-    PostFeed(PostRepository posts, SiteAccess siteAccess, PostViews views) {
+    PostFeed(PostRepository posts, VisiblePosts visible, PostViews views) {
         this.posts = posts;
-        this.siteAccess = siteAccess;
+        this.visible = visible;
         this.views = views;
     }
 
     /** siteId boşsa bütün görünen şantiyeler; cursor boşsa en yenilerden başlar. */
     @Transactional(readOnly = true)
     public PostPage listPosts(CurrentUser user, UUID siteId, String cursor, int limit) {
-        List<UUID> siteIds = siteId != null
-            ? List.of(siteAccess.requireVisible(user, siteId).getId())
-            : siteAccess.visibleSites(user).stream().map(Site::getId).toList();
+        List<UUID> siteIds = visible.siteIds(user, siteId);
         if (siteIds.isEmpty()) {
             return new PostPage(List.of(), null);
         }
@@ -49,11 +44,7 @@ public class PostFeed {
 
     @Transactional(readOnly = true)
     public PostView getPost(CurrentUser user, UUID postId) {
-        Post post = posts.findById(postId)
-            .filter(candidate -> candidate.getCompanyId().equals(user.companyId()))
-            .orElseThrow(() -> ApiException.notFound("Gönderi bulunamadı."));
-        siteAccess.requireVisible(user, post.getSiteId());
-        return views.of(post);
+        return views.of(visible.require(user, postId).post());
     }
 
     private List<Post> findOlder(List<UUID> siteIds, FeedCursor cursor, PageRequest page) {

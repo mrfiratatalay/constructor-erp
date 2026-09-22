@@ -7,6 +7,7 @@ import './styles/theme.css'
 // Fonksiyonla çağrılan bileşenlerin (showToast vb.) stilleri otomatik gelmez; burada bir kez yüklenir.
 import 'vant/es/toast/style'
 import 'vant/es/image-preview/style'
+import 'vant/es/dialog/style'
 
 const mobile: PlatformModule = {
   shell: MobileShell,

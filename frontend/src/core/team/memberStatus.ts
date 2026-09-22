@@ -10,8 +10,16 @@ export interface MemberStatus {
 /** Patronun ekip listesinde bir bakışta görmesi gereken: kişi uygulamaya girdi mi? */
 export function memberStatus(member: MemberView): MemberStatus {
   if (!member.active) return { tone: 'neutral', label: 'Pasif' }
-  if (!member.lastSeenAt) return { tone: 'warning', label: 'Bekliyor' }
+  if (!member.lastSeenAt) return { tone: 'warning', label: 'Linki açmadı' }
   return { tone: 'success', label: 'Aktif' }
+}
+
+/**
+ * Listede yalnızca patronun bir şey yapması gereken durum etiketlenir (linki açmadı, pasif).
+ * Uygulamayı kullanan kişi etiketsizdir: iyi haber sessizdir (TASARIM.md İlke 1).
+ */
+export function memberFlag(member: MemberView): MemberStatus | null {
+  return member.active && member.lastSeenAt ? null : memberStatus(member)
 }
 
 /**

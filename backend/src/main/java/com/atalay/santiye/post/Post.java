@@ -23,6 +23,9 @@ public class Post {
     private Instant resolvedAt;
     private UUID resolvedBy;
     private String resolutionNote;
+    private Instant editedAt;
+    private Instant deletedAt;
+    private UUID deletedBy;
 
     protected Post() {
     }
@@ -38,13 +41,30 @@ public class Post {
     }
 
     public boolean isOpenIssue() {
-        return issue && resolvedAt == null;
+        return issue && resolvedAt == null && deletedAt == null;
+    }
+
+    boolean isDeleted() {
+        return deletedAt != null;
     }
 
     void resolve(UUID by, String note, Instant at) {
         this.resolvedAt = at;
         this.resolvedBy = by;
         this.resolutionNote = note;
+    }
+
+    void correct(String newBody, boolean newIssue, Instant at) {
+        this.body = newBody;
+        this.issue = newIssue;
+        this.editedAt = at;
+    }
+
+    /** Satır iz olarak kalır, yazı gider. "Sorun" işareti kalır: izde silinenin bir sorun olduğu görünür. */
+    void delete(UUID by, Instant at) {
+        this.body = null;
+        this.deletedAt = at;
+        this.deletedBy = by;
     }
 
     public UUID getId() {
@@ -85,5 +105,17 @@ public class Post {
 
     public String getResolutionNote() {
         return resolutionNote;
+    }
+
+    public Instant getEditedAt() {
+        return editedAt;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
     }
 }

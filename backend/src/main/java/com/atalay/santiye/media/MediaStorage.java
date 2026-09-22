@@ -3,6 +3,8 @@ package com.atalay.santiye.media;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -47,6 +49,19 @@ class MediaStorage {
 
     Resource thumbnailResource(Media media) {
         return new FileSystemResource(thumbnail(media));
+    }
+
+    /** Medyanın klasörünü içindekilerle birlikte siler: önce dosyalar, sonra klasörün kendisi. */
+    void deleteFiles(Media media) throws IOException {
+        Path folder = folderOf(media);
+        if (!Files.exists(folder)) {
+            return;
+        }
+        try (Stream<Path> paths = Files.walk(folder)) {
+            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
+        }
     }
 
     private Path folderOf(Media media) {
