@@ -1,8 +1,80 @@
-/* Vant'ı marka belirteçlerine bağlar. `html:root`, Vant'ın `:root` tanımından daha özgül olduğu için
-   CSS dosyaları hangi sırayla yüklenirse yüklensin bizim değerimiz kazanır. */
+/*
+ * Vant'ı tasarım sistemimize bağlar. `html:root`, Vant'ın `:root` tanımından daha özgül olduğu için
+ * CSS dosyaları hangi sırayla yüklenirse yüklensin bizim değerimiz kazanır.
+ */
 html:root {
   --van-primary-color: var(--brand-primary);
+  --van-text-color: var(--text-strong);
+  --van-text-color-2: var(--text-muted);
+  --van-text-color-3: var(--text-subtle);
+  --van-background: var(--canvas);
+  --van-background-2: var(--surface);
+  --van-border-color: var(--border-soft);
+  --van-font-bold: var(--weight-bold);
+  --van-base-font: var(--font-sans);
+  --van-radius-sm: var(--radius-sm);
   --van-radius-md: var(--radius-md);
+  --van-radius-lg: var(--radius-lg);
+
   /* Kenar boşluğunu sayfa verir; inset grupların ikinci bir boşluk eklemesini kapatıyoruz. */
   --van-cell-group-inset-padding: 0;
+  --van-cell-group-inset-radius: var(--radius-md);
+  --van-cell-font-size: var(--text-base);
+  --van-cell-vertical-padding: 14px;
+  --van-cell-horizontal-padding: var(--space-4);
+
+  /* Sahada eldivenle basılabilecek büyüklükte düğmeler */
+  --van-button-large-height: 54px;
+  --van-button-normal-height: 46px;
+  --van-button-round-border-radius: var(--radius-md);
+  --van-button-primary-background: var(--brand-primary);
+  --van-button-primary-border-color: var(--brand-primary);
+  --van-button-font-weight: var(--weight-semibold);
+
+  --van-field-label-color: var(--text-muted);
+  --van-field-input-text-color: var(--text-strong);
+  --van-popup-round-radius: var(--radius-xl);
+  --van-tabs-bottom-bar-color: var(--brand-primary);
+  --van-switch-on-background: var(--brand-primary);
+}
+
+/*
+ * Vant etiketi varsayılanda dolu renkli; sahada durum etiketleri yan yana gelince çok sert duruyor.
+ * Anlam rengini yazıya, açık tonunu zemine veriyoruz: okunur ama bağırmayan rozetler.
+ */
+html .van-tag--danger {
+  color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+html .van-tag--warning {
+  color: var(--status-warning);
+  background: var(--status-warning-bg);
+}
+
+html .van-tag--success {
+  color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+html .van-tag--default {
+  color: var(--status-neutral);
+  background: var(--status-neutral-bg);
+}
+
+html:root {
+  --van-tag-padding: 2px var(--space-2);
+  --van-tag-font-size: var(--text-xs);
+  --van-tag-medium-font-size: var(--text-xs);
+  --van-tag-line-height: 18px;
+  --van-tag-round-radius: 999px;
+}
+
+/*
+ * Vant hücresinde başlık ve değer sütunu alanı yarı yarıya paylaşır; değer kısa bir etiket ya da
+ * düğmeyken başlık boşuna daralıp satırlara bölünüyordu. Değer artık içeriği kadar yer kaplar.
+ */
+html .van-cell__value {
+  flex: none;
+  max-width: 55%;
 }

@@ -1,0 +1,10 @@
+# Yalnızca local geliştirme. Bu değerler production'a asla gitmez.
+app:
+  session:
+    # localhost http üzerinden çalışır; Secure çerezi Safari http'de reddeder.
+    secure-cookie: false
+  bootstrap:
+    company-name: Kızılkan İnşaat
+    owner-name: Patron
+    owner-email: patron@kizilkan.local
+    owner-password: patron123

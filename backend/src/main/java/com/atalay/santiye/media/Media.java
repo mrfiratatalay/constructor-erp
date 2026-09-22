@@ -1,0 +1,77 @@
+package com.atalay.santiye.media;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(name = "media")
+public class Media {
+
+    @Id
+    private UUID id;
+    private UUID postId;
+    private UUID siteId;
+    private UUID companyId;
+    @Enumerated(EnumType.STRING)
+    private MediaKind kind;
+    @Enumerated(EnumType.STRING)
+    private MediaStatus status;
+    private int position;
+    private String originalType;
+    private long sizeBytes;
+    private Double durationSeconds;
+    private Instant createdAt;
+
+    protected Media() {
+    }
+
+    Media(MediaOwner owner, MediaKind kind, int position, Upload upload) {
+        this.id = UUID.randomUUID();
+        this.postId = owner.postId();
+        this.siteId = owner.siteId();
+        this.companyId = owner.companyId();
+        this.kind = kind;
+        this.status = MediaStatus.PROCESSING;
+        this.position = position;
+        this.originalType = upload.contentType();
+        this.sizeBytes = upload.sizeBytes();
+        this.createdAt = upload.receivedAt();
+    }
+
+    /** Yüklenen dosyanın özeti. */
+    record Upload(String contentType, long sizeBytes, Instant receivedAt) {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getPostId() {
+        return postId;
+    }
+
+    public UUID getSiteId() {
+        return siteId;
+    }
+
+    public UUID getCompanyId() {
+        return companyId;
+    }
+
+    public MediaKind getKind() {
+        return kind;
+    }
+
+    public MediaStatus getStatus() {
+        return status;
+    }
+
+    public Double getDurationSeconds() {
+        return durationSeconds;
+    }
+}

@@ -1,15 +1,13 @@
 package com.atalay.santiye;
 
+import com.atalay.santiye.support.IntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest
+/** Tüm testler aynı Spring bağlamını ve aynı veritabanı container'ını paylaşır. */
+@IntegrationTest
 class SantiyeApiApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }

@@ -1,0 +1,10 @@
+// Service worker ayrı bir ortamda (WebWorker) çalışır; DOM tipleriyle karışmasın diye ayrı derlenir.
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "include": ["src/sw.ts", "env.d.ts"],
+  "compilerOptions": {
+    "lib": ["ESNext", "WebWorker"],
+    "types": [],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.sw.tsbuildinfo"
+  }
+}

@@ -1,29 +1,38 @@
 <script setup lang="ts">
 import tr from 'element-plus/es/locale/lang/tr'
-import BrandLogo from '@/shared/atoms/BrandLogo.vue'
+import { useRoute } from 'vue-router'
+import SideNav from '@/desktop/organisms/SideNav.vue'
+
+const route = useRoute()
 </script>
 
 <template>
   <el-config-provider :locale="tr">
-    <el-container class="desktop-shell">
-      <el-header class="desktop-shell__header">
-        <BrandLogo surface="dark" />
-      </el-header>
-      <el-main>
+    <RouterView v-if="route.meta.public" />
+    <div v-else class="desktop-shell">
+      <SideNav class="desktop-shell__side" />
+      <main class="desktop-shell__main">
         <RouterView />
-      </el-main>
-    </el-container>
+      </main>
+    </div>
   </el-config-provider>
 </template>
 
 <style scoped>
 .desktop-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
   min-height: 100vh;
+  background: var(--canvas);
 }
 
-.desktop-shell__header {
-  display: flex;
-  align-items: center;
-  background: var(--brand-deep);
+.desktop-shell__side {
+  position: sticky;
+  top: 0;
+}
+
+.desktop-shell__main {
+  padding: var(--space-8) clamp(var(--space-6), 3vw, var(--space-10));
+  overflow-x: hidden;
 }
 </style>

@@ -1,0 +1,12 @@
+# Uçtan uca testler (Playwright): ayrı port ve ayrı veritabanı; geliştiricinin verisine dokunmaz.
+# "local,e2e" profilleriyle çalışır: ilk yönetici local profilden gelir.
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/santiye_e2e
+  flyway:
+    clean-disabled: false
+app:
+  invite:
+    base-url: http://localhost:5174

@@ -1,13 +1,41 @@
-/* Element Plus'ı marka belirteçlerine bağlar (özgüllük gerekçesi: mobile/styles/theme.css).
-   Element Plus hover ve basılı tonlarını ayrı değişkenlerde tutar; hepsini ana renkten türetiyoruz
-   ki tek bir renk değişikliği tüm tonları güncellesin. */
+/*
+ * Element Plus'ı tasarım sistemimize bağlar (özgüllük gerekçesi: mobile/styles/theme.css).
+ * Hover ve basılı tonları ana renkten türetilir: tek renk değişikliği her tonu günceller.
+ */
 html:root {
   --el-color-primary: var(--brand-primary);
   --el-color-primary-light-3: color-mix(in srgb, var(--brand-primary), #fff 30%);
   --el-color-primary-light-5: color-mix(in srgb, var(--brand-primary), #fff 50%);
   --el-color-primary-light-7: color-mix(in srgb, var(--brand-primary), #fff 70%);
   --el-color-primary-light-8: color-mix(in srgb, var(--brand-primary), #fff 80%);
-  --el-color-primary-light-9: color-mix(in srgb, var(--brand-primary), #fff 90%);
-  --el-color-primary-dark-2: color-mix(in srgb, var(--brand-primary), #000 20%);
-  --el-border-radius-base: var(--radius-md);
+  --el-color-primary-light-9: var(--brand-tint);
+  --el-color-primary-dark-2: var(--brand-strong);
+
+  --el-font-family: var(--font-sans);
+  --el-text-color-primary: var(--text-strong);
+  --el-text-color-regular: var(--text-muted);
+  --el-text-color-secondary: var(--text-subtle);
+  --el-border-color: var(--border-strong);
+  --el-border-color-light: var(--border-soft);
+  --el-border-color-lighter: var(--border-soft);
+  --el-fill-color-light: var(--surface-muted);
+  --el-fill-color-blank: var(--surface);
+  --el-bg-color: var(--surface);
+  --el-bg-color-page: var(--canvas);
+
+  --el-border-radius-base: var(--radius-sm);
+  --el-border-radius-small: 8px;
+  --el-font-size-base: var(--text-base);
+  --el-component-size: 40px;
+  --el-component-size-large: 46px;
+  --el-box-shadow-light: var(--shadow-sm);
+  --el-box-shadow: var(--shadow-md);
+}
+
+/* Tablolar: satırlar daha ferah, başlık satırı sakin. */
+html:root {
+  --el-table-header-bg-color: var(--surface-muted);
+  --el-table-header-text-color: var(--text-muted);
+  --el-table-border-color: var(--border-soft);
+  --el-table-row-hover-bg-color: var(--brand-tint);
 }

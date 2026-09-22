@@ -1,24 +1,16 @@
 import { expect, test } from '@playwright/test'
+import { loginAsOwner, shellOf, switchView } from './support/app'
 
-const EXPECTED = {
-  mobile: { shell: 'Mobil (Vant)', switchButton: 'Masaüstü görünüme geç', afterSwitch: 'Masaüstü (Element Plus)' },
-  desktop: { shell: 'Masaüstü (Element Plus)', switchButton: 'Mobil görünüme geç', afterSwitch: 'Mobil (Vant)' },
-} as const
-
-type ProjectName = keyof typeof EXPECTED
-
-test('cihaza uygun kabuk açılır', async ({ page }, testInfo) => {
-  const expected = EXPECTED[testInfo.project.name as ProjectName]
-  await page.goto('/')
-  await expect(page.getByText(expected.shell)).toBeVisible()
+test('cihaza uygun kabuk açılır', async ({ page, isMobile }) => {
+  await loginAsOwner(page)
+  await expect(shellOf(page, isMobile)).toBeVisible()
 })
 
-test('kullanıcı diğer görünüme geçebilir ve tercihi hatırlanır', async ({ page }, testInfo) => {
-  const expected = EXPECTED[testInfo.project.name as ProjectName]
-  await page.goto('/')
-  await page.getByRole('button', { name: expected.switchButton }).click()
-  await expect(page.getByText(expected.afterSwitch)).toBeVisible()
+test('kullanıcı diğer görünüme geçebilir ve tercihi hatırlanır', async ({ page, isMobile }) => {
+  await loginAsOwner(page)
+  await switchView(page, isMobile)
+  await expect(shellOf(page, !isMobile)).toBeVisible()
 
   await page.reload()
-  await expect(page.getByText(expected.afterSwitch)).toBeVisible()
+  await expect(shellOf(page, !isMobile)).toBeVisible()
 })

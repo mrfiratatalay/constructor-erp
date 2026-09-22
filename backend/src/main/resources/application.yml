@@ -1,6 +1,9 @@
 spring:
   application:
     name: santiye-api
+  # Profil verilmezse local çalışır; production'da SPRING_PROFILES_ACTIVE=prod verilir.
+  profiles:
+    default: local
 
   # Local değerler varsayılan; production'da ortam değişkenleri bunları ezer (Madde 5).
   datasource:
@@ -20,10 +23,43 @@ spring:
     problemdetails:
       enabled: true
 
+  servlet:
+    # 60 sn'lik telefon videosu 150 MB'a çıkabilir; birkaç fotoğrafla birlikte tek istekte gelir.
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 250MB
+
   threads:
     # Java 21+ sanal thread'ler: fotoğraf yükleme gibi bekleme ağırlıklı işlerde ucuz eşzamanlılık.
     virtual:
       enabled: true
+
+app:
+  # "Bugün" hesapları şantiyenin saatine göre yapılır.
+  timezone: Europe/Istanbul
+  session:
+    lifetime: 180d
+    secure-cookie: ${SESSION_SECURE_COOKIE:true}
+  invite:
+    lifetime: 7d
+    base-url: ${APP_BASE_URL:http://localhost:5173}
+  media:
+    # Fotoğraf, video ve seslerin durduğu klasör. Production'da kalıcı bir diske (ya da ileride buluta) bağlanır.
+    root: ${MEDIA_ROOT:./.data/media}
+    ffmpeg: ${FFMPEG_PATH:ffmpeg}
+    ffprobe: ${FFPROBE_PATH:ffprobe}
+    # Sahada gönderilen videolar ve sesli notlar sunucuda da bu sürelerde kesilir.
+    max-video-seconds: 60
+    max-audio-seconds: 180
+  push:
+    # Web Push servisleri (Apple, Google) sorun olursa bu adrese ulaşır.
+    subject: ${PUSH_SUBJECT:mailto:destek@kizilkan.local}
+  # İlk yönetici; yalnızca veritabanında hiç kullanıcı yokken oluşturulur.
+  bootstrap:
+    company-name: ${BOOTSTRAP_COMPANY_NAME:}
+    owner-name: ${BOOTSTRAP_OWNER_NAME:}
+    owner-email: ${BOOTSTRAP_OWNER_EMAIL:}
+    owner-password: ${BOOTSTRAP_OWNER_PASSWORD:}
 
 management:
   endpoints:

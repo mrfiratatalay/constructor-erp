@@ -1,0 +1,34 @@
+package com.atalay.santiye.media;
+
+import com.atalay.santiye.common.persistence.SiteCount;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
+interface MediaRepository extends JpaRepository<Media, UUID> {
+
+    List<Media> findByPostIdInOrderByPosition(Collection<UUID> postIds);
+
+    List<Media> findByStatus(MediaStatus status);
+
+    @Query("select new com.atalay.santiye.common.persistence.SiteCount(m.siteId, count(m)) from Media m "
+        + "where m.siteId in :siteIds and m.kind = com.atalay.santiye.media.MediaKind.PHOTO "
+        + "and m.createdAt >= :since group by m.siteId")
+    List<SiteCount> countPhotosSince(Collection<UUID> siteIds, Instant since);
+
+    /** Bugünün hazır fotoğrafları, en yeniden eskiye. Günde birkaç düzine; şantiye başına en yeni seçilir. */
+    @Query("select m from Media m where m.siteId in :siteIds and m.kind = com.atalay.santiye.media.MediaKind.PHOTO "
+        + "and m.status = com.atalay.santiye.media.MediaStatus.READY and m.createdAt >= :since order by m.createdAt desc")
+    List<Media> findReadyPhotosSince(Collection<UUID> siteIds, Instant since);
+
+    /** İşleme uzun sürer ve işlem dışında yapılır; sonucu kısa bir güncellemeyle yazılır. */
+    @Transactional
+    @Modifying
+    @Query("update Media m set m.status = :status, m.durationSeconds = :durationSeconds where m.id = :id")
+    void finish(UUID id, MediaStatus status, Double durationSeconds);
+}

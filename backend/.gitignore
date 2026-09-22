@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Yerel medya dosyaları ###
+.data/
