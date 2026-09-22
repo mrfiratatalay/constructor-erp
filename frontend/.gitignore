@@ -40,3 +40,8 @@ __screenshots__/
 
 test-results/
 playwright-report/
+
+# Elle API denemelerinden kalan curl çerez dosyaları ve geçici çıktılar
+*.jar
+ids.env
+tmp.txt
