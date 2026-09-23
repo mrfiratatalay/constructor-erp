@@ -19,7 +19,7 @@
 <style scoped>
 .split-view {
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
+  grid-template-columns: var(--layout-list-width) minmax(0, 1fr);
   height: 100%;
 }
 

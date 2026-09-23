@@ -52,11 +52,22 @@ function goBack() {
     <slot />
   </main>
   <div v-if="slots.footer" class="mobile-page__footer" :class="{ 'mobile-page__footer--no-tabbar': !tabbar }">
-    <slot name="footer" />
+    <div class="mobile-page__footer-inner"><slot name="footer" /></div>
   </div>
 </template>
 
 <style scoped>
+/*
+ * Telefonda tam genişlik; tablette sayfa, başlık ve gönderme çubuğu aynı ortalı sütunda durur, satırlar
+ * ekran boyu uzamaz. Yan çevrilmiş telefonda da sütun ortalandığı için çentik içeriğin dışında kalır.
+ */
+.mobile-page,
+.mobile-page__bar :deep(.van-nav-bar__content),
+.mobile-page__footer-inner {
+  max-width: var(--layout-phone-column);
+  margin-inline: auto;
+}
+
 .mobile-page {
   display: grid;
   gap: var(--space-4);
@@ -73,7 +84,7 @@ function goBack() {
 /* Sohbet gibi: az gönderi varken akış ekranın dibinde, gönderme çubuğunun hemen üstünde durur. */
 .mobile-page--bottom {
   align-content: end;
-  min-height: calc(100dvh - var(--van-nav-bar-height));
+  min-height: calc(var(--layout-app-height) - var(--van-nav-bar-height));
 }
 
 .mobile-page--with-footer.mobile-page--no-tabbar {

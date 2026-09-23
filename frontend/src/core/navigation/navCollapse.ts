@@ -1,4 +1,5 @@
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { MEDIA_QUERIES, useMediaQuery } from '@/core/platform'
 
 const STORAGE_KEY = 'santiye.navCollapsed'
 
@@ -18,9 +19,21 @@ function writeCollapsed(collapsed: boolean) {
   }
 }
 
-/** Masaüstü sol menüsü ikonlara daralabilir; bir kere kapatan hep kapalı görür. */
+/**
+ * Masaüstü sol menüsü ikonlara daralabilir; bir kere kapatan hep kapalı görür. Dar pencerede menü
+ * kendiliğinden daralır ki liste ve akış sıkışmasın; orada açmak geçicidir, kayıtlı tercihi değiştirmez.
+ */
 export function useNavCollapse() {
-  const collapsed = ref(readCollapsed())
-  watch(collapsed, writeCollapsed)
-  return { collapsed, toggle: () => (collapsed.value = !collapsed.value) }
+  const preferred = ref(readCollapsed())
+  const compact = useMediaQuery(MEDIA_QUERIES.compactDesktop)
+  const openedWhileCompact = ref(false)
+  watch(preferred, writeCollapsed)
+  watch(compact, () => (openedWhileCompact.value = false))
+
+  const collapsed = computed(() => (compact.value ? !openedWhileCompact.value : preferred.value))
+  function toggle() {
+    if (compact.value) openedWhileCompact.value = !openedWhileCompact.value
+    else preferred.value = !preferred.value
+  }
+  return { collapsed, toggle }
 }

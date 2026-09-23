@@ -1,3 +1,4 @@
+import { MEDIA_QUERIES } from './breakpoints'
 import { choosePlatform, type Platform, type ScreenInfo } from './choosePlatform'
 
 const STORAGE_KEY = 'santiye.platform'
@@ -14,8 +15,8 @@ function readSavedPlatform(): Platform | null {
 
 function readScreenInfo(): ScreenInfo {
   return {
-    isNarrow: window.matchMedia('(max-width: 768px)').matches,
-    isTouchTablet: window.matchMedia('(pointer: coarse) and (max-width: 1024px)').matches,
+    isNarrow: window.matchMedia(MEDIA_QUERIES.phone).matches,
+    isTouchTablet: window.matchMedia(MEDIA_QUERIES.touchTablet).matches,
   }
 }
 

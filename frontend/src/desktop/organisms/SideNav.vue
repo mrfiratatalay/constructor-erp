@@ -71,13 +71,13 @@ const active = computed(() => navRouteOf(route.name as RouteName))
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: var(--space-5);
-  width: 232px;
-  height: 100vh;
+  width: var(--layout-nav-width);
+  height: var(--layout-app-height);
   padding: var(--space-5) var(--space-3);
 }
 
 .side-nav--collapsed {
-  width: 72px;
+  width: var(--layout-nav-width-collapsed);
 }
 
 .side-nav__top {

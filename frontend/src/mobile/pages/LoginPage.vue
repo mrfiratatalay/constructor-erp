@@ -34,6 +34,8 @@ const { login, isPending, errorText } = usePasswordLogin()
   display: grid;
   gap: var(--space-6);
   align-content: start;
+  max-width: var(--layout-phone-column);
+  margin-inline: auto;
   padding: 14vh var(--space-4) var(--space-8);
 }
 

@@ -19,7 +19,7 @@ const { errorText } = useInviteAcceptance()
   justify-items: center;
   align-content: center;
   gap: var(--space-6);
-  min-height: 100vh;
+  min-height: var(--layout-app-height);
 }
 
 .invite-page__loading {

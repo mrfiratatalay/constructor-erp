@@ -71,4 +71,16 @@
   --weight-semibold: 600;
   --weight-bold: 700;
   --weight-black: 800;
+
+  /*
+   * Yerleşim ölçüleri. Burada kırılım noktası yoktur (bkz. core/platform/breakpoints.ts): ekranlar sabit
+   * genişlik yerine tavanlı (max-width) ve akışkan (clamp) ölçülerle her genişliğe kendiliğinden uyar.
+   */
+  --layout-phone-column: 640px; /* mobil kabuk: telefonda tam genişlik, tablette bu genişlikte ortalı */
+  --layout-reading-width: 760px; /* masaüstü sağ panel: akışın okunaklı genişliği */
+  --layout-list-width: clamp(280px, 28vw, 360px); /* masaüstü liste: dar pencerede incelir */
+  --layout-nav-width: 232px;
+  --layout-nav-width-collapsed: 72px;
+  /* Tablette tarayıcı çubuğu açılıp kapanınca görünen yükseklik değişir; 100vh altta kalan çubuğu gizler. */
+  --layout-app-height: 100dvh;
 }

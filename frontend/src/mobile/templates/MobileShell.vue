@@ -14,7 +14,7 @@ const route = useRoute()
 
 <style scoped>
 .mobile-shell {
-  min-height: 100dvh;
+  min-height: var(--layout-app-height);
   background: var(--canvas);
 }
 </style>
