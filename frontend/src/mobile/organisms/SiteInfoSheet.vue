@@ -10,6 +10,7 @@ import { useSiteGroup } from '@/core/sites/useSiteGroup'
 import type { LeadChoice } from '@/core/sites/useSiteLeads'
 import { SITE_STATUS } from '@/core/sites/siteStatus'
 import { useSites, type SiteForm } from '@/core/sites/useSites'
+import { useSiteTasks } from '@/core/tasks/useSiteTasks'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
 import SiteLeadCells from '@/mobile/molecules/SiteLeadCells.vue'
 import SiteFormPopup from '@/mobile/organisms/SiteFormPopup.vue'
@@ -26,6 +27,7 @@ const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
 const { data: photos } = useListSitePhotos(() => site.id)
 const { availableMembers, issued, addMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
+const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const addingMember = ref(false)
 const isOwner = computed(() => user.value?.role === 'OWNER')
@@ -70,6 +72,11 @@ async function addGroupMember(choice: LeadChoice) {
       </p>
       <SiteLeadCells :leads="site.leads" :viewer-id="user?.id" :can-assign="isOwner" class="site-info__leads"
         @add="addingMember = true" />
+      <!-- WhatsApp'ta grup bilgisindeki "Medya, bağlantılar ve belgeler" satırı gibi: görevler ayrı sayfada. -->
+      <van-cell-group inset class="site-info__tasks">
+        <van-cell title="Görevler" :value="openTasks.length ? `${openTasks.length} açık` : ''" is-link
+          :to="{ name: 'siteTasks', params: { siteId: site.id } }" @click="show = false" />
+      </van-cell-group>
       <template v-if="photos?.length">
         <h3 class="site-info__heading">Bu haftanın fotoğrafları</h3>
         <div class="site-info__photos">
@@ -116,8 +123,9 @@ async function addGroupMember(choice: LeadChoice) {
   color: var(--text-muted);
 }
 
-/* Beyaz pencerede beyaz grup kaybolmasın: künye hafif zeminli bir blok. */
-.site-info__leads {
+/* Beyaz pencerede beyaz grup kaybolmasın: künye ve görevler hafif zeminli bloklar. */
+.site-info__leads,
+.site-info__tasks {
   --van-cell-background: var(--surface-muted);
 }
 
