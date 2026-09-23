@@ -30,6 +30,14 @@ public abstract class ApiTestSupport {
         return mvc.patch().uri(uri).cookie(session).contentType(MediaType.APPLICATION_JSON).content(json).exchange();
     }
 
+    protected MvcTestResult putJson(String uri, Cookie session, String json) {
+        return mvc.put().uri(uri).cookie(session).contentType(MediaType.APPLICATION_JSON).content(json).exchange();
+    }
+
+    protected MvcTestResult delete(String uri, Cookie session) {
+        return mvc.delete().uri(uri).cookie(session).exchange();
+    }
+
     protected MvcTestResult get(String uri, Cookie session) {
         return session == null ? mvc.get().uri(uri).exchange() : mvc.get().uri(uri).cookie(session).exchange();
     }
