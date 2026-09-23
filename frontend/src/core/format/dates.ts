@@ -28,6 +28,11 @@ export function relativeDayTitle(isoDate: string): string {
   return day.format('D MMMM dddd')
 }
 
+/** "12 Eki". */
+export function shortDay(isoDate: string): string {
+  return dayjs(isoDate).format('D MMM')
+}
+
 /** "14:20". */
 export function clockTime(isoDate: string): string {
   return dayjs(isoDate).format('HH:mm')
