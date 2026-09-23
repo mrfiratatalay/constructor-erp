@@ -46,7 +46,7 @@ async function submit() {
       </el-form-item>
       <div class="task-form__row">
         <el-form-item label="Kim yapacak">
-          <el-select v-model="form.assigneeId" placeholder="Sonra atarım" clearable>
+          <el-select v-model="form.assigneeId" placeholder="Sonra atarım" clearable class="task-form__select">
             <el-option v-for="choice in choices" :key="choice.id" :label="choice.label" :value="choice.id" />
           </el-select>
         </el-form-item>
@@ -80,6 +80,8 @@ async function submit() {
   gap: var(--space-4);
 }
 
+/* Şantiye ve katılımcı pencerelerindeki seçim kutuları gibi: alan sütunun tamamını kaplar. */
+.task-form__select,
 .task-form__date {
   width: 100%;
 }
