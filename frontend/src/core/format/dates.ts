@@ -28,6 +28,11 @@ export function relativeDayTitle(isoDate: string): string {
   return day.format('D MMMM dddd')
 }
 
+/** Bugünün tarihi, "2026-09-23". Yerel saatle: toISOString UTC'ye çevirir, gece yarısına yakın gün kayar. */
+export function todayIsoDate(): string {
+  return dayjs().format('YYYY-MM-DD')
+}
+
 /** "12 Eki". */
 export function shortDay(isoDate: string): string {
   return dayjs(isoDate).format('D MMM')
