@@ -71,6 +71,16 @@ html:root {
 }
 
 /*
+ * Alttan açılan pencereler (form, bilgi çekmecesi, gönderi menüsü) tablette ekran boyu uzamaz: sayfayla
+ * aynı sütunda ortalanır. Sol, sağ ve genişlik birlikte verilince otomatik kenar boşlukları eşit bölünür.
+ */
+html .van-popup--bottom {
+  right: 0;
+  max-width: var(--layout-phone-column);
+  margin-inline: auto;
+}
+
+/*
  * Vant hücresinde başlık ve değer sütunu alanı yarı yarıya paylaşır; değer kısa bir etiket ya da
  * düğmeyken başlık boşuna daralıp satırlara bölünüyordu. Değer artık içeriği kadar yer kaplar.
  */

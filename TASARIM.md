@@ -121,6 +121,23 @@ yolculuğuna çıkarmak tek bir iş için üç ekran demekti.
 | Künye | Başlıkta şantiye · sorumlu · 📞; adres ve bu haftanın fotoğrafları ⓘ çekmecesinde. |
 | Hesabım | Sol alttaki kullanıcı düğmesinin açtığı panel; ayrı sayfa yok. |
 
+## Ekran genişlikleri
+
+Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinden uyar.
+
+| Ekran | Kabuk | Düzen |
+|---|---|---|
+| Telefon (≤ 768px) | Mobil (Vant) | Tam genişlik |
+| Dokunmatik tablet (≤ 1024px) | Mobil | Sayfa, başlık, gönderme çubuğu ve alttan açılan pencereler 640px'lik ortalı sütunda |
+| Bilgisayar, dar pencere (< 1200px) | Masaüstü (Element Plus) | Sol menü ikonlara iner (açmak geçicidir); liste 280-360px arasında incelir |
+| Bilgisayar, geniş | Masaüstü | Menü tercih neyse o; liste 360px, akış 760px'te ortalı |
+
+- Eşikler tek yerdedir: `core/platform/breakpoints.ts`. CSS'e kırılım noktası yazılmaz; genişlikler
+  `tokens.css`'teki `--layout-*` ölçüleriyle (tavanlı `max-width`, `clamp`) verilir.
+- Ekran yüksekliği `100dvh`: tablette tarayıcı çubuğu açılınca gönderme çubuğu ekranın altında kaybolmaz.
+- "Mobil/masaüstü görünüme geç" tercihi eşikten önce gelir. Tablet döndürülünce kabuk değişmez: kabuk
+  değişimi sayfayı yeniler, yarım yazılmış not kaybolurdu.
+
 ## Navigasyon
 
 | | Patron | Şef |

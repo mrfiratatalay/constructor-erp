@@ -41,7 +41,7 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
 .detail-pane__content {
   display: grid;
   gap: var(--space-4);
-  max-width: 760px;
+  max-width: var(--layout-reading-width);
   margin: 0 auto;
   padding: var(--space-5) var(--space-6);
 }
@@ -66,7 +66,7 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
 }
 
 .detail-pane__footer-inner {
-  max-width: 760px;
+  max-width: var(--layout-reading-width);
   margin: 0 auto;
 }
 </style>

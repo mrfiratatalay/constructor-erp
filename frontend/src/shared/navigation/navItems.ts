@@ -37,7 +37,7 @@ export function manageNavItems(role: CurrentUserResponseRole): NavItem[] {
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
-const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites' }
+const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', siteTasks: 'sites' }
 
 export function navRouteOf(route: RouteName): RouteName {
   return PARENT_ROUTE[route] ?? route

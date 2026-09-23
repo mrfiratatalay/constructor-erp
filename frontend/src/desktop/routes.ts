@@ -9,6 +9,7 @@ export const routes = buildRoutes({
   invite: () => import('./pages/InviteAcceptPage.vue'),
   sites: sitesPage,
   siteFeed: sitesPage,
+  siteTasks: sitesPage,
   team: () => import('./pages/TeamPage.vue'),
   // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
   profile: { redirectTo: 'sites' },

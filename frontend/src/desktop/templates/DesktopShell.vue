@@ -23,14 +23,14 @@ const route = useRoute()
 .desktop-shell {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  height: 100vh;
+  height: var(--layout-app-height);
   overflow: hidden;
   background: var(--canvas);
 }
 
 .desktop-shell__main {
   min-width: 0;
-  height: 100vh;
+  height: var(--layout-app-height);
   overflow: hidden;
 }
 </style>

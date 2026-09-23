@@ -8,6 +8,7 @@ const PAGES: PageSet = {
   invite: page,
   sites: page,
   siteFeed: page,
+  siteTasks: page,
   team: page,
   profile: page,
 }

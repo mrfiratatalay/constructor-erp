@@ -14,12 +14,13 @@ import { useToday } from '@/core/today/useToday'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
 import NewSiteDialog from '@/desktop/organisms/NewSiteDialog.vue'
 import SiteList from '@/desktop/organisms/SiteList.vue'
+import SiteTasksPanel from '@/desktop/organisms/SiteTasksPanel.vue'
 import SiteWorkspace from '@/desktop/organisms/SiteWorkspace.vue'
 import SplitView from '@/desktop/templates/SplitView.vue'
 
 /**
- * Şantiyeler (WhatsApp Masaüstü gibi): solda liste, sağda seçili şantiyenin akışı. /santiyeler ve
- * /santiyeler/:id aynı sayfadır: satıra tıklayınca liste yerinde kalır, yalnızca sağ taraf değişir.
+ * Şantiyeler (WhatsApp Masaüstü gibi): solda liste, sağda seçili şantiyenin akışı ya da görevleri.
+ * /santiyeler, /santiyeler/:id ve /santiyeler/:id/gorevler aynı sayfadır: liste yerinde kalır, yalnızca sağ taraf değişir.
  * Liste tek tip satırdır ve son haber gelen üstte durur; özet cümlesi ve sessizlik uyarısı yoktur.
  * Hiçbiri seçili değilken hiçbir şantiye kullanıcı istemeden okunmuş sayılmaz.
  */
@@ -31,7 +32,7 @@ const { sites: allSites } = useSites()
 const { leads, createSite, isSaving } = useSiteCreation()
 useSoleSiteRedirect()
 
-const selectedId = computed(() => (route.name === 'siteFeed' ? String(route.params.siteId) : null))
+const selectedId = computed(() => (route.params.siteId ? String(route.params.siteId) : null))
 const ordered = computed(() => sitesByRecency(today.value?.sites ?? []))
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')
@@ -64,7 +65,10 @@ async function add(form: NewSiteForm) {
         :description="isOwner ? 'Aktif şantiye yok. ＋ ile ilk şantiyeni ekle.' : 'Sana henüz bir şantiye atanmadı.'" />
     </template>
     <template #detail>
-      <SiteWorkspace v-if="selectedId" :key="selectedId" :site-id="selectedId" />
+      <!-- /santiyeler/:id/gorevler: sağda akışın yerine şantiyenin görevleri (liste yerinde kalır). -->
+      <SiteTasksPanel v-if="selectedId && route.name === 'siteTasks'" :key="`tasks-${selectedId}`"
+        :site-id="selectedId" />
+      <SiteWorkspace v-else-if="selectedId" :key="selectedId" :site-id="selectedId" />
       <el-empty v-else :image-size="96" class="sites__empty">
         <template #image><HardHat :size="72" class="sites__empty-icon" /></template>
         <template #description><p>Soldan bir şantiye seç</p></template>

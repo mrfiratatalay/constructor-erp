@@ -1,3 +1,5 @@
 export type { Platform } from './choosePlatform'
 export type { PlatformModule } from './platformModule'
 export { detectPlatform, switchPlatform } from './browserPlatform'
+export { BREAKPOINTS, MEDIA_QUERIES } from './breakpoints'
+export { useMediaQuery } from './useMediaQuery'

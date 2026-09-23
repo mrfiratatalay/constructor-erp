@@ -36,7 +36,7 @@ const { login, isPending, errorText } = usePasswordLogin()
 .login-page {
   display: grid;
   place-items: center;
-  min-height: 100vh;
+  min-height: var(--layout-app-height);
   padding: var(--space-6);
   background: var(--canvas);
 }

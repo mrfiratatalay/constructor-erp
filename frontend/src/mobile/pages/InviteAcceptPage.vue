@@ -18,6 +18,8 @@ const { errorText } = useInviteAcceptance()
   display: grid;
   justify-items: center;
   gap: var(--space-6);
+  max-width: var(--layout-phone-column);
+  margin-inline: auto;
   padding: 20vh var(--space-4) var(--space-6);
 }
 </style>
