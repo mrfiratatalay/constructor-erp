@@ -31,7 +31,7 @@ const { sites: allSites } = useSites()
 const { leads, createSite, isSaving } = useSiteCreation()
 useSoleSiteRedirect()
 
-const selectedId = computed(() => (route.name === 'siteFeed' ? String(route.params.siteId) : null))
+const selectedId = computed(() => (route.params.siteId ? String(route.params.siteId) : null))
 const ordered = computed(() => sitesByRecency(today.value?.sites ?? []))
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')

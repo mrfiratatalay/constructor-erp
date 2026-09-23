@@ -16,6 +16,7 @@ export const ROUTES = {
   invite: { path: '/davet/:token', meta: { public: true, title: 'Davet' } },
   sites: { path: '/santiyeler', meta: { title: 'Şantiyeler' } },
   siteFeed: { path: '/santiyeler/:siteId', meta: { detail: true, title: 'Şantiye' } },
+  siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
   team: { path: '/ekip', meta: { ownerOnly: true, title: 'Ekip' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>
