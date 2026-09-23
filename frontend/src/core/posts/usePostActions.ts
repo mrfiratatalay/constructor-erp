@@ -11,8 +11,9 @@ export function usePostActions() {
   const remove = useDeletePost({ mutation: { onSuccess } })
 
   return {
-    correctPost: (postId: string, body: string | null, issue: boolean) =>
-      correct.mutateAsync({ postId, data: { body, issue } }),
+    /** Düzeltme yalnızca yazıyı değiştirir; sunucunun beklediği "sorun" işareti olduğu gibi geri gönderilir. */
+    correctPost: (post: PostView, body: string | null) =>
+      correct.mutateAsync({ postId: post.id, data: { body, issue: post.issue } }),
     deletePost: (postId: string) => remove.mutateAsync({ postId }),
     isSaving: correct.isPending,
   }

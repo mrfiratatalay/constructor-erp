@@ -1,55 +1,59 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import type { PostView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { keepPosition, type Scroller } from '@/core/posts/feedAnchor'
 import { canCorrect, canDelete } from '@/core/posts/postPermissions'
-import { lastUnreadPostId } from '@/core/posts/unreadDivider'
+import { firstUnreadPostId } from '@/core/posts/unreadDivider'
 import { useFeed } from '@/core/posts/useFeed'
+import { useFeedBottom } from '@/core/posts/useFeedBottom'
 import { useDeletePrompt } from '@/desktop/deletePrompt'
 import PostMenu from '@/desktop/molecules/PostMenu.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
-import { useResolvePrompt } from '@/desktop/resolvePrompt'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
-import PostCard from '@/shared/organisms/PostCard.vue'
+import PostBubble from '@/shared/organisms/PostBubble.vue'
 
 /**
- * Tek şantiyenin defteri, en yeniden eskiye. seenAt: kişinin önceki bakışı; ondan sonra gelenlerin
- * altına "buradan yukarısı yeni" çizgisi çekilir. Kartın köşesindeki ⋯ menüsünden düzeltilir ya da silinir.
+ * Şantiyenin akışı, sohbet gibi: en eski üstte, en yenisi altta, panel açılınca dip. "Daha eski
+ * gönderiler" yukarıdadır ve basınca ekran zıplamaz. seenAt: kişinin önceki bakışı; ondan sonra
+ * gelenlerin üstüne "buradan aşağısı yeni" çizgisi çekilir. Kartın köşesindeki ⋯ menüsünden düzeltilir.
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
 const { data: user } = useCurrentUser()
 const { days, isLoading, hasMore, isLoadingMore, loadMore } = useFeed(() => siteId)
 const viewer = ref<{ urls: string[]; index: number } | null>(null)
 const correcting = ref<PostView | null>(null)
-const promptResolve = useResolvePrompt()
 const promptDelete = useDeletePrompt()
-const dividerAfter = computed(() =>
-  lastUnreadPostId(days.value.flatMap((day) => day.posts), seenAt, user.value?.id),
-)
+const root = useTemplateRef<HTMLElement>('root')
+
+const posts = computed(() => days.value.flatMap((day) => day.posts))
+const dividerBefore = computed(() => firstUnreadPostId(posts.value, seenAt, user.value?.id))
+/** Kayan öğe sağ panelin gövdesidir (el-scrollbar'ın sarmalayıcısı); akış onun içinde yaşar. */
+const scroller = (): Scroller => root.value?.closest<HTMLElement>('.el-scrollbar__wrap') ?? null
+useFeedBottom(scroller, () => posts.value.at(-1)?.id)
+const loadOlder = () => keepPosition(scroller(), () => loadMore())
 </script>
 
 <template>
-  <div class="feed-column">
+  <div ref="root" class="feed-column">
     <el-skeleton v-if="isLoading" :rows="6" animated />
-    <el-empty v-else-if="!days.length" description="Henüz gönderi yok. İlk gönderiyi yukarıdan ekleyebilirsin." />
+    <el-button v-if="hasMore" class="feed-column__more" :loading="isLoadingMore" @click="loadOlder">
+      Daha eski gönderiler
+    </el-button>
+    <slot v-if="!hasMore" name="start" :empty="!posts.length" />
     <section v-for="day in days" :key="day.key" class="feed-column__day">
-      <FeedDayTitle :title="day.title" :count="day.count" />
+      <FeedDayTitle :title="day.title" />
       <template v-for="post in day.posts" :key="post.id">
-        <PostCard :post="post" :show-site="false" @open-photos="(urls, index) => (viewer = { urls, index })">
-          <template #menu>
+        <el-divider v-if="post.id === dividerBefore" class="feed-column__new">Buradan aşağısı yeni</el-divider>
+        <PostBubble :post="post" :mine="post.author.id === user?.id"
+          @open-photos="(urls, index) => (viewer = { urls, index })">
+          <template v-if="canCorrect(post, user) || canDelete(post, user)" #menu>
             <PostMenu :can-correct="canCorrect(post, user)" :can-delete="canDelete(post, user)"
               @correct="correcting = post" @delete="promptDelete(post)" />
           </template>
-          <template #action>
-            <el-button type="success" plain @click="promptResolve(post)">Çözüldü olarak işaretle</el-button>
-          </template>
-        </PostCard>
-        <el-divider v-if="post.id === dividerAfter" class="feed-column__new">Buradan yukarısı yeni</el-divider>
+        </PostBubble>
       </template>
     </section>
-    <el-button v-if="hasMore" class="feed-column__more" :loading="isLoadingMore" @click="loadMore">
-      Daha eski gönderiler
-    </el-button>
     <el-image-viewer v-if="viewer" :url-list="viewer.urls" :initial-index="viewer.index" teleported
       @close="viewer = null" />
     <PostCorrectDialog v-model="correcting" />
@@ -59,12 +63,13 @@ const dividerAfter = computed(() =>
 <style scoped>
 .feed-column {
   display: grid;
-  gap: var(--space-4);
+  align-content: end;
+  gap: var(--space-3);
 }
 
 .feed-column__day {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 /* Geniş ekranda tek fotoğraf ~480px'e çıkıyordu; tavan koyuyoruz, fazlası kırpılır (tıklayınca tamamı açılır). */

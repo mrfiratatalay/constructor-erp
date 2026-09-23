@@ -6,6 +6,7 @@ export function siteNames(siteIds: string[], sites: SiteView[]): string {
   return names.length > 0 ? names.join(', ') : '—'
 }
 
+/** Başlıkta ve satır önizlemesinde kullanılır; sorumlu yoksa ekran susar. */
 export function leadNames(leads: SiteLead[]): string {
-  return leads.length > 0 ? leads.map((lead) => lead.fullName).join(', ') : 'Sorumlu atanmadı'
+  return leads.map((lead) => lead.fullName).join(', ')
 }

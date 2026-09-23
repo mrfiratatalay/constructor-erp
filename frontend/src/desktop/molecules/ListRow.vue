@@ -3,12 +3,10 @@ import { RouterLink, type RouteLocationRaw } from 'vue-router'
 
 /**
  * Liste satırı: üstte başlık ve sağda küçük bilgi, altında tek satır ayrıntı. Seçili satır lacivert zeminli.
- * tone verilirse soldaki şerit renklenir (sorunun yaşı: dün amber, 2+ gün kırmızı).
  * to verilirse bağlantıdır (adres değişir, paylaşılabilir), verilmezse düğmedir (select yayar).
  */
-const { selected = false, tone, to } = defineProps<{
+const { selected = false, to } = defineProps<{
   selected?: boolean
-  tone?: 'warning' | 'danger'
   to?: RouteLocationRaw
 }>()
 const emit = defineEmits<{ select: [] }>()
@@ -16,7 +14,7 @@ const emit = defineEmits<{ select: [] }>()
 
 <template>
   <component :is="to ? RouterLink : 'button'" :to="to" :type="to ? undefined : 'button'" class="list-row"
-    :class="{ 'list-row--selected': selected, [`list-row--${tone}`]: tone }" :aria-current="selected || undefined"
+    :class="{ 'list-row--selected': selected }" :aria-current="selected || undefined"
     @click="to || emit('select')">
     <span class="list-row__top">
       <span class="list-row__title"><slot name="title" /></span>
@@ -46,14 +44,6 @@ const emit = defineEmits<{ select: [] }>()
 
 .list-row:hover {
   background: var(--surface-muted);
-}
-
-.list-row--warning {
-  border-left-color: var(--status-warning);
-}
-
-.list-row--danger {
-  border-left-color: var(--status-danger);
 }
 
 .list-row--selected,

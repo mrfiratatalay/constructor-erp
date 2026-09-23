@@ -5,15 +5,15 @@ import { telHref } from '@/core/format/phone'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
- * Şantiye künyesi: sorumlular ve telefonları. Bilgisayar her zaman arayamaz; numara düğmede yazılı durur,
- * tıklanınca bağlı telefon uygulaması açılır. Kişi kendini aramaz. Sorumlu yoksa olumsuz bilgi yer kaplamaz:
- * patron (canAssign) "Sorumlu ata" bağlantısını görür.
+ * Şantiye künyesi: grup katılımcıları ve telefonları. Bilgisayar her zaman arayamaz; numara düğmede yazılı
+ * durur, tıklanınca bağlı telefon uygulaması açılır. Patron buradan gruba kişi ekler.
  */
 const { leads, viewerId, canAssign = false } = defineProps<{
   leads: SiteLead[]
   viewerId?: string
   canAssign?: boolean
 }>()
+const emit = defineEmits<{ add: [] }>()
 </script>
 
 <template>
@@ -22,7 +22,7 @@ const { leads, viewerId, canAssign = false } = defineProps<{
       <UserAvatar :name="lead.fullName" :size="36" />
       <span class="lead-contacts__who">
         <strong>{{ lead.fullName }}</strong>
-        <span>Şantiye sorumlusu</span>
+        <span>Katılımcı</span>
       </span>
       <el-button v-if="lead.phone && lead.id !== viewerId" tag="a" :href="telHref(lead.phone)" size="small"
         class="lead-contacts__call">
@@ -30,7 +30,7 @@ const { leads, viewerId, canAssign = false } = defineProps<{
       </el-button>
     </li>
   </ul>
-  <el-link v-else-if="canAssign" type="primary" @click="$router.push({ name: 'team' })">Sorumlu ata ›</el-link>
+  <el-button v-if="canAssign" plain class="lead-contacts__add" @click="emit('add')">Katılımcı ekle</el-button>
 </template>
 
 <style scoped>
@@ -67,5 +67,9 @@ const { leads, viewerId, canAssign = false } = defineProps<{
 
 .lead-contacts__icon {
   margin-right: 6px;
+}
+
+.lead-contacts__add {
+  justify-self: start;
 }
 </style>

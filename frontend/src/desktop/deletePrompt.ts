@@ -11,7 +11,7 @@ export function useDeletePrompt() {
     try {
       await ElMessageBox.confirm(
         'Yerinde "silindi" izi kalır; fotoğraf ve sesler kalıcı olarak silinir.',
-        post.issue ? 'Sorun silinsin mi?' : 'Gönderi silinsin mi?',
+        'Gönderi silinsin mi?',
         { confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç', type: 'warning', confirmButtonClass: 'el-button--danger' },
       )
       await deletePost(post.id)

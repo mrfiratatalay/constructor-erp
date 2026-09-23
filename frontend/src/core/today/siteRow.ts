@@ -1,45 +1,21 @@
 import type { SiteToday } from '@/core/api/generated/model'
-import { currentHour } from '@/core/format/dates'
-
-/** "Bugün haber yok" ancak bu saatten sonra uyarıdır: sabah hiçbir şantiyeden haber gelmemiştir. */
-export const SILENT_AFTER_HOUR = 13
+import { postPreview } from '@/core/posts/postPreview'
+import { leadNames } from '@/core/sites/siteNames'
 
 /**
- * Liste aşağı doğru daralır: geniş (okunmamış yeni haber: fotoğraflarıyla), orta (açık sorun ya da sessiz:
- * fotoğrafsız), tek satır (sakin). Fotoğraf görmediğin yeni şeydir; sorunu kırmızı etiket anlatır.
+ * Şantiye listesi WhatsApp'ın sohbet listesidir: son haber gelen üstte. Yoğunluk kademesi, sessizlik
+ * etiketi ve "dikkat" sıralaması yok — bir satırın ne zaman konuştuğunu saatin kendisi söyler
+ * ("Dün 17:40", "12 Eyl"), ikinci kez etiketle söylemek gürültüdür.
  */
-export type SiteDensity = 'wide' | 'quiet' | 'compact'
-
-export interface SiteRow {
-  site: SiteToday
-  density: SiteDensity
+export function sitesByRecency(sites: SiteToday[]): SiteToday[] {
+  return [...sites].sort((a, b) => (b.lastPostAt ?? '').localeCompare(a.lastPostAt ?? ''))
 }
 
-export function isSilent(site: SiteToday, hour = currentHour()): boolean {
-  return site.noNewsToday && hour >= SILENT_AFTER_HOUR
-}
-
-function densityOf(site: SiteToday, hour: number): SiteDensity {
-  if (site.unreadPosts > 0) return 'wide'
-  return site.openIssues > 0 || isSilent(site, hour) ? 'quiet' : 'compact'
-}
-
-/** Orta yoğunlukta önizleme yalnızca sorunlu şantiyede: sessiz şantiyenin son haberi eskidir, yerine sorumlu yazılır. */
-export function showsPreview(site: SiteToday, density: SiteDensity): boolean {
-  return density === 'wide' || (density === 'quiet' && site.openIssues > 0)
-}
-
-/** Sıra: açık sorun, okunmamış haber, sessiz, sakin; her grup kendi içinde son habere göre. */
-function rankOf(site: SiteToday, hour: number): number {
-  if (site.openIssues > 0) return 0
-  if (site.unreadPosts > 0) return 1
-  return isSilent(site, hour) ? 2 : 3
-}
-
-const newestFirst = (a: SiteToday, b: SiteToday) => (b.lastPostAt ?? '').localeCompare(a.lastPostAt ?? '')
-
-export function siteRows(sites: SiteToday[], hour = currentHour()): SiteRow[] {
-  return [...sites]
-    .sort((a, b) => rankOf(a, hour) - rankOf(b, hour) || newestFirst(a, b))
-    .map((site) => ({ site, density: densityOf(site, hour) }))
+/**
+ * Satırın alt yazısı: son gönderinin ilk satırı ("Ahmet: Demir gelmedi"), gönderi yoksa sorumlusu.
+ * Sorumlu da yoksa satır susar: "henüz haber yok" gibi olumsuz bir cümle yazılmaz.
+ */
+export function sitePreview(site: SiteToday): string {
+  if (site.latestPost) return postPreview(site.latestPost)
+  return site.leads.length ? leadNames(site.leads) : ''
 }

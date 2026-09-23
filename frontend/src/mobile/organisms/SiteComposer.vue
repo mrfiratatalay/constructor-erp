@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { showFailToast, type UploaderBeforeRead } from 'vant'
-import { Camera, Mic, SendHorizontal, TriangleAlert } from 'lucide-vue-next'
+import { Camera, Mic, SendHorizontal } from 'lucide-vue-next'
 import { durationLabel } from '@/core/format/dates'
 import { LIMITS } from '@/core/posts/attachments'
 import { useComposer, type ComposeTarget } from '@/core/posts/useComposer'
@@ -10,12 +10,12 @@ import PhotoSendSheet from '@/mobile/organisms/PhotoSendSheet.vue'
 
 /**
  * Şantiye sayfasının gönderme çubuğu, WhatsApp'ın mesaj çubuğu gibi (TASARIM.md İlke 7): 📷 kamera ya da
- * galeri → önizleme; yazı doğrudan çubuğa; 🎤 basılı tut, bırakınca gider. Yazı varken 🎤 yerine ➤ çıkar,
- * "sorun" işareti de yalnızca o zaman görünür. Şantiye seçilmez: gönderi sayfanın şantiyesine gider.
+ * galeri → önizleme; yazı doğrudan çubuğa; 🎤 basılı tut, bırakınca gider. Yazı varken 🎤 yerine ➤ çıkar.
+ * Şantiye seçilmez: gönderi sayfanın şantiyesine gider.
  */
 const { site } = defineProps<{ site: ComposeTarget }>()
 const composer = useComposer(() => site)
-const { body, issue } = composer
+const { body } = composer
 const sheetOpen = ref(false)
 const recorder = useVoiceRecorder((file) => void sendVoice(file))
 const { isRecording, seconds } = recorder
@@ -34,9 +34,8 @@ const pickPhotos: UploaderBeforeRead = (file) => {
   return false
 }
 
-/** Mikrofon yalnızca yazı yokken görünür; o an "sorun" işareti de görünmez, sesli not düz not gider. */
+/** Mikrofon yalnızca yazı yokken görünür: sesli not tek hareketle gider. */
 async function sendVoice(file: File) {
-  issue.value = false
   await addFiles([file])
   await composer.submit()
 }
@@ -52,11 +51,6 @@ async function startRecording() {
 
 <template>
   <div class="site-composer">
-    <label v-if="hasText" class="site-composer__issue" :class="{ 'site-composer__issue--on': issue }">
-      <TriangleAlert :size="16" />
-      <span>Sorun olarak işaretle</span>
-      <van-switch v-model="issue" size="20px" />
-    </label>
     <div class="site-composer__bar">
       <van-uploader :before-read="pickPhotos" :max-count="LIMITS.attachments" :preview-image="false" multiple
         accept="image/*,video/*">
@@ -76,7 +70,7 @@ async function startRecording() {
         @mousedown.prevent="startRecording" @mouseup="recorder.stop" @mouseleave="recorder.stop">
         <Mic :size="22" />
       </van-button>
-      <van-button v-else round :type="issue ? 'danger' : 'primary'" :disabled="!hasText"
+      <van-button v-else round type="primary" :disabled="!hasText"
         class="site-composer__round" aria-label="Gönder" @click="composer.submit()">
         <SendHorizontal :size="20" />
       </van-button>
@@ -89,24 +83,6 @@ async function startRecording() {
 .site-composer {
   display: grid;
   gap: var(--space-2);
-}
-
-.site-composer__issue {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0 var(--space-2);
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-}
-
-.site-composer__issue span {
-  flex: 1;
-}
-
-.site-composer__issue--on {
-  color: var(--status-danger);
 }
 
 .site-composer__bar {

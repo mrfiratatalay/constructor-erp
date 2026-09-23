@@ -4,14 +4,14 @@ import type { PostDeletion } from '@/core/api/generated/model'
 import { dateTime } from '@/core/format/dates'
 
 /** Silinen gönderinin izi: içerik gitti, ama silindiği ve kimin sildiği görünür (TASARIM.md İlke 6). */
-const { deletion, issue } = defineProps<{ deletion: PostDeletion; issue: boolean }>()
+const { deletion } = defineProps<{ deletion: PostDeletion }>()
 </script>
 
 <template>
   <p class="deleted-post">
     <Ban :size="16" class="deleted-post__icon" />
     <span>
-      {{ issue ? 'Bu sorun silindi' : 'Bu gönderi silindi' }}
+      Bu gönderi silindi
       <span class="deleted-post__meta">· {{ deletion.deletedByName }} · {{ dateTime(deletion.deletedAt) }}</span>
     </span>
   </p>

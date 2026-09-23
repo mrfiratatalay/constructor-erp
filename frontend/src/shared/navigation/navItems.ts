@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { HardHat, TriangleAlert, UserRound, Users } from 'lucide-vue-next'
+import { HardHat, UserRound, Users } from 'lucide-vue-next'
 import type { CurrentUserResponseRole } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
 
@@ -12,19 +12,20 @@ export interface NavItem {
 /** Patronun birden çok şantiyesi var; şantiye sorumlusu çoğunlukla tek şantiyeye bakar. */
 const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyeler', SITE_LEAD: 'Şantiyem' }
 
-const ITEMS: Record<'issues' | 'profile' | 'team', Omit<NavItem, 'route'>> = {
-  issues: { label: 'Sorunlar', icon: TriangleAlert },
+const ITEMS: Record<'profile' | 'team', Omit<NavItem, 'route'>> = {
   profile: { label: 'Ben', icon: UserRound },
   team: { label: 'Ekip', icon: Users },
 }
 
 const item = (route: keyof typeof ITEMS): NavItem => ({ route, ...ITEMS[route] })
 
-/** Günlük iş: iki rolde de aynı üç sekme. Gönderme ayrı bir sekme değildir, şantiyenin içindedir. */
+/**
+ * Günlük iş tek yerdedir: şantiyeler. Gönderme ayrı bir sekme değildir, şantiyenin içindedir.
+ * Masaüstünde "Ben" sol menünün altındaki kullanıcı düğmesidir, o yüzden menüde yer almaz.
+ */
 export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
   const sites: NavItem = { route: 'sites', label: SITES_LABEL[role], icon: HardHat }
-  // Masaüstünde "Ben" sol menünün altındaki kullanıcı düğmesindedir.
-  return platform === 'mobile' ? [sites, item('issues'), item('profile')] : [sites, item('issues')]
+  return platform === 'mobile' ? [sites, item('profile')] : [sites]
 }
 
 /**
@@ -36,7 +37,7 @@ export function manageNavItems(role: CurrentUserResponseRole): NavItem[] {
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
-const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', resolvedIssues: 'issues' }
+const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites' }
 
 export function navRouteOf(route: RouteName): RouteName {
   return PARENT_ROUTE[route] ?? route

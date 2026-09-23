@@ -5,15 +5,26 @@ import { useRouter } from 'vue-router'
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
  * brand: ana ekranın lacivert, ızgaralı başlığı (ad solda, action sağda).
+ * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi: şantiyenin sorumlusu).
  * footer: ekranın altında sabit duran alan (şantiye sayfasındaki gönderme çubuğu).
  * tabbar: altta sekme çubuğu var mı; yoksa footer ekranın en altına oturur.
+ * bottom: içerik azken sayfanın dibine yaslanır — sohbet böyle durur (WhatsApp).
  */
 const {
   title,
+  subtitle = '',
   back = false,
   brand = false,
   tabbar = true,
-} = defineProps<{ title: string; back?: boolean; brand?: boolean; tabbar?: boolean }>()
+  bottom = false,
+} = defineProps<{
+  title: string
+  subtitle?: string
+  back?: boolean
+  brand?: boolean
+  tabbar?: boolean
+  bottom?: boolean
+}>()
 const slots = useSlots()
 const router = useRouter()
 
@@ -24,12 +35,20 @@ function goBack() {
 </script>
 
 <template>
-  <van-nav-bar :title="brand ? undefined : title" :left-arrow="back" :border="!brand"
-    :class="{ 'mobile-page__bar--brand': brand }" safe-area-inset-top fixed placeholder @click-left="goBack">
+  <van-nav-bar :title="brand || subtitle ? undefined : title" :left-arrow="back" :border="!brand"
+    :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed placeholder
+    @click-left="goBack">
     <template v-if="brand" #left><span class="mobile-page__brand">{{ title }}</span></template>
+    <template v-if="!brand && subtitle" #title>
+      <span class="mobile-page__title">
+        <strong>{{ title }}</strong>
+        <small>{{ subtitle }}</small>
+      </span>
+    </template>
     <template #right><slot name="action" /></template>
   </van-nav-bar>
-  <main class="mobile-page" :class="{ 'mobile-page--with-footer': slots.footer, 'mobile-page--no-tabbar': !tabbar }">
+  <main class="mobile-page"
+    :class="{ 'mobile-page--with-footer': slots.footer, 'mobile-page--no-tabbar': !tabbar, 'mobile-page--bottom': bottom }">
     <slot />
   </main>
   <div v-if="slots.footer" class="mobile-page__footer" :class="{ 'mobile-page__footer--no-tabbar': !tabbar }">
@@ -51,8 +70,22 @@ function goBack() {
   padding-bottom: calc(170px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Sohbet gibi: az gönderi varken akış ekranın dibinde, gönderme çubuğunun hemen üstünde durur. */
+.mobile-page--bottom {
+  align-content: end;
+  min-height: calc(100dvh - var(--van-nav-bar-height));
+}
+
 .mobile-page--with-footer.mobile-page--no-tabbar {
   padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
+/*
+ * Sayfa içindeki yapışkan parçalar (ör. akıştaki gün başlığı) başlık çubuğunun altından geçer:
+ * Vant'ın varsayılanı 1'dir ve sayfadaki her yapışkan öğe onu örtüyordu.
+ */
+.mobile-page__bar :deep(.van-nav-bar) {
+  --van-nav-bar-z-index: 5;
 }
 
 /* Sınıf, Vant'ın yer tutucusuna düşer; sabit çubuk onun içindedir ve renkleri buradan miras alır. */
@@ -68,6 +101,30 @@ function goBack() {
   color: rgb(255 255 255 / 0.72);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
+}
+
+/* İki satırlık başlık (ad + sorumlu) çubuğun yüksekliğini bozmasın: ikinci satır küçük ve sıkışık. */
+.mobile-page__title {
+  display: grid;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.mobile-page__title strong {
+  overflow: hidden;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-page__title small {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: var(--weight-regular);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mobile-page__brand {

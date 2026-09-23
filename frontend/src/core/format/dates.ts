@@ -48,11 +48,6 @@ export function daysAgo(isoDate: string): number {
   return dayjs().startOf('day').diff(dayjs(isoDate).startOf('day'), 'day')
 }
 
-/** Günün saati (0-23): sabah saatlerinde "haber yok" uyarısını susturmak için. */
-export function currentHour(): number {
-  return dayjs().hour()
-}
-
 /** Ses ve video süresi: "0:45", "2:05". */
 export function durationLabel(seconds: number): string {
   const whole = Math.max(0, Math.round(seconds))

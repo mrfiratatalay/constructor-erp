@@ -4,19 +4,18 @@ import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import type { PostView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { canChangeIssueFlag, canCorrect, canDelete } from '@/core/posts/postPermissions'
+import { canCorrect, canDelete } from '@/core/posts/postPermissions'
 import { usePostActions } from '@/core/posts/usePostActions'
 
 /**
- * Gönderiye uzun basınca alttan açılan menü (WhatsApp gibi): Düzelt ve Sil. Düzeltmede yalnızca yazı ve
- * "sorun" işareti değişir, gönderide "düzenlendi" izi kalır; silinenin yerinde "silindi" izi kalır.
+ * Gönderiye uzun basınca alttan açılan menü (WhatsApp gibi): Düzelt ve Sil. Düzeltmede yalnızca yazı
+ * değişir, gönderide "düzenlendi" izi kalır; silinenin yerinde "silindi" izi kalır.
  */
 const post = defineModel<PostView | null>({ required: true })
 const { data: user } = useCurrentUser()
 const { correctPost, deletePost, isSaving } = usePostActions()
 const correcting = ref<PostView | null>(null)
 const body = ref('')
-const issue = ref(false)
 
 const actions = computed(() => {
   const target = post.value
@@ -36,14 +35,13 @@ function onSelect(action: { key: string }) {
 
 function startCorrecting(target: PostView) {
   body.value = target.body ?? ''
-  issue.value = target.issue
   correcting.value = target
 }
 
 async function saveCorrection() {
   if (!correcting.value) return
   try {
-    await correctPost(correcting.value.id, body.value.trim() || null, issue.value)
+    await correctPost(correcting.value, body.value.trim() || null)
     correcting.value = null
     showSuccessToast('Düzeltildi')
   } catch (error) {
@@ -53,7 +51,7 @@ async function saveCorrection() {
 
 async function confirmDelete(target: PostView) {
   const confirmed = await showConfirmDialog({
-    title: target.issue ? 'Sorun silinsin mi?' : 'Gönderi silinsin mi?',
+    title: 'Gönderi silinsin mi?',
     message: 'Yerinde "silindi" izi kalır; fotoğraf ve sesler kalıcı olarak silinir.',
     confirmButtonText: 'Sil',
     confirmButtonColor: 'var(--status-danger)',
@@ -78,12 +76,6 @@ async function confirmDelete(target: PostView) {
       <h2 class="correct-sheet__title">Gönderiyi düzelt</h2>
       <van-cell-group inset class="correct-sheet__fields">
         <van-field v-model="body" type="textarea" rows="3" autosize maxlength="4000" placeholder="Yazı" />
-        <van-cell center title="Bu bir sorun"
-          :label="correcting && !canChangeIssueFlag(correcting) ? 'Çözülmüş sorunun işareti değişmez.' : undefined">
-          <template #right-icon>
-            <van-switch v-model="issue" :disabled="!correcting || !canChangeIssueFlag(correcting)" />
-          </template>
-        </van-cell>
       </van-cell-group>
       <van-button type="primary" block round size="large" :loading="isSaving" @click="saveCorrection">
         Kaydet

@@ -5,11 +5,11 @@ const isUnread = (post: PostView, seenAt: string, viewerId?: string) =>
   !post.deletion && post.author.id !== viewerId && dayjs(post.createdAt).isAfter(seenAt)
 
 /**
- * "Buradan yukarısı yeni" çizgisinin altına geleceği gönderi: önceki bakıştan sonra başkalarının
- * gönderdiği en eskisi. İlk ziyarette (önceki bakış yok) çizgi çizilmez, her şey zaten yeni.
- * Silinen gönderi yeni sayılmaz (sunucudaki okunmadı sayısıyla aynı kural).
+ * "Buradan aşağısı yeni" çizgisinin üstüne geleceği gönderi: önceki bakıştan sonra başkalarının gönderdiği
+ * en eskisi. Akış eskiden yeniye dizilir, bu yüzden çizgi o gönderinin önüne çizilir. İlk ziyarette
+ * (önceki bakış yok) çizgi çizilmez, her şey zaten yeni. Silinen gönderi yeni sayılmaz.
  */
-export function lastUnreadPostId(posts: PostView[], seenAt: string | null, viewerId?: string): string | null {
+export function firstUnreadPostId(posts: PostView[], seenAt: string | null, viewerId?: string): string | null {
   if (!seenAt) return null
-  return posts.filter((post) => isUnread(post, seenAt, viewerId)).at(-1)?.id ?? null
+  return posts.find((post) => isUnread(post, seenAt, viewerId))?.id ?? null
 }

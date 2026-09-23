@@ -10,14 +10,13 @@ export interface ComposeTarget {
 }
 
 /**
- * Gönderi hazırlama: yazı, "sorun" işareti ve ekler. Şantiye sabittir: gönderi şantiyenin kendi
- * sayfasından atılır, seçici yoktur. Gönderince kuyruğa girer, form temizlenir.
+ * Gönderi hazırlama: yazı ve ekler. Şantiye sabittir: gönderi şantiyenin kendi sayfasından atılır,
+ * seçici yoktur. Gönderince kuyruğa girer, form temizlenir.
  */
 export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>) {
   const queue = useUploadQueue()
   const files = useAttachments()
   const body = ref('')
-  const issue = ref(false)
 
   const canSend = computed(
     () => !!toValue(target) && (body.value.trim() !== '' || files.attachments.value.length > 0),
@@ -31,16 +30,16 @@ export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>)
       siteId: site.id,
       siteName: site.name,
       body: body.value.trim() || null,
-      issue: issue.value,
+      // Sunucu alanı bekliyor; "sorun" kavramı arayüzden kalktığı için her gönderi düz nottur.
+      issue: false,
       files: files.attachments.value.map((item) => item.file),
       queuedAt: new Date().toISOString(),
     })
     files.clear()
     body.value = ''
-    issue.value = false
   }
 
-  return { body, issue, canSend, submit, ...files }
+  return { body, canSend, submit, ...files }
 }
 
 /** Gönderme çubuğu ile fotoğraf önizleme penceresi aynı taslağı paylaşır. */

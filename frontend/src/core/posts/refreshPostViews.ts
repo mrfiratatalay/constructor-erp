@@ -7,7 +7,7 @@ export const ISSUES_QUERY_PREFIX = '/api/issues'
 
 /**
  * Bir gönderi değişince (çözüldü, düzeltildi, silindi) onu gösteren her ekran birlikte yenilenir:
- * akış, sorunlar, ana ekran ve şantiyenin fotoğrafları.
+ * akış, ana ekran ve şantiyenin fotoğrafları.
  */
 export function refreshPostViews(queryClient: QueryClient, siteId: string) {
   const prefixes = [FEED_QUERY_PREFIX, ISSUES_QUERY_PREFIX, TODAY_QUERY_PREFIX]

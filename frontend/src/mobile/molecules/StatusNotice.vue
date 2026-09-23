@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { CircleCheck, Clock, TriangleAlert } from 'lucide-vue-next'
-import type { SummaryTone } from '@/core/today/todaySummary'
+import type { StatusTone } from '@/core/format/statusTone'
 
 /** Tek cümlelik durum şeridi. link: dokunulur ve ilgili sayfaya götürür (sağda ok çıkar). */
-const { tone, text, link = false } = defineProps<{ tone: SummaryTone; text: string; link?: boolean }>()
+const { tone, text, link = false } = defineProps<{ tone: StatusTone; text: string; link?: boolean }>()
 const emit = defineEmits<{ open: [] }>()
-const ICONS = { danger: TriangleAlert, warning: TriangleAlert, calm: Clock, good: CircleCheck } as const
+const ICONS = { danger: TriangleAlert, warning: TriangleAlert, success: CircleCheck, neutral: Clock } as const
 </script>
 
 <template>
@@ -32,8 +32,8 @@ const ICONS = { danger: TriangleAlert, warning: TriangleAlert, calm: Clock, good
 }
 
 /* Sakin ve iyi haber alarm değildir: marka lacivertiyle, bağırmadan. */
-.status-notice--calm,
-.status-notice--good {
+.status-notice--neutral,
+.status-notice--success {
   --van-notice-bar-text-color: var(--brand-primary);
   --van-notice-bar-background: var(--brand-tint);
 }

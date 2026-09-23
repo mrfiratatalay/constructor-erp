@@ -1,267 +1,165 @@
 # Kızılkan Şantiye — Ekran Tasarımı Kararları
 
-22 Eylül 2026'da kararlaştırıldı; ilk sürüm ekranlarda görüldükten sonra aynı gün ikinci
-turda inceltildi. Ekran düzeniyle ilgili bir tercih yapılacağı zaman önce buraya bakılır.
-Kurallar değil, kararlardır; gerekçesiyle birlikte değişir.
+22 Eylül 2026'da kararlaştırıldı, aynı gün dördüncü turda sadeleştirildi. Ekran düzeniyle ilgili bir
+tercih yapılacağı zaman önce buraya bakılır. Kurallar değil, kararlardır; gerekçesiyle birlikte değişir.
+
+## Tek ölçüt: tek cümle testi
+
+Dayına telefonu uzatınca söylenecek cümle şudur:
+
+> **"Bu, sadece şantiyeler için WhatsApp. Şefler buraya atıyor, sen burada görüyorsun."**
+
+Bundan uzun bir açıklama gerekiyorsa tasarım yanlıştır. Dördüncü turda ekranlar bu teste vuruldu ve
+öğrenilmesi gereken dokuz sessiz kural (yoğunluk kademesi, rozet renkleri, yaş şeritleri, sessizlik
+saati, boş ekranın "iyi haber" anlamı…) tek tek kaldırıldı.
 
 ## İlkeler
 
-**1. İyi haber sessizdir.** Sıfır sayı, boş kutu, "sorun yok" rozeti gösterilmez.
-Sakin şantiyenin yeri, yer kaplamamaktır. Ekranda görünen her şey ya bir iş ya bir haberdir.
+**1. Tanıdık olan kazanır.** Şefin ve patronun elindeki alışkanlık WhatsApp'tır: sohbet listesi, grubun
+içi, mesaj çubuğu, basılı tut ses kaydı, uzun basınca menü. Yeni bir kalıp icat etmek yerine onu
+kullanırız. Yeni bir kavram eklemeden önce sorulur: **bunun WhatsApp'ta karşılığı ne?**
 
-**2. Ayrımı başlıkla değil, yoğunlukla anlat.** "Dikkat isteyen / Diğer" gibi başlıklar
-yerine önemli olan geniş, önemsiz olan dar çizilir. Kullanıcı okumadan, siluetten anlar.
+**2. Ekranda ne varsa yazar.** Anlam renk, genişlik ya da boşlukla anlatılmaz. "3 gündür bekliyor"
+yazılır; kırmızı şeritle ima edilmez. Dayın ekrana okumaya bakar, siluete değil.
 
-**3. Eyleme dönüşmeyen sayı gösterilmez.** "Bugün 34 fotoğraf" bilgisiyle patron hiçbir şey
-yapmaz; "2 açık sorun, en eskisi 3 gündür" bilgisiyle telefon açar.
+**3. Olumsuz bilgi yer kaplamaz.** "Henüz haber yok", "sorumlu atanmadı", "bugün sessiz" gibi cümleler
+ekranda durmaz. Bir şantiyenin en son ne zaman konuştuğunu **satırdaki saat** zaten söyler
+("Dün 17:40", "12 Eyl"); ikinci kez etiketle söylemek gürültüdür.
 
-**4. Bir gönderi şantiyesine aittir.** Gönderme her zaman şantiyenin içinde olur;
-ayrı bir gönderme ekranı ve şantiye seçici yoktur.
+**4. Eyleme dönüşmeyen sayı gösterilmez.** "Bugün 34 fotoğraf" ile patron hiçbir şey yapmaz.
 
-**5. Uyarı, ancak anlam taşıdığı saatte uyarır.** Sabah 08:00'de hiçbir şantiyeden haber
-gelmemiştir. "Bugün haber yok" 13:00'ten önce nötr gri, sonra amber yazılır.
+**5. Bir gönderi şantiyesine aittir.** Gönderme her zaman şantiyenin içinde olur; ayrı bir gönderme
+ekranı ve şantiye seçici yoktur.
 
-**6. Defter iz bırakmadan değişmez.** Gönderi silinebilir ve düzeltilebilir, ama yerinde
-"silindi" ya da "düzenlendi" izi kalır. Patron sabah bildirilen bir sorunun öğlen sessizce
-kaybolmadığından emin olur.
+**6. Defter iz bırakmadan değişmez.** Gönderi silinebilir ve düzeltilebilir, ama yerinde "silindi" ya da
+"düzenlendi" izi kalır.
 
-**7. Tanıdık olan kazanır.** Şefin elindeki alışkanlık WhatsApp'tır: mesaj çubuğu, basılı tut
-ses kaydı, uzun basınca menü. Yeni bir kalıp icat etmek yerine onu kullanırız.
+## Ekran 1 — Şantiyeler (WhatsApp'ın sohbet listesi)
 
-## Ekran 1 — Şantiyeler (ana ekran)
+Patronda "Şantiyeler", şefte "Şantiyem". Tek şantiyesi olan listeyi hiç görmez, doğrudan o şantiyenin
+sayfasına düşer.
 
-Patronda "Şantiyeler", şefte "Şantiyem". Tek şantiyesi olan listeyi hiç görmez,
-doğrudan o şantiyenin sayfasına düşer.
+**Başlık:** ince lacivert (blueprint) şerit; firma adı ve patronda ＋. Özet cümlesi, tarih ve bildirim
+hatırlatması yok.
 
-**Başlık:** ince lacivert (blueprint) şerit. Marka adı + tarih, altında tek cümlelik durum
-("3 açık sorun · 2 şantiye sessiz"), Sorunlar'a gider. Selamlama yok.
+**Satır tek tiptir:**
 
-**Liste yukarıdan aşağı daralır.** Sıralama: açık sorun → okunmamış haber → sessiz → sakin.
+```
+┌────────────────────────────────────────┐
+│ Bahçelievler Konutları          07:42  │  ad · son haberin saati
+│ Ahmet: Beton pompası gecikti         ③ │  önizleme · okunmadı rozeti
+└────────────────────────────────────────┘
+```
 
-| Durum | Yoğunluk |
+| Parça | Karar |
 |---|---|
-| Okunmamış haber | Geniş: 3'lü kare fotoğraf şeridi (fazlası `+5`), son gönderinin önizleme metni, durum satırı, okunmadı rozeti |
-| Açık sorun var, hepsi okunmuş | Orta: fotoğraf yok; önizleme metni + kırmızı sorun etiketi |
-| Bugün haber gelmedi | Orta: fotoğraf yok, "Dünden beri haber yok" + şef adı |
-| Sorun yok, hepsi okunmuş | Sıkışık: tek satır — ad · şef · saat |
+| Sıralama | Son haber gelen üstte (WhatsApp). Rol, sorun ya da sessizlik sıralamaya karışmaz. |
+| Önizleme | Son gönderinin ilk satırı: `Ahmet: "Demir gelmedi…"`. Patron çoğu gün içeri girmeden cevabını alır. |
+| Gönderi yoksa | Sorumlunun adı yazılır; sorumlu da yoksa satır susar (İlke 3). |
+| Okunmadı rozeti | Marka lacivertidir. Kırmızı hiçbir yerde kullanılmaz. |
+| Tamamlananlar | Listenin sonunda "Tamamlanan N şantiye ›". |
 
-**Fotoğraf = görmediğin yeni şey.** İlk sürümde sorunlu şantiye okunmuş olsa da üç büyük
-fotoğrafla duruyordu; bir satır ~300px yer kaplıyor, fotoğraf "yeni" anlamını yitiriyordu.
-Sorunu kırmızı etiket anlatır, fotoğrafı yeni haber. Sıralama değişmez: sorunlu şantiye yine en üsttedir.
+Kaldırılanlar ve nedenleri: **yoğunluk kademeleri** (geniş/orta/dar satır) — önemi genişlikle anlatmak
+öğrenilmesi gereken bir şifreydi; **satırdaki fotoğraf şeridi** — fotoğrafların yeri akış; **durum
+etiketleri** ("2 açık sorun", "Dünden beri haber yok", "Bugün henüz haber yok") ve **üstteki özet
+cümlesi** — İlke 2 ve 3.
 
-**Bildirim hatırlatması listenin altında, tek satır.** İlk sürümde en tepede ~180px kaplıyordu
-ve ilk ekranda yalnızca 1,3 şantiye görünüyordu. Ana içerik her zaman önce gelir.
+## Ekran 2 — Şantiye sayfası (WhatsApp'ta bir grubun içi)
 
-**Önizleme metni** (`Ahmet: "Demir gelmedi…"`) ekranın en değerli parçasıdır: patron çoğu gün
-içeri hiç girmeden cevabını alır.
-
-**Okunmadı rozeti lacivert**, kırmızı değil. Kırmızı açık soruna ayrılmıştır; okunmamış
-gönderi alarm değil, bilgidir.
-
-**Sakin satırda hiçbir işaret yok** — yeşil onay simgesi de yok (İlke 1).
-
-**Her şey yolundaysa** listenin üstünde sakin bir cümle: "Bugün her şey yolunda —
-9 şantiyeden de haber geldi."
-
-## Ekran 2 — Sorunlar
-
-Bu bir akış değil, bir iş listesidir. Sekme ve şantiye süzgeci yoktur: açık sorun sayısı
-normalde 3-5'tir, süzülecek bir şey yokken süzgeç gürültüdür.
-
-**En eski üstte.** Yaş, satırın **sol şeridinin rengini** belirler:
-bugün nötr (şeritsiz) · dün amber · 2+ gün kırmızı. Böylece hiçbir şey yapılmazsa
-ekran kendi kendine kızarır — sessiz bir hatırlatma.
-
-Akışta sorun, olaylar arasında bir olaydır; orada üstteki kırmızı bant doğrudur.
-Burada her şey zaten sorundur, ayırt edici olan yaştır.
-
-**Satır:** yaş etiketi · şantiye · şef · gönderi metni · fotoğraflar ·
-`Çözüldü` ve `📞 Ara` düğmeleri.
-
-**Altta** `Çözülen N sorun ›` linki, ayrı sayfaya gider.
-
-**Boş durum** bu ekranın en sık hâlidir, öyle yazılır:
-"Bekleyen iş yok. Son sorun 2 gün önce çözüldü."
-
-## Ekran 3 — Şantiye sayfası
-
-En çok açılan ekran; "Akış" sekmesi buraya taşındı.
-
-1. **Künye:** şantiye adı, şef adı, `📞 Ara` düğmesi. Sorumlu atanmamışsa patron tek satırlık
-   "Sorumlu ata" bağlantısı görür (Ekip'e gider), şef hiçbir şey görmez: olumsuz bilgi kart kaplamaz.
-2. **Açık sorun şeridi** — yalnızca sorun varsa çıkar, sıfırken hiç yer kaplamaz.
-3. **Akış:** gün başlıklarıyla, **en yeni üstte**. Bu bir sohbet değil, şantiye defteri:
-   gönderiler rapordur, karşılıklı konuşma değil.
-4. **"Buradan yukarısı yeni" ayracı:** son bakıştan sonraki gönderilerin altında ince çizgi.
-   Ana ekrandaki rozet "3 yeni var" der, bu çizgi "hangileri" der.
-5. **Gönderme: WhatsApp mesaj çubuğu** (sayfanın altında sabit, herkeste; İlke 7).
+En çok açılan ekran.
 
 ```
-  Boşken:                                Yazmaya başlayınca:
- ┌──────────────────────────────┐         ⚠ Sorun olarak işaretle ○
- │ 📷 │ Bir not yaz…      │ 🎤 │        ┌──────────────────────────────┐
- └──────────────────────────────┘        │ 📷 │ Demir gelmedi…    │ ➤  │
-                                         └──────────────────────────────┘
+┌──────────────────────────────────────┐
+│ ‹  BAHÇELİEVLER KONUTLARI     📞  ⓘ │  ad + altında sorumlu
+├──────────────────────────────────────┤
+│      · Şantiye oluşturuldu ·         │  sistem satırları (gri)
+│      · Sorumlu: Ahmet Yılmaz ·       │
+│             — DÜN —                  │
+│  [ gönderi ]                         │  en eski üstte
+│  ─── buradan aşağısı yeni ───        │
+│            — BUGÜN —                 │
+│  [ gönderi ]                         │  en yeni EN ALTTA
+├──────────────────────────────────────┤
+│  📷 │ Bir not yaz…          │  🎤   │
+└──────────────────────────────────────┘
 ```
 
-   - Yazı doğrudan çubuğa yazılır; ayrı pencere açılmaz.
-   - 📷 kamera/galeri açar → önizleme penceresi (fotoğraflar + açıklama + sorun) → Gönder.
-   - 🎤 basılı tut, bırakınca gider. Yazı varken 🎤 yerine ➤ çıkar.
-   - "Sorun olarak işaretle" yalnızca içerik varken çubuğun üstünde görünür.
+| Parça | Karar |
+|---|---|
+| **Akış yönü** | **En eski üstte, en yenisi altta; sayfa açılınca dibe iner.** Yukarı kaydırınca geçmiş yüklenir ve ekran zıplamaz (eklenen yükseklik kadar aşağı kaydırılır). |
+| Künye | Ayrı kart değil, başlığın kendisi: şantiye adı, altında sorumlu; sağda 📞 ve ⓘ. Sorumlu yoksa alt satır hiç yazılmaz. |
+| Akışın başı | WhatsApp'taki "grup oluşturuldu" satırlarının karşılığı: `· Şantiye oluşturuldu ·`, `· Sorumlu: Ahmet Yılmaz ·`. Yalnızca bütün geçmiş yüklendiğinde görünür. |
+| Boş şantiye | Sistem satırları durur; patron aynı yerde **"Davet linki gönder: Ahmet"** düğmesini görür. İlk gönderi gelince düğme kendiliğinden kaybolur. |
+| Yeni ayracı | Önceki bakıştan sonra gelenlerin **üstüne** ince çizgi: "Buradan aşağısı yeni". |
+| Gönderme | Sayfanın altında sabit çubuk: 📷 kamera/galeri → önizleme, yazı doğrudan çubuğa, 🎤 basılı tut. Yazı varken 🎤 yerine ➤. |
+| Alt sekmeler | Bu sayfada gizlenir (WhatsApp'ta sohbetin içi gibi); tek şantiyeli şefte kalır. |
 
-   İlk sürümdeki üç düğme (Fotoğraf · Ses · Not) üçü de aynı pencereyi açıyordu; "Not" bile
-   fotoğraf kutusuyla başlıyordu. Söz verilenle yapılan farklıydı.
+**"En yeni üstte" kararı geri alındı (4. tur).** Gerekçesi "bu bir sohbet değil, defter"di; ama kabuğu
+WhatsApp yapıp içeriyi ters akıtmak, alışkanlığı tam da en çok kullanılan yerde bozuyordu. Şantiye günü
+kronolojiktir: sabah demir geldi, öğlen beton döküldü. Hikâye baştan okunur.
 
-6. **Alt sekmeler bu sayfada gizlenir** (WhatsApp'ta sohbetin içi gibi): gönderme çubuğu ile
-   sekme çubuğu üst üste ekranın %15'ini yiyordu. Tek şantiyeli şef için bu sayfa ana ekrandır;
-   onda sekmeler kalır.
+## Ekran 3 — Şantiye kurma (WhatsApp'ta grup kurma)
+
+Listenin başlığındaki ＋ (yalnızca patron):
+
+1. **Tek pencere:** Şantiye adı (zorunlu) · Adres (isteğe bağlı) · **Sorumlu**: ekipten seç / yeni kişi
+   ekle (ad soyad + telefon) / sonra atarım.
+2. **Kaydedince şantiyenin içine düşülür** — WhatsApp'ta grup kurunca içine düştüğün gibi.
+3. Orada sistem satırları ve **"Davet linki gönder"** düğmesi hazır durur: link WhatsApp'tan gider,
+   şef şifresiz girer.
+
+Sorumlu ataması burada yapılabilir, çünkü patronu "önce Ekip'e git, kişiyi ekle, sonra geri dön"
+yolculuğuna çıkarmak tek bir iş için üç ekran demekti.
 
 ## Masaüstü: solda liste, sağda şantiye (WhatsApp Masaüstü)
 
-Üçüncü turda (22 Eylül) değişti. İkinci turdaki masaüstü çözümü, yani büyük kart ızgarası, küçük
-kart ızgarası, sakinler tablosu ve şantiye sayfasında sağ sütunda üç kutu, aynı şeyi (şantiyeyi) ekranda
-üç ayrı kılıkta gösteriyordu. Göz tek bir listeyi okuyamıyordu, "kutu kutu" dağınık görünüyordu.
-Patron her şantiye için sayfa değiştirip geri dönüyordu.
-
-```
-┌───┬────────────────────────┬─────────────────────────────────────────┐
-│ ☰ │ Şantiyeler     22 Eyl  │ NAMIK KEMAL · Ahmet Yılmaz     📞   ⓘ    │
-│ 🏗 │ ⚠ 1 açık sorun·1 sessiz │─────────────────────────────────────────│
-│ ⚠ │────────────────────────│  BUGÜN                                  │
-│   │ Bahçelievler     03:42 │  ┌ gönderi ─────────────────────────┐   │
-│ ⚙ │ Ahmet: Beton pompası…  │  └──────────────────────────────────┘   │
-│ 👥 │ ⚠ 1 açık sorun          │  ─── buradan yukarısı yeni ───          │
-│   │▐NAMIK KEMAL     03:42 ①│                                         │
-│   │ EREGLI                 │                                         │
-│   │ Henüz hiç haber yok    │ ┌─────────────────────────────────────┐ │
-│ PA│ Kartal B Blok    03:42 │ │ 📷 │ Bir not yaz…             │ 🎤 │ │
-└───┴────────────────────────┴─────────────────────────────────────────┘
-```
-
 | Parça | Karar |
 |---|---|
-| Sol menü | `el-menu` `collapse`: ☰ ile ikonlara daralır (64px), ikonun üstünde ad ipucu olarak çıkar. Seçim tarayıcıda hatırlanır. Seçili öğe baret sarısıyla dolu, yazısı lacivert (logodaki KŞ rozetinin ikilisi). Beyaz yazı değil: sarı üstünde beyaz ~1,5:1 kontrastla okunmaz, lacivert ~11:1. |
-| Liste | Tek tip satır: ad + saat + okunmadı rozeti, altında önizleme ya da durum. Seçili satır lacivert zeminli. Kart, ızgara, tablo ve listede fotoğraf yok: fotoğraflar sağdaki akışta. Durum cümlesi listenin başında tek satır yazı (kutu değil). |
-| Sağ panel | Seçili şantiyenin defteri; adres `/santiyeler/:id`, bağlantı paylaşılabilir, geri tuşu çalışır. Gönderme altta, mobildeki WhatsApp çubuğuyla aynı. |
-| Hiçbir şantiye seçili değilken | Sağda sakin bir boş durum: günün cümlesi + "Soldan bir şantiye seç". Kullanıcı istemeden hiçbir şantiye okunmuş sayılmaz. |
-| Künye | Sağ panel başlığında şantiye · şef adı · 📞. Adres, bütün sorumlular ve bu haftanın fotoğrafları ⓘ ile açılan `el-drawer` çekmecede (WhatsApp'taki "kişi bilgisi"). |
-| Kaydırma | Liste ve akış ayrı ayrı kayar (`el-scrollbar`); sayfa bütün olarak kaymaz. |
+| Sol menü | `el-menu` `collapse`: tek günlük öğe (🏗 Şantiyeler) ve altında Yönetim grubunda 👥 Ekip. Seçili öğe baret sarısı zeminde lacivert yazı. |
+| Liste | Mobildeki satırın aynısı: ad · saat · önizleme · okunmadı rozeti. Kart, ızgara, fotoğraf yok. |
+| Sağ panel | Seçili şantiyenin akışı; adres `/santiyeler/:id`, bağlantı paylaşılabilir, geri tuşu çalışır. Akış yönü ve "Daha eski gönderiler" düğmesi mobildekiyle aynı mantıkta (düğme yukarıda). |
+| Künye | Başlıkta şantiye · sorumlu · 📞; adres ve bu haftanın fotoğrafları ⓘ çekmecesinde. |
+| Hesabım | Sol alttaki kullanıcı düğmesinin açtığı panel; ayrı sayfa yok. |
 
-Mobil değişmez: orada zaten liste → şantiye sayfası (WhatsApp mobil) düzeni var.
+## Navigasyon
 
-### Sorunlar da aynı düzende
+| | Patron | Şef |
+|---|---|---|
+| 1 | Şantiyeler | Şantiyem (doğrudan kendi akışı) |
+| 2 | Ben | Ben |
 
-İki ana menü aynı mantıkla çalışır; amcan bir kere öğrenir. Sorunlar bir iş kuyruğudur: e-posta kutusu
-gibi yukarıdan aşağı "oku → karar ver → sıradakine geç" diye işlenir. İkinci turdaki tek sütun kartlarda
-(her birinde koca fotoğraf) ekranda aynı anda ancak 1,5 sorun görünüyordu.
-
-```
-┌───┬────────────────────────┬─────────────────────────────────────────┐
-│ ☰ │ Sorunlar        3 açık │ 3 GÜNDÜR BEKLİYOR                        │
-│   │▌3 gündür  Bahçelievler │ Bahçelievler Konutları › · Ahmet   📞    │
-│   │ Beton pompası 2 saat…  │─────────────────────────────────────────│
-│   │▌Dün       Etimesgut    │ Beton pompası 2 saat geç geldi…          │
-│   │ Bugün     Keçiören     │ [ fotoğraf ]  [ fotoğraf ]              │
-│   │ Çözülen 12 sorun ›     │              [ ✓ Çözüldü ]              │
-└───┴────────────────────────┴─────────────────────────────────────────┘
-```
-
-| Parça | Karar |
-|---|---|
-| Liste satırı | Yaş · şantiye · sorunun ilk satırı. Yaş şeridi mobildekiyle aynı: bugün şeritsiz, dün amber, 2+ gün kırmızı. |
-| Sağ panel | Tam metin, büyük fotoğraflar, bildiren; başlıkta şantiye adı (şantiyeye gider) ve 📞; altta tek büyük "Çözüldü". |
-| Açılış | En eski (en uzun bekleyen) sorun seçili gelir. Seçmek yan etki yaratmaz (Şantiyeler'deki "okundu"nun aksine), bu yüzden güvenli. |
-| Çözülünce | Sıradaki sorun kendiliğinden açılır; kuyruk bitince sağda "Bekleyen iş yok." |
-| Çözülenler | Listenin sonunda "Çözülen N sorun ›"; aynı düzende çözülenler listesi. |
-
-### Şantiye ayarları ayrı bir ekran değil
-
-Ayarlar şantiyenin kendisinde durur (WhatsApp'ta grubun ayarları grubun bilgi ekranındadır). İkinci
-turda aynı şantiye iki yerde, iki kılıkta duruyordu: adresi düzeltmek için şantiyeden çıkıp Yönetim ›
-Şantiye ayarları'na gitmek, tabloda aynı şantiyeyi bulmak gerekiyordu.
-
-| Ne | Nerede |
-|---|---|
-| Şantiye ekleme | Şantiye listesinin başlığında ＋ (yalnızca patron) |
-| Düzenleme (ad, adres, durum) | Şantiyenin ⓘ çekmecesinde "Düzenle" (yalnızca patron); form bugünkünün aynısı |
-| Tamamlanan şantiyeler | Listenin sonunda "Tamamlanan N şantiye ›" (Sorunlar'daki "Çözülen N sorun ›" kalıbı) |
-
-"Şantiye ayarları" menüsü ve sayfası kalkar; Yönetim'de yalnızca Ekip kalır. Mobilde de aynı: ana ekranın
-başlığında ＋, şantiye sayfasının başlığında ⓘ (alttan açılan pencere); "Ben"deki satır gider.
-
-### Ekip de aynı düzende
-
-Uygulamanın bütün ana ekranları tek kalıp: solda liste, sağda seçili olan. İkinci turdaki tabloda her
-satırda üç küçük düğme vardı (kişiyi kapatan dahil), her satırda yeşil "Aktif" etiketi duruyordu, patronun
-kendi satırında bile "Giriş linki" vardı.
-
-| Parça | Karar |
-|---|---|
-| Liste | Ad · rol · son görülme. Tek etiket: sarı "Linki açmadı" (patronun yapacağı bir iş varsa). Yeşil "Aktif" yok (İlke 1). Pasifler en altta "Pasif N kişi ›". |
-| Sağ panel | Rol ve telefon (📞), şantiyeleri (bağlantı), giriş bölümü (son görülme + "Yeni giriş linki · WhatsApp'ta gönder"), Düzenle. "Erişimi kapat" en altta, ayrı ve kırmızı. Patron kendi hesabında giriş linki ve erişimi kapat görmez. |
-| Kişi ekleme | Liste başlığında ＋ (Şantiyeler'deki ＋ ile aynı yer). Kaydedince sağda yeni kişi açılır, giriş linki göndermeye hazır. |
-| Mobil | Liste kalır; kişiye dokununca çıplak menü yerine sağ panelin aynısı alttan açılır. |
-
-### Hesabım masaüstünde sayfa değil, panel
-
-Sol alttaki kullanıcı düğmesine (menü daralmışken yalnızca avatar) basınca açılan `el-popover`: ad · rol ·
-firma, Bildirimler anahtarı, Mobil görünüme geç, Çıkış yap. İkinci turda üç satır bilgi ve bir anahtar
-için menüden geçilen ayrı bir sayfa vardı. Masaüstünde `/ben` sayfası kalkar; mobilde "Ben" sekmesi kalır
-("Şantiye ayarları" satırı çıkar). Giriş ekranı değişmez.
-
-### Masaüstünün son hâli
-
-| Menü | Ekran |
-|---|---|
-| 🏗 Şantiyeler | Liste · seçili şantiyenin defteri (＋ ekle, ⓘ bilgi ve düzenle, Tamamlananlar) |
-| ⚠ Sorunlar | Liste · seçili sorun (en eskisi seçili, çözülünce sıradaki, Çözülenler) |
-| 👥 Ekip (Yönetim, patron) | Liste · seçili kişi (＋ ekle, giriş linki, Pasifler) |
-| [PA] kullanıcı | Panel: bildirimler, mobil görünüm, çıkış |
+Ekip yönetimi "Ben" altında, masaüstünde sol menüdeki "Yönetim" grubunda. Şantiye ayarları ayrı bir ekran
+değildir: ekleme listedeki ＋, düzenleme şantiyenin ⓘ çekmecesinde.
 
 ## Gönderi silme ve düzeltme
 
 | Kural | Karar |
 |---|---|
 | Kim silebilir | Yazar kendi gönderisini, patron her gönderiyi |
-| Kim düzeltebilir | Yalnızca yazar: başkasının ağzından yazılmaz. Patron başkasının gönderisini düzeltemez, silebilir. |
-| Ne zaman | Her zaman |
-| İz | Silinen gönderinin yerinde "Bu gönderi silindi · Patron · 22 Eylül 14:20" kalır (sorunsa "Bu sorun silindi"); düzeltilende saatin altında "düzenlendi" (İlke 6) |
-| Silinen içerik | Yazı ve fotoğraf/video/ses dosyaları gerçekten silinir: adresini bilen de açamaz, ana ekranın fotoğraf şeridine ve okunmadı sayısına girmez. Satır iz olarak kalır. |
-| Düzeltilebilen | Yazı ve sorun işareti. Fotoğraf yanlışsa gönderi silinip yeniden atılır. Çözülmüş sorunun işareti değişmez. |
-| Nasıl | Mobilde gönderiye uzun basınca alttan menü (WhatsApp gibi); masaüstünde kartın köşesinde `⋯` |
-| Sorunlar'a etkisi | Silinen açık sorun Sorunlar'dan düşer. Sonradan "sorun" işaretlenen gönderi Sorunlar'a girer ve bildirim gider. Giden bildirim geri alınamaz. |
+| Kim düzeltebilir | Yalnızca yazar: başkasının ağzından yazılmaz |
+| Ne düzeltilir | Yalnızca yazı. Fotoğraf yanlışsa gönderi silinip yeniden atılır. |
+| İz | "Bu gönderi silindi · Patron · 22 Eylül 14:20"; düzeltilende saatin altında "düzenlendi" (İlke 6) |
+| Silinen içerik | Yazı ve dosyalar gerçekten silinir; satır iz olarak kalır. |
+| Nasıl | Mobilde uzun basınca alttan menü, masaüstünde kartın köşesinde `⋯` |
 
-## Navigasyon
+## Askıya alınanlar
 
-Üç sekme, iki rolde de aynı yapı. Ortadaki yükseltilmiş `+` düğmesi ve rol bazlı iki ayrı
-menü tablosu kalkar.
+**Sorunlar modülü (4. turda arayüzden kaldırıldı).** Menü, sorun kuyruğu, çözülenler arşivi, kırmızı
+etiketler, "sorun olarak işaretle" anahtarı ve "Çözüldü" düğmeleri arayüzden çıktı. Gerekçe: aynı gönderi
+iki ayrı yerde iki ayrı kılıkta yaşıyordu ve ekranın öğrenilmesi gereken kavram sayısını ikiye katlıyordu.
+Sorunun takibi ileride **başka bir kılıkta** ele alınacak (konuşulan seçenek: grubun içinde sabitlenmiş
+mesaj + listede kırmızı önizleme). Backend'e dokunulmadı: `posts.issue`, çözüm kaydı, bildirim ve uçlar
+yerinde duruyor, veri kaybı yok.
 
-| | Patron | Şef |
-|---|---|---|
-| 1 | Şantiyeler | Şantiyem (doğrudan kendi akışı) |
-| 2 | Sorunlar | Sorunlar (kendi şantiyesininkiler) |
-| 3 | Ben | Ben |
+**Bildirimler.** Push'un tek tetikleyicisi sorun bildirimiydi; sorun arayüzden kalkınca bildirim de
+fiilen sessizleşti. Ana ekrandaki "bildirim al" hatırlatması kaldırıldı, anahtar "Ben"de kaldı. Neyin
+bildirim göndereceği (ör. akşam 17:00'de rapor göndermemiş şefe hatırlatma) ayrıca kararlaştırılacak.
 
-Şantiye ve ekip yönetimi "Ben" altına iner: ayda bir yapılan iş, günlük sekme işgal etmez.
-Masaüstünde sol menüde ayrı bir "Yönetim" grubundadır. Şantiye düzenleme de buraya taşındı
-(`/ayarlar/santiyeler`); şantiye sayfasında düzenle düğmesi yoktur.
+## Sonraki turda konuşulacaklar
 
-## Backend
-
-| Ne | Niçin |
-|---|---|
-| Telefon `SiteLead` ve gönderi yazarında | Sorunlar ve şantiye künyesindeki `Ara` düğmesi. Alan `users.phone` olarak zaten vardı. |
-| `site_visits` tablosu (V6), `POST /sites/{id}/visits` | Okunmadı rozeti ve "buradan yukarısı yeni" ayracı. Şantiye açılınca ve kapanınca hepsi okundu sayılır. Hiç bakılmamış şantiyede yalnızca bugünkü gönderiler okunmamış sayılır. |
-| `/today` satırında son gönderi, 3 fotoğraf, okunmamış sayısı, en eski açık sorun | Ana ekranın üç yoğunluğu. |
-| Açık sorunlar en eski üstte | Sorunlar ekranının sıralaması. |
-| Gönderi düzeltme ve silme (V7), `PATCH` / `DELETE /posts/{id}` | Silinen satır iz olarak kalır, medyası silinir (dosyalar işlem kesinleşince). |
-| `GET /sites/{id}/photos` | Masaüstü sağ sütunundaki "bu haftanın fotoğrafları" (son 7 gün, en çok 24). |
-
-## Kaldırılanlar
-
-- `TodayHero` — dört sayı kutusu; ikisi eyleme dönüşmüyordu (İlke 3)
-- Ana ekrandaki iki `SectionHeading` — ayrımı artık yoğunluk taşıyor (İlke 2)
-- `Akış` sekmesi — şantiyenin içine taşındı
-- Sorunlar'daki `van-tabs` ve `SiteFilter`
-- `ComposePage` ve şantiye seçici — gönderme sayfa içine indi (İlke 4)
-- Tabbar'daki `primary` düğme ve `navItems.ts`'teki rol bazlı menü tabloları
+- **Gönderi kartı mı, baloncuk mu?** Şu an gönderiler beyaz kart (avatar · ad · saat · yazı · fotoğraf).
+  WhatsApp'ta mesaj baloncuktur ve kendi mesajın sağda durur. Fotoğraf raporlarının geniş okunması için
+  kart tercih edildi; tanıdıklık istenirse baloncuğa çevrilir.
+- Gönderinin "gidiyor" hâli: çevrimdışı kuyrukta bekleyen gönderi şu an ayrı bir liste; WhatsApp'ta
+  akışın içinde soluk mesaj + ⏳ olarak durur.
+- İlk açılış: sıfır şantiye, sıfır kişiyken patronun ilk on dakikası.

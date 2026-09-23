@@ -10,7 +10,7 @@ const route = useRoute()
 const { data: user } = useCurrentUser()
 const visible = useTabbarVisible()
 const items = computed(() => (user.value ? mainNavItems(user.value.role, 'mobile') : []))
-/** Seçili sekme adresten gelir: şantiye sayfası "Şantiyeler", çözülenler "Sorunlar" sekmesinin altındadır. */
+/** Seçili sekme adresten gelir: şantiye sayfası "Şantiyeler" sekmesini yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 </script>
 

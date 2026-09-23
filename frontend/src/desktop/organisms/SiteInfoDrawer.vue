@@ -6,11 +6,15 @@ import { errorMessage } from '@/core/api/errors'
 import { useListSitePhotos } from '@/core/api/generated/photos/photos'
 import type { SiteView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { useSiteGroup } from '@/core/sites/useSiteGroup'
+import type { LeadChoice } from '@/core/sites/useSiteLeads'
 import { SITE_STATUS } from '@/core/sites/siteStatus'
 import { useSites, type SiteForm } from '@/core/sites/useSites'
 import StatusTag from '@/desktop/atoms/StatusTag.vue'
 import LeadContacts from '@/desktop/molecules/LeadContacts.vue'
+import LoginLinkDialog from '@/desktop/organisms/LoginLinkDialog.vue'
 import SiteFormDialog from '@/desktop/organisms/SiteFormDialog.vue'
+import SiteMemberAddDialog from '@/desktop/organisms/SiteMemberAddDialog.vue'
 
 /**
  * Şantiye bilgisi (WhatsApp'taki "kişi bilgisi" gibi): adres, sorumlular, durum ve bu haftanın fotoğrafları.
@@ -21,15 +25,28 @@ const { site } = defineProps<{ site: SiteView }>()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
 const { data: photos } = useListSitePhotos(() => site.id)
+const { availableMembers, issued, addMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
 const editing = ref(false)
+const addingMember = ref(false)
 const viewerIndex = ref<number | null>(null)
 const isOwner = computed(() => user.value?.role === 'OWNER')
+const hasInfoLine = computed(() => !!site.address || site.status !== 'ACTIVE')
+const hasLeadBlock = computed(() => site.leads.length > 0 || isOwner.value)
 const photoUrls = computed(() => (photos.value ?? []).map((photo) => photo.url ?? ''))
 
 async function save(form: SiteForm) {
   try {
     await saveSite(site, form)
     editing.value = false
+  } catch (error) {
+    ElMessage.error(errorMessage(error))
+  }
+}
+
+async function addGroupMember(choice: LeadChoice) {
+  try {
+    await addMember(choice)
+    addingMember.value = false
   } catch (error) {
     ElMessage.error(errorMessage(error))
   }
@@ -43,14 +60,16 @@ async function save(form: SiteForm) {
         <h2 class="site-info__name">{{ site.name }}</h2>
         <el-button v-if="isOwner" @click="editing = true">Düzenle</el-button>
       </header>
-      <p class="site-info__line">
-        <MapPin :size="15" />{{ site.address ?? 'Adres girilmedi' }}
+      <p v-if="hasInfoLine" class="site-info__line">
+        <template v-if="site.address"><MapPin :size="15" />{{ site.address }}</template>
         <StatusTag v-if="site.status !== 'ACTIVE'" :tone="SITE_STATUS[site.status].tone">
           {{ SITE_STATUS[site.status].label }}
         </StatusTag>
       </p>
-      <el-divider content-position="left">Sorumlular</el-divider>
-      <LeadContacts :leads="site.leads" :viewer-id="user?.id" :can-assign="isOwner" />
+      <template v-if="hasLeadBlock">
+        <el-divider content-position="left">Katılımcılar</el-divider>
+        <LeadContacts :leads="site.leads" :viewer-id="user?.id" :can-assign="isOwner" @add="addingMember = true" />
+      </template>
       <template v-if="photos?.length">
         <el-divider content-position="left">Bu haftanın fotoğrafları</el-divider>
         <div class="site-info__photos">
@@ -62,6 +81,9 @@ async function save(form: SiteForm) {
     <el-image-viewer v-if="viewerIndex !== null" :url-list="photoUrls" :initial-index="viewerIndex" teleported
       @close="viewerIndex = null" />
     <SiteFormDialog v-model:show="editing" :site="site" :saving="isSaving" @submit="save" />
+    <SiteMemberAddDialog v-model:show="addingMember" :members="availableMembers" :saving="isAddingMember"
+      @submit="addGroupMember" />
+    <LoginLinkDialog :issued="issued" @close="issued = null" />
   </el-drawer>
 </template>
 

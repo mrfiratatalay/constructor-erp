@@ -22,7 +22,7 @@ const { collapsed, toggle } = useNavCollapse()
 
 const main = computed(() => (user.value ? mainNavItems(user.value.role, 'desktop') : []))
 const manage = computed(() => (user.value ? manageNavItems(user.value.role) : []))
-/** Seçili menü adresten gelir: şantiye sayfası "Şantiyeler", çözülenler "Sorunlar" altındadır. */
+/** Seçili menü adresten gelir: şantiye sayfası da "Şantiyeler" menüsünü yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 </script>
 

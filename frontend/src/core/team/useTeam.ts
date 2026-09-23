@@ -12,8 +12,9 @@ import type { CreateMemberRequest, InviteLink, MemberView } from '@/core/api/gen
 /** Ekleme ve düzenleme formunun ortak alanları. */
 export type MemberForm = CreateMemberRequest
 
+/** Linki gösteren pencerenin ihtiyacı kadarı: şantiye sayfasından davet edilen sorumlu da buraya girer. */
 export interface IssuedLink {
-  member: MemberView
+  member: Pick<MemberView, 'id' | 'fullName'>
   link: InviteLink
 }
 
