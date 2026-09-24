@@ -17,8 +17,8 @@ export async function sendQueuedPost(
   onProgress: (fraction: number) => void,
 ): Promise<{ outcome: SendOutcome; error: string | null }> {
   try {
-    const { id, siteId, body, issue, files, replyToId = null } = post
-    await createPost({ id, siteId, body, issue, files, replyToId }, {
+    const { id, siteId, body, issue, files, replyToId = null, fieldUpdate = false } = post
+    await createPost({ id, siteId, body, issue, files, replyToId, fieldUpdate }, {
       onUploadProgress: (event) => onProgress(event.total ? event.loaded / event.total : 0),
     })
     return { outcome: 'sent', error: null }

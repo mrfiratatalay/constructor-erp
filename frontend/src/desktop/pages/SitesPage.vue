@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Plus, Search } from 'lucide-vue-next'
+import { HardHat, Plus, Search, UserPlus } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { PostView, SiteToday } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
@@ -14,6 +14,7 @@ import { sitesInListOrder } from '@/core/today/siteRow'
 import { useToday } from '@/core/today/useToday'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
 import WelcomePane from '@/desktop/molecules/WelcomePane.vue'
+import JoinLinkDialog from '@/desktop/organisms/JoinLinkDialog.vue'
 import NewSiteDialog from '@/desktop/organisms/NewSiteDialog.vue'
 import SearchResults from '@/desktop/organisms/SearchResults.vue'
 import SiteList from '@/desktop/organisms/SiteList.vue'
@@ -23,15 +24,16 @@ import SplitView from '@/desktop/templates/SplitView.vue'
 
 /**
  * Şantiyeler, WhatsApp Masaüstü gibi: solda firma adı, arama ve liste (sabitlenenler üstte); sağda seçili
- * şantiye ya da sade karşılama. /santiyeler, /santiyeler/:id ve /santiyeler/:id/gorevler aynı sayfadır:
- * liste yerinde kalır, yalnızca sağ taraf değişir. Hiçbiri seçili değilken hiçbir şantiye okunmuş sayılmaz.
+ * şantiye ya da sade karşılama. /santiyeler, /santiyeler/:id, /santiyeler/:id/saha ve /santiyeler/:id/gorevler
+ * aynı sayfadır: liste yerinde kalır, yalnızca sağ taraf değişir. Hiçbiri seçili değilken hiçbir şantiye okunmuş
+ * sayılmaz. Başlıktaki ＋, WhatsApp'taki "Yeni sohbet" gibi tek kapıdır: Yeni şantiye · Kişi ekle.
  */
 const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
-const { people, createSite, isSaving } = useSiteCreation()
+const { createSite, isSaving } = useSiteCreation()
 const { togglePin } = useSitePins()
 
 const selectedId = computed(() => (route.params.siteId ? String(route.params.siteId) : null))
@@ -40,6 +42,12 @@ const search = useSearch(ordered)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')
 const adding = ref(false)
+const inviting = ref(false)
+
+function onAdd(command: 'site' | 'people') {
+  if (command === 'site') adding.value = true
+  else inviting.value = true
+}
 
 async function add(form: NewSiteForm) {
   try {
@@ -64,7 +72,15 @@ const openPost = (post: PostView) =>
     <template #list-header>
       <ListHeader :title="user?.companyName ?? 'Şantiyeler'">
         <template v-if="isOwner" #action>
-          <el-button circle type="primary" aria-label="Şantiye ekle" @click="adding = true"><Plus :size="18" /></el-button>
+          <el-dropdown trigger="click" placement="bottom-end" @command="onAdd">
+            <el-button circle type="primary" aria-label="Ekle"><Plus :size="18" /></el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="site" :icon="HardHat">Yeni şantiye</el-dropdown-item>
+                <el-dropdown-item command="people" :icon="UserPlus">Kişi ekle</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
         <el-input v-model="search.text.value" placeholder="Ara" clearable class="sites__search">
           <template #prefix><Search :size="16" /></template>
@@ -79,7 +95,7 @@ const openPost = (post: PostView) =>
         <SiteList v-else :sites="ordered" :selected-id="selectedId" :completed="completed" :viewer-id="user?.id"
           @pin="pin" />
         <el-empty v-if="today && !today.sites.length" :image-size="72"
-          :description="isOwner ? 'Aktif şantiye yok.' : 'Sana henüz bir şantiye atanmadı.'">
+          :description="isOwner ? 'Aktif şantiye yok.' : 'Henüz şantiye kurulmadı.'">
           <el-button v-if="isOwner" type="primary" @click="adding = true">İlk şantiyeni kur</el-button>
         </el-empty>
       </template>
@@ -92,7 +108,8 @@ const openPost = (post: PostView) =>
       <WelcomePane v-else :company-name="user?.companyName" />
     </template>
   </SplitView>
-  <NewSiteDialog v-model:show="adding" :people="people" :saving="isSaving" @submit="add" />
+  <NewSiteDialog v-model:show="adding" :saving="isSaving" @submit="add" />
+  <JoinLinkDialog v-model:show="inviting" />
 </template>
 
 <style scoped>

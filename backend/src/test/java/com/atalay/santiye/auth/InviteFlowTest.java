@@ -7,42 +7,46 @@ import com.atalay.santiye.support.IntegrationTest;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 
+/** Giriş linki: telefonunu değiştiren ya da "giremiyorum" diyen kişiye patronun gönderdiği tek kullanımlık link. */
 @IntegrationTest
 class InviteFlowTest extends ApiTestSupport {
 
     @Test
-    void inviteLinkSignsTheMemberInExactlyOnce() {
-        String created = createMember(loginAsOwner(), "Ahmet Usta", "SITE_LEAD");
-        String inviteUrl = read(created, "$.invite.url");
+    void loginLinkSignsTheMemberInExactlyOnce() {
+        Cookie owner = loginAsOwner();
+        String memberId = userIdOf(signedInLead(owner, "Ahmet Usta"));
+        String loginUrl = loginLinkFor(owner, memberId);
 
-        Cookie member = sessionCookieOf(acceptInvite(inviteUrl));
+        Cookie otherPhone = sessionCookieOf(acceptInvite(loginUrl));
 
-        assertThat(get("/api/auth/me", member)).bodyJson().extractingPath("$.role").isEqualTo("SITE_LEAD");
-        assertThat(acceptInvite(inviteUrl)).hasStatus(400);
+        assertThat(get("/api/auth/me", otherPhone)).bodyJson().extractingPath("$.role").isEqualTo("SITE_LEAD");
+        assertThat(acceptInvite(loginUrl)).hasStatus(400);
     }
 
     @Test
     void aNewLinkInvalidatesTheUnusedOldOne() {
         Cookie owner = loginAsOwner();
-        String created = createMember(owner, "Serkan Kalfa", "SITE_LEAD");
-        String oldUrl = read(created, "$.invite.url");
-        String memberId = read(created, "$.member.id");
+        String memberId = userIdOf(signedInLead(owner, "Serkan Kalfa"));
+        String oldUrl = loginLinkFor(owner, memberId);
 
-        String newLink = contentOf(postJson("/api/team/members/" + memberId + "/login-link", owner, ""));
+        String newUrl = loginLinkFor(owner, memberId);
 
         assertThat(acceptInvite(oldUrl)).hasStatus(400);
-        assertThat(acceptInvite(read(newLink, "$.url"))).hasStatusOk();
+        assertThat(acceptInvite(newUrl)).hasStatusOk();
     }
 
     @Test
-    void deactivatedMemberIsSignedOutOnEveryDevice() {
+    void removedMemberIsSignedOutOnEveryDevice() {
         Cookie owner = loginAsOwner();
-        String created = createMember(owner, "Murat Formen", "SITE_LEAD");
-        Cookie member = sessionCookieOf(acceptInvite(read(created, "$.invite.url")));
+        Cookie member = signedInLead(owner, "Murat Formen");
 
-        String body = "{\"fullName\": \"Murat Formen\", \"role\": \"SITE_LEAD\", \"active\": false, \"siteIds\": []}";
-        assertThat(patchJson("/api/team/members/" + read(created, "$.member.id"), owner, body)).hasStatusOk();
+        String body = "{\"fullName\": \"Murat Formen\", \"role\": \"SITE_LEAD\", \"active\": false}";
+        assertThat(patchJson("/api/team/members/" + userIdOf(member), owner, body)).hasStatusOk();
 
         assertThat(get("/api/auth/me", member)).hasStatus(401);
+    }
+
+    private String loginLinkFor(Cookie owner, String memberId) {
+        return read(contentOf(postJson("/api/team/members/" + memberId + "/login-link", owner, "")), "$.url");
     }
 }

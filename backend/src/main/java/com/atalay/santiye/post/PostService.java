@@ -54,7 +54,7 @@ public class PostService {
             throw ApiException.badRequest("Boş gönderi gönderilemez: fotoğraf, video, ses ya da yazı ekle.");
         }
         var draft = new NewPost(form.id(), author.companyId(), form.siteId(), author.userId(), body, form.issue(),
-            replyTarget(form), false);
+            replyTarget(form), false, Boolean.TRUE.equals(form.fieldUpdate()));
         Post post = posts.save(new Post(draft, clock.instant()));
         mediaIntake.accept(new MediaOwner(post.getId(), post.getSiteId(), post.getCompanyId()), files);
         announceIfIssue(post, site, author);

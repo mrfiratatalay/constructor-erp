@@ -4,162 +4,23 @@
  * Kızılkan Şantiye API
  * OpenAPI spec version: 1.0
  */
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { useMutation } from '@tanstack/vue-query'
 import type {
-  DataTag,
   MutationFunction,
   QueryClient,
-  QueryFunction,
-  QueryKey,
   UseMutationOptions,
   UseMutationReturnType,
-  UseQueryOptions,
-  UseQueryReturnType,
 } from '@tanstack/vue-query'
 
-import { toValue, unref } from 'vue'
+import { toValue } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 
-import type {
-  CreateMemberRequest,
-  InviteLink,
-  MemberCreatedResponse,
-  MemberView,
-  UpdateMemberRequest,
-} from '../model'
+import type { InviteLink, MemberView, UpdateMemberRequest } from '../model'
 
 import { apiRequest } from '../../http'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
-export const listMembers = (options?: SecondParameter<typeof apiRequest>, signal?: AbortSignal) => {
-  return apiRequest<MemberView[]>({ url: `/api/team/members`, method: 'GET', signal }, options)
-}
-
-export const getListMembersQueryKey = () => {
-  return ['api', 'team', 'members'] as const
-}
-
-export const getListMembersQueryOptions = <
-  TData = Awaited<ReturnType<typeof listMembers>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMembers>>, TError, TData>>
-  request?: SecondParameter<typeof apiRequest>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
-
-  const queryKey = getListMembersQueryKey()
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listMembers>>> = ({ signal }) =>
-    listMembers(requestOptions, signal)
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listMembers>>,
-    TError,
-    TData
-  >
-}
-
-export type ListMembersQueryResult = NonNullable<Awaited<ReturnType<typeof listMembers>>>
-export type ListMembersQueryError = unknown
-
-export function useListMembers<TData = Awaited<ReturnType<typeof listMembers>>, TError = unknown>(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMembers>>, TError, TData>>
-    request?: SecondParameter<typeof apiRequest>
-  },
-  queryClient?: QueryClient,
-): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getListMembersQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
-
-  return query
-}
-
-export const createMember = (
-  createMemberRequest: MaybeRefOrGetter<CreateMemberRequest>,
-  options?: SecondParameter<typeof apiRequest>,
-  signal?: AbortSignal,
-) => {
-  createMemberRequest = toValue(createMemberRequest)
-
-  return apiRequest<MemberCreatedResponse>(
-    {
-      url: `/api/team/members`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: createMemberRequest,
-      signal,
-    },
-    options,
-  )
-}
-
-export const getCreateMemberMutationKey = () => ['createMember'] as const
-
-export const getCreateMemberMutationOptions = <TError = unknown, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createMember>>,
-    TError,
-    CreateMemberMutationVariables,
-    TContext
-  >
-  request?: SecondParameter<typeof apiRequest>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createMember>>,
-  TError,
-  CreateMemberMutationVariables,
-  TContext
-> => {
-  const mutationKey = getCreateMemberMutationKey()
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createMember>>,
-    CreateMemberMutationVariables
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return createMember(data, requestOptions)
-  }
-
-  return { mutationFn, ...mutationOptions }
-}
-
-export type CreateMemberMutationResult = NonNullable<Awaited<ReturnType<typeof createMember>>>
-export type CreateMemberMutationBody = CreateMemberRequest
-export type CreateMemberMutationError = unknown
-export type CreateMemberMutationVariables = { data: CreateMemberRequest }
-
-export const useCreateMember = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createMember>>,
-      TError,
-      CreateMemberMutationVariables,
-      TContext
-    >
-    request?: SecondParameter<typeof apiRequest>
-  },
-  queryClient?: QueryClient,
-): UseMutationReturnType<
-  Awaited<ReturnType<typeof createMember>>,
-  TError,
-  CreateMemberMutationVariables,
-  TContext
-> => {
-  return useMutation(getCreateMemberMutationOptions(options), queryClient)
-}
 export const issueLoginLink = (
   memberId: MaybeRefOrGetter<string>,
   options?: SecondParameter<typeof apiRequest>,

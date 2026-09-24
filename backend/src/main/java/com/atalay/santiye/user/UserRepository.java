@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<AppUser, UUID> {
     List<AppUser> findByCompanyIdOrderByFullName(UUID companyId);
 
     List<AppUser> findByCompanyIdAndRoleAndActiveTrue(UUID companyId, UserRole role);
+
+    List<AppUser> findByCompanyIdAndActiveTrueOrderByFullName(UUID companyId);
 }

@@ -30,6 +30,8 @@ public class Post {
     private boolean forwarded;
     private Instant pinnedAt;
     private UUID pinnedBy;
+    @Column(name = "is_field_update")
+    private boolean fieldUpdate;
 
     protected Post() {
     }
@@ -43,6 +45,7 @@ public class Post {
         this.issue = post.issue();
         this.replyToId = post.replyToId();
         this.forwarded = post.forwarded();
+        this.fieldUpdate = post.fieldUpdate();
         this.createdAt = createdAt;
     }
 
@@ -89,6 +92,11 @@ public class Post {
 
     boolean isPinned() {
         return pinnedAt != null;
+    }
+
+    /** "Sahaya ekle" / "Sahadan çıkar": mesaj sohbette olduğu gibi kalır, yalnızca Saha'da görünüp görünmediği. */
+    void markFieldUpdate(boolean onField) {
+        this.fieldUpdate = onField;
     }
 
     public UUID getId() {
@@ -157,5 +165,9 @@ public class Post {
 
     public UUID getPinnedBy() {
         return pinnedBy;
+    }
+
+    public boolean isFieldUpdate() {
+        return fieldUpdate;
     }
 }

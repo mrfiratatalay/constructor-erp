@@ -5,58 +5,45 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.atalay.santiye.support.ApiTestSupport;
 import com.atalay.santiye.support.IntegrationTest;
 import jakarta.servlet.http.Cookie;
-import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.junit.jupiter.api.Test;
 
 @IntegrationTest
 class TeamMembersTest extends ApiTestSupport {
 
     @Test
-    void aMemberNeedsAPhoneNumber() {
-        String json = "{\"fullName\": \"Numarasız Usta\", \"role\": \"SITE_LEAD\", \"siteIds\": []}";
-
-        assertThat(postJson("/api/team/members", loginAsOwner(), json)).hasStatus(400);
+    void aNewcomerNeedsAPhoneNumber() {
+        assertThat(join(joinToken(loginAsOwner()), null, "Numarasız Usta", "")).hasStatus(400);
     }
 
     @Test
-    void theSameNumberIsNotAddedTwice() {
-        Cookie owner = loginAsOwner();
+    void theSameNumberCannotJoinTwice() {
+        String token = joinToken(loginAsOwner());
         String phone = uniquePhone();
-        assertThat(postJson("/api/team/members", owner, memberJson("Selim Usta", phone))).hasStatus(201);
+        assertThat(join(token, null, "Selim Usta", phone)).hasStatusOk();
 
         String sameNumberWrittenDifferently = "+90 " + phone.substring(1);
-        assertThat(postJson("/api/team/members", owner, memberJson("Selim", sameNumberWrittenDifferently)))
-            .hasStatus(400).bodyJson().extractingPath("$.detail").isEqualTo("Bu numara zaten ekipte: Selim Usta.");
+        assertThat(join(token, null, "Selim", sameNumberWrittenDifferently)).hasStatus(400).bodyJson()
+            .extractingPath("$.detail").isEqualTo("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
     }
 
     @Test
-    void removedMemberLeavesEverySiteAndComesBackWithTheSameNumber() {
+    void removedPersonComesBackWithTheSameNumber() {
         Cookie owner = loginAsOwner();
-        String siteId = createSite(owner, "Ekipten Çıkma Şantiyesi");
+        String token = joinToken(owner);
         String phone = uniquePhone();
-        String created = contentOf(postJson("/api/team/members", owner, memberJson("Oğuz Kalfa", phone, siteId)));
-        String memberId = read(created, "$.member.id");
+        String memberId = userIdOf(sessionCookieOf(join(token, null, "Oğuz Kalfa", phone)));
 
-        String removal = "{\"fullName\": \"Oğuz Kalfa\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", "
-            .formatted(phone) + "\"active\": false, \"siteIds\": [\"%s\"]}".formatted(siteId);
-        assertThat(patchJson("/api/team/members/" + memberId, owner, removal)).bodyJson()
-            .extractingPath("$.siteIds").asArray().isEmpty();
+        String removal = "{\"fullName\": \"Oğuz Kalfa\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"active\": false}"
+            .formatted(phone);
+        assertThat(patchJson("/api/team/members/" + memberId, owner, removal)).hasStatusOk();
 
-        MvcTestResult again = postJson("/api/team/members", owner, memberJson("Oğuz Kalfa", phone));
-        assertThat(again).hasStatus(201);
-        assertThat(read(contentOf(again), "$.member.id")).isEqualTo(memberId);
+        assertThat(userIdOf(sessionCookieOf(join(token, null, "Oğuz Kalfa", phone)))).isEqualTo(memberId);
     }
 
     @Test
     void namesAreWrittenTheTurkishWay() {
-        String json = memberJson("İLKER IŞIK", uniquePhone());
+        Cookie member = sessionCookieOf(join(joinToken(loginAsOwner()), null, "İLKER IŞIK", uniquePhone()));
 
-        assertThat(postJson("/api/team/members", loginAsOwner(), json)).bodyJson()
-            .extractingPath("$.member.fullName").isEqualTo("İlker Işık");
-    }
-
-    private static String memberJson(String fullName, String phone, String... siteIds) {
-        return "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"siteIds\": %s}"
-            .formatted(fullName, phone, jsonArray(siteIds));
+        assertThat(get("/api/auth/me", member)).bodyJson().extractingPath("$.fullName").isEqualTo("İlker Işık");
     }
 }

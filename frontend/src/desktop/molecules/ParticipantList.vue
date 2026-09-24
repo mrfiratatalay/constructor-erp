@@ -1,48 +1,38 @@
 <script setup lang="ts">
-import { Phone } from 'lucide-vue-next'
-import { formatPhone, telHref } from '@/core/format/phone'
+import { formatPhone } from '@/core/format/phone'
 import type { Participant } from '@/core/sites/participants'
+import { personMenu, type PersonAction } from '@/core/team/personMenu'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
- * Şantiyenin katılımcıları (WhatsApp Masaüstü'ndeki grup bilgisi gibi): en üstte "Sen", yanında rol etiketi,
- * numarası okunur biçimde (tıklayınca arar). Patron satırın ⌄ menüsünden giriş linki gönderir ("giremiyorum"
- * derse), kişiyi düzeltir ya da şantiyeden çıkarır. Kimsenin durumu yazmaz.
+ * Şantiyenin katılımcıları (WhatsApp Masaüstü'ndeki grup bilgisi gibi): firmanın herkesi, en üstte "Sen", yanında
+ * rol etiketi ve numarası (bilgisayar arayamaz; numara telefondan aranır). Patron satırın ⌄ menüsünden giriş linki
+ * gönderir, düzeltir, patron yapar ya da firmadan çıkarır; "＋ Kişi ekle" firmanın bağlantısını açar.
+ * Kimsenin durumu yazmaz.
  */
-type Command = 'link' | 'edit' | 'remove'
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
-const emit = defineEmits<{
-  add: []
-  link: [participant: Participant]
-  edit: [participant: Participant]
-  remove: [participant: Participant]
-}>()
-
-function onCommand(command: Command, participant: Participant) {
-  if (command === 'link') emit('link', participant)
-  if (command === 'edit') emit('edit', participant)
-  if (command === 'remove') emit('remove', participant)
-}
+const emit = defineEmits<{ add: []; act: [action: PersonAction, participant: Participant] }>()
 </script>
 
 <template>
-  <el-button v-if="canManage" plain class="participants__add" @click="emit('add')">＋ Katılımcı ekle</el-button>
+  <el-button v-if="canManage" plain class="participants__add" @click="emit('add')">＋ Kişi ekle</el-button>
   <ul class="participants">
     <li v-for="participant in participants" :key="participant.id" class="participants__row">
-      <UserAvatar :name="participant.isViewer ? 'Sen' : participant.name" :size="36" />
+      <UserAvatar :name="participant.name" :size="36" />
       <span class="participants__who">
         <strong>{{ participant.name }}</strong>
-        <a v-if="participant.phone" :href="telHref(participant.phone)"><Phone :size="12" />{{ formatPhone(participant.phone) }}</a>
+        <small v-if="participant.phone">{{ formatPhone(participant.phone) }}</small>
       </span>
-      <span class="participants__role">{{ participant.role }}</span>
-      <el-dropdown v-if="canManage && !participant.isViewer" trigger="click"
-        @command="(command: Command) => onCommand(command, participant)">
-        <el-button text size="small" aria-label="Katılımcı menüsü">⌄</el-button>
+      <span class="participants__role">{{ participant.roleLabel }}</span>
+      <el-dropdown v-if="personMenu(participant, canManage).length" trigger="click"
+        @command="(action: PersonAction) => emit('act', action, participant)">
+        <el-button text size="small" aria-label="Kişi menüsü">⌄</el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="link">Giriş linki gönder</el-dropdown-item>
-            <el-dropdown-item command="edit">Düzenle</el-dropdown-item>
-            <el-dropdown-item command="remove" divided class="participants__danger">Şantiyeden çıkar</el-dropdown-item>
+            <el-dropdown-item v-for="item in personMenu(participant, canManage)" :key="item.action"
+              :command="item.action" :divided="item.danger" :class="{ participants__danger: item.danger }">
+              {{ item.label }}
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -71,13 +61,10 @@ function onCommand(command: Command, participant: Participant) {
   min-width: 0;
 }
 
-.participants__who a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.participants__who small {
   color: var(--text-muted);
   font-size: var(--text-sm);
-  text-decoration: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .participants__role {

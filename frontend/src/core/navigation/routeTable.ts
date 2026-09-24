@@ -14,10 +14,12 @@ interface Elsewhere {
 export const ROUTES = {
   login: { path: '/giris', meta: { public: true, guestOnly: true, title: 'Giriş' } },
   invite: { path: '/davet/:token', meta: { public: true, title: 'Davet' } },
-  // Şantiye davet bağlantısı: oturumu olan da olmayan da açar (oturumu olan tek dokunuşla katılır).
-  siteJoin: { path: '/katil/:token', meta: { public: true, title: 'Şantiyeye katıl' } },
+  // Firmaya katılma bağlantısı: tıklayan adını ve numarasını yazıp katılır; zaten içerideyse listeye gider.
+  join: { path: '/katil/:token', meta: { public: true, title: 'Katıl' } },
   sites: { path: '/santiyeler', meta: { title: 'Şantiyeler' } },
   siteFeed: { path: '/santiyeler/:siteId', meta: { detail: true, title: 'Şantiye' } },
+  // Şantiyenin Saha sekmesi (günlük); Sohbet ile aynı sayfadır, yalnızca sekme değişir.
+  siteField: { path: '/santiyeler/:siteId/saha', meta: { detail: true, title: 'Saha' } },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>

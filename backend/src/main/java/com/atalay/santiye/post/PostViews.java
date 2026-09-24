@@ -83,7 +83,8 @@ class PostViews {
             post.getReplyToId() == null ? null : lookups.quotes().get(post.getReplyToId()),
             post.isForwarded(),
             pinOf(post, lookups.people()),
-            seenByAll(post, lookups.participants().getOrDefault(post.getSiteId(), List.of())));
+            seenByAll(post, lookups.participants().getOrDefault(post.getSiteId(), List.of())),
+            post.isFieldUpdate());
     }
 
     private static PostAuthorRef authorOf(AppUser author) {

@@ -2,6 +2,7 @@
 /**
  * Sağ panelin iç düzeni: üstte sabit başlık, ortada kayan içerik (okunaklı genişlikte, ortalı),
  * altta sabit çubuk (ör. gönderme). Şantiye ve kişi ayrıntısı aynı düzeni kullanır.
+ * tabs: başlığın altında ikinci satır (şantiyenin Sohbet / Saha sekmeleri).
  * bottom: içerik azken dibe yaslanır — sohbet böyle durur (WhatsApp Masaüstü).
  */
 const { bottom = false } = defineProps<{ bottom?: boolean }>()
@@ -10,6 +11,7 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
 <template>
   <div class="detail-pane">
     <header v-if="$slots.header" class="detail-pane__header"><slot name="header" /></header>
+    <nav v-if="$slots.tabs" class="detail-pane__tabs"><slot name="tabs" /></nav>
     <el-scrollbar class="detail-pane__body" :class="{ 'detail-pane__body--bottom': bottom }">
       <div class="detail-pane__content" :class="{ 'detail-pane__content--bottom': bottom }"><slot /></div>
     </el-scrollbar>
@@ -29,6 +31,12 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
 
 .detail-pane__header {
   padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface);
+}
+
+.detail-pane__tabs {
+  padding: 0 var(--space-6);
   border-bottom: 1px solid var(--border-soft);
   background: var(--surface);
 }

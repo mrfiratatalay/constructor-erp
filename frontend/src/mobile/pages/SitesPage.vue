@@ -12,6 +12,7 @@ import { useSiteCreation, type NewSiteForm } from '@/core/sites/useSiteCreation'
 import { useSites } from '@/core/sites/useSites'
 import { sitesInListOrder } from '@/core/today/siteRow'
 import { useToday } from '@/core/today/useToday'
+import JoinLinkSheet from '@/mobile/organisms/JoinLinkSheet.vue'
 import NewSitePopup from '@/mobile/organisms/NewSitePopup.vue'
 import SearchResults from '@/mobile/organisms/SearchResults.vue'
 import SiteRowCell from '@/mobile/organisms/SiteRowCell.vue'
@@ -21,24 +22,37 @@ import MobilePage from '@/mobile/templates/MobilePage.vue'
 /**
  * Ana ekran: WhatsApp'ın sohbet listesi. Başlıkta firma adı ve ＋ (patron), altında arama; sabitlenenler üstte,
  * sonra akışında en son bir şey olan. Satıra uzun basınca 📌 Sabitle. Tamamlananlar listenin sonunda.
+ * ＋, WhatsApp'taki "Yeni sohbet" gibi tek kapıdır: Yeni şantiye · Kişi ekle (firmanın bağlantısı).
  */
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
-const { people, createSite, isSaving } = useSiteCreation()
+const { createSite, isSaving } = useSiteCreation()
 const { togglePin } = useSitePins()
 
 const rows = computed(() => sitesInListOrder(today.value?.sites ?? []))
 const search = useSearch(rows)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')
+const choosing = ref(false)
 const adding = ref(false)
+const inviting = ref(false)
 const showCompleted = ref(false)
 const menuFor = ref<SiteToday | null>(null)
 const open = (siteId: string) => router.push({ name: 'siteFeed', params: { siteId } })
 const openPost = (post: PostView) => router.push({ name: 'siteFeed', params: { siteId: post.site.id }, query: { mesaj: post.id } })
 const menuActions = computed(() => [{ name: menuFor.value?.pinnedAt ? 'Sabitlemeyi kaldır' : '📌 Sabitle' }])
+const ADD_ACTIONS = [
+  { name: 'Yeni şantiye', key: 'site' },
+  { name: 'Kişi ekle', subname: 'Bağlantıyı WhatsApp grubuna at', key: 'people' },
+]
+
+function onAdd(action: { key: string }) {
+  choosing.value = false
+  if (action.key === 'site') adding.value = true
+  else inviting.value = true
+}
 
 async function add(form: NewSiteForm) {
   try {
@@ -60,7 +74,7 @@ async function pin() {
 <template>
   <MobilePage :title="user?.companyName ?? 'Şantiyeler'" brand>
     <template #action>
-      <van-button v-if="isOwner" round size="small" class="sites__add" aria-label="Şantiye ekle" @click="adding = true">
+      <van-button v-if="isOwner" round size="small" class="sites__add" aria-label="Ekle" @click="choosing = true">
         <Plus :size="18" />
       </van-button>
     </template>
@@ -74,7 +88,7 @@ async function pin() {
         <SiteRowCell v-for="site in rows" :key="site.siteId" :site="site" :viewer-id="user?.id" @open="open"
           @menu="menuFor = $event" />
       </van-cell-group>
-      <van-empty v-else-if="today" :description="isOwner ? 'Aktif şantiye yok. İlk şantiyeni kur.' : 'Sana henüz bir şantiye atanmadı.'">
+      <van-empty v-else-if="today" :description="isOwner ? 'Aktif şantiye yok. İlk şantiyeni kur.' : 'Henüz şantiye kurulmadı.'">
         <template #image><HardHat :size="48" class="sites__empty-icon" /></template>
         <van-button v-if="isOwner" round type="primary" @click="adding = true">İlk şantiyeni kur</van-button>
       </van-empty>
@@ -88,7 +102,10 @@ async function pin() {
     </template>
     <van-action-sheet :show="menuFor !== null" :actions="menuActions" :description="menuFor?.name"
       cancel-text="Vazgeç" teleport="body" @select="pin" @update:show="(shown: boolean) => !shown && (menuFor = null)" />
-    <NewSitePopup v-model:show="adding" :people="people" :saving="isSaving" @submit="add" />
+    <van-action-sheet v-model:show="choosing" :actions="ADD_ACTIONS" cancel-text="Vazgeç" teleport="body"
+      @select="onAdd" />
+    <NewSitePopup v-model:show="adding" :saving="isSaving" @submit="add" />
+    <JoinLinkSheet v-model:show="inviting" />
   </MobilePage>
 </template>
 

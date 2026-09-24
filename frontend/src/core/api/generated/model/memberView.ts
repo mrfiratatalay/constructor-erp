@@ -13,7 +13,4 @@ export interface MemberView {
   phone?: string | null
   role: MemberViewRole
   active: boolean
-  /** @nullable */
-  lastSeenAt?: string | null
-  siteIds: string[]
 }

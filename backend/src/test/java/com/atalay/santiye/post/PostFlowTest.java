@@ -29,17 +29,15 @@ class PostFlowTest extends ApiTestSupport {
     }
 
     @Test
-    void siteLeadCannotPostToOrReadAnotherSite() {
+    void everyoneWritesToEverySiteOfTheCompany() {
         Cookie owner = loginAsOwner();
-        String ownSite = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Sınırlı Usta", ownSite);
-        PostDraft ownerNote = PostDraft.to(otherSite, "Patronun notu");
+        String siteId = createSite(owner, "Herkesin " + UUID.randomUUID());
+        Cookie lead = signedInLead(owner, "Her Yerde Usta");
+        PostDraft ownerNote = PostDraft.to(siteId, "Patronun notu");
         sendPost(owner, ownerNote);
 
-        assertThat(sendPost(lead, PostDraft.to(otherSite, "Yanlış yer"))).hasStatus(404);
-        assertThat(get("/api/posts/" + ownerNote.id(), lead)).hasStatus(404);
-        assertThat(contentOf(get("/api/posts", lead))).doesNotContain("Patronun notu");
+        assertThat(sendPost(lead, PostDraft.to(siteId, "Ustanın notu"))).hasStatus(201);
+        assertThat(get("/api/posts/" + ownerNote.id(), lead)).hasStatusOk();
     }
 
     @Test

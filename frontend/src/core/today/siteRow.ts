@@ -4,7 +4,10 @@ import { eventLine } from '@/core/sites/siteEvents'
 
 const time = (iso: string | null | undefined) => (iso ? Date.parse(iso) : 0)
 
-/** Akıştaki en son şeyin zamanı: son mesaj ya da son sistem satırı ("Patron, Musa'yı ekledi"). */
+/**
+ * Listede sayılan en son şeyin zamanı: son mesaj ya da kuruluş satırı. Katıldı/çıkarıldı satırları sunucudan
+ * gelmez: her şantiyeye birden düşerler, sayılsalardı bütün şantiyeler aynı anda en üste zıplardı.
+ */
 export function activityAt(site: SiteToday): string | null {
   const event = site.latestEvent?.createdAt ?? null
   return time(event) > time(site.lastPostAt) ? event : (site.lastPostAt ?? event)

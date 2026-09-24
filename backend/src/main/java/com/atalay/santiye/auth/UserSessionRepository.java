@@ -1,7 +1,5 @@
 package com.atalay.santiye.auth;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,9 +17,4 @@ interface UserSessionRepository extends JpaRepository<UserSession, UUID> {
     @Modifying
     @Query("delete from UserSession s where s.userId = :userId")
     void deleteAllByUserId(UUID userId);
-
-    @Query("""
-        select new com.atalay.santiye.auth.LastSeen(s.userId, max(s.lastSeenAt))
-        from UserSession s where s.userId in :userIds group by s.userId""")
-    List<LastSeen> findLastSeen(Collection<UUID> userIds);
 }

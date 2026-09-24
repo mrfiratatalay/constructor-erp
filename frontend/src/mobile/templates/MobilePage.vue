@@ -2,11 +2,13 @@
 import { useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { ChevronLeft } from 'lucide-vue-next'
+import PageTitle from '@/mobile/molecules/PageTitle.vue'
 
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
  * brand: ana ekranın lacivert, ızgaralı başlığı (ad solda, action sağda).
  * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi).
+ * subbar: başlığın hemen altında, sayfa kayarken ona yapışık duran çubuk (şantiyede Sohbet / Saha).
  * footer: ekranın altında sabit duran alan (şantiye sayfasındaki gönderme çubuğu).
  * tabbar: altta sekme çubuğu var mı; yoksa footer ekranın en altına oturur.
  * bottom: içerik azken sayfanın dibine yaslanır — sohbet böyle durur (WhatsApp).
@@ -49,16 +51,15 @@ function goBack() {
         <slot name="heading" />
       </span>
     </template>
-    <template v-if="!brand && subtitle" #title>
-      <span class="mobile-page__title">
-        <strong>{{ title }}</strong>
-        <small>{{ subtitle }}</small>
-      </span>
-    </template>
+    <template v-if="!brand && subtitle" #title><PageTitle :title="title" :subtitle="subtitle" /></template>
     <template #right><slot name="action" /></template>
   </van-nav-bar>
+  <div v-if="slots.subbar" class="mobile-page__subbar">
+    <div class="mobile-page__subbar-inner"><slot name="subbar" /></div>
+  </div>
   <main class="mobile-page"
-    :class="{ 'mobile-page--with-footer': slots.footer, 'mobile-page--no-tabbar': !tabbar, 'mobile-page--bottom': bottom }">
+    :class="{ 'mobile-page--with-footer': slots.footer, 'mobile-page--no-tabbar': !tabbar, 'mobile-page--bottom': bottom,
+              'mobile-page--with-subbar': slots.subbar }">
     <slot />
   </main>
   <div v-if="slots.footer" class="mobile-page__footer" :class="{ 'mobile-page__footer--no-tabbar': !tabbar }">
@@ -73,18 +74,25 @@ function goBack() {
  */
 .mobile-page,
 .mobile-page__bar :deep(.van-nav-bar__content),
+.mobile-page__subbar-inner,
 .mobile-page__footer-inner {
   max-width: var(--layout-phone-column);
   margin-inline: auto;
 }
 
 .mobile-page {
+  /* Üstte sabit duran başlık (ve varsa alt çubuğu): sayfadaki yapışkan parçalar bunun altına yapışır. */
+  --mobile-page-top: calc(var(--van-nav-bar-height) + env(safe-area-inset-top, 0px));
   display: grid;
   gap: var(--space-4);
   align-content: start;
   padding: var(--space-4);
   /* Alt sekme çubuğu içeriği kapatmasın; telefonun alt çentik boşluğu da hesaba katılır. */
   padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-page--with-subbar {
+  --mobile-page-top: calc(var(--van-nav-bar-height) + var(--layout-subbar-height) + env(safe-area-inset-top, 0px));
 }
 
 .mobile-page--with-footer {
@@ -94,7 +102,17 @@ function goBack() {
 /* Sohbet gibi: az gönderi varken akış ekranın dibinde, gönderme çubuğunun hemen üstünde durur. */
 .mobile-page--bottom {
   align-content: end;
-  min-height: calc(var(--layout-app-height) - var(--van-nav-bar-height));
+  min-height: calc(var(--layout-app-height) - var(--mobile-page-top));
+}
+
+/* Normal akışta durur, sayfa kayınca başlığın altına yapışır: içeriğin üstünü hiçbir zaman örtmez. */
+.mobile-page__subbar {
+  position: sticky;
+  top: calc(var(--van-nav-bar-height) + env(safe-area-inset-top, 0px));
+  z-index: 5;
+  height: var(--layout-subbar-height);
+  background: var(--surface);
+  box-shadow: 0 1px 0 var(--border-soft);
 }
 
 .mobile-page--with-footer.mobile-page--no-tabbar {
@@ -122,30 +140,6 @@ function goBack() {
   color: rgb(255 255 255 / 0.72);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
-}
-
-/* İki satırlık başlık (ad + katılımcılar) çubuğun yüksekliğini bozmasın: ikinci satır küçük ve sıkışık. */
-.mobile-page__title {
-  display: grid;
-  overflow: hidden;
-  line-height: 1.25;
-}
-
-.mobile-page__title strong {
-  overflow: hidden;
-  font-size: var(--text-base);
-  font-weight: var(--weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mobile-page__title small {
-  overflow: hidden;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: var(--weight-regular);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .mobile-page__heading {

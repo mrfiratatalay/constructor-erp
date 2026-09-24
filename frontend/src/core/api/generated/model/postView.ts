@@ -29,4 +29,5 @@ export interface PostView {
   forwarded: boolean
   pin?: PostPin
   seenByAll: boolean
+  fieldUpdate: boolean
 }

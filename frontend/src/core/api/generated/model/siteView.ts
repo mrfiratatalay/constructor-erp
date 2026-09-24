@@ -14,6 +14,7 @@ export interface SiteView {
   address?: string | null
   status: SiteViewStatus
   leads: SiteLead[]
+  owners: SiteLead[]
   /** @nullable */
   photoUrl?: string | null
   /** @nullable */

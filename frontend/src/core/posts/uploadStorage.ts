@@ -11,6 +11,8 @@ export interface QueuedPost {
   queuedAt: string
   /** Yanıtlanan mesaj (WhatsApp'taki alıntı); eski sürümde kuyruğa girenlerde yoktur. */
   replyToId?: string | null
+  /** Saha sekmesinden yazıldı; eski sürümde kuyruğa girenlerde yoktur. */
+  fieldUpdate?: boolean
 }
 
 const store = createStore('kizilkan-santiye', 'gonderim-kuyrugu')

@@ -42,7 +42,7 @@ class TodayStats {
             posts.openIssues(siteIds),
             posts.oldestOpenIssueAt(siteIds),
             media.recentPhotoThumbnails(siteIds, startOfDay, PHOTO_STRIP),
-            events.latestBySite(siteIds),
+            events.creationBySite(siteIds),
             pins.pinnedAt(user.userId()));
     }
 }

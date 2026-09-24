@@ -20,5 +20,4 @@ export interface UpdateMemberRequest {
   phone?: string | null
   role: UpdateMemberRequestRole
   active: boolean
-  siteIds: string[]
 }

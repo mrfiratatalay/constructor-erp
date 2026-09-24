@@ -51,7 +51,6 @@ const loadOlder = () => keepPosition(scroller(), () => loadMore())
     <el-button v-if="hasMore" class="feed-column__more" :loading="isLoadingMore" @click="loadOlder">
       Daha eski mesajlar
     </el-button>
-    <slot v-if="!hasMore" name="start" :empty="!posts.length" />
     <section v-for="day in days" :key="day.key" class="feed-column__day">
       <FeedDayTitle :title="day.title" />
       <template v-for="item in day.items" :key="item.key">

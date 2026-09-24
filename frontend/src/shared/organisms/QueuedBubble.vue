@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { clockTime } from '@/core/format/dates'
-import { kindOf } from '@/core/posts/attachments'
+import { queuedFilesLabel } from '@/core/posts/queuedFiles'
 import type { QueuedPost } from '@/core/posts/uploadStorage'
 import TickMark from '@/shared/atoms/TickMark.vue'
 
@@ -11,13 +11,7 @@ import TickMark from '@/shared/atoms/TickMark.vue'
  */
 const { post } = defineProps<{ post: QueuedPost }>()
 
-const LABELS = { PHOTO: '📷 Fotoğraf', VIDEO: '🎥 Video', AUDIO: '🎤 Sesli not', DOCUMENT: '📄 Belge' } as const
-const files = computed(() => {
-  const kinds = post.files.map((file) => kindOf(file)).filter((kind) => kind !== null)
-  const first = kinds[0]
-  if (!first) return null
-  return kinds.length > 1 ? `${LABELS[first]} ve ${kinds.length - 1} dosya daha` : LABELS[first]
-})
+const files = computed(() => queuedFilesLabel(post.files))
 </script>
 
 <template>

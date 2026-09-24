@@ -1,24 +1,22 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { MemberView } from '@/core/api/generated/model'
 import type { MemberForm } from '@/core/team/memberForm'
 
 /**
- * Yalnızca ad soyad ve telefon: eklenen herkes şeftir, şantiyeye ekleme şantiyenin içinde yapılır.
- * Telefon zorunlu: giriş linki WhatsApp'ta doğrudan bu numaranın sohbetine gider.
+ * Kişiyi düzenle: yalnızca ad soyad ve telefon; rolü kişiye dokununca çıkan "Patron yap / Şef yap" değiştirir.
+ * Telefon zorunlu: giriş linki WhatsApp'ta doğrudan bu numaranın sohbetine gider, 📞 bu numarayı arar.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { member, saving } = defineProps<{ member: MemberView | null; saving: boolean }>()
+const { person, saving } = defineProps<{ person: { fullName: string; phone: string | null } | null; saving: boolean }>()
 const emit = defineEmits<{ submit: [form: MemberForm] }>()
 
 const fullName = ref('')
 const phone = ref('')
 
-// Düzenlemede kişinin bilgileriyle, eklemede boş açılır.
 watch(show, (open) => {
   if (!open) return
-  fullName.value = member?.fullName ?? ''
-  phone.value = member?.phone ?? ''
+  fullName.value = person?.fullName ?? ''
+  phone.value = person?.phone ?? ''
 })
 
 function submit() {
@@ -29,17 +27,15 @@ function submit() {
 <template>
   <van-popup v-model:show="show" position="bottom" round closeable teleport="body">
     <van-form class="member-form" @submit="submit">
-      <h2 class="member-form__title">{{ member ? 'Kişiyi düzenle' : 'Yeni kişi' }}</h2>
+      <h2 class="member-form__title">Kişiyi düzenle</h2>
       <van-cell-group inset>
         <van-field v-model="fullName" label="Ad soyad" placeholder="Ahmet Yılmaz" maxlength="120"
           :rules="[{ required: true, message: 'Ad soyad gerekli' }]" />
         <van-field v-model="phone" label="Telefon" type="tel" placeholder="0532 123 45 67" maxlength="20"
           :rules="[{ required: true, message: 'Telefon gerekli' }]" />
       </van-cell-group>
-      <p class="member-form__hint">Giriş linki WhatsApp'ta bu numaraya gider.</p>
-      <van-button type="primary" native-type="submit" block round :loading="saving">
-        {{ member ? 'Kaydet' : 'Ekle' }}
-      </van-button>
+      <p class="member-form__hint">Giriş linki WhatsApp'ta bu numaraya gider; 📞 bu numarayı arar.</p>
+      <van-button type="primary" native-type="submit" block round :loading="saving">Kaydet</van-button>
     </van-form>
   </van-popup>
 </template>

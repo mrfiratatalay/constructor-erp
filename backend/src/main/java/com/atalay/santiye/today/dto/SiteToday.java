@@ -10,8 +10,9 @@ import java.util.UUID;
 
 /**
  * Bir şantiyenin ana ekrandaki satırı (WhatsApp'ın sohbet listesindeki satır).
- * latestPost: önizleme metni için son gönderi. latestEvent: son sistem satırı; hiç gönderisi olmayan şantiyenin
- * önizlemesi ("Patron, Musa'yı ekledi"). unreadPosts: kişinin son bakışından sonra başkalarının gönderdikleri.
+ * latestPost: önizleme metni için son gönderi. latestEvent: listede sayılan sistem satırı, yani kuruluş; hiç
+ * gönderisi olmayan şantiyenin önizlemesi ("Patron şantiyeyi kurdu"). Katıldı/çıkarıldı satırları her şantiyeye
+ * birden düştüğü için listede sayılmaz. unreadPosts: kişinin son bakışından sonra başkalarının gönderdikleri.
  * pinnedAt: kişi şantiyeyi sabitlediyse ne zaman. photoThumbnailUrl: satırın solundaki şantiye fotoğrafı.
  */
 public record SiteToday(
