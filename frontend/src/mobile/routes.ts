@@ -7,5 +7,9 @@ export const routes = buildRoutes({
   sites: () => import('./pages/SitesPage.vue'),
   siteFeed: () => import('./pages/SiteFeedPage.vue'),
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
+  // Yoklamanın mobil ekranları sonraki commit'lerde gelir; o zamana kadar bu adresler Şantiyeler'e yönlenir.
+  attendance: { redirectTo: 'sites' },
+  siteAttendance: { redirectTo: 'sites' },
+  workerAttendance: { redirectTo: 'sites' },
   profile: () => import('./pages/ProfilePage.vue'),
 })

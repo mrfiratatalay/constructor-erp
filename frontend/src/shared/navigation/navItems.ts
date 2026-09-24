@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { HardHat, UserRound } from 'lucide-vue-next'
+import { ClipboardCheck, HardHat, UserRound } from 'lucide-vue-next'
 import type { CurrentUserResponseRole } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
 
@@ -20,11 +20,18 @@ const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyel
 export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
   const sites: NavItem = { route: 'sites', label: SITES_LABEL[role], icon: HardHat }
   const profile: NavItem = { route: 'profile', label: 'Ben', icon: UserRound }
-  return platform === 'mobile' ? [sites, profile] : [sites]
+  // Yoklama ayrı modüldür: sohbete gitmez, geçmişi buradan okunur (TASARIM.md "Yoklama").
+  const attendance: NavItem = { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck }
+  return platform === 'mobile' ? [sites, profile] : [sites, attendance]
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
-const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', siteTasks: 'sites' }
+const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
+  siteFeed: 'sites',
+  siteTasks: 'sites',
+  siteAttendance: 'attendance',
+  workerAttendance: 'attendance',
+}
 
 export function navRouteOf(route: RouteName): RouteName {
   return PARENT_ROUTE[route] ?? route
