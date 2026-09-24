@@ -12,11 +12,13 @@ import PhotoSendDialog from '@/desktop/organisms/PhotoSendDialog.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
 /**
- * Gönderme çubuğu, WhatsApp Masaüstü gibi: ＋ (fotoğraf-video ya da belge), yazı ve 😊, 🎤 basılı tut
+ * Gönderme çubuğu, WhatsApp Masaüstü gibi: ＋ (fotoğraf-video, belge ya da yoklama), yazı ve 😊, 🎤 basılı tut
  * (yukarı kaydırınca kilitlenir). Enter gönderir, Shift+Enter yeni satır. Yazı varken 🎤 yerine ➤.
+ * Yoklama bir ek değildir, sohbete mesaj göndermez: yalnızca yoklama penceresini ister (attendance).
  * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
+const emit = defineEmits<{ attendance: [] }>()
 const { body, replyTo } = composer
 const dialogOpen = ref(false)
 const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
@@ -43,6 +45,11 @@ async function onPicked(event: Event) {
   await addFiles(files)
 }
 
+function onAdd(which: string) {
+  if (which === 'attendance') emit('attendance')
+  else (which === 'pdf' ? pdfInput : galleryInput).value?.click()
+}
+
 async function send() {
   if (hasText.value) await composer.submit()
 }
@@ -61,13 +68,13 @@ async function sendVoice(file: File) {
       <el-button v-if="isRecording && locked" circle size="large" aria-label="Kaydı sil" @click="hold.cancel">
         <Trash2 :size="18" />
       </el-button>
-      <el-dropdown v-else trigger="click" placement="top-start"
-        @command="(which: string) => (which === 'pdf' ? pdfInput : galleryInput)?.click()">
+      <el-dropdown v-else trigger="click" placement="top-start" @command="onAdd">
         <el-button circle size="large" aria-label="Ekle"><Plus :size="20" /></el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item command="gallery">Fotoğraf ve video</el-dropdown-item>
             <el-dropdown-item command="pdf">Belge (PDF)</el-dropdown-item>
+            <el-dropdown-item command="attendance" divided>Yoklama</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

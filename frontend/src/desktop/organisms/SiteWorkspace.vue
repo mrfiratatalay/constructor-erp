@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import { EllipsisVertical, Phone } from 'lucide-vue-next'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { fullDate, todayIsoDate } from '@/core/format/dates'
 import { firstName } from '@/core/format/names'
 import { telHref } from '@/core/format/phone'
 import { useComposer } from '@/core/posts/useComposer'
 import { firstCallable, participantLine } from '@/core/sites/participants'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
+import AttendanceDialog from '@/desktop/organisms/AttendanceDialog.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
 import SiteComposerBar from '@/desktop/organisms/SiteComposerBar.vue'
 import SiteInfoPanel from '@/desktop/organisms/SiteInfoPanel.vue'
@@ -37,6 +40,15 @@ const callable = computed(() => (site.value ? firstCallable(site.value, user.val
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => router.replace({ query: { mesaj: postId } })
+const attendanceOpen = ref(false)
+
+/** Yoklama sohbete gitmez; kaydedilince kayıtlara gitmek isteğe bağlıdır (Yoklama modülü). */
+async function onAttendanceSaved(day: string) {
+  const wantsHistory = await ElMessageBox.confirm(`${fullDate(day)} tarihli yoklama kaydedildi.`, 'Yoklama kaydedildi', {
+    confirmButtonText: 'Yoklama kayıtlarını görüntüle', cancelButtonText: 'Kapat', type: 'success',
+  }).then(() => true, () => false)
+  if (wantsHistory) void router.push({ name: 'siteAttendance', params: { siteId } })
+}
 </script>
 
 <template>
@@ -67,11 +79,13 @@ const openFound = (postId: string) => router.replace({ query: { mesaj: postId } 
         </template>
       </FeedColumn>
       <template v-if="site" #footer>
-        <SiteComposerBar :composer="composer" :site-name="site.name" />
+        <SiteComposerBar :composer="composer" :site-name="site.name" @attendance="attendanceOpen = true" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
     <SiteSearchPanel v-else-if="panel === 'search'" :site-id="siteId" @open="openFound" @close="panel = null" />
+    <AttendanceDialog v-if="site" v-model:show="attendanceOpen" :site-id="siteId" :site-name="site.name"
+      :day="todayIsoDate()" @saved="onAttendanceSaved" />
   </div>
 </template>
 
