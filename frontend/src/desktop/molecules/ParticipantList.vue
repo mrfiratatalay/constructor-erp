@@ -6,10 +6,23 @@ import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
  * Şantiyenin katılımcıları (WhatsApp Masaüstü'ndeki grup bilgisi gibi): en üstte "Sen", yanında rol etiketi,
- * numarası okunur biçimde. Patron satırın ⌄ menüsünden kişi bilgisine gider ya da kişiyi şantiyeden çıkarır.
+ * numarası okunur biçimde (tıklayınca arar). Patron satırın ⌄ menüsünden giriş linki gönderir ("giremiyorum"
+ * derse), kişiyi düzeltir ya da şantiyeden çıkarır. Kimsenin durumu yazmaz.
  */
+type Command = 'link' | 'edit' | 'remove'
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
-const emit = defineEmits<{ add: []; view: [participant: Participant]; remove: [participant: Participant] }>()
+const emit = defineEmits<{
+  add: []
+  link: [participant: Participant]
+  edit: [participant: Participant]
+  remove: [participant: Participant]
+}>()
+
+function onCommand(command: Command, participant: Participant) {
+  if (command === 'link') emit('link', participant)
+  if (command === 'edit') emit('edit', participant)
+  if (command === 'remove') emit('remove', participant)
+}
 </script>
 
 <template>
@@ -23,12 +36,13 @@ const emit = defineEmits<{ add: []; view: [participant: Participant]; remove: [p
       </span>
       <span class="participants__role">{{ participant.role }}</span>
       <el-dropdown v-if="canManage && !participant.isViewer" trigger="click"
-        @command="(command: 'view' | 'remove') => command === 'view' ? emit('view', participant) : emit('remove', participant)">
+        @command="(command: Command) => onCommand(command, participant)">
         <el-button text size="small" aria-label="Katılımcı menüsü">⌄</el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="view">Kişi bilgisi</el-dropdown-item>
-            <el-dropdown-item command="remove" class="participants__danger">Şantiyeden çıkar</el-dropdown-item>
+            <el-dropdown-item command="link">Giriş linki gönder</el-dropdown-item>
+            <el-dropdown-item command="edit">Düzenle</el-dropdown-item>
+            <el-dropdown-item command="remove" divided class="participants__danger">Şantiyeden çıkar</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

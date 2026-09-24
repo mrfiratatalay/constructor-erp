@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { MapPin, X } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { SiteView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { mapsHref } from '@/core/format/address'
-import { siteParticipants, type Participant } from '@/core/sites/participants'
-import { useSiteGroup } from '@/core/sites/useSiteGroup'
+import { siteParticipants } from '@/core/sites/participants'
 import { useSiteLibrary } from '@/core/sites/useSiteLibrary'
-import type { LeadChoice } from '@/core/sites/useSiteLeads'
 import { useSites, type SiteForm } from '@/core/sites/useSites'
 import { useSiteTasks } from '@/core/tasks/useSiteTasks'
-import ParticipantList from '@/desktop/molecules/ParticipantList.vue'
-import LoginLinkDialog from '@/desktop/organisms/LoginLinkDialog.vue'
 import SiteFormDialog from '@/desktop/organisms/SiteFormDialog.vue'
 import SiteLibraryPanel from '@/desktop/organisms/SiteLibraryPanel.vue'
-import SiteMemberAddDialog from '@/desktop/organisms/SiteMemberAddDialog.vue'
+import SiteParticipants from '@/desktop/organisms/SiteParticipants.vue'
 import SitePhotoHeader from '@/desktop/organisms/SitePhotoHeader.vue'
 
 /**
@@ -29,11 +25,9 @@ const emit = defineEmits<{ close: [] }>()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
-const { availableMembers, issued, addMember, removeMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
 const library = useSiteLibrary(() => site.id)
 const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
-const addingMember = ref(false)
 const showingLibrary = ref(false)
 const isOwner = computed(() => user.value?.role === 'OWNER')
 const participants = computed(() => siteParticipants(site, user.value))
@@ -48,18 +42,6 @@ const save = (form: SiteForm) =>
     editing.value = false
   })
 
-const add = (choice: LeadChoice) =>
-  attempt(async () => {
-    await addMember(choice)
-    addingMember.value = false
-  })
-
-async function remove(participant: Participant) {
-  const confirmed = await ElMessageBox.confirm('Bu şantiyeyi artık göremez; öbür şantiyeleri kalır.',
-    `${participant.name} şantiyeden çıkarılsın mı?`, { confirmButtonText: 'Çıkar', cancelButtonText: 'Vazgeç',
-      type: 'warning', confirmButtonClass: 'el-button--danger' }).then(() => true, () => false)
-  if (confirmed) await attempt(() => removeMember(participant.id))
-}
 </script>
 
 <template>
@@ -90,13 +72,10 @@ async function remove(participant: Participant) {
           <span>Görevler</span><small>{{ openTasks.length ? `${openTasks.length} açık` : '' }} ›</small>
         </button>
         <el-divider content-position="left">Katılımcılar · {{ participants.length }}</el-divider>
-        <ParticipantList :participants="participants" :can-manage="isOwner" @add="addingMember = true" @remove="remove"
-          @view="router.push({ name: 'teamMember', params: { memberId: $event.id } })" />
+        <SiteParticipants :site="site" />
       </div>
     </el-scrollbar>
     <SiteFormDialog v-model:show="editing" :site="site" :saving="isSaving" @submit="save" />
-    <SiteMemberAddDialog v-model:show="addingMember" :members="availableMembers" :saving="isAddingMember" @submit="add" />
-    <LoginLinkDialog :issued="issued" @close="issued = null" />
   </aside>
 </template>
 

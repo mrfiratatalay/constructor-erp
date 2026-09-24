@@ -7,14 +7,21 @@ import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
  * Şantiyenin katılımcıları (WhatsApp'taki grup bilgisi gibi): en üstte "Sen", yanında rol etiketi; kişinin
- * numarası okunur biçimde ve tek dokunuşla arama. Patron bir kişiye dokununca: Kişi bilgisi, Ara, Şantiyeden çıkar.
+ * numarası okunur biçimde ve tek dokunuşla arama. Patron bir kişiye dokununca WhatsApp'taki gibi bir menü:
+ * Ara, Giriş linki gönder ("giremiyorum" derse), Düzenle, Şantiyeden çıkar. Kimsenin durumu yazmaz.
  */
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
-const emit = defineEmits<{ add: []; view: [participant: Participant]; remove: [participant: Participant] }>()
+const emit = defineEmits<{
+  add: []
+  link: [participant: Participant]
+  edit: [participant: Participant]
+  remove: [participant: Participant]
+}>()
 const chosen = ref<Participant | null>(null)
 const actions = computed(() => [
-  { name: 'Kişi bilgisi', key: 'view' },
   ...(chosen.value?.phone ? [{ name: `Ara · ${formatPhone(chosen.value.phone)}`, key: 'call' }] : []),
+  { name: 'Giriş linki gönder', key: 'link' },
+  { name: 'Düzenle', key: 'edit' },
   { name: 'Şantiyeden çıkar', key: 'remove', color: 'var(--status-danger)' },
 ])
 
@@ -26,8 +33,9 @@ function onAction(action: { key: string }) {
   const participant = chosen.value
   chosen.value = null
   if (!participant) return
-  if (action.key === 'view') emit('view', participant)
   if (action.key === 'call' && participant.phone) window.location.href = telHref(participant.phone)
+  if (action.key === 'link') emit('link', participant)
+  if (action.key === 'edit') emit('edit', participant)
   if (action.key === 'remove') emit('remove', participant)
 }
 </script>

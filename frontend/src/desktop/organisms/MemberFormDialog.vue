@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MemberView } from '@/core/api/generated/model'
-import type { MemberForm } from '@/core/team/useTeam'
+import type { MemberForm } from '@/core/team/memberForm'
 
 /**
  * Yalnızca ad soyad ve telefon: eklenen herkes şeftir, şantiyeye ekleme şantiyenin içinde yapılır.

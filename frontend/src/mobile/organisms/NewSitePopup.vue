@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { MemberView } from '@/core/api/generated/model'
-import type { NewPerson, NewSiteForm } from '@/core/sites/useSiteCreation'
+import type { NewSiteForm } from '@/core/sites/useSiteCreation'
 import NewSiteDetails from '@/mobile/molecules/NewSiteDetails.vue'
 import NewSiteMembers from '@/mobile/molecules/NewSiteMembers.vue'
 
 /**
  * Yeni şantiye, WhatsApp'ta grup kurmanın iki adımı: 1) katılımcılar, 2) fotoğraf ve ad. Oluşturunca
- * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve davet düğmeleri hazır durur.
+ * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve WhatsApp'tan davet düğmesi hazır durur.
  */
 const show = defineModel<boolean>('show', { required: true })
 const { people, saving } = defineProps<{ people: MemberView[]; saving: boolean }>()
@@ -15,17 +15,15 @@ const emit = defineEmits<{ submit: [form: NewSiteForm] }>()
 
 const step = ref<1 | 2>(1)
 const memberIds = ref<string[]>([])
-const newPeople = ref<NewPerson[]>([])
 const name = ref('')
 const address = ref('')
 const photo = ref<File | null>(null)
-const memberCount = computed(() => memberIds.value.length + newPeople.value.length)
+const memberCount = computed(() => memberIds.value.length)
 
 watch(show, (open) => {
   if (!open) return
   step.value = 1
   memberIds.value = []
-  newPeople.value = []
   name.value = ''
   address.value = ''
   photo.value = null
@@ -34,7 +32,6 @@ watch(show, (open) => {
 function submit() {
   emit('submit', {
     memberIds: memberIds.value,
-    newPeople: newPeople.value,
     name: name.value.trim(),
     address: address.value.trim() || null,
     photo: photo.value,
@@ -49,8 +46,7 @@ function submit() {
         <h2 class="new-site__title">{{ step === 1 ? 'Katılımcı ekle' : 'Yeni şantiye' }}</h2>
         <span class="new-site__step">{{ step }}/2</span>
       </header>
-      <NewSiteMembers v-if="step === 1" v-model:member-ids="memberIds" v-model:new-people="newPeople"
-        :people="people" />
+      <NewSiteMembers v-if="step === 1" v-model:member-ids="memberIds" :people="people" />
       <NewSiteDetails v-else v-model:name="name" v-model:address="address" v-model:photo="photo"
         :member-count="memberCount" />
       <van-button v-if="step === 1" type="primary" block round native-type="button" @click="step = 2">

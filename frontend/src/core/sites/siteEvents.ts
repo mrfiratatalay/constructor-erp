@@ -21,11 +21,19 @@ function memberLine(event: SiteEventView, actor: string | null, viewerId?: strin
   return `${actor}, ${accusative(subject)} ${actor === 'Sen' ? verb.you : verb.third}`
 }
 
+/** WhatsApp'taki "bu grubun davet bağlantısıyla katıldı" satırı. */
+function joinedLine(event: SiteEventView, viewerId?: string): string {
+  if (event.subjectId === viewerId) return 'Davet bağlantısıyla katıldın'
+  return `${event.subjectName ?? 'Bir kişi'} davet bağlantısıyla katıldı`
+}
+
 /**
  * Akıştaki sistem satırı, WhatsApp'taki gibi kim kime ne yaptı: "Patron, Musa Kusbey'i ekledi",
- * "Patron seni ekledi", "Sen, Ali'yi çıkardın". Yapanı bilinmeyen eski kayıtta: "Musa Kusbey eklendi".
+ * "Patron seni ekledi", "Sen, Ali'yi çıkardın", "Musa davet bağlantısıyla katıldı". Yapanı bilinmeyen eski
+ * kayıtta: "Musa Kusbey eklendi".
  */
 export function eventLine(event: SiteEventView, viewerId?: string): string {
+  if (event.kind === 'MEMBER_JOINED') return joinedLine(event, viewerId)
   const actor = event.actorId && event.actorId === viewerId ? 'Sen' : (event.actorName ?? null)
   return event.kind === 'CREATED' ? createdLine(actor) : memberLine(event, actor, viewerId)
 }

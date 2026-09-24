@@ -11,11 +11,16 @@ test('yanlış şifre anlaşılır bir mesajla reddedilir', async ({ page }) => 
 })
 
 test('oturum yokken korunan sayfa girişe, girişten sonra geri gönderir', async ({ page }) => {
-  await page.goto('/ekip')
-  await expect(page).toHaveURL(/\/giris\?next=(%2F|\/)ekip$/)
+  await page.goto('/ben')
+  await expect(page).toHaveURL(/\/giris\?next=(%2F|\/)ben$/)
 })
 
 test('geçersiz davet linki ne yapılacağını söyler', async ({ page }) => {
   await page.goto('/davet/uydurma-link')
   await expect(page.getByText('Yöneticinden yeni bir link iste.')).toBeVisible()
+})
+
+test('geçersiz şantiye davet bağlantısı ne yapılacağını söyler', async ({ page }) => {
+  await page.goto('/katil/uydurma-baglanti')
+  await expect(page.getByText('Patronundan yeni bir bağlantı iste.')).toBeVisible()
 })

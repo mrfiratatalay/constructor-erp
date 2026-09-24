@@ -26,11 +26,14 @@ test('tablette mobil sayfa ekran boyu uzamaz, 640px sütunda ortalanır', async 
   expect(column?.x).toBe((810 - 640) / 2)
 })
 
-test('dar masaüstü penceresinde sol menü ikonlara iner, pencere genişleyince açılır', async ({ page }) => {
+test('dar masaüstü penceresinde sol menü ince başlar, ☰ üstüne kaydırır; geniş pencerede açıktır', async ({ page }) => {
   await openAs(page, 'desktop', 1024, 768)
   const nav = page.locator('.side-nav')
-  await expect(nav).toHaveClass(/side-nav--collapsed/)
+  await expect(nav).not.toHaveClass(/side-nav--open/)
+  await page.getByRole('button', { name: 'Menüyü aç' }).click()
+  await expect(nav).toHaveClass(/side-nav--floating/)
 
   await page.setViewportSize({ width: 1440, height: 900 })
-  await expect(nav).not.toHaveClass(/side-nav--collapsed/)
+  await expect(nav).toHaveClass(/side-nav--open/)
+  await expect(nav).not.toHaveClass(/side-nav--floating/)
 })

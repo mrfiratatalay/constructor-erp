@@ -2,13 +2,13 @@
 import { computed, reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MemberView } from '@/core/api/generated/model'
-import type { NewPerson, NewSiteForm } from '@/core/sites/useSiteCreation'
+import type { NewSiteForm } from '@/core/sites/useSiteCreation'
 import NewSiteDetails from '@/desktop/molecules/NewSiteDetails.vue'
 import NewSiteMembers from '@/desktop/molecules/NewSiteMembers.vue'
 
 /**
  * Yeni şantiye, WhatsApp'ta grup kurmanın iki adımı: 1) katılımcılar, 2) fotoğraf ve ad. Oluşturunca
- * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve davet düğmeleri hazır durur.
+ * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve WhatsApp'tan davet düğmesi hazır durur.
  */
 const show = defineModel<boolean>('show', { required: true })
 const { people, saving } = defineProps<{ people: MemberView[]; saving: boolean }>()
@@ -16,14 +16,14 @@ const emit = defineEmits<{ submit: [form: NewSiteForm] }>()
 
 const step = ref<1 | 2>(1)
 const formRef = ref<FormInstance>()
-const form = reactive({ memberIds: [] as string[], newPeople: [] as NewPerson[], name: '', address: '', photo: null as File | null })
+const form = reactive({ memberIds: [] as string[], name: '', address: '', photo: null as File | null })
 const rules: FormRules = { name: [{ required: true, message: 'Şantiye adı gerekli', trigger: 'blur' }] }
-const memberCount = computed(() => form.memberIds.length + form.newPeople.length)
+const memberCount = computed(() => form.memberIds.length)
 
 watch(show, (open) => {
   if (!open) return
   step.value = 1
-  Object.assign(form, { memberIds: [], newPeople: [], name: '', address: '', photo: null })
+  Object.assign(form, { memberIds: [], name: '', address: '', photo: null })
 })
 
 async function submit() {
@@ -36,8 +36,7 @@ async function submit() {
 <template>
   <el-dialog v-model="show" :title="step === 1 ? 'Katılımcı ekle · 1/2' : 'Yeni şantiye · 2/2'" width="520px">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
-      <NewSiteMembers v-if="step === 1" v-model:member-ids="form.memberIds" v-model:new-people="form.newPeople"
-        :people="people" />
+      <NewSiteMembers v-if="step === 1" v-model:member-ids="form.memberIds" :people="people" />
       <NewSiteDetails v-else v-model:name="form.name" v-model:address="form.address" v-model:photo="form.photo"
         :member-count="memberCount" />
     </el-form>

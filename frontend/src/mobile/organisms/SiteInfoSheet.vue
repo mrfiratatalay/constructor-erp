@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { showConfirmDialog, showFailToast, showImagePreview } from 'vant'
+import { showFailToast, showImagePreview } from 'vant'
 import { MapPin } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { SiteView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { mapsHref } from '@/core/format/address'
-import { siteParticipants, type Participant } from '@/core/sites/participants'
-import { useSiteGroup } from '@/core/sites/useSiteGroup'
+import { siteParticipants } from '@/core/sites/participants'
 import { useSiteLibrary } from '@/core/sites/useSiteLibrary'
-import type { LeadChoice } from '@/core/sites/useSiteLeads'
 import { useSites, type SiteForm } from '@/core/sites/useSites'
 import { useSiteTasks } from '@/core/tasks/useSiteTasks'
-import ParticipantCells from '@/mobile/molecules/ParticipantCells.vue'
 import SiteMediaRow from '@/mobile/molecules/SiteMediaRow.vue'
-import LoginLinkSheet from '@/mobile/organisms/LoginLinkSheet.vue'
 import SiteFormPopup from '@/mobile/organisms/SiteFormPopup.vue'
 import SiteLibrarySheet from '@/mobile/organisms/SiteLibrarySheet.vue'
-import SiteMemberAddSheet from '@/mobile/organisms/SiteMemberAddSheet.vue'
+import SiteParticipants from '@/mobile/organisms/SiteParticipants.vue'
 import SitePhotoHeader from '@/mobile/organisms/SitePhotoHeader.vue'
 
 /**
@@ -27,14 +22,11 @@ import SitePhotoHeader from '@/mobile/organisms/SitePhotoHeader.vue'
  */
 const show = defineModel<boolean>('show', { required: true })
 const { site } = defineProps<{ site: SiteView }>()
-const router = useRouter()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
-const { availableMembers, issued, addMember, removeMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
 const library = useSiteLibrary(() => site.id)
 const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
-const addingMember = ref(false)
 const libraryOpen = ref(false)
 const isOwner = computed(() => user.value?.role === 'OWNER')
 const participants = computed(() => siteParticipants(site, user.value))
@@ -48,29 +40,6 @@ const save = (form: SiteForm) =>
     await saveSite(site, form)
     editing.value = false
   })
-
-const add = (choice: LeadChoice) =>
-  attempt(async () => {
-    await addMember(choice)
-    addingMember.value = false
-  })
-
-async function remove(participant: Participant) {
-  const confirmed = await showConfirmDialog({
-    title: `${participant.name} şantiyeden çıkarılsın mı?`,
-    message: 'Bu şantiyeyi artık göremez; öbür şantiyeleri kalır.',
-    confirmButtonText: 'Çıkar',
-    confirmButtonColor: 'var(--status-danger)',
-    cancelButtonText: 'Vazgeç',
-  }).then(() => true, () => false)
-  if (confirmed) await attempt(() => removeMember(participant.id))
-}
-
-/** Kişi bilgisi ayrı bir sayfadır (WhatsApp'ta katılımcıyı görüntülemek gibi); pencere önce kapanır. */
-function viewPerson(participant: Participant) {
-  show.value = false
-  void router.push({ name: 'teamMember', params: { memberId: participant.id } })
-}
 
 function openStripItem(index: number) {
   const item = library.strip.value[index]
@@ -100,12 +69,9 @@ function openStripItem(index: number) {
           :to="{ name: 'siteTasks', params: { siteId: site.id } }" @click="show = false" />
       </van-cell-group>
       <h3 class="site-info__heading">Katılımcılar · {{ participants.length }}</h3>
-      <ParticipantCells :participants="participants" :can-manage="isOwner" @add="addingMember = true" @remove="remove"
-        @view="viewPerson" />
+      <SiteParticipants :site="site" />
     </section>
     <SiteFormPopup v-model:show="editing" :site="site" :saving="isSaving" @submit="save" />
-    <SiteMemberAddSheet v-model:show="addingMember" :members="availableMembers" :saving="isAddingMember" @submit="add" />
-    <LoginLinkSheet :issued="issued" @close="issued = null" />
     <SiteLibrarySheet v-model:show="libraryOpen" :site-id="site.id" />
   </van-popup>
 </template>

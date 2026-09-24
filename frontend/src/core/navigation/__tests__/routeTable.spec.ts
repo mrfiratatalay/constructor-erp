@@ -6,11 +6,10 @@ const page = () => Promise.resolve({ render: () => null })
 const PAGES: PageSet = {
   login: page,
   invite: page,
+  siteJoin: page,
   sites: page,
   siteFeed: page,
   siteTasks: page,
-  team: page,
-  teamMember: page,
   profile: page,
 }
 

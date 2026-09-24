@@ -2,8 +2,7 @@
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { dateTime } from '@/core/format/dates'
-import { copyText, whatsappShareUrl } from '@/core/team/loginLink'
-import type { IssuedLink } from '@/core/team/useTeam'
+import { copyText, whatsappShareUrl, type IssuedLink } from '@/core/team/loginLink'
 
 const { issued } = defineProps<{ issued: IssuedLink | null }>()
 const emit = defineEmits<{ close: [] }>()

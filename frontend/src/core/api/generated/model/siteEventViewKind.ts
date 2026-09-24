@@ -11,4 +11,5 @@ export const SiteEventViewKind = {
   CREATED: 'CREATED',
   MEMBER_ADDED: 'MEMBER_ADDED',
   MEMBER_REMOVED: 'MEMBER_REMOVED',
+  MEMBER_JOINED: 'MEMBER_JOINED',
 } as const

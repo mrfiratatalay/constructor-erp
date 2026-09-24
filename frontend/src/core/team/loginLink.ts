@@ -1,5 +1,11 @@
-import type { MemberView } from '@/core/api/generated/model'
+import type { InviteLink, MemberView } from '@/core/api/generated/model'
 import { whatsappNumber } from '@/core/format/phone'
+
+/** Linki gösteren pencerenin ihtiyacı kadarı: kime, hangi link. */
+export interface IssuedLink {
+  member: Pick<MemberView, 'id' | 'fullName' | 'phone'>
+  link: InviteLink
+}
 
 /**
  * WhatsApp o kişinin sohbetinde, mesaj yazılmış hâlde açılır; patron yalnızca gönder'e basar.

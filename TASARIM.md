@@ -1,7 +1,7 @@
 # Kızılkan Şantiye — Ekran Tasarımı Kararları
 
 22 Eylül 2026'da kararlaştırıldı, aynı gün dördüncü turda sadeleştirildi; 23 Eylül'de Şantiyeler modülü
-ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24 Eylül'de Ekip. Ekran düzeniyle
+ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24 Eylül'de kişiler. Ekran düzeniyle
 ilgili bir tercih yapılacağı zaman önce buraya bakılır. Kurallar değil, kararlardır; gerekçesiyle birlikte değişir.
 
 ## Tek ölçüt: tek cümle testi
@@ -116,7 +116,7 @@ Başlığa dokununca: telefonda alttan açılır, masaüstünde akışın sağı
 | Künye | Ad, "Şantiye · N katılımcı", adres (dokununca harita), patronda Düzenle (ad, adres, tamamlandı). |
 | Medya ve belgeler | "Medya ve belgeler · N ›" ve son fotoğrafların şeridi. İçeride Medya ve Belgeler sekmeleri, aylara ayrılmış; şantiyenin bütün geçmişi. |
 | Görevler | Görevler satırı (Musa'nın özelliği; ürün kararı Musa'yla konuşulacak). |
-| Katılımcılar | "Katılımcılar · N"; en üstte "Sen", her kişinin yanında firmadaki rolü (Patron / Şef), numarası okunur biçimde (`0552 813 78 50`). Patron bir kişiye dokununca: Ara, Şantiyeden çıkar. |
+| Katılımcılar | "Katılımcılar · N"; en üstte "Sen", her kişinin yanında firmadaki rolü (Patron / Şef), numarası okunur biçimde (`0552 813 78 50`). Durum yazısı yok. Patronda "＋ Katılımcı ekle"; bir kişiye dokununca Ara, Giriş linki gönder, Düzenle, Şantiyeden çıkar (bkz. Kişiler). |
 
 "Sorumlu" kelimesi kullanılmaz: bir şantiyede birden çok kişi olur ve hepsi aynı türden üyedir. Kişi
 şantiyenin **katılımcısıdır**, firmadaki rolü **Şef**'tir.
@@ -125,42 +125,41 @@ Başlığa dokununca: telefonda alttan açılır, masaüstünde akışın sağı
 
 Listenin başlığındaki ＋ (yalnızca patron), WhatsApp'taki gibi iki adım:
 
-1. **Katılımcılar:** ekipten işaretle ya da "＋ Yeni kişi" (ad soyad + telefon). Kimseyi seçmeden geçmek serbest.
+1. **Katılımcılar:** firmadan işaretle. Yeni kişi burada yazılmaz; şantiye kurulunca WhatsApp'tan davet edilir. Kimseyi seçmeden geçmek serbest.
 2. **Fotoğraf ve ad:** yuvarlak fotoğraf (isteğe bağlı), şantiye adı (zorunlu), adres (isteğe bağlı).
 
 Oluşturunca şantiyenin içine düşülür; akışın başında "Patron şantiyeyi kurdu", "Patron, Musa'yı ekledi"
-satırları ve "Davet linki gönder" düğmeleri hazır durur.
+satırları ve **WhatsApp'tan davet et** düğmesi hazır durur (ilk mesaj gelince kaybolur).
 
-## Ekran 4 — Ekip (WhatsApp'taki Kişiler)
+## Kişiler: ayrı ekran yok, her şey şantiyenin içinde (WhatsApp'ta grubun katılımcıları)
 
-24 Eylül'de kararlaştırıldı. Önce ayrıntılı bir sürüm konuşuldu (davet durumu, "Patron yap", pasifler listesi,
-"(Sen)" satırı); toplamı on kavrama çıkınca sadeleştirildi. Kök neden: WhatsApp'ta "hesap açmak" yoktur;
-giriş linki, katıldı mı, erişimi kapatmak gibi yönetici işleri ekrana sızıyordu. Soru her seferinde:
-**"Neyi hiç yapmasak?"**
+24 Eylül'de kararlaştırıldı. Önce bir Ekip ekranı yapıldı (liste, kişi bilgisi, son görülme, giriş durumu);
+Fırat beğenmedi: patronun işine yarayan hiçbir şey göstermeyen bir ayar sayfasıydı. Karar: **Ekip ekranı
+yok.** WhatsApp'ta da kişileri yöneten bir ekran yoktur; kişi gruba eklenir, gruptan çıkarılır.
 
-> **"Ekip, adamlarının listesi. ＋ ile eklersin, WhatsApp'tan linkini atarsın; ayrılanı çıkarırsın."**
+**Kimsenin durumu yazmaz.** "Henüz girmedi", "son görülme", "linki açmadı" bizim teknik derdimizdir, dayının
+değil. Biri giremezse gerçek hayattaki gibi arar, patron linki yeniden gönderir.
 
-Dört kavram: **kişi, şantiye, giriş linki, çıkarmak.** Ekip'i yalnızca patron görür.
-
-| Parça | Karar |
+| İş | Nerede, nasıl |
 |---|---|
-| Liste | Baş harfli yuvarlak, ad, altında şantiyeleri ("Namık Kemal, Kartal B Blok"). Alfabetik. Etiket yok, patronun kendisi yok, çıkarılanlar yok. |
-| Kişi bilgisi | Telefonda tam sayfa (`/ekip/:id`, geri hareketi listeye döner), masaüstünde sağ panel. Yuvarlak, ad, numara, "son görülme …" ya da "Henüz girmedi". [📞 Ara] [🔗 Giriş linki gönder] (henüz girmemişte link düğmesi öne çıkar). Şantiyeleri: yalnızca bakmak ve gitmek için. En altta kırmızı "Ekipten çıkar". Sağ üstte Düzenle. |
-| Ekleme / düzenleme | Yalnızca ad soyad ve telefon, ikisi de zorunlu. Eklenen herkes şeftir (rol seçimi yok; firmanın tek patronu var). Ekle'ye basınca giriş linki WhatsApp'ta o numaranın sohbetinde, mesaj yazılmış açılır. Şantiye kurarken ve katılımcı eklerken açılan "Yeni kişi" formu da aynı iki alandır. |
-| Şantiyeye ekleme | Yalnızca şantiyenin içinde (katılımcılar). Ekip'te şantiye seçimi yok. |
-| Ekipten çıkarmak | Uygulamaya giremez, bütün şantiyelerden çıkar ("Patron, Musa'yı çıkardı"); yazdıkları şantiyelerde kalır. Aynı numara yeniden eklenirse eski kaydı geri açılır. |
-| Numara | Ekipte tekildir ("Bu numara zaten ekipte: Ahmet Yılmaz"); "0532…", "+90 532…" aynı numaradır. |
-| İsim | Kaydederken Türkçe kurallarla düzeltilir: "FIRAT ATALAY" → "Fırat Atalay". Bilerek karışık yazılmış ad (ör. "McAllister") olduğu gibi kalır. |
-| Kişi bilgisine kapı | Ekip listesi ve şantiye bilgisindeki katılımcılar (patron dokununca "Kişi bilgisi"). |
+| Yeni kişi | Şantiye bilgisi → **＋ Katılımcı ekle** → **WhatsApp'tan davet et**. WhatsApp kişi seçtirerek açılır (dayının rehberi WhatsApp'ın içinde; iPhone'da da çalışır), mesaj ve **davet bağlantısı** hazırdır. Bağlantıyı açan kişi **adını ve numarasını kendisi yazar**, katılır, doğrudan şantiyenin içine düşer. Akışta "Musa davet bağlantısıyla katıldı" yazar. Patron hiç numara yazmaz. |
+| Firmadaki biri | Aynı pencerede "Firmadan ekle" listesinden tek dokunuş. Link yok, mesaj yok. |
+| Oturumu açık şef | Bağlantıya dokununca form yok, tek "Katıl" düğmesi. |
+| Kişiye dokununca | Ara · Giriş linki gönder (biri "giremiyorum" derse ya da telefonunu değiştirirse; WhatsApp doğrudan onun sohbetinde açılır) · Düzenle (ad ve numara) · Şantiyeden çıkar. |
+| Şantiyeden çıkarmak | O şantiyeyi artık göremez. Başka şantiyesi yoksa uygulamaya da giremez; onay penceresi bunu söyler. Aynı numarayla yeniden katılırsa eski kaydı açılır. |
+| Davet bağlantısı | Tek kişilik ve 7 gün geçerli; kim katıldıysa kaydı kalır. Yanlış kişiye gitse bile en fazla bir kişi girer ve akışta görünür; patron çıkarır. |
+| Numara | Firmada tekildir; "0532…", "+90 532…" aynı numaradır. Kayıtlı bir numarayla bağlantıdan yeni hesap açılmaz (kimse başkasının yerine giremesin): o kişi giriş linkiyle girip bağlantıya yeniden dokunur. |
+| İsim | Kaydederken Türkçe kurallarla düzeltilir: "FIRAT ATALAY" → "Fırat Atalay"; bilerek karışık yazılmış ad (ör. "McAllister") kalır. |
 
-Genel bir "WhatsApp'ta yaz" düğmesi yok: uygulama şantiye konuşmaları WhatsApp'ta kaybolmasın diye var.
-WhatsApp yalnızca işe yaradığı yerde çıkar: giriş linkini göndermek.
+Telefon rehberinden doğrudan seçmek (Contact Picker) konuşuldu: tarayıcıda yalnızca Android'de çalışıyor,
+dayının iPhone'unda çalışmıyor. Rehberin tamamını okumak ise ancak mağaza uygulamasıyla mümkün. Davet bağlantısı
+ikisini de gereksiz kılar: rehber işini WhatsApp yapar.
 
 ## Masaüstü: solda liste, sağda şantiye (WhatsApp Masaüstü)
 
 | Parça | Karar |
 |---|---|
-| Sol şerit | İnce ikon şeridi: 🏗 Şantiyeler, 👥 Ekip (üstüne gelince adı), en altta kişinin kendisi (Hesabım). Seçili öğe baret sarısı zeminde lacivert. |
+| Sol menü | Gmail'deki gibi en üstte ☰: açıkken ikonların yanında adları (🏗 Şantiyeler), altta kişinin adı ve rolü; kapalıyken ince ikon şeridi (üstüne gelince adı). İlk açılışta açık gelir (İlke 2: ekranda ne varsa yazar), kapatan için tercih hatırlanır. Seçili öğe baret sarısı zeminde lacivert. En altta kişinin kendisi: Hesabım. 24 Eylül'de "hep ince şerit" kararı bu yüzden geri alındı: ikonların adı yazmıyordu. |
 | Liste | Telefondaki satırın aynısı; başlıkta firma adı ve ＋, altında arama. Satırın üstüne gelince ⌄: Sabitle. |
 | Sağ taraf | Seçili şantiye; adres `/santiyeler/:id`, bağlantı paylaşılabilir. Hiçbiri seçili değilken sade karşılama (kimse istemeden okunmuş sayılmaz). |
 | Bilgi ve arama | Akışın sağında panel; ikisi aynı yeri paylaşır. |
@@ -173,8 +172,8 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 |---|---|---|
 | Telefon (≤ 768px) | Mobil (Vant) | Tam genişlik |
 | Dokunmatik tablet (≤ 1024px) | Mobil | Sayfa, başlık, gönderme çubuğu ve alttan açılan pencereler 640px'lik ortalı sütunda |
-| Bilgisayar, dar pencere | Masaüstü (Element Plus) | Sol şerit hep ince (72px); liste 280-360px arasında incelir |
-| Bilgisayar, geniş | Masaüstü | Liste 360px, akış 760px'te ortalı; bilgi paneli 320-400px |
+| Bilgisayar, dar pencere (< 1200px) | Masaüstü (Element Plus) | Sol menü ince (72px) başlar; ☰ onu içeriğin üstüne kaydırır (arkası kararır; seçince, boşluğa tıklayınca ya da Esc ile kapanır, kayıtlı tercih değişmez). Liste 280-360px arasında incelir |
+| Bilgisayar, geniş | Masaüstü | Sol menü açıkken 256px (içerik yana kayar), kapalıyken 72px. Liste 360px, akış 760px'te ortalı; bilgi paneli 320-400px |
 
 - Eşikler tek yerdedir: `core/platform/breakpoints.ts`. CSS'e kırılım noktası yazılmaz; genişlikler
   `tokens.css`'teki `--layout-*` ölçüleriyle (tavanlı `max-width`, `clamp`) verilir.
@@ -189,8 +188,8 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 | 1 | Şantiyeler | Şantiyeler (tek şantiyesi olsa da liste) |
 | 2 | Ben | Ben |
 
-Ekip yönetimi telefonda "Ben" altında, masaüstünde sol şeritte 👥. Şantiye ayarları ayrı bir ekran değildir:
-ekleme listedeki ＋, düzenleme şantiye bilgisinde (başlığa dokununca).
+Ayrı bir Ekip ekranı yoktur: kişiler şantiyenin içinde eklenir ve yönetilir (bkz. Kişiler). Şantiye ayarları da
+ayrı bir ekran değildir: ekleme listedeki ＋, düzenleme şantiye bilgisinde (başlığa dokununca).
 
 ## Mesaj silme ve düzeltme
 

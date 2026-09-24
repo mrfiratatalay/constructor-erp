@@ -12,6 +12,7 @@ import com.atalay.santiye.team.dto.MemberView;
 import com.atalay.santiye.team.dto.UpdateMemberRequest;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -59,13 +60,30 @@ public class TeamService {
         String phone = checkedPhone(request.phone());
         Optional<AppUser> holder = holderOf(owner.companyId(), phone, null);
         holder.filter(AppUser::isActive).ifPresent(TeamService::rejectTaken);
-        AppUser member = holder.orElseGet(
-            () -> new AppUser(owner.companyId(), request.fullName(), request.role(), clock.instant()));
-        member.updateProfile(PersonNames.tidy(request.fullName()), phone, request.role());
-        member.setActive(true);
-        users.save(member);
+        AppUser member = enroll(holder.orElseGet(() -> newMember(owner.companyId(), request.role())),
+            request.fullName(), phone, request.role());
         memberships.assign(owner.companyId(), member.getId(), request.siteIds(), owner.userId());
         return new MemberCreatedResponse(toView(member, null, request.siteIds()), invites.issue(member));
+    }
+
+    /**
+     * Şantiye davet bağlantısıyla gelen kişi kendini ekler (şef olarak). Numara ekipte aktif birinin ise yeni hesap
+     * açılmaz: kimse başkasının numarasını yazıp onun yerine giremesin. O kişi giriş linkiyle girip bağlantıya
+     * yeniden dokunur. Ekipten çıkarılmış birinin numarasıysa eski kaydı geri açılır.
+     */
+    @Transactional
+    public AppUser joinByLink(UUID companyId, String fullName, String phone) {
+        if (fullName == null || fullName.isBlank()) {
+            throw ApiException.badRequest("Adını yaz.");
+        }
+        String checked = checkedPhone(phone);
+        Optional<AppUser> holder = holderOf(companyId, checked, null);
+        if (holder.filter(AppUser::isActive).isPresent()) {
+            throw ApiException.badRequest(
+                "Bu numara zaten kayıtlı. Patronundan giriş linki iste, sonra bu bağlantıya yeniden dokun.");
+        }
+        return enroll(holder.orElseGet(() -> newMember(companyId, UserRole.SITE_LEAD)), fullName, checked,
+            UserRole.SITE_LEAD);
     }
 
     /** Ekipten çıkarılan kişi (active=false) her cihazda oturumu kapanır ve bütün şantiyelerden çıkar. */
@@ -111,12 +129,22 @@ public class TeamService {
             .findFirst();
     }
 
+    private AppUser newMember(UUID companyId, UserRole role) {
+        return new AppUser(companyId, "", role, clock.instant());
+    }
+
+    private AppUser enroll(AppUser member, String fullName, String phone, UserRole role) {
+        member.updateProfile(PersonNames.tidy(fullName), phone, role);
+        member.setActive(true);
+        return users.save(member);
+    }
+
     private static void rejectTaken(AppUser holder) {
         throw ApiException.badRequest("Bu numara zaten ekipte: " + holder.getFullName() + ".");
     }
 
     private static String checkedPhone(String phone) {
-        if (!PhoneNumbers.looksValid(phone)) {
+        if (phone == null || !PhoneNumbers.looksValid(phone)) {
             throw ApiException.badRequest("Telefon numarası eksik ya da hatalı.");
         }
         return phone.trim();

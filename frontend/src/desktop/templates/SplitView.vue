@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Masaüstü ana ekranlarının ortak iskeleti (WhatsApp Masaüstü): solda liste, sağda seçili olan.
- * Liste ve detay ayrı ayrı kayar; sayfa bütün olarak kaymaz. Şantiyeler ve Ekip aynı kalıptır:
+ * Liste ve detay ayrı ayrı kayar; sayfa bütün olarak kaymaz. Yeni ana ekranlar da aynı kalıbı kullanır:
  * amcan bir kere öğrenir, her yerde kullanır.
  */
 </script>

@@ -50,6 +50,22 @@ public class SiteMembershipService {
         unique.forEach(userId -> events.record(siteId, SiteEventKind.MEMBER_ADDED, actorId, userId));
     }
 
+    /** Davet bağlantısıyla katılma. Zaten katılımcıysa hiçbir şey değişmez; değilse akışa "katıldı" düşer. */
+    @Transactional
+    public boolean join(UUID siteId, UUID userId) {
+        if (members.findSiteIdsByUserId(userId).contains(siteId)) {
+            return false;
+        }
+        members.save(new SiteMember(siteId, userId));
+        events.record(siteId, SiteEventKind.MEMBER_JOINED, userId, userId);
+        return true;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isMember(UUID siteId, UUID userId) {
+        return members.findSiteIdsByUserId(userId).contains(siteId);
+    }
+
     @Transactional(readOnly = true)
     public Map<UUID, List<UUID>> siteIdsByUser(Collection<UUID> userIds) {
         return members.findByUserIds(userIds).stream()

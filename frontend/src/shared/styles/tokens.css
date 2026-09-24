@@ -79,7 +79,8 @@
   --layout-phone-column: 640px; /* mobil kabuk: telefonda tam genişlik, tablette bu genişlikte ortalı */
   --layout-reading-width: 760px; /* masaüstü sağ panel: akışın okunaklı genişliği */
   --layout-list-width: clamp(280px, 28vw, 360px); /* masaüstü liste: dar pencerede incelir */
-  --layout-nav-width: 72px; /* masaüstü sol şerit: yalnızca ikonlar (WhatsApp Masaüstü gibi) */
+  --layout-nav-width: 72px; /* masaüstü sol menü kapalıyken: yalnızca ikonlar */
+  --layout-nav-width-open: 256px; /* masaüstü sol menü açıkken: ikon + ad */
   --layout-info-width: clamp(320px, 26vw, 400px); /* masaüstü şantiye bilgisi paneli */
   /* Tablette tarayıcı çubuğu açılıp kapanınca görünen yükseklik değişir; 100vh altta kalan çubuğu gizler. */
   --layout-app-height: 100dvh;
