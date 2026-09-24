@@ -58,6 +58,21 @@ export function monthTitle(isoDate: string): string {
   return dayjs(isoDate).format('MMMM YYYY')
 }
 
+/** Ay anahtarı, "2026-09": tarih verilmezse bu ay. Ay seçicide ve API'nin month alanında kullanılır. */
+export function monthKey(isoDate?: string): string {
+  return dayjs(isoDate).format('YYYY-MM')
+}
+
+/** Önceki ya da sonraki ay: shiftMonth("2026-01", -1) → "2025-12". */
+export function shiftMonth(month: string, by: number): string {
+  return dayjs(`${month}-01`).add(by, 'month').format('YYYY-MM')
+}
+
+/** "25 Eylül 2026". */
+export function fullDate(isoDate: string): string {
+  return dayjs(isoDate).format('D MMMM YYYY')
+}
+
 /** Kaç takvim günü önce: bugün 0, dün 1. Saat farkı değil gün farkı sayılır. */
 export function daysAgo(isoDate: string): number {
   return dayjs().startOf('day').diff(dayjs(isoDate).startOf('day'), 'day')
