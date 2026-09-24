@@ -5,39 +5,44 @@ import type { PostView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useLongPress } from '@/core/gestures/useLongPress'
 import { keepPosition } from '@/core/posts/feedAnchor'
-import { canCorrect, canDelete } from '@/core/posts/postPermissions'
 import { firstUnreadPostId } from '@/core/posts/unreadDivider'
-import { useFeed } from '@/core/posts/useFeed'
 import { useFeedBottom } from '@/core/posts/useFeedBottom'
+import { useJumpTarget } from '@/core/posts/useJumpTarget'
+import { usePinnedPosts } from '@/core/posts/usePinnedPosts'
+import { useSiteTimeline } from '@/core/posts/useSiteTimeline'
+import { eventLine } from '@/core/sites/siteEvents'
 import PostActionSheet from '@/mobile/organisms/PostActionSheet.vue'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
+import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
+import PinnedBanner from '@/shared/molecules/PinnedBanner.vue'
 import PostBubble from '@/shared/organisms/PostBubble.vue'
+import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
 
 /**
- * Şantiyenin akışı, sohbet gibi: en eski üstte, en yenisi altta, sayfa açılınca dip. Yukarı kaydırınca
- * geçmiş gelir ve ekran zıplamaz. seenAt: kişinin önceki bakışı; ondan sonra gelenlerin üstüne
- * "buradan aşağısı yeni" çizgisi çekilir. Gönderiye uzun basınca Düzelt / Sil menüsü açılır.
+ * Şantiyenin akışı, WhatsApp'taki sohbet gibi: üstte sabit mesaj şeridi, en eski üstte, en yenisi altta,
+ * aralarda sistem satırları ("Patron, Musa'yı ekledi"), en dipte henüz gitmemiş mesajlar (🕓). Yukarı
+ * kaydırınca geçmiş gelir ve ekran zıplamaz. seenAt: önceki bakış; sonrasına "buradan aşağısı yeni" çizgisi.
+ * Mesaja uzun basınca menü açılır; Yanıtla, gönderme çubuğuna (sayfaya) iletilir.
  *
- * start yuvası akışın en başına girer (şantiye kuruldu satırları) ve yalnızca bütün geçmiş yüklendiğinde
- * görünür; boşsa (empty) sayfa oraya kendi boş durumunu koyar.
+ * start yuvası akışın en başına girer (davet düğmeleri) ve yalnızca bütün geçmiş yüklendiğinde görünür.
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
+const emit = defineEmits<{ reply: [post: PostView] }>()
 const { data: user } = useCurrentUser()
-const { days, isLoading, hasMore, isLoadingMore, loadMore } = useFeed(() => siteId)
+const timeline = useSiteTimeline(() => siteId)
+const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
+const { jump } = useJumpTarget(timeline)
+const { pinned } = usePinnedPosts(() => siteId)
 const acting = ref<PostView | null>(null)
 const longPress = useLongPress()
 
-const posts = computed(() => days.value.flatMap((day) => day.posts))
 const dividerBefore = computed(() => firstUnreadPostId(posts.value, seenAt, user.value?.id))
-// Mobilde kayan şey sayfanın kendisidir: kaydırıcı yok (null).
-useFeedBottom(() => null, () => posts.value.at(-1)?.id)
+// Mobilde kayan şey sayfanın kendisidir (null). Yeni gönderilen (🕓) mesaj da dibe indirir.
+useFeedBottom(() => null, () => pending.value.at(-1)?.id ?? posts.value.at(-1)?.id)
 const loadOlder = () => keepPosition(null, () => loadMore())
 
-/** Uzun basma yalnızca üzerinde işlem yapılabilen gönderiye bağlanır; ötekilerde telefonun kendi menüsü kalır. */
-function pressHandlers(post: PostView) {
-  const actionable = canCorrect(post, user.value) || canDelete(post, user.value)
-  return actionable ? longPress(() => (acting.value = post)) : {}
-}
+/** Silinen mesajın menüsü yoktur; ötekilerde uzun basma WhatsApp'taki menüyü açar. */
+const pressHandlers = (post: PostView) => (post.deletion ? {} : longPress(() => (acting.value = post)))
 
 function openPhotos(urls: string[], index: number) {
   showImagePreview({ images: urls, startPosition: index, closeable: true })
@@ -45,6 +50,7 @@ function openPhotos(urls: string[], index: number) {
 </script>
 
 <template>
+  <PinnedBanner v-if="pinned.length" :pinned="pinned" class="feed-list__pinned" @open="jump" />
   <van-skeleton v-if="isLoading" :row="6" avatar />
   <!-- direction="up": yeni gönderi aşağıda olduğu için "daha fazla" yukarıda istenir (WhatsApp gibi). -->
   <van-list v-else :loading="isLoadingMore" :finished="!hasMore" direction="up" finished-text=""
@@ -52,17 +58,32 @@ function openPhotos(urls: string[], index: number) {
     <slot v-if="!hasMore" name="start" :empty="!posts.length" />
     <section v-for="day in days" :key="day.key" class="feed-list__day">
       <FeedDayTitle :title="day.title" />
-      <template v-for="post in day.posts" :key="post.id">
-        <van-divider v-if="post.id === dividerBefore" class="feed-list__new">Buradan aşağısı yeni</van-divider>
-        <PostBubble :post="post" :mine="post.author.id === user?.id" v-bind="pressHandlers(post)"
-          @open-photos="openPhotos" />
+      <template v-for="item in day.items" :key="item.key">
+        <FeedSystemLine v-if="item.kind === 'event'" :text="eventLine(item.event, user?.id)" />
+        <template v-else>
+          <van-divider v-if="item.post.id === dividerBefore" class="feed-list__new">Buradan aşağısı yeni</van-divider>
+          <PostBubble :post="item.post" :mine="item.post.author.id === user?.id" v-bind="pressHandlers(item.post)"
+            @open-photos="openPhotos" @open-quote="jump" />
+        </template>
       </template>
     </section>
+    <section v-if="pending.length" class="feed-list__day">
+      <QueuedBubble v-for="post in pending" :key="post.id" :post="post" />
+    </section>
   </van-list>
-  <PostActionSheet v-model="acting" />
+  <PostActionSheet v-model="acting" @reply="emit('reply', $event)" />
 </template>
 
 <style scoped>
+/* Sabit mesaj şeridi, başlık çubuğunun hemen altında yapışık durur (WhatsApp gibi). */
+.feed-list__pinned {
+  position: sticky;
+  top: calc(var(--van-nav-bar-height) + env(safe-area-inset-top, 0px));
+  z-index: 3;
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) 0;
+  width: auto;
+}
+
 .feed-list__day {
   display: grid;
   gap: var(--space-2);

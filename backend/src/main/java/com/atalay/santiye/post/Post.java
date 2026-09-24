@@ -26,6 +26,10 @@ public class Post {
     private Instant editedAt;
     private Instant deletedAt;
     private UUID deletedBy;
+    private UUID replyToId;
+    private boolean forwarded;
+    private Instant pinnedAt;
+    private UUID pinnedBy;
 
     protected Post() {
     }
@@ -37,6 +41,8 @@ public class Post {
         this.authorId = post.authorId();
         this.body = post.body();
         this.issue = post.issue();
+        this.replyToId = post.replyToId();
+        this.forwarded = post.forwarded();
         this.createdAt = createdAt;
     }
 
@@ -60,11 +66,29 @@ public class Post {
         this.editedAt = at;
     }
 
-    /** Satır iz olarak kalır, yazı gider. "Sorun" işareti kalır: izde silinenin bir sorun olduğu görünür. */
+    /**
+     * Satır iz olarak kalır, yazı gider. "Sorun" işareti kalır: izde silinenin bir sorun olduğu görünür.
+     * Silinen mesaj sabit kalmaz: şeritte içeriği olmayan bir iz durmaz.
+     */
     void delete(UUID by, Instant at) {
         this.body = null;
         this.deletedAt = at;
         this.deletedBy = by;
+        unpin();
+    }
+
+    void pin(UUID by, Instant at) {
+        this.pinnedAt = at;
+        this.pinnedBy = by;
+    }
+
+    void unpin() {
+        this.pinnedAt = null;
+        this.pinnedBy = null;
+    }
+
+    boolean isPinned() {
+        return pinnedAt != null;
     }
 
     public UUID getId() {
@@ -117,5 +141,21 @@ public class Post {
 
     public UUID getDeletedBy() {
         return deletedBy;
+    }
+
+    public UUID getReplyToId() {
+        return replyToId;
+    }
+
+    public boolean isForwarded() {
+        return forwarded;
+    }
+
+    public Instant getPinnedAt() {
+        return pinnedAt;
+    }
+
+    public UUID getPinnedBy() {
+        return pinnedBy;
     }
 }

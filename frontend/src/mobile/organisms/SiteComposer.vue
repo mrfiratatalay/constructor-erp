@@ -1,37 +1,54 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { showFailToast, type UploaderBeforeRead } from 'vant'
-import { Camera, Mic, SendHorizontal } from 'lucide-vue-next'
+import { computed, ref, useTemplateRef } from 'vue'
+import { showFailToast } from 'vant'
+import { Camera, Lock, Mic, Plus, SendHorizontal, Trash2 } from 'lucide-vue-next'
 import { durationLabel } from '@/core/format/dates'
-import { LIMITS } from '@/core/posts/attachments'
-import { useComposer, type ComposeTarget } from '@/core/posts/useComposer'
+import { useHoldToRecord } from '@/core/gestures/useHoldToRecord'
+import { quoteOf } from '@/core/posts/postPreview'
+import type { Composer } from '@/core/posts/useComposer'
 import { useVoiceRecorder } from '@/core/posts/useVoiceRecorder'
 import PhotoSendSheet from '@/mobile/organisms/PhotoSendSheet.vue'
+import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
 /**
- * Şantiye sayfasının gönderme çubuğu, WhatsApp'ın mesaj çubuğu gibi (TASARIM.md İlke 7): 📷 kamera ya da
- * galeri → önizleme; yazı doğrudan çubuğa; 🎤 basılı tut, bırakınca gider. Yazı varken 🎤 yerine ➤ çıkar.
- * Şantiye seçilmez: gönderi sayfanın şantiyesine gider.
+ * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video ya da belge), yazı, 📷 (doğrudan kamera),
+ * 🎤 basılı tut. 🎤'dan yukarı kaydırınca kayıt kilitlenir; sonra 🗑 ya da ➤. Yazı varken 📷 ve 🎤 yerine ➤.
+ * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
  */
-const { site } = defineProps<{ site: ComposeTarget }>()
-const composer = useComposer(() => site)
-const { body } = composer
+const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
+const { body, replyTo } = composer
 const sheetOpen = ref(false)
+const menuOpen = ref(false)
+const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
+const pdfInput = useTemplateRef<HTMLInputElement>('pdf')
+const cameraInput = useTemplateRef<HTMLInputElement>('camera')
 const recorder = useVoiceRecorder((file) => void sendVoice(file))
 const { isRecording, seconds } = recorder
+const hold = useHoldToRecord(recorder, () => showFailToast('Mikrofona izin verilmedi. Tarayıcı ayarlarından mikrofon iznini aç.'))
+const { locked } = hold
 const hasText = computed(() => body.value.trim() !== '')
 const showMic = computed(() => !hasText.value && recorder.isSupported)
+const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
+const MENU = [{ name: 'Fotoğraf ve video', key: 'gallery' }, { name: 'Belge (PDF)', key: 'pdf' }]
 
 async function addFiles(files: File[]) {
   const problems = await composer.addFiles(files)
   if (problems.length) showFailToast(problems.join('\n'))
 }
 
-/** Vant seçilen dosyayı kendi listesine eklemesin diye false döner: tek doğru liste composer'da. */
-const pickPhotos: UploaderBeforeRead = (file) => {
+/** Seçilen dosyalar önizlemeye gider (WhatsApp gibi); açıklama orada yazılır. */
+async function onPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = [...(input.files ?? [])]
+  input.value = ''
+  if (!files.length) return
   sheetOpen.value = true
-  void addFiles(Array.isArray(file) ? file : [file])
-  return false
+  await addFiles(files)
+}
+
+function onMenu(action: { key: string }) {
+  menuOpen.value = false
+  ;(action.key === 'gallery' ? galleryInput : pdfInput).value?.click()
 }
 
 /** Mikrofon yalnızca yazı yokken görünür: sesli not tek hareketle gider. */
@@ -39,44 +56,50 @@ async function sendVoice(file: File) {
   await addFiles([file])
   await composer.submit()
 }
-
-async function startRecording() {
-  try {
-    await recorder.start()
-  } catch {
-    showFailToast('Mikrofona izin verilmedi. Tarayıcı ayarlarından mikrofon iznini aç.')
-  }
-}
 </script>
 
 <template>
   <div class="site-composer">
+    <QuoteStrip v-if="quote" :quote="quote" closable @close="replyTo = null" />
     <div class="site-composer__bar">
-      <van-uploader :before-read="pickPhotos" :max-count="LIMITS.attachments" :preview-image="false" multiple
-        accept="image/*,video/*">
-        <van-button round class="site-composer__round" aria-label="Fotoğraf ya da video ekle">
+      <template v-if="isRecording && locked">
+        <van-button round class="site-composer__round" aria-label="Kaydı sil" @click="hold.cancel">
+          <Trash2 :size="20" />
+        </van-button>
+        <p class="site-composer__recording">● {{ durationLabel(seconds) }}</p>
+        <van-button round type="primary" class="site-composer__round" aria-label="Gönder" @click="hold.send">
+          <SendHorizontal :size="20" />
+        </van-button>
+      </template>
+      <template v-else>
+        <van-button v-if="!isRecording" round class="site-composer__round" aria-label="Ekle" @click="menuOpen = true">
+          <Plus :size="22" />
+        </van-button>
+        <p v-if="isRecording" class="site-composer__recording">
+          ● {{ durationLabel(seconds) }} <span><Lock :size="13" /> kilit için yukarı kaydır</span>
+        </p>
+        <van-field v-else v-model="body" type="textarea" rows="1" :autosize="{ maxHeight: 120 }" maxlength="4000"
+          placeholder="Bir not yaz…" :border="false" class="site-composer__field" />
+        <van-button v-if="!hasText && !isRecording" round class="site-composer__round site-composer__plain"
+          aria-label="Kamera" @click="cameraInput?.click()">
           <Camera :size="22" />
         </van-button>
-      </van-uploader>
-      <p v-if="isRecording" class="site-composer__recording">
-        ● {{ durationLabel(seconds) }} · bırakınca gider
-      </p>
-      <van-field v-else v-model="body" type="textarea" rows="1" :autosize="{ maxHeight: 120 }" maxlength="4000"
-        placeholder="Bir not yaz…" :border="false" class="site-composer__field" />
-      <!-- Basılı tut, konuş, bırak: WhatsApp'taki gibi. Uzun basınca telefonun seçim menüsü açılmasın. -->
-      <van-button v-if="showMic" round :type="isRecording ? 'danger' : 'primary'"
-        class="site-composer__round site-composer__mic" aria-label="Sesli not için basılı tut"
-        @touchstart.prevent="startRecording" @touchend="recorder.stop" @touchcancel="recorder.stop"
-        @mousedown.prevent="startRecording" @mouseup="recorder.stop" @mouseleave="recorder.stop">
-        <Mic :size="22" />
-      </van-button>
-      <van-button v-else round type="primary" :disabled="!hasText"
-        class="site-composer__round" aria-label="Gönder" @click="composer.submit()">
-        <SendHorizontal :size="20" />
-      </van-button>
+        <van-button v-if="showMic" round :type="isRecording ? 'danger' : 'primary'"
+          class="site-composer__round site-composer__mic" aria-label="Sesli not için basılı tut" v-bind="hold.handlers">
+          <Mic :size="22" />
+        </van-button>
+        <van-button v-else-if="!isRecording" round type="primary" :disabled="!hasText" class="site-composer__round"
+          aria-label="Gönder" @click="composer.submit()">
+          <SendHorizontal :size="20" />
+        </van-button>
+      </template>
     </div>
+    <input ref="gallery" type="file" accept="image/*,video/*" multiple hidden @change="onPicked" />
+    <input ref="pdf" type="file" accept="application/pdf" multiple hidden @change="onPicked" />
+    <input ref="camera" type="file" accept="image/*" capture="environment" hidden @change="onPicked" />
   </div>
-  <PhotoSendSheet v-model:show="sheetOpen" :composer="composer" :site-name="site.name" @add-files="addFiles" />
+  <van-action-sheet v-model:show="menuOpen" :actions="MENU" cancel-text="Vazgeç" teleport="body" @select="onMenu" />
+  <PhotoSendSheet v-model:show="sheetOpen" :composer="composer" :site-name="siteName" @add-files="addFiles" />
 </template>
 
 <style scoped>
@@ -98,7 +121,14 @@ async function startRecording() {
   padding: 0;
 }
 
+.site-composer__plain {
+  border: 0;
+  background: transparent;
+}
+
+/* Basılı tutarken sayfa kaymasın, telefonun seçim menüsü açılmasın. */
 .site-composer__mic {
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -121,10 +151,21 @@ async function startRecording() {
 .site-composer__recording {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   margin: 0;
   padding: 0 var(--space-4);
   color: var(--status-danger);
   font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
+}
+
+.site-composer__recording span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
 }
 </style>

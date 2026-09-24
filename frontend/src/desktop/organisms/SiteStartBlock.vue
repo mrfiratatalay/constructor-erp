@@ -3,22 +3,16 @@ import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
 import type { SiteLead, SiteView } from '@/core/api/generated/model'
-import { leadNames } from '@/core/sites/siteNames'
 import { useSiteInvite } from '@/core/team/useSiteInvite'
 import LoginLinkDialog from '@/desktop/organisms/LoginLinkDialog.vue'
-import FeedStartNote from '@/shared/molecules/FeedStartNote.vue'
 
 /**
- * Akışın başı: şantiyenin kurulduğunu ve sorumlusunu söyleyen gri satırlar. Şantiyede henüz hiç gönderi
- * yoksa (empty) patronun oradaki tek işi görünür: sorumluya WhatsApp'tan davet linki.
+ * Yeni şantiyenin boş akışında patronun tek işi: katılımcılara WhatsApp'tan davet linki. Kuruldu ve eklendi
+ * satırları akışın kendisindedir (sistem satırları); ilk mesaj gelince düğmeler kendiliğinden kaybolur.
  */
 const { site, empty, canInvite } = defineProps<{ site: SiteView; empty: boolean; canInvite: boolean }>()
 const { issued, inviteLead, isInviting } = useSiteInvite()
 
-const lines = computed(() => {
-  if (site.leads.length) return ['Şantiye oluşturuldu', `Sorumlu: ${leadNames(site.leads)}`]
-  return ['Şantiye oluşturuldu']
-})
 const invitable = computed(() => (canInvite && empty ? site.leads : []))
 
 async function invite(lead: SiteLead) {
@@ -31,7 +25,6 @@ async function invite(lead: SiteLead) {
 </script>
 
 <template>
-  <FeedStartNote :lines="lines" />
   <el-button v-for="lead in invitable" :key="lead.id" type="primary" plain :loading="isInviting"
     class="site-start__invite" @click="invite(lead)">
     Davet linki gönder: {{ lead.fullName }}

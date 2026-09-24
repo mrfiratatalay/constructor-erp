@@ -13,7 +13,7 @@ export function useSiteInvite() {
 
   async function inviteLead(lead: SiteLead) {
     const link = await issue.mutateAsync({ memberId: lead.id })
-    issued.value = { member: { id: lead.id, fullName: lead.fullName }, link }
+    issued.value = { member: { id: lead.id, fullName: lead.fullName, phone: lead.phone ?? null }, link }
   }
 
   return { issued, inviteLead, isInviting: issue.isPending }

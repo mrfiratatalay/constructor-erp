@@ -2,38 +2,41 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { HardHat, Plus } from 'lucide-vue-next'
+import { Plus, Search } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
+import type { PostView, SiteToday } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { dayTitle } from '@/core/format/dates'
-import { useSoleSiteRedirect } from '@/core/sites/soleSite'
+import { useSitePins } from '@/core/pins/useSitePins'
+import { useSearch } from '@/core/search/useSearch'
 import { useSiteCreation, type NewSiteForm } from '@/core/sites/useSiteCreation'
 import { useSites } from '@/core/sites/useSites'
-import { sitesByRecency } from '@/core/today/siteRow'
+import { sitesInListOrder } from '@/core/today/siteRow'
 import { useToday } from '@/core/today/useToday'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
+import WelcomePane from '@/desktop/molecules/WelcomePane.vue'
 import NewSiteDialog from '@/desktop/organisms/NewSiteDialog.vue'
+import SearchResults from '@/desktop/organisms/SearchResults.vue'
 import SiteList from '@/desktop/organisms/SiteList.vue'
 import SiteTasksPanel from '@/desktop/organisms/SiteTasksPanel.vue'
 import SiteWorkspace from '@/desktop/organisms/SiteWorkspace.vue'
 import SplitView from '@/desktop/templates/SplitView.vue'
 
 /**
- * Şantiyeler (WhatsApp Masaüstü gibi): solda liste, sağda seçili şantiyenin akışı ya da görevleri.
- * /santiyeler, /santiyeler/:id ve /santiyeler/:id/gorevler aynı sayfadır: liste yerinde kalır, yalnızca sağ taraf değişir.
- * Liste tek tip satırdır ve son haber gelen üstte durur; özet cümlesi ve sessizlik uyarısı yoktur.
- * Hiçbiri seçili değilken hiçbir şantiye kullanıcı istemeden okunmuş sayılmaz.
+ * Şantiyeler, WhatsApp Masaüstü gibi: solda firma adı, arama ve liste (sabitlenenler üstte); sağda seçili
+ * şantiye ya da sade karşılama. /santiyeler, /santiyeler/:id ve /santiyeler/:id/gorevler aynı sayfadır:
+ * liste yerinde kalır, yalnızca sağ taraf değişir. Hiçbiri seçili değilken hiçbir şantiye okunmuş sayılmaz.
  */
 const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
-const { leads, createSite, isSaving } = useSiteCreation()
-useSoleSiteRedirect()
+const { people, createSite, isSaving } = useSiteCreation()
+const { togglePin } = useSitePins()
 
 const selectedId = computed(() => (route.params.siteId ? String(route.params.siteId) : null))
-const ordered = computed(() => sitesByRecency(today.value?.sites ?? []))
+const ordered = computed(() => sitesInListOrder(today.value?.sites ?? []))
+const search = useSearch(ordered)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')
 const adding = ref(false)
@@ -47,35 +50,49 @@ async function add(form: NewSiteForm) {
     ElMessage.error(errorMessage(error))
   }
 }
+
+async function pin(site: SiteToday) {
+  await togglePin(site).catch((error) => ElMessage.error(errorMessage(error)))
+}
+
+const openPost = (post: PostView) =>
+  router.push({ name: 'siteFeed', params: { siteId: post.site.id }, query: { mesaj: post.id } })
 </script>
 
 <template>
   <SplitView>
     <template #list-header>
-      <ListHeader title="Şantiyeler" :meta="today ? dayTitle(today.date) : undefined">
+      <ListHeader :title="user?.companyName ?? 'Şantiyeler'">
         <template v-if="isOwner" #action>
           <el-button circle type="primary" aria-label="Şantiye ekle" @click="adding = true"><Plus :size="18" /></el-button>
         </template>
+        <el-input v-model="search.text.value" placeholder="Ara" clearable class="sites__search">
+          <template #prefix><Search :size="16" /></template>
+        </el-input>
       </ListHeader>
     </template>
     <template #list>
-      <el-skeleton v-if="isLoading" :rows="6" animated class="sites__skeleton" />
-      <SiteList v-else :sites="ordered" :selected-id="selectedId" :completed="completed" />
-      <el-empty v-if="today && !today.sites.length" :image-size="72"
-        :description="isOwner ? 'Aktif şantiye yok. ＋ ile ilk şantiyeni ekle.' : 'Sana henüz bir şantiye atanmadı.'" />
+      <SearchResults v-if="search.isActive.value" :sites="search.matchingSites.value" :posts="search.posts.value"
+        :searching="search.isSearching.value" @open-post="openPost" />
+      <template v-else>
+        <el-skeleton v-if="isLoading" :rows="6" animated class="sites__skeleton" />
+        <SiteList v-else :sites="ordered" :selected-id="selectedId" :completed="completed" :viewer-id="user?.id"
+          @pin="pin" />
+        <el-empty v-if="today && !today.sites.length" :image-size="72"
+          :description="isOwner ? 'Aktif şantiye yok.' : 'Sana henüz bir şantiye atanmadı.'">
+          <el-button v-if="isOwner" type="primary" @click="adding = true">İlk şantiyeni kur</el-button>
+        </el-empty>
+      </template>
     </template>
     <template #detail>
       <!-- /santiyeler/:id/gorevler: sağda akışın yerine şantiyenin görevleri (liste yerinde kalır). -->
       <SiteTasksPanel v-if="selectedId && route.name === 'siteTasks'" :key="`tasks-${selectedId}`"
         :site-id="selectedId" />
       <SiteWorkspace v-else-if="selectedId" :key="selectedId" :site-id="selectedId" />
-      <el-empty v-else :image-size="96" class="sites__empty">
-        <template #image><HardHat :size="72" class="sites__empty-icon" /></template>
-        <template #description><p>Soldan bir şantiye seç</p></template>
-      </el-empty>
+      <WelcomePane v-else :company-name="user?.companyName" />
     </template>
   </SplitView>
-  <NewSiteDialog v-model:show="adding" :leads="leads" :saving="isSaving" @submit="add" />
+  <NewSiteDialog v-model:show="adding" :people="people" :saving="isSaving" @submit="add" />
 </template>
 
 <style scoped>
@@ -83,11 +100,9 @@ async function add(form: NewSiteForm) {
   padding: var(--space-4);
 }
 
-.sites__empty {
-  flex: 1;
-}
-
-.sites__empty-icon {
-  color: var(--border-strong);
+.sites__search :deep(.el-input__wrapper) {
+  border-radius: 999px;
+  background: var(--surface-muted);
+  box-shadow: none;
 }
 </style>

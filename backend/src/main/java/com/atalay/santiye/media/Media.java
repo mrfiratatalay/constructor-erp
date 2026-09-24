@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+/** Gönderinin dosyası; postId boşsa şantiyenin kendi fotoğrafıdır (WhatsApp'taki grup fotoğrafı). */
 @Entity
 @Table(name = "media")
 public class Media {
@@ -25,6 +26,7 @@ public class Media {
     private String originalType;
     private long sizeBytes;
     private Double durationSeconds;
+    private String fileName;
     private Instant createdAt;
 
     protected Media() {
@@ -40,11 +42,28 @@ public class Media {
         this.position = position;
         this.originalType = upload.contentType();
         this.sizeBytes = upload.sizeBytes();
+        this.fileName = upload.fileName();
         this.createdAt = upload.receivedAt();
     }
 
-    /** Yüklenen dosyanın özeti. */
-    record Upload(String contentType, long sizeBytes, Instant receivedAt) {
+    /** İletilen gönderinin kopyası: dosyalar hazırdır, yeniden işlenmez. */
+    Media(MediaOwner owner, Media source, Instant copiedAt) {
+        this.id = UUID.randomUUID();
+        this.postId = owner.postId();
+        this.siteId = owner.siteId();
+        this.companyId = owner.companyId();
+        this.kind = source.kind;
+        this.status = MediaStatus.READY;
+        this.position = source.position;
+        this.originalType = source.originalType;
+        this.sizeBytes = source.sizeBytes;
+        this.durationSeconds = source.durationSeconds;
+        this.fileName = source.fileName;
+        this.createdAt = copiedAt;
+    }
+
+    /** Yüklenen dosyanın özeti. fileName yalnızca belgede ekranda gösterilir. */
+    record Upload(String contentType, long sizeBytes, String fileName, Instant receivedAt) {
     }
 
     public UUID getId() {
@@ -73,5 +92,17 @@ public class Media {
 
     public Double getDurationSeconds() {
         return durationSeconds;
+    }
+
+    public long getSizeBytes() {
+        return sizeBytes;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 }

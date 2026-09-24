@@ -1,21 +1,32 @@
 import type { SiteToday } from '@/core/api/generated/model'
-import { postPreview } from '@/core/posts/postPreview'
-import { leadNames } from '@/core/sites/siteNames'
+import { chatPreview, type ChatPreview } from '@/core/posts/postPreview'
+import { eventLine } from '@/core/sites/siteEvents'
 
-/**
- * Şantiye listesi WhatsApp'ın sohbet listesidir: son haber gelen üstte. Yoğunluk kademesi, sessizlik
- * etiketi ve "dikkat" sıralaması yok — bir satırın ne zaman konuştuğunu saatin kendisi söyler
- * ("Dün 17:40", "12 Eyl"), ikinci kez etiketle söylemek gürültüdür.
- */
-export function sitesByRecency(sites: SiteToday[]): SiteToday[] {
-  return [...sites].sort((a, b) => (b.lastPostAt ?? '').localeCompare(a.lastPostAt ?? ''))
+const time = (iso: string | null | undefined) => (iso ? Date.parse(iso) : 0)
+
+/** Akıştaki en son şeyin zamanı: son mesaj ya da son sistem satırı ("Patron, Musa'yı ekledi"). */
+export function activityAt(site: SiteToday): string | null {
+  const event = site.latestEvent?.createdAt ?? null
+  return time(event) > time(site.lastPostAt) ? event : (site.lastPostAt ?? event)
 }
 
 /**
- * Satırın alt yazısı: son gönderinin ilk satırı ("Ahmet: Demir gelmedi"), gönderi yoksa sorumlusu.
- * Sorumlu da yoksa satır susar: "henüz haber yok" gibi olumsuz bir cümle yazılmaz.
+ * Şantiye listesi WhatsApp'ın sohbet listesidir: sabitlenenler en üstte (son sabitlenen önde), sonra akışında
+ * en son bir şey olan. Sessizlik etiketi yok: bir şantiyenin ne zaman konuştuğunu satırdaki zaman söyler.
  */
-export function sitePreview(site: SiteToday): string {
-  if (site.latestPost) return postPreview(site.latestPost)
-  return site.leads.length ? leadNames(site.leads) : ''
+export function sitesInListOrder(sites: SiteToday[]): SiteToday[] {
+  const pinned = sites.filter((site) => site.pinnedAt).sort((a, b) => time(b.pinnedAt) - time(a.pinnedAt))
+  const rest = sites.filter((site) => !site.pinnedAt).sort((a, b) => time(activityAt(b)) - time(activityAt(a)))
+  return [...pinned, ...rest]
+}
+
+/**
+ * Satırın alt yazısı, akıştaki son şey: son mesaj ("Sen: ✓✓ Demirci neden yok?") ya da ondan sonra olduysa
+ * sistem satırı. Hiç mesajı olmayan şantiyede kuruluş satırı durur ("Patron şantiyeyi kurdu").
+ */
+export function sitePreview(site: SiteToday, viewerId?: string): ChatPreview | null {
+  const event = site.latestEvent
+  const eventIsNewer = event && time(event.createdAt) > time(site.lastPostAt)
+  if (site.latestPost && !eventIsNewer) return chatPreview(site.latestPost, viewerId)
+  return event ? { author: null, text: eventLine(event, viewerId), tick: null } : null
 }

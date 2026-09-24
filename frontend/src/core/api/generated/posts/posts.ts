@@ -23,15 +23,160 @@ import type { MaybeRefOrGetter } from 'vue'
 import type {
   CorrectPostRequest,
   CreatePostForm,
+  ForwardPostRequest,
+  ListPinnedPostsParams,
   ListPostsParams,
   PostPage,
   PostView,
+  SearchPostsParams,
+  SeenBy,
 } from '../model'
 
 import { apiRequest } from '../../http'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
+export const pinPost = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<PostView>({ url: `/api/posts/${postId}/pin`, method: 'PUT', signal }, options)
+}
+
+export const getPinPostMutationKey = () => ['pinPost'] as const
+
+export const getPinPostMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof pinPost>>,
+    TError,
+    PinPostMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof pinPost>>,
+  TError,
+  PinPostMutationVariables,
+  TContext
+> => {
+  const mutationKey = getPinPostMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof pinPost>>,
+    PinPostMutationVariables
+  > = (props) => {
+    const { postId } = props ?? {}
+
+    return pinPost(postId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PinPostMutationResult = NonNullable<Awaited<ReturnType<typeof pinPost>>>
+
+export type PinPostMutationError = unknown
+export type PinPostMutationVariables = { postId: string }
+
+export const usePinPost = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof pinPost>>,
+      TError,
+      PinPostMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof pinPost>>,
+  TError,
+  PinPostMutationVariables,
+  TContext
+> => {
+  return useMutation(getPinPostMutationOptions(options), queryClient)
+}
+export const unpinPost = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<PostView>(
+    { url: `/api/posts/${postId}/pin`, method: 'DELETE', signal },
+    options,
+  )
+}
+
+export const getUnpinPostMutationKey = () => ['unpinPost'] as const
+
+export const getUnpinPostMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof unpinPost>>,
+    TError,
+    UnpinPostMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof unpinPost>>,
+  TError,
+  UnpinPostMutationVariables,
+  TContext
+> => {
+  const mutationKey = getUnpinPostMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof unpinPost>>,
+    UnpinPostMutationVariables
+  > = (props) => {
+    const { postId } = props ?? {}
+
+    return unpinPost(postId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type UnpinPostMutationResult = NonNullable<Awaited<ReturnType<typeof unpinPost>>>
+
+export type UnpinPostMutationError = unknown
+export type UnpinPostMutationVariables = { postId: string }
+
+export const useUnpinPost = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof unpinPost>>,
+      TError,
+      UnpinPostMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof unpinPost>>,
+  TError,
+  UnpinPostMutationVariables,
+  TContext
+> => {
+  return useMutation(getUnpinPostMutationOptions(options), queryClient)
+}
 export const listPosts = (
   params?: MaybeRefOrGetter<ListPostsParams>,
   options?: SecondParameter<typeof apiRequest>,
@@ -114,6 +259,9 @@ export const createPost = (
   if (createPostForm?.files !== undefined && createPostForm.files !== null) {
     createPostForm?.files.forEach((value) => formData.append(`files`, value))
   }
+  if (createPostForm?.replyToId !== undefined && createPostForm.replyToId !== null) {
+    formData.append(`replyToId`, createPostForm.replyToId)
+  }
 
   return apiRequest<PostView>(
     {
@@ -185,6 +333,86 @@ export const useCreatePost = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getCreatePostMutationOptions(options), queryClient)
+}
+export const forwardPost = (
+  postId: MaybeRefOrGetter<string>,
+  forwardPostRequest: MaybeRefOrGetter<ForwardPostRequest>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+  forwardPostRequest = toValue(forwardPostRequest)
+
+  return apiRequest<PostView>(
+    {
+      url: `/api/posts/${postId}/forward`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: forwardPostRequest,
+      signal,
+    },
+    options,
+  )
+}
+
+export const getForwardPostMutationKey = () => ['forwardPost'] as const
+
+export const getForwardPostMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof forwardPost>>,
+    TError,
+    ForwardPostMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof forwardPost>>,
+  TError,
+  ForwardPostMutationVariables,
+  TContext
+> => {
+  const mutationKey = getForwardPostMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof forwardPost>>,
+    ForwardPostMutationVariables
+  > = (props) => {
+    const { postId, data } = props ?? {}
+
+    return forwardPost(postId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type ForwardPostMutationResult = NonNullable<Awaited<ReturnType<typeof forwardPost>>>
+export type ForwardPostMutationBody = ForwardPostRequest
+export type ForwardPostMutationError = unknown
+export type ForwardPostMutationVariables = { postId: string; data: ForwardPostRequest }
+
+export const useForwardPost = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof forwardPost>>,
+      TError,
+      ForwardPostMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof forwardPost>>,
+  TError,
+  ForwardPostMutationVariables,
+  TContext
+> => {
+  return useMutation(getForwardPostMutationOptions(options), queryClient)
 }
 export const getPost = (
   postId: MaybeRefOrGetter<string>,
@@ -395,4 +623,199 @@ export const useCorrectPost = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getCorrectPostMutationOptions(options), queryClient)
+}
+export const listPostReceipts = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<SeenBy[]>(
+    { url: `/api/posts/${postId}/receipts`, method: 'GET', signal },
+    options,
+  )
+}
+
+export const getListPostReceiptsQueryKey = (postId: MaybeRefOrGetter<string>) => {
+  return ['api', 'posts', postId, 'receipts'] as const
+}
+
+export const getListPostReceiptsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listPostReceipts>>,
+  TError = unknown,
+>(
+  postId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listPostReceipts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getListPostReceiptsQueryKey(postId)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPostReceipts>>> = ({ signal }) =>
+    listPostReceipts(postId, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => toValue(postId) !== null && toValue(postId) !== undefined),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof listPostReceipts>>, TError, TData>
+}
+
+export type ListPostReceiptsQueryResult = NonNullable<Awaited<ReturnType<typeof listPostReceipts>>>
+export type ListPostReceiptsQueryError = unknown
+
+export function useListPostReceipts<
+  TData = Awaited<ReturnType<typeof listPostReceipts>>,
+  TError = unknown,
+>(
+  postId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listPostReceipts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getListPostReceiptsQueryOptions(postId, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const searchPosts = (
+  params: MaybeRefOrGetter<SearchPostsParams>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  params = toValue(params)
+
+  return apiRequest<PostView[]>(
+    { url: `/api/posts/search`, method: 'GET', params, signal },
+    options,
+  )
+}
+
+export const getSearchPostsQueryKey = (params?: MaybeRefOrGetter<SearchPostsParams>) => {
+  return ['api', 'posts', 'search', ...(params ? [params] : [])] as const
+}
+
+export const getSearchPostsQueryOptions = <
+  TData = Awaited<ReturnType<typeof searchPosts>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<SearchPostsParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchPosts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getSearchPostsQueryKey(params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof searchPosts>>> = ({ signal }) =>
+    searchPosts(params, requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof searchPosts>>,
+    TError,
+    TData
+  >
+}
+
+export type SearchPostsQueryResult = NonNullable<Awaited<ReturnType<typeof searchPosts>>>
+export type SearchPostsQueryError = unknown
+
+export function useSearchPosts<TData = Awaited<ReturnType<typeof searchPosts>>, TError = unknown>(
+  params: MaybeRefOrGetter<SearchPostsParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchPosts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSearchPostsQueryOptions(params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const listPinnedPosts = (
+  params: MaybeRefOrGetter<ListPinnedPostsParams>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  params = toValue(params)
+
+  return apiRequest<PostView[]>(
+    { url: `/api/posts/pinned`, method: 'GET', params, signal },
+    options,
+  )
+}
+
+export const getListPinnedPostsQueryKey = (params?: MaybeRefOrGetter<ListPinnedPostsParams>) => {
+  return ['api', 'posts', 'pinned', ...(params ? [params] : [])] as const
+}
+
+export const getListPinnedPostsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listPinnedPosts>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<ListPinnedPostsParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listPinnedPosts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getListPinnedPostsQueryKey(params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPinnedPosts>>> = ({ signal }) =>
+    listPinnedPosts(params, requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listPinnedPosts>>,
+    TError,
+    TData
+  >
+}
+
+export type ListPinnedPostsQueryResult = NonNullable<Awaited<ReturnType<typeof listPinnedPosts>>>
+export type ListPinnedPostsQueryError = unknown
+
+export function useListPinnedPosts<
+  TData = Awaited<ReturnType<typeof listPinnedPosts>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<ListPinnedPostsParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listPinnedPosts>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getListPinnedPostsQueryOptions(params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
 }

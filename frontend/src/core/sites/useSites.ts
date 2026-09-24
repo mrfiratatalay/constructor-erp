@@ -8,7 +8,7 @@ import {
   useUpdateSite,
 } from '@/core/api/generated/sites/sites'
 import type { SiteView, UpdateSiteRequest } from '@/core/api/generated/model'
-import { TODAY_QUERY_PREFIX } from '@/core/today/useToday'
+import { TODAY_QUERY_KEY } from '@/core/today/useToday'
 
 export type SiteForm = UpdateSiteRequest
 
@@ -21,7 +21,7 @@ export function useSites() {
   const refreshLists = () =>
     Promise.all([
       queryClient.invalidateQueries({ queryKey: getListSitesQueryKey() }),
-      queryClient.invalidateQueries({ queryKey: [TODAY_QUERY_PREFIX] }),
+      queryClient.invalidateQueries({ queryKey: TODAY_QUERY_KEY }),
     ])
   const refreshSite = (site: SiteView) =>
     Promise.all([refreshLists(), queryClient.invalidateQueries({ queryKey: getGetSiteQueryKey(site.id) })])

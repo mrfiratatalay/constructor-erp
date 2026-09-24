@@ -5,8 +5,11 @@ import { durationLabel } from '@/core/format/dates'
 
 const { src, duration } = defineProps<{ src: string; duration: number }>()
 
+/** WhatsApp'taki hız düğmesi: patron beş sesli notu arka arkaya hızlı dinler. */
+const SPEEDS = [1, 1.5, 2]
 const audio = ref<HTMLAudioElement>()
 const isPlaying = ref(false)
+const speed = ref(1)
 const position = ref(0)
 const progress = computed(() => (duration > 0 ? Math.min(1, position.value / duration) : 0))
 
@@ -14,6 +17,11 @@ function toggle() {
   if (!audio.value) return
   if (isPlaying.value) audio.value.pause()
   else void audio.value.play()
+}
+
+function nextSpeed() {
+  speed.value = SPEEDS[(SPEEDS.indexOf(speed.value) + 1) % SPEEDS.length]!
+  if (audio.value) audio.value.playbackRate = speed.value
 }
 
 /** Çubuğun neresine dokunulursa oraya atlar. */
@@ -36,7 +44,11 @@ function seek(event: MouseEvent) {
       <span class="audio-note__fill" :style="{ width: `${progress * 100}%` }" />
     </div>
     <span class="audio-note__time">{{ durationLabel(isPlaying || position > 0 ? position : duration) }}</span>
-    <audio ref="audio" :src="src" preload="metadata" @play="isPlaying = true" @pause="isPlaying = false"
+    <button class="audio-note__speed" type="button" :aria-label="`Oynatma hızı ${speed}×`" @click="nextSpeed">
+      {{ String(speed).replace('.', ',') }}×
+    </button>
+    <audio ref="audio" :src="src" preload="metadata" @play="(isPlaying = true), audio && (audio.playbackRate = speed)"
+      @pause="isPlaying = false"
       @ended="(isPlaying = false), (position = 0)" @timeupdate="position = audio?.currentTime ?? 0" />
   </div>
 </template>
@@ -78,6 +90,19 @@ function seek(event: MouseEvent) {
   inset: 0 auto 0 0;
   border-radius: inherit;
   background: var(--brand-primary);
+}
+
+.audio-note__speed {
+  flex: none;
+  min-width: 38px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--text-subtle);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .audio-note__time {

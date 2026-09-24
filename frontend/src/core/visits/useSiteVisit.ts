@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import { onScopeDispose, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import { useVisitSite } from '@/core/api/generated/visits/visits'
-import { TODAY_QUERY_PREFIX } from '@/core/today/useToday'
+import { TODAY_QUERY_KEY } from '@/core/today/useToday'
 
 /**
  * Şantiye sayfası açılınca ziyareti yazar: ana ekrandaki okunmadı rozeti söner.
@@ -12,7 +12,7 @@ export function useSiteVisit(siteId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
   const previousSeenAt = ref<string | null>(null)
   const { mutateAsync } = useVisitSite({
-    mutation: { onSuccess: () => queryClient.invalidateQueries({ queryKey: [TODAY_QUERY_PREFIX] }) },
+    mutation: { onSuccess: () => queryClient.invalidateQueries({ queryKey: TODAY_QUERY_KEY }) },
   })
 
   async function visit(id: string) {

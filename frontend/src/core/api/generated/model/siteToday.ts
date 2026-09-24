@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { PostView } from './postView'
+import type { SiteEventView } from './siteEventView'
 import type { SiteLead } from './siteLead'
 
 export interface SiteToday {
@@ -22,4 +23,9 @@ export interface SiteToday {
   oldestOpenIssueAt?: string | null
   noNewsToday: boolean
   recentPhotoUrls: string[]
+  latestEvent?: SiteEventView
+  /** @nullable */
+  pinnedAt?: string | null
+  /** @nullable */
+  photoThumbnailUrl?: string | null
 }

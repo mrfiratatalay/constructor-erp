@@ -8,6 +8,8 @@ import type { IssueResolution } from './issueResolution'
 import type { MediaView } from './mediaView'
 import type { PostAuthorRef } from './postAuthorRef'
 import type { PostDeletion } from './postDeletion'
+import type { PostPin } from './postPin'
+import type { PostQuote } from './postQuote'
 import type { PostSiteRef } from './postSiteRef'
 
 export interface PostView {
@@ -23,4 +25,8 @@ export interface PostView {
   /** @nullable */
   editedAt?: string | null
   deletion?: PostDeletion
+  replyTo?: PostQuote
+  forwarded: boolean
+  pin?: PostPin
+  seenByAll: boolean
 }

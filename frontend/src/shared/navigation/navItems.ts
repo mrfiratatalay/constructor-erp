@@ -9,8 +9,8 @@ export interface NavItem {
   icon: Component
 }
 
-/** Patronun birden çok şantiyesi var; şantiye sorumlusu çoğunlukla tek şantiyeye bakar. */
-const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyeler', SITE_LEAD: 'Şantiyem' }
+/** Herkes aynı listeyi görür (WhatsApp'ın "Sohbetler"i gibi); tek şantiyesi olan şef için de ad aynı. */
+const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyeler', SITE_LEAD: 'Şantiyeler' }
 
 const ITEMS: Record<'profile' | 'team', Omit<NavItem, 'route'>> = {
   profile: { label: 'Ben', icon: UserRound },
@@ -36,8 +36,8 @@ export function manageNavItems(role: CurrentUserResponseRole): NavItem[] {
   return role === 'OWNER' ? [item('team')] : []
 }
 
-/** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
-const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', siteTasks: 'sites' }
+/** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler", kişi bilgisindeyken "Ekip" seçili. */
+const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = { siteFeed: 'sites', siteTasks: 'sites', teamMember: 'team' }
 
 export function navRouteOf(route: RouteName): RouteName {
   return PARENT_ROUTE[route] ?? route

@@ -7,5 +7,6 @@ export const routes = buildRoutes({
   siteFeed: () => import('./pages/SiteFeedPage.vue'),
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   team: () => import('./pages/TeamPage.vue'),
+  teamMember: () => import('./pages/TeamMemberPage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

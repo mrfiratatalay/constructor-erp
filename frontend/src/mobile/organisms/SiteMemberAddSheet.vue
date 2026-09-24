@@ -23,7 +23,7 @@ watch([show, () => members], ([open]) => {
 function submit() {
   emit('submit', {
     leadId: choice.value === NEW_MEMBER ? null : choice.value,
-    newLead: choice.value === NEW_MEMBER ? { fullName: fullName.value, phone: phone.value || null } : null,
+    newLead: choice.value === NEW_MEMBER ? { fullName: fullName.value, phone: phone.value } : null,
   })
 }
 </script>
@@ -41,7 +41,8 @@ function submit() {
       <van-cell-group v-if="choice === NEW_MEMBER" inset>
         <van-field v-model="fullName" label="Ad soyad" placeholder="Ahmet Yılmaz" maxlength="120"
           :rules="[{ required: true, message: 'Ad soyad gerekli' }]" />
-        <van-field v-model="phone" label="Telefon" type="tel" placeholder="WhatsApp daveti için" maxlength="20" />
+        <van-field v-model="phone" label="Telefon" type="tel" placeholder="0532 123 45 67" maxlength="20"
+          :rules="[{ required: true, message: 'Telefon gerekli' }]" />
       </van-cell-group>
       <van-button type="primary" native-type="submit" block round :loading="saving">Ekle ve link hazırla</van-button>
     </van-form>

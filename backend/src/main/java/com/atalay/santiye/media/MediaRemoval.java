@@ -11,9 +11,8 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Silinen gönderinin medyası gerçekten gider: adresini bilen de açamaz, ana ekranın fotoğraf şeridine de
- * düşmez. Satırlar gönderinin silinmesiyle aynı işlemde, dosyalar işlem kesinleşince silinir: işlem geri
- * alınırsa dosyalar yerinde kalır.
+ * Silinen gönderinin medyası gerçekten gider: adresini bilen de açamaz, galeriye de düşmez. Satırlar
+ * silmeyle aynı işlemde, dosyalar işlem kesinleşince silinir: işlem geri alınırsa dosyalar yerinde kalır.
  */
 @Service
 public class MediaRemoval {
@@ -30,7 +29,16 @@ public class MediaRemoval {
 
     @Transactional
     public void removeForPost(UUID postId) {
-        List<Media> items = media.findByPostIdInOrderByPosition(List.of(postId));
+        removeAll(media.findByPostIdInOrderByPosition(List.of(postId)));
+    }
+
+    /** Tek bir medya: ör. değiştirilen şantiye fotoğrafının eskisi. */
+    @Transactional
+    public void remove(UUID mediaId) {
+        media.findById(mediaId).ifPresent(item -> removeAll(List.of(item)));
+    }
+
+    private void removeAll(List<Media> items) {
         media.deleteAll(items);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -48,7 +56,7 @@ public class MediaRemoval {
         try {
             storage.deleteFiles(item);
         } catch (IOException error) {
-            log.warn("Silinen gönderinin dosyası silinemedi: {}", item.getId(), error);
+            log.warn("Silinen medyanın dosyası silinemedi: {}", item.getId(), error);
         }
     }
 }

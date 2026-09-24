@@ -4,7 +4,7 @@ import type { MediaViewKind } from '@/core/api/generated/model'
 
 const { kind, failed } = defineProps<{ kind: MediaViewKind; failed: boolean }>()
 
-const LABELS: Record<MediaViewKind, string> = { PHOTO: 'Fotoğraf', VIDEO: 'Video', AUDIO: 'Sesli not' }
+const LABELS: Record<MediaViewKind, string> = { PHOTO: 'Fotoğraf', VIDEO: 'Video', AUDIO: 'Sesli not', DOCUMENT: 'Belge' }
 </script>
 
 <template>

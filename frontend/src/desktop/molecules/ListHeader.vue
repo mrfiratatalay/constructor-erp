@@ -8,7 +8,7 @@ const { title, meta } = defineProps<{ title: string; meta?: string }>()
     <div class="list-header__top">
       <h1 class="list-header__title">{{ title }}</h1>
       <span v-if="meta" class="list-header__meta">{{ meta }}</span>
-      <slot name="action" />
+      <span v-if="$slots.action" class="list-header__action"><slot name="action" /></span>
     </div>
     <slot />
   </header>
@@ -32,6 +32,11 @@ const { title, meta } = defineProps<{ title: string; meta?: string }>()
   font-size: var(--text-lg);
   font-weight: var(--weight-black);
   letter-spacing: -0.02em;
+}
+
+/* Eylem (＋) sağda durur; yanında küçük bilgi olmasa da. */
+.list-header__action {
+  margin-left: auto;
 }
 
 .list-header__meta {

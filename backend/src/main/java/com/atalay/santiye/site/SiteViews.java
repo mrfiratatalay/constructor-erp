@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
-/** Şantiyeyi sorumlularının adlarıyla birlikte dışarıya verilecek biçime çevirir; tek sorguda toplu yapar. */
+/** Şantiyeyi katılımcılarının adlarıyla birlikte dışarıya verilecek biçime çevirir; tek sorguda toplu yapar. */
 @Component
 class SiteViews {
 
@@ -46,6 +46,9 @@ class SiteViews {
             .filter(user -> user != null)
             .map(user -> new SiteLead(user.getId(), user.getFullName(), user.getPhone()))
             .toList();
-        return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), siteLeads);
+        UUID photo = site.getPhotoMediaId();
+        String photoUrl = photo == null ? null : "/api/media/" + photo;
+        return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), siteLeads, photoUrl,
+            photoUrl == null ? null : photoUrl + "/thumbnail");
     }
 }

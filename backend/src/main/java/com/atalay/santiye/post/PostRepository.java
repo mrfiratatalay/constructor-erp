@@ -53,6 +53,18 @@ interface PostRepository extends JpaRepository<Post, UUID> {
         + "group by p.siteId")
     List<SiteMoment> findOldestOpenIssueAt(Collection<UUID> siteIds);
 
+    /** Şantiyenin sabit mesajları, en son sabitlenen önde (akışın üstündeki şerit). */
+    @Query("select p from Post p where p.siteId = :siteId and p.pinnedAt is not null order by p.pinnedAt desc")
+    List<Post> findPinned(UUID siteId);
+
+    /**
+     * Mesaj araması: yazısında aranan geçen, silinmemiş mesajlar, en yeniden eskiye. Desen küçük harfe
+     * çevrilmiş ve joker karakterleri kaçırılmış gelir.
+     */
+    @Query("select p from Post p where p.siteId in :siteIds and p.deletedAt is null "
+        + "and lower(p.body) like :pattern escape '\\' order by p.createdAt desc")
+    List<Post> search(Collection<UUID> siteIds, String pattern, Pageable page);
+
     /** Şantiye başına en son gönderi (ana ekrandaki önizleme). Aynı ana düşen ikiziyle birlikte gelebilir. */
     @Query("select p from Post p where p.siteId in :siteIds and p.deletedAt is null and p.createdAt = "
         + "(select max(q.createdAt) from Post q where q.siteId = p.siteId and q.deletedAt is null)")

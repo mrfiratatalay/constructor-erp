@@ -1,68 +1,65 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { MemberView } from '@/core/api/generated/model'
-import type { NewSiteForm } from '@/core/sites/useSiteCreation'
+import type { NewPerson, NewSiteForm } from '@/core/sites/useSiteCreation'
+import NewSiteDetails from '@/mobile/molecules/NewSiteDetails.vue'
+import NewSiteMembers from '@/mobile/molecules/NewSiteMembers.vue'
 
 /**
- * Yeni şantiye, WhatsApp'ta grup kurmak gibi: ad ver, sorumluyu seç, bitir. Sorumlu ya ekipten seçilir
- * ya da burada oluşturulur; "Sonra atarım" da geçerli bir cevaptır, patron akışını kesmez.
+ * Yeni şantiye, WhatsApp'ta grup kurmanın iki adımı: 1) katılımcılar, 2) fotoğraf ve ad. Oluşturunca
+ * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve davet düğmeleri hazır durur.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { leads, saving } = defineProps<{ leads: MemberView[]; saving: boolean }>()
+const { people, saving } = defineProps<{ people: MemberView[]; saving: boolean }>()
 const emit = defineEmits<{ submit: [form: NewSiteForm] }>()
 
-/** Sorumlu seçimi: kişinin kimliği, yeni kişi için 'new', boş bırakmak için ''. */
-const LATER = ''
-const NEW_LEAD = 'new'
-
+const step = ref<1 | 2>(1)
+const memberIds = ref<string[]>([])
+const newPeople = ref<NewPerson[]>([])
 const name = ref('')
 const address = ref('')
-const lead = ref<string>(LATER)
-const leadName = ref('')
-const leadPhone = ref('')
+const photo = ref<File | null>(null)
+const memberCount = computed(() => memberIds.value.length + newPeople.value.length)
 
 watch(show, (open) => {
   if (!open) return
+  step.value = 1
+  memberIds.value = []
+  newPeople.value = []
   name.value = ''
   address.value = ''
-  lead.value = LATER
-  leadName.value = ''
-  leadPhone.value = ''
+  photo.value = null
 })
 
 function submit() {
   emit('submit', {
-    name: name.value,
-    address: address.value || null,
-    leadId: lead.value === NEW_LEAD || lead.value === LATER ? null : lead.value,
-    newLead: lead.value === NEW_LEAD ? { fullName: leadName.value, phone: leadPhone.value || null } : null,
+    memberIds: memberIds.value,
+    newPeople: newPeople.value,
+    name: name.value.trim(),
+    address: address.value.trim() || null,
+    photo: photo.value,
   })
 }
 </script>
 
 <template>
-  <van-popup v-model:show="show" position="bottom" round closeable>
+  <van-popup v-model:show="show" position="bottom" round closeable teleport="body" safe-area-inset-bottom>
     <van-form class="new-site" @submit="submit">
-      <h2 class="new-site__title">Yeni şantiye</h2>
-      <van-cell-group inset>
-        <van-field v-model="name" label="Ad" placeholder="Çamlıca Konutları" maxlength="120"
-          :rules="[{ required: true, message: 'Şantiye adı gerekli' }]" />
-        <van-field v-model="address" label="Adres" placeholder="İsteğe bağlı" maxlength="300" />
-      </van-cell-group>
-      <section class="new-site__block">
-        <strong>Sorumlu</strong>
-        <van-radio-group v-model="lead" class="new-site__block">
-          <van-radio v-for="member in leads" :key="member.id" :name="member.id">{{ member.fullName }}</van-radio>
-          <van-radio :name="NEW_LEAD">Yeni kişi ekle</van-radio>
-          <van-radio :name="LATER">Sonra atarım</van-radio>
-        </van-radio-group>
-      </section>
-      <van-cell-group v-if="lead === NEW_LEAD" inset>
-        <van-field v-model="leadName" label="Ad soyad" placeholder="Ahmet Yılmaz" maxlength="120"
-          :rules="[{ required: true, message: 'Ad soyad gerekli' }]" />
-        <van-field v-model="leadPhone" label="Telefon" type="tel" placeholder="Davet için" maxlength="20" />
-      </van-cell-group>
-      <van-button type="primary" native-type="submit" block round :loading="saving">Oluştur</van-button>
+      <header class="new-site__head">
+        <h2 class="new-site__title">{{ step === 1 ? 'Katılımcı ekle' : 'Yeni şantiye' }}</h2>
+        <span class="new-site__step">{{ step }}/2</span>
+      </header>
+      <NewSiteMembers v-if="step === 1" v-model:member-ids="memberIds" v-model:new-people="newPeople"
+        :people="people" />
+      <NewSiteDetails v-else v-model:name="name" v-model:address="address" v-model:photo="photo"
+        :member-count="memberCount" />
+      <van-button v-if="step === 1" type="primary" block round native-type="button" @click="step = 2">
+        İleri{{ memberCount ? ` · ${memberCount} kişi` : '' }}
+      </van-button>
+      <div v-else class="new-site__actions">
+        <van-button round native-type="button" @click="step = 1">Geri</van-button>
+        <van-button type="primary" round native-type="submit" :loading="saving">Oluştur</van-button>
+      </div>
     </van-form>
   </van-popup>
 </template>
@@ -71,9 +68,16 @@ function submit() {
 .new-site {
   display: grid;
   gap: var(--space-4);
-  max-height: 85dvh;
+  max-height: 88dvh;
   overflow-y: auto;
   padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+}
+
+.new-site__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-right: var(--space-8);
 }
 
 .new-site__title {
@@ -81,8 +85,14 @@ function submit() {
   font-size: 18px;
 }
 
-.new-site__block {
+.new-site__step {
+  color: var(--text-subtle);
+  font-size: var(--text-sm);
+}
+
+.new-site__actions {
   display: grid;
+  grid-template-columns: auto 1fr;
   gap: var(--space-3);
 }
 </style>

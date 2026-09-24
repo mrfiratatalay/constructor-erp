@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { MediaView } from '@/core/api/generated/model'
 import AudioNote from '@/shared/atoms/AudioNote.vue'
+import DocumentChip from '@/shared/atoms/DocumentChip.vue'
 import MediaPending from '@/shared/atoms/MediaPending.vue'
 import PhotoGrid from '@/shared/molecules/PhotoGrid.vue'
 
@@ -12,6 +13,7 @@ const ready = computed(() => media.filter((item) => item.status === 'READY' && i
 const photos = computed(() => ready.value.filter((item) => item.kind === 'PHOTO'))
 const videos = computed(() => ready.value.filter((item) => item.kind === 'VIDEO'))
 const voices = computed(() => ready.value.filter((item) => item.kind === 'AUDIO'))
+const documents = computed(() => ready.value.filter((item) => item.kind === 'DOCUMENT'))
 const pending = computed(() => media.filter((item) => item.status !== 'READY'))
 </script>
 
@@ -22,6 +24,7 @@ const pending = computed(() => media.filter((item) => item.status !== 'READY'))
     <video v-for="video in videos" :key="video.id" class="post-media__video" :src="video.url!"
       :poster="video.thumbnailUrl ?? undefined" controls playsinline preload="metadata" />
     <AudioNote v-for="voice in voices" :key="voice.id" :src="voice.url!" :duration="voice.durationSeconds ?? 0" />
+    <DocumentChip v-for="document in documents" :key="document.id" :document="document" />
     <MediaPending v-for="item in pending" :key="item.id" :kind="item.kind" :failed="item.status === 'FAILED'" />
   </div>
 </template>

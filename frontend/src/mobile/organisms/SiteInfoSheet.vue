@@ -1,130 +1,151 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { showFailToast, showImagePreview } from 'vant'
+import { useRouter } from 'vue-router'
+import { showConfirmDialog, showFailToast, showImagePreview } from 'vant'
 import { MapPin } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
-import { useListSitePhotos } from '@/core/api/generated/photos/photos'
 import type { SiteView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { mapsHref } from '@/core/format/address'
+import { siteParticipants, type Participant } from '@/core/sites/participants'
 import { useSiteGroup } from '@/core/sites/useSiteGroup'
+import { useSiteLibrary } from '@/core/sites/useSiteLibrary'
 import type { LeadChoice } from '@/core/sites/useSiteLeads'
-import { SITE_STATUS } from '@/core/sites/siteStatus'
 import { useSites, type SiteForm } from '@/core/sites/useSites'
 import { useSiteTasks } from '@/core/tasks/useSiteTasks'
-import StatusTag from '@/mobile/atoms/StatusTag.vue'
-import SiteLeadCells from '@/mobile/molecules/SiteLeadCells.vue'
-import SiteFormPopup from '@/mobile/organisms/SiteFormPopup.vue'
-import SiteMemberAddSheet from '@/mobile/organisms/SiteMemberAddSheet.vue'
+import ParticipantCells from '@/mobile/molecules/ParticipantCells.vue'
+import SiteMediaRow from '@/mobile/molecules/SiteMediaRow.vue'
 import LoginLinkSheet from '@/mobile/organisms/LoginLinkSheet.vue'
+import SiteFormPopup from '@/mobile/organisms/SiteFormPopup.vue'
+import SiteLibrarySheet from '@/mobile/organisms/SiteLibrarySheet.vue'
+import SiteMemberAddSheet from '@/mobile/organisms/SiteMemberAddSheet.vue'
+import SitePhotoHeader from '@/mobile/organisms/SitePhotoHeader.vue'
 
 /**
- * Şantiye bilgisi (başlıktaki ⓘ ile alttan açılır; WhatsApp'taki "kişi bilgisi" gibi): adres, sorumlular,
- * durum ve bu haftanın fotoğrafları. Ayarlar da burada: patron şantiyeyi buradan düzenler.
+ * Şantiye bilgisi, WhatsApp'taki grup bilgisi gibi: büyük fotoğraf, ad, "Şantiye · N katılımcı", adres
+ * (dokununca harita), medya ve belgeler, görevler, katılımcılar. Patron buradan düzenler, kişi ekler/çıkarır.
  */
 const show = defineModel<boolean>('show', { required: true })
 const { site } = defineProps<{ site: SiteView }>()
+const router = useRouter()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
-const { data: photos } = useListSitePhotos(() => site.id)
-const { availableMembers, issued, addMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
+const { availableMembers, issued, addMember, removeMember, isSaving: isAddingMember } = useSiteGroup(() => site.id)
+const library = useSiteLibrary(() => site.id)
 const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const addingMember = ref(false)
+const libraryOpen = ref(false)
 const isOwner = computed(() => user.value?.role === 'OWNER')
-const hasInfoLine = computed(() => !!site.address || site.status !== 'ACTIVE')
+const participants = computed(() => siteParticipants(site, user.value))
 
-function openPhoto(index: number) {
-  const urls = (photos.value ?? []).map((photo) => photo.url ?? '')
-  showImagePreview({ images: urls, startPosition: index, closeable: true })
+async function attempt(work: () => Promise<unknown>) {
+  await work().catch((error) => showFailToast(errorMessage(error)))
 }
 
-async function save(form: SiteForm) {
-  try {
+const save = (form: SiteForm) =>
+  attempt(async () => {
     await saveSite(site, form)
     editing.value = false
-  } catch (error) {
-    showFailToast(errorMessage(error))
-  }
-}
+  })
 
-async function addGroupMember(choice: LeadChoice) {
-  try {
+const add = (choice: LeadChoice) =>
+  attempt(async () => {
     await addMember(choice)
     addingMember.value = false
-  } catch (error) {
-    showFailToast(errorMessage(error))
-  }
+  })
+
+async function remove(participant: Participant) {
+  const confirmed = await showConfirmDialog({
+    title: `${participant.name} şantiyeden çıkarılsın mı?`,
+    message: 'Bu şantiyeyi artık göremez; öbür şantiyeleri kalır.',
+    confirmButtonText: 'Çıkar',
+    confirmButtonColor: 'var(--status-danger)',
+    cancelButtonText: 'Vazgeç',
+  }).then(() => true, () => false)
+  if (confirmed) await attempt(() => removeMember(participant.id))
+}
+
+/** Kişi bilgisi ayrı bir sayfadır (WhatsApp'ta katılımcıyı görüntülemek gibi); pencere önce kapanır. */
+function viewPerson(participant: Participant) {
+  show.value = false
+  void router.push({ name: 'teamMember', params: { memberId: participant.id } })
+}
+
+function openStripItem(index: number) {
+  const item = library.strip.value[index]
+  if (!item) return
+  if (item.kind === 'VIDEO') return void window.open(item.url ?? '', '_blank')
+  const urls = library.photoUrls.value
+  showImagePreview({ images: urls, startPosition: Math.max(0, urls.indexOf(item.url ?? '')), closeable: true })
 }
 </script>
 
 <template>
   <van-popup v-model:show="show" position="bottom" round closeable teleport="body" safe-area-inset-bottom>
     <section class="site-info">
+      <SitePhotoHeader :site="site" :can-edit="isOwner" />
       <header class="site-info__head">
-        <h2 class="site-info__name">{{ site.name }}</h2>
+        <h2>{{ site.name }}</h2>
+        <p>Şantiye · {{ participants.length }} katılımcı{{ site.status === 'COMPLETED' ? ' · Tamamlandı' : '' }}</p>
+        <a v-if="site.address" :href="mapsHref(site.address)" target="_blank" rel="noopener" class="site-info__address">
+          <MapPin :size="15" />{{ site.address }}
+        </a>
         <van-button v-if="isOwner" size="small" round plain type="primary" @click="editing = true">Düzenle</van-button>
       </header>
-      <p v-if="hasInfoLine" class="site-info__line">
-        <template v-if="site.address"><MapPin :size="15" />{{ site.address }}</template>
-        <StatusTag v-if="site.status !== 'ACTIVE'" :tone="SITE_STATUS[site.status].tone">
-          {{ SITE_STATUS[site.status].label }}
-        </StatusTag>
-      </p>
-      <SiteLeadCells :leads="site.leads" :viewer-id="user?.id" :can-assign="isOwner" class="site-info__leads"
-        @add="addingMember = true" />
-      <!-- WhatsApp'ta grup bilgisindeki "Medya, bağlantılar ve belgeler" satırı gibi: görevler ayrı sayfada. -->
+      <SiteMediaRow :count="library.count.value" :strip="library.strip.value" @open="libraryOpen = true"
+        @open-photo="openStripItem" />
       <van-cell-group inset class="site-info__tasks">
         <van-cell title="Görevler" :value="openTasks.length ? `${openTasks.length} açık` : ''" is-link
           :to="{ name: 'siteTasks', params: { siteId: site.id } }" @click="show = false" />
       </van-cell-group>
-      <template v-if="photos?.length">
-        <h3 class="site-info__heading">Bu haftanın fotoğrafları</h3>
-        <div class="site-info__photos">
-          <van-image v-for="(photo, index) in photos" :key="photo.id" :src="photo.thumbnailUrl ?? photo.url ?? ''"
-            fit="cover" class="site-info__photo" @click="openPhoto(index)" />
-        </div>
-      </template>
+      <h3 class="site-info__heading">Katılımcılar · {{ participants.length }}</h3>
+      <ParticipantCells :participants="participants" :can-manage="isOwner" @add="addingMember = true" @remove="remove"
+        @view="viewPerson" />
     </section>
     <SiteFormPopup v-model:show="editing" :site="site" :saving="isSaving" @submit="save" />
-    <SiteMemberAddSheet v-model:show="addingMember" :members="availableMembers" :saving="isAddingMember"
-      @submit="addGroupMember" />
+    <SiteMemberAddSheet v-model:show="addingMember" :members="availableMembers" :saving="isAddingMember" @submit="add" />
     <LoginLinkSheet :issued="issued" @close="issued = null" />
+    <SiteLibrarySheet v-model:show="libraryOpen" :site-id="site.id" />
   </van-popup>
 </template>
 
 <style scoped>
 .site-info {
   display: grid;
-  gap: var(--space-3);
-  max-height: 86dvh;
+  gap: var(--space-4);
+  max-height: 90dvh;
   overflow-y: auto;
   padding: var(--space-6) var(--space-4) var(--space-4);
 }
 
 .site-info__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding-right: var(--space-8);
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+  text-align: center;
 }
 
-.site-info__name {
-  flex: 1;
+.site-info__head h2 {
   margin: 0;
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
 }
 
-.site-info__line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
+.site-info__head p {
   margin: 0;
   color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 
-/* Beyaz pencerede beyaz grup kaybolmasın: künye ve görevler hafif zeminli bloklar. */
-.site-info__leads,
+.site-info__address {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-primary);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
 .site-info__tasks {
   --van-cell-background: var(--surface-muted);
 }
@@ -135,18 +156,5 @@ async function addGroupMember(choice: LeadChoice) {
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-.site-info__photos {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-}
-
-.site-info__photo {
-  display: block;
-  overflow: hidden;
-  aspect-ratio: 1;
-  border-radius: var(--radius-sm);
 }
 </style>

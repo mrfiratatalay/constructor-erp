@@ -1,18 +1,20 @@
 import type { QueryClient } from '@tanstack/vue-query'
-import { getListSitePhotosQueryKey } from '@/core/api/generated/photos/photos'
+import { getListSiteLibraryQueryKey } from '@/core/api/generated/library/library'
+import { getListPinnedPostsQueryKey, getSearchPostsQueryKey } from '@/core/api/generated/posts/posts'
 import { FEED_QUERY_PREFIX } from '@/core/posts/useFeed'
-import { TODAY_QUERY_PREFIX } from '@/core/today/useToday'
-
-export const ISSUES_QUERY_PREFIX = '/api/issues'
+import { TODAY_QUERY_KEY } from '@/core/today/useToday'
 
 /**
- * Bir gönderi değişince (çözüldü, düzeltildi, silindi) onu gösteren her ekran birlikte yenilenir:
- * akış, ana ekran ve şantiyenin fotoğrafları.
+ * Bir mesaj değişince (düzeltildi, silindi, sabitlendi, iletildi) onu gösteren her ekran birlikte yenilenir:
+ * akış, ana ekran, sabit mesaj şeridi, arama sonuçları ve şantiyenin galerisi.
  */
 export function refreshPostViews(queryClient: QueryClient, siteId: string) {
-  const prefixes = [FEED_QUERY_PREFIX, ISSUES_QUERY_PREFIX, TODAY_QUERY_PREFIX]
-  return Promise.all([
-    ...prefixes.map((prefix) => queryClient.invalidateQueries({ queryKey: [prefix] })),
-    queryClient.invalidateQueries({ queryKey: getListSitePhotosQueryKey(siteId) }),
-  ])
+  const keys = [
+    [FEED_QUERY_PREFIX],
+    TODAY_QUERY_KEY,
+    getListPinnedPostsQueryKey(),
+    getSearchPostsQueryKey(),
+    getListSiteLibraryQueryKey(siteId),
+  ]
+  return Promise.all(keys.map((queryKey) => queryClient.invalidateQueries({ queryKey: [...queryKey] })))
 }

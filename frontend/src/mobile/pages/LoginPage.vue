@@ -24,7 +24,7 @@ const { login, isPending, errorText } = usePasswordLogin()
       </van-button>
     </van-form>
     <p class="login-page__hint">
-      Şantiye sorumluları şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linke dokunarak girer.
+      Şefler şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linke dokunarak girer.
     </p>
   </main>
 </template>

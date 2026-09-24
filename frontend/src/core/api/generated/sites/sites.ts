@@ -20,7 +20,7 @@ import type {
 import { computed, toValue, unref } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 
-import type { CreateSiteRequest, SiteView, UpdateSiteRequest } from '../model'
+import type { CreateSiteRequest, SiteEventView, SiteView, UpdateSiteRequest } from '../model'
 
 import { apiRequest } from '../../http'
 
@@ -167,6 +167,144 @@ export const useUpdateSite = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getUpdateSiteMutationOptions(options), queryClient)
 }
+export const pinSite = (
+  siteId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  siteId = toValue(siteId)
+
+  return apiRequest<void>({ url: `/api/sites/${siteId}/pin`, method: 'PUT', signal }, options)
+}
+
+export const getPinSiteMutationKey = () => ['pinSite'] as const
+
+export const getPinSiteMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof pinSite>>,
+    TError,
+    PinSiteMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof pinSite>>,
+  TError,
+  PinSiteMutationVariables,
+  TContext
+> => {
+  const mutationKey = getPinSiteMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof pinSite>>,
+    PinSiteMutationVariables
+  > = (props) => {
+    const { siteId } = props ?? {}
+
+    return pinSite(siteId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PinSiteMutationResult = NonNullable<Awaited<ReturnType<typeof pinSite>>>
+
+export type PinSiteMutationError = unknown
+export type PinSiteMutationVariables = { siteId: string }
+
+export const usePinSite = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof pinSite>>,
+      TError,
+      PinSiteMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof pinSite>>,
+  TError,
+  PinSiteMutationVariables,
+  TContext
+> => {
+  return useMutation(getPinSiteMutationOptions(options), queryClient)
+}
+export const unpinSite = (
+  siteId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  siteId = toValue(siteId)
+
+  return apiRequest<void>({ url: `/api/sites/${siteId}/pin`, method: 'DELETE', signal }, options)
+}
+
+export const getUnpinSiteMutationKey = () => ['unpinSite'] as const
+
+export const getUnpinSiteMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof unpinSite>>,
+    TError,
+    UnpinSiteMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof unpinSite>>,
+  TError,
+  UnpinSiteMutationVariables,
+  TContext
+> => {
+  const mutationKey = getUnpinSiteMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof unpinSite>>,
+    UnpinSiteMutationVariables
+  > = (props) => {
+    const { siteId } = props ?? {}
+
+    return unpinSite(siteId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type UnpinSiteMutationResult = NonNullable<Awaited<ReturnType<typeof unpinSite>>>
+
+export type UnpinSiteMutationError = unknown
+export type UnpinSiteMutationVariables = { siteId: string }
+
+export const useUnpinSite = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof unpinSite>>,
+      TError,
+      UnpinSiteMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof unpinSite>>,
+  TError,
+  UnpinSiteMutationVariables,
+  TContext
+> => {
+  return useMutation(getUnpinSiteMutationOptions(options), queryClient)
+}
 export const listSites = (options?: SecondParameter<typeof apiRequest>, signal?: AbortSignal) => {
   return apiRequest<SiteView[]>({ url: `/api/sites`, method: 'GET', signal }, options)
 }
@@ -294,4 +432,70 @@ export const useCreateSite = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getCreateSiteMutationOptions(options), queryClient)
+}
+export const listSiteEvents = (
+  siteId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  siteId = toValue(siteId)
+
+  return apiRequest<SiteEventView[]>(
+    { url: `/api/sites/${siteId}/events`, method: 'GET', signal },
+    options,
+  )
+}
+
+export const getListSiteEventsQueryKey = (siteId: MaybeRefOrGetter<string>) => {
+  return ['api', 'sites', siteId, 'events'] as const
+}
+
+export const getListSiteEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSiteEvents>>,
+  TError = unknown,
+>(
+  siteId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listSiteEvents>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getListSiteEventsQueryKey(siteId)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSiteEvents>>> = ({ signal }) =>
+    listSiteEvents(siteId, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => toValue(siteId) !== null && toValue(siteId) !== undefined),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof listSiteEvents>>, TError, TData>
+}
+
+export type ListSiteEventsQueryResult = NonNullable<Awaited<ReturnType<typeof listSiteEvents>>>
+export type ListSiteEventsQueryError = unknown
+
+export function useListSiteEvents<
+  TData = Awaited<ReturnType<typeof listSiteEvents>>,
+  TError = unknown,
+>(
+  siteId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listSiteEvents>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getListSiteEventsQueryOptions(siteId, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
 }

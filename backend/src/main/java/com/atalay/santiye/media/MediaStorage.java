@@ -3,6 +3,7 @@ package com.atalay.santiye.media;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.stream.Stream;
 import org.springframework.core.io.FileSystemResource;
@@ -49,6 +50,18 @@ class MediaStorage {
 
     Resource thumbnailResource(Media media) {
         return new FileSystemResource(thumbnail(media));
+    }
+
+    /** İletilen gönderinin dosyaları yeni medyanın klasörüne kopyalanır: asıl gönderi silinse de kopya kalır. */
+    void copyFiles(Media source, Media target) throws IOException {
+        Path from = folderOf(source);
+        Path to = folderOf(target);
+        Files.createDirectories(to);
+        try (Stream<Path> files = Files.list(from)) {
+            for (Path file : files.toList()) {
+                Files.copy(file, to.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
     }
 
     /** Medyanın klasörünü içindekilerle birlikte siler: önce dosyalar, sonra klasörün kendisi. */

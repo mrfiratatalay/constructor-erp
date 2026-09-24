@@ -9,12 +9,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Tek istekte gönderi ve dosyaları (multipart). Kimliği telefon üretir: aynı gönderi tekrar gelirse
- * yeni kayıt açılmaz. Dosyalar gönderiyle birlikte ya hep kaydedilir ya hiç.
+ * yeni kayıt açılmaz. Dosyalar gönderiyle birlikte ya hep kaydedilir ya hiç. replyToId: yanıtlanan mesaj
+ * (WhatsApp'taki alıntı); aynı şantiyenin bir mesajı olmalı.
  */
 public record CreatePostForm(
     @NotNull UUID id,
     @NotNull UUID siteId,
     @Nullable @Size(max = 4000) String body,
     boolean issue,
-    @Nullable List<MultipartFile> files) {
+    @Nullable List<MultipartFile> files,
+    @Nullable UUID replyToId) {
 }

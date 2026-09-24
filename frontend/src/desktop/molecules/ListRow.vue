@@ -4,6 +4,7 @@ import { RouterLink, type RouteLocationRaw } from 'vue-router'
 /**
  * Liste satırı: üstte başlık ve sağda küçük bilgi, altında tek satır ayrıntı. Seçili satır lacivert zeminli.
  * to verilirse bağlantıdır (adres değişir, paylaşılabilir), verilmezse düğmedir (select yayar).
+ * leading: solda duran resim (WhatsApp'taki gibi şantiye fotoğrafı); verilmezse satır yalnızca yazıdır.
  */
 const { selected = false, to } = defineProps<{
   selected?: boolean
@@ -16,18 +17,22 @@ const emit = defineEmits<{ select: [] }>()
   <component :is="to ? RouterLink : 'button'" :to="to" :type="to ? undefined : 'button'" class="list-row"
     :class="{ 'list-row--selected': selected }" :aria-current="selected || undefined"
     @click="to || emit('select')">
-    <span class="list-row__top">
-      <span class="list-row__title"><slot name="title" /></span>
-      <span class="list-row__meta"><slot name="meta" /></span>
+    <span v-if="$slots.leading" class="list-row__leading"><slot name="leading" /></span>
+    <span class="list-row__body">
+      <span class="list-row__top">
+        <span class="list-row__title"><slot name="title" /></span>
+        <span class="list-row__meta"><slot name="meta" /></span>
+      </span>
+      <span v-if="$slots.default" class="list-row__detail"><slot /></span>
     </span>
-    <span v-if="$slots.default" class="list-row__detail"><slot /></span>
   </component>
 </template>
 
 <style scoped>
 .list-row {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   width: 100%;
   padding: var(--space-3) var(--space-4);
   border: 0;
@@ -40,6 +45,18 @@ const emit = defineEmits<{ select: [] }>()
   text-decoration: none;
   cursor: pointer;
   transition: background 0.12s;
+}
+
+.list-row__leading {
+  display: flex;
+  flex: none;
+}
+
+.list-row__body {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
 }
 
 .list-row:hover {

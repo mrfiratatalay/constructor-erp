@@ -2,23 +2,21 @@
 import { computed } from 'vue'
 import { useUploadQueue } from '@/core/posts/uploadQueueStore'
 
+/**
+ * Gönderilemeyen mesajlar (sunucu reddetti: ör. dosya çok büyük). Bekleyen ve giden mesajlar burada değil,
+ * akışta 🕓 ile durur (WhatsApp gibi); burada yalnızca kullanıcının karar vermesi gerekenler.
+ */
 const queue = useUploadQueue()
-const isOffline = computed(() => typeof navigator !== 'undefined' && !navigator.onLine)
+const failed = computed(() => queue.items.filter((item) => item.state === 'failed'))
 </script>
 
 <template>
-  <div v-if="queue.items.length" class="upload-queue">
-    <el-alert v-for="item in queue.items" :key="item.post.id" :closable="false" show-icon
-      :type="item.state === 'failed' ? 'error' : item.state === 'sending' ? 'info' : 'warning'"
-      :title="item.post.siteName">
+  <div v-if="failed.length" class="upload-queue">
+    <el-alert v-for="item in failed" :key="item.post.id" :closable="false" show-icon type="error"
+      :title="`${item.post.siteName}: gönderilemedi`">
       <div class="upload-queue__row">
-        <span v-if="item.state === 'sending'">Gönderiliyor… %{{ Math.round(item.progress * 100) }}</span>
-        <span v-else-if="item.state === 'failed'">{{ item.error }}</span>
-        <span v-else>{{ isOffline ? 'İnternet yok, bağlantı gelince gönderilecek' : 'Birazdan tekrar denenecek' }}</span>
-        <el-button v-if="item.state === 'failed'" size="small" type="danger" plain
-          @click="queue.discard(item.post.id)">
-          Sil
-        </el-button>
+        <span>{{ item.error }}</span>
+        <el-button size="small" type="danger" plain @click="queue.discard(item.post.id)">Sil</el-button>
       </div>
     </el-alert>
   </div>

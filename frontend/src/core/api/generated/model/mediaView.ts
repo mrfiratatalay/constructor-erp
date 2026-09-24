@@ -17,4 +17,8 @@ export interface MediaView {
   url?: string | null
   /** @nullable */
   thumbnailUrl?: string | null
+  /** @nullable */
+  fileName?: string | null
+  sizeBytes: number
+  createdAt: string
 }

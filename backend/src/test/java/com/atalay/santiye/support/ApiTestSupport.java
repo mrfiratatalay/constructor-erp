@@ -49,8 +49,8 @@ public abstract class ApiTestSupport {
 
     /** Patron ekibe bir kişi ekler; dönen JSON'da kişi ve davet linki vardır. */
     protected String createMember(Cookie owner, String fullName, String role, String... siteIds) {
-        String json = "{\"fullName\": \"%s\", \"role\": \"%s\", \"siteIds\": %s}"
-            .formatted(fullName, role, jsonArray(siteIds));
+        String json = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"%s\", \"siteIds\": %s}"
+            .formatted(fullName, uniquePhone(), role, jsonArray(siteIds));
         MvcTestResult result = postJson("/api/team/members", owner, json);
         assertThat(result).hasStatus(201);
         return contentOf(result);
@@ -80,6 +80,11 @@ public abstract class ApiTestSupport {
             request.file(file);
         }
         return request.exchange();
+    }
+
+    /** Telefon zorunlu ve ekipte tekildir; testler aynı veritabanını paylaştığı için her kişiye rastgele numara. */
+    protected static String uniquePhone() {
+        return "05%09d".formatted(java.util.concurrent.ThreadLocalRandom.current().nextInt(1_000_000_000));
     }
 
     protected static String jsonArray(String... values) {

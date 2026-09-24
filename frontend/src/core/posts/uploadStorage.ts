@@ -9,6 +9,8 @@ export interface QueuedPost {
   issue: boolean
   files: File[]
   queuedAt: string
+  /** Yanıtlanan mesaj (WhatsApp'taki alıntı); eski sürümde kuyruğa girenlerde yoktur. */
+  replyToId?: string | null
 }
 
 const store = createStore('kizilkan-santiye', 'gonderim-kuyrugu')

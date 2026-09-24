@@ -11,4 +11,5 @@ export const MediaViewKind = {
   PHOTO: 'PHOTO',
   VIDEO: 'VIDEO',
   AUDIO: 'AUDIO',
+  DOCUMENT: 'DOCUMENT',
 } as const

@@ -15,7 +15,7 @@ export interface QueueItem {
 
 interface QueueState {
   items: Ref<QueueItem[]>
-  listeners: Array<() => void>
+  listeners: Array<() => unknown>
   flushing: boolean
 }
 
@@ -31,9 +31,10 @@ async function removeItem(state: QueueState, postId: string) {
 async function sendItem(state: QueueState, item: QueueItem): Promise<boolean> {
   item.state = 'sending'
   const result = await sendQueuedPost(item.post, (fraction) => (item.progress = fraction))
+  // Önce akış yenilenir, sonra 🕓'lı geçici baloncuk kalkar: asıl mesaj gelmeden yer boşalmaz.
   if (result.outcome === 'sent') {
+    await Promise.all(state.listeners.map((listener) => listener()))
     await removeItem(state, item.post.id)
-    state.listeners.forEach((listener) => listener())
     return true
   }
   Object.assign(item, { state: result.outcome === 'rejected' ? 'failed' : 'waiting', progress: 0, error: result.error })
@@ -75,6 +76,6 @@ export const useUploadQueue = defineStore('uploadQueue', () => {
     },
     discard: (postId: string) => removeItem(state, postId),
     /** Bir gönderi başarıyla gidince çağrılır (ör. akışı yenilemek için). */
-    onSent: (listener: () => void) => state.listeners.push(listener),
+    onSent: (listener: () => unknown) => state.listeners.push(listener),
   }
 })

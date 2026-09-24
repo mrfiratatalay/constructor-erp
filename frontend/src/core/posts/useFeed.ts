@@ -2,20 +2,19 @@ import { useInfiniteQuery } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { listPosts } from '@/core/api/generated/posts/posts'
 import type { PostPage } from '@/core/api/generated/model'
-import { groupByDay } from '@/core/posts/groupByDay'
 
 /** Tüm akış sorgularının ortak öneki: gönderi gidince hepsi birden yenilenir. */
 export const FEED_QUERY_PREFIX = '/api/posts'
 
 const PAGE_SIZE = 20
 
-/** İşlenen video/ses varsa sık, yoksa dakikada bir yenilenir: patron ekranı açık bıraksa da güncel kalır. */
+/** İşlenen video/ses varsa sık, yoksa 15 saniyede bir yenilenir: mesajlar ve mavi tikler güncel kalır. */
 function refreshInterval(pages: PostPage[] | undefined): number {
   const processing = pages?.some((page) => page.items.some((post) => post.media.some((m) => m.status === 'PROCESSING')))
-  return processing ? 4_000 : 60_000
+  return processing ? 4_000 : 15_000
 }
 
-/** siteId boşsa kişinin görebildiği bütün şantiyeler. Aşağı kaydırdıkça daha eskiler gelir. */
+/** Şantiyenin mesajları, en yeniden eskiye. Yukarı kaydırdıkça daha eskiler gelir. */
 export function useFeed(siteId: MaybeRefOrGetter<string | undefined>) {
   const query = useInfiniteQuery({
     queryKey: computed(() => [FEED_QUERY_PREFIX, { siteId: toValue(siteId) }]),
@@ -27,7 +26,7 @@ export function useFeed(siteId: MaybeRefOrGetter<string | undefined>) {
   })
 
   return {
-    days: computed(() => groupByDay(query.data.value?.pages.flatMap((page) => page.items) ?? [])),
+    posts: computed(() => query.data.value?.pages.flatMap((page) => page.items) ?? []),
     isLoading: query.isPending,
     hasMore: query.hasNextPage,
     isLoadingMore: query.isFetchingNextPage,

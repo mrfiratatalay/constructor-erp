@@ -1,24 +1,20 @@
 <script setup lang="ts">
 import { Ellipsis } from 'lucide-vue-next'
+import type { PostAction, PostMenuItem } from '@/core/posts/postMenu'
 
-/** Gönderi kartının köşesindeki ⋯ menüsü: yetkiye göre Düzelt ve Sil. İkisi de yoksa hiç görünmez. */
-const { canCorrect, canDelete } = defineProps<{ canCorrect: boolean; canDelete: boolean }>()
-const emit = defineEmits<{ correct: []; delete: [] }>()
-
-function onCommand(command: 'correct' | 'delete') {
-  if (command === 'correct') emit('correct')
-  else emit('delete')
-}
+/** Mesajın köşesindeki ⋯ menüsü (WhatsApp Masaüstü'ndeki ⌄ gibi); öğeleri core/posts/postMenu belirler. */
+const { items } = defineProps<{ items: PostMenuItem[] }>()
+const emit = defineEmits<{ select: [action: PostAction] }>()
 </script>
 
 <template>
-  <el-dropdown v-if="canCorrect || canDelete" trigger="click" placement="bottom-end" @command="onCommand">
-    <el-button text circle aria-label="Gönderi işlemleri"><Ellipsis :size="18" /></el-button>
+  <el-dropdown v-if="items.length" trigger="click" placement="bottom-end" @command="(action: PostAction) => emit('select', action)">
+    <el-button text circle aria-label="Mesaj işlemleri"><Ellipsis :size="18" /></el-button>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item v-if="canCorrect" command="correct">Düzelt</el-dropdown-item>
-        <el-dropdown-item v-if="canDelete" command="delete" :divided="canCorrect" class="post-menu__delete">
-          Sil
+        <el-dropdown-item v-for="item in items" :key="item.action" :command="item.action" :divided="item.danger"
+          :class="{ 'post-menu__danger': item.danger }">
+          {{ item.label }}
         </el-dropdown-item>
       </el-dropdown-menu>
     </template>
@@ -26,7 +22,7 @@ function onCommand(command: 'correct' | 'delete') {
 </template>
 
 <style scoped>
-.post-menu__delete {
+.post-menu__danger {
   color: var(--status-danger);
 }
 </style>

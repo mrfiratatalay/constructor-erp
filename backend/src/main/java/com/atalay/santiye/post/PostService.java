@@ -11,6 +11,7 @@ import com.atalay.santiye.site.SiteAccess;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +53,23 @@ public class PostService {
         if (body == null && files.isEmpty()) {
             throw ApiException.badRequest("Boş gönderi gönderilemez: fotoğraf, video, ses ya da yazı ekle.");
         }
-        var draft = new NewPost(form.id(), author.companyId(), form.siteId(), author.userId(), body, form.issue());
+        var draft = new NewPost(form.id(), author.companyId(), form.siteId(), author.userId(), body, form.issue(),
+            replyTarget(form), false);
         Post post = posts.save(new Post(draft, clock.instant()));
         mediaIntake.accept(new MediaOwner(post.getId(), post.getSiteId(), post.getCompanyId()), files);
         announceIfIssue(post, site, author);
         return views.of(post);
+    }
+
+    /** Yanıt yalnızca aynı şantiyenin bir mesajına verilir; silinmiş mesaj da alıntılanabilir (iz olarak). */
+    private UUID replyTarget(CreatePostForm form) {
+        if (form.replyToId() == null) {
+            return null;
+        }
+        return posts.findById(form.replyToId())
+            .filter(quoted -> quoted.getSiteId().equals(form.siteId()))
+            .map(Post::getId)
+            .orElseThrow(() -> ApiException.badRequest("Yanıtlanan mesaj bu şantiyede bulunamadı."));
     }
 
     private void announceIfIssue(Post post, Site site, CurrentUser author) {

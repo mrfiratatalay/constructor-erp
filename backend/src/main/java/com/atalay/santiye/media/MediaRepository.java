@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,15 @@ interface MediaRepository extends JpaRepository<Media, UUID> {
     @Query("select m from Media m where m.siteId in :siteIds and m.kind = com.atalay.santiye.media.MediaKind.PHOTO "
         + "and m.status = com.atalay.santiye.media.MediaStatus.READY and m.createdAt >= :since order by m.createdAt desc")
     List<Media> findReadyPhotosSince(Collection<UUID> siteIds, Instant since);
+
+    /**
+     * Şantiyenin "Medya ve belgeler"i: gönderilerdeki hazır fotoğraf, video ve belgeler, en yeniden eskiye.
+     * Sesli notlar sohbetin parçasıdır, galeriye girmez; şantiyenin kendi fotoğrafı (gönderisiz) da girmez.
+     */
+    @Query("select m from Media m where m.siteId = :siteId and m.postId is not null "
+        + "and m.status = com.atalay.santiye.media.MediaStatus.READY "
+        + "and m.kind <> com.atalay.santiye.media.MediaKind.AUDIO order by m.createdAt desc")
+    List<Media> findLibrary(UUID siteId, Pageable page);
 
     /** İşleme uzun sürer ve işlem dışında yapılır; sonucu kısa bir güncellemeyle yazılır. */
     @Transactional

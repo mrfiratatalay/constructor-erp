@@ -43,8 +43,8 @@ class SiteAccessTest extends ApiTestSupport {
     @Test
     void assigningAnUnknownSiteIsRejected() {
         Cookie owner = loginAsOwner();
-        String json = "{\"fullName\": \"Murat\", \"role\": \"SITE_LEAD\", \"siteIds\": [\"%s\"]}"
-            .formatted(java.util.UUID.randomUUID());
+        String json = "{\"fullName\": \"Murat\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"siteIds\": [\"%s\"]}"
+            .formatted(uniquePhone(), java.util.UUID.randomUUID());
 
         assertThat(postJson("/api/team/members", owner, json)).hasStatus(400).bodyJson()
             .extractingPath("$.detail").isEqualTo("Seçilen şantiyelerden biri bulunamadı.");

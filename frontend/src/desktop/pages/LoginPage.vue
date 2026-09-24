@@ -26,7 +26,7 @@ const { login, isPending, errorText } = usePasswordLogin()
         </el-button>
       </el-form>
       <p class="login-page__hint">
-        Şantiye sorumluları şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linkle girer.
+        Şefler şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linkle girer.
       </p>
     </el-card>
   </main>

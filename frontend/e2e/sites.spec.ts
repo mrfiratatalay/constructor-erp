@@ -8,7 +8,7 @@ test('şantiye sorumlusu yalnızca kendisine atanan şantiyeyi görür', async (
   await loginAsOwner(page)
   await createSite(page, assigned)
   await createSite(page, other)
-  const loginLink = await addMember(page, `Sorumlu ${stamp}`, [assigned])
+  const loginLink = await addMember(page, `Sorumlu ${stamp}`)
 
   const leadPhone = await browser.newContext()
   const leadPage = await leadPhone.newPage()

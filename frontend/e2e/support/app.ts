@@ -29,15 +29,15 @@ export async function switchView(page: Page, fromMobile: boolean) {
 /** Giriş linki, WhatsApp butonunun hazır mesajının içinden okunur: paylaşılan mesaj da doğrulanmış olur. */
 export async function readLoginLinkFromWhatsappButton(page: Page): Promise<string> {
   const href = await page.getByRole('link', { name: "WhatsApp'ta gönder" }).getAttribute('href')
-  const message = decodeURIComponent((href ?? '').replace('https://wa.me/?text=', ''))
+  const message = new URL(href ?? 'https://wa.me/').searchParams.get('text') ?? ''
   const link = message.match(/https?:\/\/\S+\/davet\/\S+/)?.[0]
   expect(link, `WhatsApp mesajında giriş linki yok: ${message}`).toBeTruthy()
   return link as string
 }
 
-/** Ekip listesinde tek bir kişinin satırı: mobilde hücre, masaüstünde tablo satırı. */
+/** Ekip listesinde tek bir kişinin satırı: mobilde hücre, masaüstünde liste satırı. */
 export function memberRow(page: Page, fullName: string): Locator {
-  return page.locator('.van-cell, .el-table__row').filter({ hasText: fullName })
+  return page.locator('.van-cell, .list-row').filter({ hasText: fullName })
 }
 
 export async function createSite(page: Page, name: string) {
@@ -48,12 +48,12 @@ export async function createSite(page: Page, name: string) {
   await expect(page.getByText(name).first()).toBeVisible()
 }
 
-/** Patron ekibe kişi ekler (isteğe bağlı şantiyelerle) ve giriş linkini döner. */
-export async function addMember(page: Page, fullName: string, siteNames: string[] = []) {
+/** Patron ekibe kişi ekler (ad + telefon; şantiyeye ekleme şantiyenin içindedir) ve giriş linkini döner. */
+export async function addMember(page: Page, fullName: string) {
   await page.goto('/ekip')
   await page.getByRole('button', { name: 'Kişi ekle' }).click()
   await page.getByPlaceholder('Ahmet Yılmaz').fill(fullName)
-  for (const site of siteNames) await page.getByText(site, { exact: true }).click()
-  await page.getByRole('button', { name: 'Ekle ve giriş linki oluştur' }).click()
+  await page.getByPlaceholder('0532 123 45 67').fill(`05${String(Date.now()).slice(-9)}`)
+  await page.getByRole('button', { name: 'Ekle', exact: true }).click()
   return readLoginLinkFromWhatsappButton(page)
 }

@@ -1,52 +1,44 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { CreateMemberRequestRole, MemberView, SiteView } from '@/core/api/generated/model'
-import { ROLE_OPTIONS } from '@/core/team/roles'
+import type { MemberView } from '@/core/api/generated/model'
 import type { MemberForm } from '@/core/team/useTeam'
 
+/**
+ * Yalnızca ad soyad ve telefon: eklenen herkes şeftir, şantiyeye ekleme şantiyenin içinde yapılır.
+ * Telefon zorunlu: giriş linki WhatsApp'ta doğrudan bu numaranın sohbetine gider.
+ */
 const show = defineModel<boolean>('show', { required: true })
-const { member, sites, saving } = defineProps<{ member: MemberView | null; sites: SiteView[]; saving: boolean }>()
+const { member, saving } = defineProps<{ member: MemberView | null; saving: boolean }>()
 const emit = defineEmits<{ submit: [form: MemberForm] }>()
 
 const fullName = ref('')
 const phone = ref('')
-const role = ref<CreateMemberRequestRole>('SITE_LEAD')
-const siteIds = ref<string[]>([])
 
 // Düzenlemede kişinin bilgileriyle, eklemede boş açılır.
 watch(show, (open) => {
   if (!open) return
   fullName.value = member?.fullName ?? ''
   phone.value = member?.phone ?? ''
-  role.value = member?.role ?? 'SITE_LEAD'
-  siteIds.value = [...(member?.siteIds ?? [])]
 })
 
 function submit() {
-  emit('submit', { fullName: fullName.value, phone: phone.value || null, role: role.value, siteIds: siteIds.value })
+  emit('submit', { fullName: fullName.value.trim(), phone: phone.value.trim() })
 }
 </script>
 
 <template>
-  <van-popup v-model:show="show" position="bottom" round closeable>
+  <van-popup v-model:show="show" position="bottom" round closeable teleport="body">
     <van-form class="member-form" @submit="submit">
-      <h2 class="member-form__title">{{ member ? 'Kişiyi düzenle' : 'Ekibe kişi ekle' }}</h2>
+      <h2 class="member-form__title">{{ member ? 'Kişiyi düzenle' : 'Yeni kişi' }}</h2>
       <van-cell-group inset>
         <van-field v-model="fullName" label="Ad soyad" placeholder="Ahmet Yılmaz" maxlength="120"
           :rules="[{ required: true, message: 'Ad soyad gerekli' }]" />
-        <van-field v-model="phone" label="Telefon" type="tel" placeholder="İsteğe bağlı" maxlength="20" />
+        <van-field v-model="phone" label="Telefon" type="tel" placeholder="0532 123 45 67" maxlength="20"
+          :rules="[{ required: true, message: 'Telefon gerekli' }]" />
       </van-cell-group>
-      <van-radio-group v-model="role" class="member-form__options">
-        <van-radio v-for="option in ROLE_OPTIONS" :key="option.value" :name="option.value">{{ option.label }}</van-radio>
-      </van-radio-group>
-      <section v-if="role === 'SITE_LEAD'" class="member-form__options">
-        <strong>Sorumlu olduğu şantiyeler</strong>
-        <van-checkbox-group v-model="siteIds" class="member-form__options">
-          <van-checkbox v-for="site in sites" :key="site.id" :name="site.id" shape="square">{{ site.name }}</van-checkbox>
-        </van-checkbox-group>
-      </section>
+      <p class="member-form__hint">Giriş linki WhatsApp'ta bu numaraya gider.</p>
       <van-button type="primary" native-type="submit" block round :loading="saving">
-        {{ member ? 'Kaydet' : 'Ekle ve giriş linki oluştur' }}
+        {{ member ? 'Kaydet' : 'Ekle' }}
       </van-button>
     </van-form>
   </van-popup>
@@ -66,8 +58,9 @@ function submit() {
   font-size: 18px;
 }
 
-.member-form__options {
-  display: grid;
-  gap: var(--space-3);
+.member-form__hint {
+  margin: calc(var(--space-2) * -1) var(--space-4) 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 </style>

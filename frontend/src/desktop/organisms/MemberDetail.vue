@@ -1,110 +1,69 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { Phone, Send } from 'lucide-vue-next'
+import { Link2, Phone } from 'lucide-vue-next'
 import type { MemberView, SiteView } from '@/core/api/generated/model'
 import { telHref } from '@/core/format/phone'
-import { lastSeenText } from '@/core/team/memberStatus'
-import { ROLE_LABELS } from '@/core/team/roles'
+import { seenLine } from '@/core/team/memberLines'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
+import ContactHero from '@/shared/molecules/ContactHero.vue'
+import SiteAvatar from '@/shared/atoms/SiteAvatar.vue'
 
 /**
- * Sağ panelde seçili kişi: rol ve telefon, şantiyeleri (şantiyeye götürür), uygulamaya giriş (son görülme
- * ve WhatsApp'la giriş linki). Kişiyi kapatan tehlikeli eylem en altta, ayrı ve kırmızı. Patron kendi
- * hesabında giriş linki ve erişim eylemini görmez; patron hesapları kapatılamaz (kimse kendini kilitlemesin).
+ * Sağ panelde kişi bilgisi, WhatsApp'taki gibi: yuvarlak, ad, numara, son görülme; Ara ve Giriş linki gönder;
+ * şantiyeleri (yalnızca bakmak ve gitmek için, ekleme şantiyenin içinde); en altta kırmızı "Ekipten çıkar".
+ * Henüz girmemiş kişide link düğmesi öne çıkar. Patron kendine bakınca düğmeler yoktur; patron çıkarılamaz.
  */
 const { member, sites, isSelf } = defineProps<{ member: MemberView; sites: SiteView[]; isSelf: boolean }>()
-const emit = defineEmits<{ edit: [member: MemberView]; newLink: [member: MemberView]; toggleActive: [member: MemberView] }>()
-const router = useRouter()
+const emit = defineEmits<{ edit: [member: MemberView]; newLink: [member: MemberView]; remove: [member: MemberView] }>()
 
 const memberSites = computed(() => sites.filter((site) => member.siteIds.includes(site.id)))
-const canToggle = computed(() => !isSelf && member.role !== 'OWNER')
+const canRemove = computed(() => !isSelf && member.role !== 'OWNER')
 </script>
 
 <template>
   <DetailPane>
     <template #header>
-      <div class="member-detail__head">
-        <span class="member-detail__who">
-          <strong>{{ member.fullName }}</strong>
-          <span>{{ ROLE_LABELS[member.role] }}{{ member.phone ? ` · ${member.phone}` : '' }}</span>
-        </span>
-        <el-button v-if="member.phone && !isSelf" tag="a" :href="telHref(member.phone)" class="member-detail__call">
-          <Phone :size="15" class="member-detail__icon" />Ara
-        </el-button>
+      <div class="member-detail__bar">
+        <strong>Kişi bilgisi</strong>
         <el-button @click="emit('edit', member)">Düzenle</el-button>
       </div>
     </template>
-    <section class="member-detail__section">
-      <h3>Şantiyeleri</h3>
-      <p v-if="member.role === 'OWNER'" class="member-detail__muted">Bütün şantiyeler</p>
-      <p v-else-if="!memberSites.length" class="member-detail__muted">Henüz şantiye atanmadı; Düzenle ile ata.</p>
-      <el-link v-for="site in memberSites" v-else :key="site.id" type="primary" class="member-detail__site"
-        @click="router.push({ name: 'siteFeed', params: { siteId: site.id } })">{{ site.name }} ›</el-link>
-    </section>
-    <section class="member-detail__section">
-      <h3>Uygulamaya giriş</h3>
-      <p class="member-detail__muted">{{ lastSeenText(member) }}</p>
-      <el-button v-if="member.active && !isSelf" type="primary" class="member-detail__link"
-        @click="emit('newLink', member)">
-        <Send :size="15" class="member-detail__icon" />Giriş linki gönder
+    <ContactHero :full-name="member.fullName" :phone="member.phone" :status="seenLine(member)" />
+    <div v-if="!isSelf" class="member-detail__actions">
+      <el-button v-if="member.phone" tag="a" :href="telHref(member.phone)" class="member-detail__call">
+        <Phone :size="16" class="member-detail__icon" />Ara
       </el-button>
+      <el-button :type="member.lastSeenAt ? 'default' : 'primary'" @click="emit('newLink', member)">
+        <Link2 :size="16" class="member-detail__icon" />Giriş linki gönder
+      </el-button>
+    </div>
+    <section v-if="memberSites.length" class="member-detail__sites">
+      <h3>Şantiyeleri</h3>
+      <RouterLink v-for="site in memberSites" :key="site.id" class="member-detail__site"
+        :to="{ name: 'siteFeed', params: { siteId: site.id } }">
+        <SiteAvatar :photo-url="site.photoUrl" :size="40" />
+        <span>{{ site.name }}</span>
+        <small>›</small>
+      </RouterLink>
     </section>
-    <section v-if="canToggle" class="member-detail__section member-detail__danger">
-      <el-button v-if="member.active" type="danger" text @click="emit('toggleActive', member)">Erişimi kapat</el-button>
-      <el-button v-else type="primary" text @click="emit('toggleActive', member)">Erişimi yeniden aç</el-button>
-    </section>
+    <el-button v-if="canRemove" type="danger" text class="member-detail__remove" @click="emit('remove', member)">
+      Ekipten çıkar
+    </el-button>
   </DetailPane>
 </template>
 
 <style scoped>
-.member-detail__head {
+.member-detail__bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
 }
 
-.member-detail__who {
-  display: grid;
-  flex: 1;
-  min-width: 0;
-}
-
-.member-detail__who strong {
-  font-size: var(--text-md);
-  font-weight: var(--weight-black);
-}
-
-.member-detail__who span,
-.member-detail__muted {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-}
-
-.member-detail__section {
-  display: grid;
+.member-detail__actions {
+  display: flex;
+  justify-content: center;
   gap: var(--space-2);
-  justify-items: start;
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.member-detail__section h3 {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-}
-
-.member-detail__danger {
-  border-bottom: 0;
-}
-
-.member-detail__site {
-  font-weight: var(--weight-semibold);
 }
 
 .member-detail__icon {
@@ -113,5 +72,48 @@ const canToggle = computed(() => !isSelf && member.role !== 'OWNER')
 
 .member-detail__call {
   text-decoration: none;
+}
+
+.member-detail__sites {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-soft);
+}
+
+.member-detail__sites h3 {
+  margin: 0 0 var(--space-1);
+  color: var(--text-subtle);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.member-detail__site {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+
+.member-detail__site:hover {
+  background: var(--surface-muted);
+}
+
+.member-detail__site span {
+  flex: 1;
+  font-weight: var(--weight-semibold);
+}
+
+.member-detail__site small {
+  color: var(--text-subtle);
+  font-size: var(--text-md);
+}
+
+.member-detail__remove {
+  justify-self: start;
+  padding-top: var(--space-4);
 }
 </style>

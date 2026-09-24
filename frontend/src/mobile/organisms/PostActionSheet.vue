@@ -4,101 +4,78 @@ import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import type { PostView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { canCorrect, canDelete } from '@/core/posts/postPermissions'
+import { postMenu, type PostAction } from '@/core/posts/postMenu'
 import { usePostActions } from '@/core/posts/usePostActions'
+import ForwardSheet from '@/mobile/organisms/ForwardSheet.vue'
+import PostCorrectSheet from '@/mobile/organisms/PostCorrectSheet.vue'
+import PostInfoSheet from '@/mobile/organisms/PostInfoSheet.vue'
 
 /**
- * Gönderiye uzun basınca alttan açılan menü (WhatsApp gibi): Düzelt ve Sil. Düzeltmede yalnızca yazı
- * değişir, gönderide "düzenlendi" izi kalır; silinenin yerinde "silindi" izi kalır.
+ * Mesaja uzun basınca alttan açılan menü, WhatsApp'taki sırayla: Yanıtla, Kopyala, İlet, Sabitle, Bilgi,
+ * Düzelt, Sil. Hangisinin görüneceğine core/posts/postMenu karar verir; burada yalnızca seçilen iş yapılır.
  */
 const post = defineModel<PostView | null>({ required: true })
+const emit = defineEmits<{ reply: [post: PostView] }>()
 const { data: user } = useCurrentUser()
-const { correctPost, deletePost, isSaving } = usePostActions()
+const actions = usePostActions()
 const correcting = ref<PostView | null>(null)
-const body = ref('')
+const forwarding = ref<PostView | null>(null)
+const inspecting = ref<PostView | null>(null)
 
-const actions = computed(() => {
-  const target = post.value
-  if (!target) return []
-  const correct = canCorrect(target, user.value) ? [{ name: 'Düzelt', key: 'correct' }] : []
-  const remove = canDelete(target, user.value) ? [{ name: 'Sil', key: 'delete', color: 'var(--status-danger)' }] : []
-  return [...correct, ...remove]
-})
+const items = computed(() =>
+  (post.value ? postMenu(post.value, user.value) : []).map((item) => ({
+    name: item.label,
+    key: item.action,
+    color: item.danger ? 'var(--status-danger)' : undefined,
+  })),
+)
 
-function onSelect(action: { key: string }) {
-  const target = post.value
-  post.value = null
-  if (!target) return
-  if (action.key === 'correct') startCorrecting(target)
-  else void confirmDelete(target)
-}
-
-function startCorrecting(target: PostView) {
-  body.value = target.body ?? ''
-  correcting.value = target
-}
-
-async function saveCorrection() {
-  if (!correcting.value) return
+async function attempt(work: () => Promise<unknown>, done?: string) {
   try {
-    await correctPost(correcting.value, body.value.trim() || null)
-    correcting.value = null
-    showSuccessToast('Düzeltildi')
+    await work()
+    if (done) showSuccessToast(done)
   } catch (error) {
     showFailToast(errorMessage(error))
   }
 }
 
+async function copy(target: PostView) {
+  if (await actions.copyText(target)) showSuccessToast('Kopyalandı')
+  else showFailToast('Kopyalanamadı')
+}
+
 async function confirmDelete(target: PostView) {
   const confirmed = await showConfirmDialog({
-    title: 'Gönderi silinsin mi?',
+    title: 'Mesaj silinsin mi?',
     message: 'Yerinde "silindi" izi kalır; fotoğraf ve sesler kalıcı olarak silinir.',
     confirmButtonText: 'Sil',
     confirmButtonColor: 'var(--status-danger)',
     cancelButtonText: 'Vazgeç',
   }).then(() => true, () => false)
-  if (!confirmed) return
-  try {
-    await deletePost(target.id)
-    showSuccessToast('Silindi')
-  } catch (error) {
-    showFailToast(errorMessage(error))
-  }
+  if (confirmed) await attempt(() => actions.deletePost(target.id), 'Silindi')
+}
+
+const HANDLERS: Record<PostAction, (target: PostView) => unknown> = {
+  reply: (target) => emit('reply', target),
+  copy,
+  forward: (target) => (forwarding.value = target),
+  pin: (target) => attempt(() => actions.togglePin(target), target.pin ? 'Sabitleme kaldırıldı' : 'Sabitlendi'),
+  info: (target) => (inspecting.value = target),
+  correct: (target) => (correcting.value = target),
+  delete: confirmDelete,
+}
+
+function onSelect(action: { key: PostAction }) {
+  const target = post.value
+  post.value = null
+  if (target) void HANDLERS[action.key](target)
 }
 </script>
 
 <template>
-  <van-action-sheet :show="post !== null" :actions="actions" cancel-text="Vazgeç" teleport="body"
+  <van-action-sheet :show="post !== null" :actions="items" cancel-text="Vazgeç" teleport="body"
     @select="onSelect" @update:show="(open: boolean) => !open && (post = null)" />
-  <van-popup :show="correcting !== null" position="bottom" round closeable teleport="body" safe-area-inset-bottom
-    @update:show="(open: boolean) => !open && (correcting = null)">
-    <section class="correct-sheet">
-      <h2 class="correct-sheet__title">Gönderiyi düzelt</h2>
-      <van-cell-group inset class="correct-sheet__fields">
-        <van-field v-model="body" type="textarea" rows="3" autosize maxlength="4000" placeholder="Yazı" />
-      </van-cell-group>
-      <van-button type="primary" block round size="large" :loading="isSaving" @click="saveCorrection">
-        Kaydet
-      </van-button>
-    </section>
-  </van-popup>
+  <PostCorrectSheet v-model="correcting" />
+  <ForwardSheet v-model="forwarding" />
+  <PostInfoSheet v-model="inspecting" />
 </template>
-
-<style scoped>
-.correct-sheet {
-  display: grid;
-  gap: var(--space-4);
-  padding: var(--space-6) var(--space-4) var(--space-4);
-}
-
-.correct-sheet__title {
-  margin: 0;
-  padding-right: var(--space-8);
-  font-size: var(--text-lg);
-}
-
-/* Beyaz pencerede beyaz grup kaybolmasın: alanlar hafif zeminli bir blok. */
-.correct-sheet__fields {
-  --van-cell-background: var(--surface-muted);
-}
-</style>

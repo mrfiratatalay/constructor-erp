@@ -1,69 +1,80 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { Info, Phone } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
+import { EllipsisVertical, Phone } from 'lucide-vue-next'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { telHref } from '@/core/format/phone'
-import { useTabbarVisible } from '@/core/navigation/useTabbarVisible'
-import { leadNames } from '@/core/sites/siteNames'
-import { useHasSiteList } from '@/core/sites/soleSite'
+import { useComposer } from '@/core/posts/useComposer'
+import { firstCallable, participantLine } from '@/core/sites/participants'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import StatusNotice from '@/mobile/molecules/StatusNotice.vue'
 import FeedList from '@/mobile/organisms/FeedList.vue'
 import SiteComposer from '@/mobile/organisms/SiteComposer.vue'
 import SiteInfoSheet from '@/mobile/organisms/SiteInfoSheet.vue'
+import SiteSearchSheet from '@/mobile/organisms/SiteSearchSheet.vue'
 import SiteStartBlock from '@/mobile/organisms/SiteStartBlock.vue'
-import UploadQueueCells from '@/mobile/organisms/UploadQueueCells.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
+import SiteHeading from '@/shared/molecules/SiteHeading.vue'
 
 /**
- * Şantiyenin akışı; WhatsApp'ta bir grubun içi gibi: başlıkta ad ve sorumlu, sağda 📞 ile ⓘ, altta
- * gönderme çubuğu, ortada eskiden yeniye akan gönderiler. Künye ayrı bir kart değil başlığın kendisidir:
- * akışın tepesi artık geçmişin başıdır, orada duran bilgi bir daha görünmez.
- * Sayfa açılınca şantiye okunmuş sayılır; listesi olan kişide alt sekmeler gizlenir.
+ * Şantiyenin içi, WhatsApp'ta bir grubun içi gibi: solda geri, fotoğraf, ad ve "Musa, Sen" (dokununca bilgi);
+ * sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Ortada akış, altta gönderme çubuğu. Sayfa açılınca
+ * şantiye okunmuş sayılır; alt sekmeler gizlenir.
  */
 const route = useRoute()
+const router = useRouter()
 const siteId = computed(() => String(route.params.siteId))
 const { data: site } = useGetSite(siteId)
 const { data: user } = useCurrentUser()
 const { previousSeenAt } = useSiteVisit(siteId)
-const hasSiteList = useHasSiteList()
-const tabbarVisible = useTabbarVisible()
+const composer = useComposer(() => (site.value ? { id: site.value.id, name: site.value.name } : undefined))
 const infoOpen = ref(false)
+const searchOpen = ref(false)
+const moreOpen = ref(false)
 
 const isOwner = computed(() => user.value?.role === 'OWNER')
-/** Kişi kendini aramaz; başlıktaki 📞 ilk telefonu olan sorumluya gider, ötekiler ⓘ çekmecesinde. */
-const callable = computed(() =>
-  (site.value?.leads ?? []).find((lead) => lead.phone && lead.id !== user.value?.id),
-)
+const callable = computed(() => (site.value ? firstCallable(site.value, user.value) : null))
+const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
+
+function onMore(action: { key: string }) {
+  moreOpen.value = false
+  if (action.key === 'info') infoOpen.value = true
+  else searchOpen.value = true
+}
+
+/** Aramada bulunan mesaja gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
+const openFound = (postId: string) => router.replace({ query: { mesaj: postId } })
 </script>
 
 <template>
-  <!-- Sorumlu yoksa alt satır hiç yazılmaz: olumsuz bilgi künyede yer kaplamaz (akışın başında söylenir). -->
-  <MobilePage :title="site?.name ?? 'Şantiye'" :subtitle="site?.leads.length ? leadNames(site.leads) : ''"
-    :back="hasSiteList" :tabbar="tabbarVisible" bottom>
+  <MobilePage :title="site?.name ?? 'Şantiye'" back :tabbar="false" bottom>
+    <template v-if="site" #heading>
+      <SiteHeading :site="site" :line="participantLine(site, user)" :size="38" @open="infoOpen = true" />
+    </template>
     <template v-if="site" #action>
       <van-button v-if="callable" size="small" round plain type="primary" class="site-feed__action" aria-label="Ara"
         tag="a" :href="telHref(callable.phone!)">
         <Phone :size="17" />
       </van-button>
-      <van-button size="small" round plain type="primary" class="site-feed__action" aria-label="Şantiye bilgileri"
-        @click="infoOpen = true">
-        <Info :size="17" />
+      <van-button size="small" round plain class="site-feed__action site-feed__more" aria-label="Diğer"
+        @click="moreOpen = true">
+        <EllipsisVertical :size="18" />
       </van-button>
     </template>
     <StatusNotice v-if="site?.status === 'COMPLETED'" tone="neutral" text="Bu şantiye tamamlandı." />
-    <UploadQueueCells />
-    <FeedList :site-id="siteId" :seen-at="previousSeenAt">
+    <FeedList :site-id="siteId" :seen-at="previousSeenAt" @reply="composer.replyTo.value = $event">
       <template #start="{ empty }">
         <SiteStartBlock v-if="site" :site="site" :empty="empty" :can-invite="isOwner" />
       </template>
     </FeedList>
     <template v-if="site" #footer>
-      <SiteComposer :site="{ id: site.id, name: site.name }" />
+      <SiteComposer :composer="composer" :site-name="site.name" />
     </template>
     <SiteInfoSheet v-if="site" v-model:show="infoOpen" :site="site" />
+    <SiteSearchSheet v-model:show="searchOpen" :site-id="siteId" @open="openFound" />
+    <van-action-sheet v-model:show="moreOpen" :actions="MORE" cancel-text="Vazgeç" teleport="body"
+      @select="onMore" />
   </MobilePage>
 </template>
 
@@ -72,5 +83,9 @@ const callable = computed(() =>
   width: 34px;
   padding: 0;
   margin-left: var(--space-2);
+}
+
+.site-feed__more {
+  border: 0;
 }
 </style>

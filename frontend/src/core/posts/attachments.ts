@@ -1,6 +1,6 @@
 import { newId } from '@/core/posts/newId'
 
-export type AttachmentKind = 'PHOTO' | 'VIDEO' | 'AUDIO'
+export type AttachmentKind = 'PHOTO' | 'VIDEO' | 'AUDIO' | 'DOCUMENT'
 
 export interface Attachment {
   id: string
@@ -17,6 +17,7 @@ export function kindOf(file: File): AttachmentKind | null {
   if (file.type.startsWith('image/')) return 'PHOTO'
   if (file.type.startsWith('video/')) return 'VIDEO'
   if (file.type.startsWith('audio/')) return 'AUDIO'
+  if (file.type === 'application/pdf') return 'DOCUMENT'
   return null
 }
 

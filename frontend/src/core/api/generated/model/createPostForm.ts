@@ -17,4 +17,6 @@ export interface CreatePostForm {
   issue: boolean
   /** @nullable */
   files?: Blob[] | null
+  /** @nullable */
+  replyToId?: string | null
 }

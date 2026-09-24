@@ -17,5 +17,6 @@ test('patron ekibe kişi ekler, kişi linkle kendi telefonundan girer', async ({
   await memberPhone.close()
 
   await page.reload()
-  await expect(memberRow(page, fullName)).toContainText('Son görülme')
+  await memberRow(page, fullName).click()
+  await expect(page.getByText(/son görülme/)).toBeVisible()
 })

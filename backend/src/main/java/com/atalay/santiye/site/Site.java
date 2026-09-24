@@ -20,6 +20,7 @@ public class Site {
     @Enumerated(EnumType.STRING)
     private SiteStatus status;
     private Instant createdAt;
+    private UUID photoMediaId;
 
     protected Site() {
     }
@@ -37,6 +38,11 @@ public class Site {
         this.name = name;
         this.address = address;
         this.status = status;
+    }
+
+    /** Grup fotoğrafı gibi: patron koyar, değiştirir ya da kaldırır (null). */
+    public void changePhoto(UUID mediaId) {
+        this.photoMediaId = mediaId;
     }
 
     public UUID getId() {
@@ -57,5 +63,13 @@ public class Site {
 
     public SiteStatus getStatus() {
         return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public UUID getPhotoMediaId() {
+        return photoMediaId;
     }
 }

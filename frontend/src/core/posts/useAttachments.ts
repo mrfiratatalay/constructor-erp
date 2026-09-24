@@ -6,7 +6,7 @@ import { readVideoDuration } from '@/core/posts/videoDuration'
 /** Eklenebiliyorsa eki, eklenemiyorsa kullanıcıya gösterilecek nedeni döner. */
 async function prepareAttachment(file: File, currentCount: number): Promise<Attachment | string> {
   const kind = kindOf(file)
-  if (!kind) return `${file.name}: yalnızca fotoğraf, video ve ses eklenebilir.`
+  if (!kind) return `${file.name}: yalnızca fotoğraf, video, ses ve PDF eklenebilir.`
   if (currentCount >= LIMITS.attachments) return `En fazla ${LIMITS.attachments} dosya eklenebilir.`
   if (kind === 'VIDEO' && ((await readVideoDuration(file)) ?? 0) > LIMITS.videoSeconds + 1) {
     return `Video en fazla ${LIMITS.videoSeconds} saniye olabilir.`

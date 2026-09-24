@@ -30,7 +30,7 @@ async function save() {
 </script>
 
 <template>
-  <el-dialog :model-value="post !== null" title="Gönderiyi düzelt" width="520px"
+  <el-dialog :model-value="post !== null" title="Mesajı düzelt" width="520px"
     @update:model-value="(open: boolean) => !open && (post = null)">
     <el-form label-position="top" @submit.prevent="save">
       <el-form-item label="Yazı">

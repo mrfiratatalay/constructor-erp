@@ -8,7 +8,7 @@ import type { IssuedLink } from '@/core/team/useTeam'
 const { issued } = defineProps<{ issued: IssuedLink | null }>()
 const emit = defineEmits<{ close: [] }>()
 
-const shareUrl = computed(() => (issued ? whatsappShareUrl(issued.member.fullName, issued.link.url) : ''))
+const shareUrl = computed(() => (issued ? whatsappShareUrl(issued.member, issued.link.url) : ''))
 
 async function copy() {
   if (!issued) return

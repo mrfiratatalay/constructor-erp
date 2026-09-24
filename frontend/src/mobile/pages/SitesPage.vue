@@ -4,35 +4,41 @@ import { useRouter } from 'vue-router'
 import { showFailToast } from 'vant'
 import { HardHat, Plus } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
+import type { PostView, SiteToday } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { useSoleSiteRedirect } from '@/core/sites/soleSite'
+import { useSitePins } from '@/core/pins/useSitePins'
+import { useSearch } from '@/core/search/useSearch'
 import { useSiteCreation, type NewSiteForm } from '@/core/sites/useSiteCreation'
 import { useSites } from '@/core/sites/useSites'
-import { sitesByRecency } from '@/core/today/siteRow'
+import { sitesInListOrder } from '@/core/today/siteRow'
 import { useToday } from '@/core/today/useToday'
 import NewSitePopup from '@/mobile/organisms/NewSitePopup.vue'
+import SearchResults from '@/mobile/organisms/SearchResults.vue'
 import SiteRowCell from '@/mobile/organisms/SiteRowCell.vue'
 import UploadQueueCells from '@/mobile/organisms/UploadQueueCells.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Ana ekran: WhatsApp'ın sohbet listesi. Tek tip satır, son haber gelen üstte; özet cümlesi, sessizlik
- * uyarısı ve yoğunluk kademesi yok — ekranda ne varsa okunur, öğrenilecek bir işaret yok.
- * Şantiye ekleme başlıktaki ＋ (patron); kurulan şantiyenin içine doğrudan düşülür.
+ * Ana ekran: WhatsApp'ın sohbet listesi. Başlıkta firma adı ve ＋ (patron), altında arama; sabitlenenler üstte,
+ * sonra akışında en son bir şey olan. Satıra uzun basınca 📌 Sabitle. Tamamlananlar listenin sonunda.
  */
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
-const { leads, createSite, isSaving } = useSiteCreation()
-useSoleSiteRedirect()
+const { people, createSite, isSaving } = useSiteCreation()
+const { togglePin } = useSitePins()
 
-const rows = computed(() => sitesByRecency(today.value?.sites ?? []))
+const rows = computed(() => sitesInListOrder(today.value?.sites ?? []))
+const search = useSearch(rows)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
 const isOwner = computed(() => user.value?.role === 'OWNER')
 const adding = ref(false)
 const showCompleted = ref(false)
+const menuFor = ref<SiteToday | null>(null)
 const open = (siteId: string) => router.push({ name: 'siteFeed', params: { siteId } })
+const openPost = (post: PostView) => router.push({ name: 'siteFeed', params: { siteId: post.site.id }, query: { mesaj: post.id } })
+const menuActions = computed(() => [{ name: menuFor.value?.pinnedAt ? 'Sabitlemeyi kaldır' : '📌 Sabitle' }])
 
 async function add(form: NewSiteForm) {
   try {
@@ -43,6 +49,12 @@ async function add(form: NewSiteForm) {
     showFailToast(errorMessage(error))
   }
 }
+
+async function pin() {
+  const site = menuFor.value
+  menuFor.value = null
+  if (site) await togglePin(site).catch((error) => showFailToast(errorMessage(error)))
+}
 </script>
 
 <template>
@@ -52,23 +64,31 @@ async function add(form: NewSiteForm) {
         <Plus :size="18" />
       </van-button>
     </template>
-    <van-skeleton v-if="isLoading" :row="6" />
-    <UploadQueueCells />
-    <van-cell-group v-if="rows.length" inset>
-      <SiteRowCell v-for="site in rows" :key="site.siteId" :site="site" @open="open" />
-    </van-cell-group>
-    <van-empty v-else-if="today"
-      :description="isOwner ? 'Aktif şantiye yok. Yukarıdaki ＋ ile ilk şantiyeni ekle.' : 'Sana henüz bir şantiye atanmadı.'">
-      <template #image><HardHat :size="48" class="sites__empty-icon" /></template>
-    </van-empty>
-    <van-cell-group v-if="completed.length" inset>
-      <van-cell :title="`Tamamlanan ${completed.length} şantiye`" is-link
-        :arrow-direction="showCompleted ? 'up' : 'down'" @click="showCompleted = !showCompleted" />
-      <template v-if="showCompleted">
-        <van-cell v-for="site in completed" :key="site.id" :title="site.name" is-link @click="open(site.id)" />
-      </template>
-    </van-cell-group>
-    <NewSitePopup v-model:show="adding" :leads="leads" :saving="isSaving" @submit="add" />
+    <van-search v-model="search.text.value" shape="round" placeholder="Ara" class="sites__search" />
+    <SearchResults v-if="search.isActive.value" :sites="search.matchingSites.value" :posts="search.posts.value"
+      :searching="search.isSearching.value" @open-site="open" @open-post="openPost" />
+    <template v-else>
+      <van-skeleton v-if="isLoading" :row="6" avatar />
+      <UploadQueueCells />
+      <van-cell-group v-if="rows.length" inset>
+        <SiteRowCell v-for="site in rows" :key="site.siteId" :site="site" :viewer-id="user?.id" @open="open"
+          @menu="menuFor = $event" />
+      </van-cell-group>
+      <van-empty v-else-if="today" :description="isOwner ? 'Aktif şantiye yok. İlk şantiyeni kur.' : 'Sana henüz bir şantiye atanmadı.'">
+        <template #image><HardHat :size="48" class="sites__empty-icon" /></template>
+        <van-button v-if="isOwner" round type="primary" @click="adding = true">İlk şantiyeni kur</van-button>
+      </van-empty>
+      <van-cell-group v-if="completed.length" inset>
+        <van-cell :title="`Tamamlanan ${completed.length} şantiye`" is-link
+          :arrow-direction="showCompleted ? 'up' : 'down'" @click="showCompleted = !showCompleted" />
+        <template v-if="showCompleted">
+          <van-cell v-for="site in completed" :key="site.id" :title="site.name" is-link @click="open(site.id)" />
+        </template>
+      </van-cell-group>
+    </template>
+    <van-action-sheet :show="menuFor !== null" :actions="menuActions" :description="menuFor?.name"
+      cancel-text="Vazgeç" teleport="body" @select="pin" @update:show="(shown: boolean) => !shown && (menuFor = null)" />
+    <NewSitePopup v-model:show="adding" :people="people" :saving="isSaving" @submit="add" />
   </MobilePage>
 </template>
 
@@ -80,6 +100,17 @@ async function add(form: NewSiteForm) {
   border: 0;
   background: rgb(255 255 255 / 0.16);
   color: var(--brand-on-deep);
+}
+
+/* WhatsApp'taki gibi beyaz, yuvarlak arama kutusu; gri zeminde sınırı belli olsun. */
+.sites__search {
+  padding: 0;
+  background: transparent;
+}
+
+.sites__search :deep(.van-search__content) {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .sites__empty-icon {

@@ -3,11 +3,15 @@ package com.atalay.santiye.media;
 import java.util.Arrays;
 import java.util.Optional;
 
-/** Her tür, her cihazın oynatabildiği tek bir biçime çevrilir. */
+/**
+ * Her tür, her cihazın oynatabildiği tek bir biçime çevrilir. Belge (PDF) çevrilmez: gelen dosyanın
+ * kendisi gösterilir, çünkü her cihaz PDF açar.
+ */
 public enum MediaKind {
     PHOTO("image/", "display.jpg", "image/jpeg"),
     VIDEO("video/", "display.mp4", "video/mp4"),
-    AUDIO("audio/", "display.m4a", "audio/mp4");
+    AUDIO("audio/", "display.m4a", "audio/mp4"),
+    DOCUMENT("application/pdf", "original", "application/pdf");
 
     private final String uploadTypePrefix;
     private final String displayFile;
@@ -33,12 +37,12 @@ public enum MediaKind {
         return displayContentType;
     }
 
-    /** Ses dışındakilerin küçük önizleme görseli olur (videoda ilk kareler). */
+    /** Fotoğraf ve videonun küçük önizleme görseli olur (videoda ilk kareler). */
     boolean hasThumbnail() {
-        return this != AUDIO;
+        return this == PHOTO || this == VIDEO;
     }
 
     boolean isTimed() {
-        return this != PHOTO;
+        return this == VIDEO || this == AUDIO;
     }
 }

@@ -1,4 +1,5 @@
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
+import type { PostView } from '@/core/api/generated/model'
 import { newId } from '@/core/posts/newId'
 import { useAttachments } from '@/core/posts/useAttachments'
 import { useUploadQueue } from '@/core/posts/uploadQueueStore'
@@ -10,13 +11,15 @@ export interface ComposeTarget {
 }
 
 /**
- * Gönderi hazırlama: yazı ve ekler. Şantiye sabittir: gönderi şantiyenin kendi sayfasından atılır,
- * seçici yoktur. Gönderince kuyruğa girer, form temizlenir.
+ * Gönderi hazırlama: yazı, ekler ve varsa yanıtlanan mesaj. Şantiye sabittir: gönderi şantiyenin kendi
+ * sayfasından atılır, seçici yoktur. Gönderince kuyruğa girer, form temizlenir.
  */
 export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>) {
   const queue = useUploadQueue()
   const files = useAttachments()
   const body = ref('')
+  /** Yanıtlanan mesaj: çubuğun üstünde alıntı olarak durur, ✕ ile vazgeçilir (WhatsApp gibi). */
+  const replyTo = ref<PostView | null>(null)
 
   const canSend = computed(
     () => !!toValue(target) && (body.value.trim() !== '' || files.attachments.value.length > 0),
@@ -34,12 +37,14 @@ export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>)
       issue: false,
       files: files.attachments.value.map((item) => item.file),
       queuedAt: new Date().toISOString(),
+      replyToId: replyTo.value?.id ?? null,
     })
     files.clear()
     body.value = ''
+    replyTo.value = null
   }
 
-  return { body, canSend, submit, ...files }
+  return { body, replyTo, canSend, submit, ...files }
 }
 
 /** Gönderme çubuğu ile fotoğraf önizleme penceresi aynı taslağı paylaşır. */

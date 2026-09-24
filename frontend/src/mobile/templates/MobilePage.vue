@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { useSlots } from 'vue'
 import { useRouter } from 'vue-router'
+import { ChevronLeft } from 'lucide-vue-next'
 
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
  * brand: ana ekranın lacivert, ızgaralı başlığı (ad solda, action sağda).
- * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi: şantiyenin sorumlusu).
+ * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi).
  * footer: ekranın altında sabit duran alan (şantiye sayfasındaki gönderme çubuğu).
  * tabbar: altta sekme çubuğu var mı; yoksa footer ekranın en altına oturur.
  * bottom: içerik azken sayfanın dibine yaslanır — sohbet böyle durur (WhatsApp).
+ * heading: WhatsApp'taki sohbet başlığı gibi solda duran başlık (geri oku, fotoğraf, ad); verilirse title yazılmaz.
  */
 const {
   title,
@@ -35,10 +37,18 @@ function goBack() {
 </script>
 
 <template>
-  <van-nav-bar :title="brand || subtitle ? undefined : title" :left-arrow="back" :border="!brand"
-    :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed placeholder
-    @click-left="goBack">
+  <van-nav-bar :title="brand || subtitle || slots.heading ? undefined : title" :left-arrow="back && !slots.heading"
+    :border="!brand" :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed
+    placeholder @click-left="!slots.heading && goBack()">
     <template v-if="brand" #left><span class="mobile-page__brand">{{ title }}</span></template>
+    <template v-else-if="slots.heading" #left>
+      <span class="mobile-page__heading">
+        <button v-if="back" type="button" class="mobile-page__back" aria-label="Geri" @click.stop="goBack">
+          <ChevronLeft :size="24" />
+        </button>
+        <slot name="heading" />
+      </span>
+    </template>
     <template v-if="!brand && subtitle" #title>
       <span class="mobile-page__title">
         <strong>{{ title }}</strong>
@@ -114,7 +124,7 @@ function goBack() {
   font-weight: var(--weight-semibold);
 }
 
-/* İki satırlık başlık (ad + sorumlu) çubuğun yüksekliğini bozmasın: ikinci satır küçük ve sıkışık. */
+/* İki satırlık başlık (ad + katılımcılar) çubuğun yüksekliğini bozmasın: ikinci satır küçük ve sıkışık. */
 .mobile-page__title {
   display: grid;
   overflow: hidden;
@@ -136,6 +146,24 @@ function goBack() {
   font-weight: var(--weight-regular);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mobile-page__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: calc(100vw - 120px);
+  min-width: 0;
+}
+
+.mobile-page__back {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-primary);
 }
 
 .mobile-page__brand {

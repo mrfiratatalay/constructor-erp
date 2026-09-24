@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 
 interface SiteVisitRepository extends JpaRepository<SiteVisit, SiteVisitId> {
 
+    @Query("select v from SiteVisit v where v.id.siteId in :siteIds")
+    List<SiteVisit> findBySiteIds(Collection<UUID> siteIds);
+
     /**
      * Kişinin son bakışından sonra başkalarının gönderdikleri; kendi gönderisi okunmamış sayılmaz.
      * Hiç bakmadığı şantiyede since'ten (günün başı) sonrası sayılır: ilk gün eski kayıtlar yığılmaz.

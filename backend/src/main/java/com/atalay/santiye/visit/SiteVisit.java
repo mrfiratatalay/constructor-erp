@@ -26,6 +26,10 @@ class SiteVisit {
         this.seenAt = at;
     }
 
+    SiteVisitId getId() {
+        return id;
+    }
+
     Instant getSeenAt() {
         return seenAt;
     }

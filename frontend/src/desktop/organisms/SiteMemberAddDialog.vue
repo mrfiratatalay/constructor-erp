@@ -12,7 +12,10 @@ const NEW_MEMBER = 'new'
 const formRef = ref<FormInstance>()
 const form = reactive({ choice: NEW_MEMBER, fullName: '', phone: '' })
 const hasMembers = computed(() => members.length > 0)
-const rules: FormRules = { fullName: [{ required: true, message: 'Ad soyad gerekli', trigger: 'blur' }] }
+const rules: FormRules = {
+  fullName: [{ required: true, message: 'Ad soyad gerekli', trigger: 'blur' }],
+  phone: [{ required: true, message: 'Telefon gerekli', trigger: 'blur' }],
+}
 
 watch([show, () => members], ([open]) => {
   if (!open) return
@@ -24,7 +27,7 @@ async function submit() {
   if (!valid) return
   emit('submit', {
     leadId: form.choice === NEW_MEMBER ? null : form.choice,
-    newLead: form.choice === NEW_MEMBER ? { fullName: form.fullName, phone: form.phone || null } : null,
+    newLead: form.choice === NEW_MEMBER ? { fullName: form.fullName, phone: form.phone } : null,
   })
 }
 </script>
@@ -43,8 +46,8 @@ async function submit() {
         <el-form-item label="Ad soyad" prop="fullName">
           <el-input v-model="form.fullName" maxlength="120" placeholder="Ahmet Yılmaz" />
         </el-form-item>
-        <el-form-item label="Telefon">
-          <el-input v-model="form.phone" maxlength="20" placeholder="WhatsApp daveti için" />
+        <el-form-item label="Telefon" prop="phone">
+          <el-input v-model="form.phone" maxlength="20" placeholder="0532 123 45 67" />
         </el-form-item>
       </template>
     </el-form>

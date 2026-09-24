@@ -4,10 +4,13 @@ import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.site.SiteAccess;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,7 +45,12 @@ class MediaController {
     @GetMapping("/{mediaId}")
     ResponseEntity<Resource> getMediaFile(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID mediaId) {
         Media item = readable(user, mediaId);
-        return file(storage.displayResource(item), item.getKind().displayContentType());
+        ResponseEntity.BodyBuilder response = ok(item.getKind().displayContentType());
+        if (item.getKind() == MediaKind.DOCUMENT && item.getFileName() != null) {
+            response.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                .filename(item.getFileName(), StandardCharsets.UTF_8).build().toString());
+        }
+        return response.body(existing(storage.displayResource(item)));
     }
 
     @GetMapping("/{mediaId}/thumbnail")
@@ -51,7 +59,7 @@ class MediaController {
         if (!item.getKind().hasThumbnail()) {
             throw ApiException.notFound("Önizleme yok.");
         }
-        return file(storage.thumbnailResource(item), MediaType.IMAGE_JPEG_VALUE);
+        return ok(MediaType.IMAGE_JPEG_VALUE).body(existing(storage.thumbnailResource(item)));
     }
 
     /** Başka firmanın ya da görülemeyen şantiyenin dosyası "bulunamadı" döner. */
@@ -64,10 +72,17 @@ class MediaController {
         return item;
     }
 
-    private static ResponseEntity<Resource> file(Resource resource, String contentType) {
+    /** Kaydı olup diskte dosyası olmayan medya (ör. başka ortamda yüklenmiş) sunucu hatası değil, "bulunamadı"dır. */
+    private static Resource existing(Resource resource) {
+        if (!resource.exists()) {
+            throw ApiException.notFound("Dosya bulunamadı.");
+        }
+        return resource;
+    }
+
+    private static ResponseEntity.BodyBuilder ok(String contentType) {
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(contentType))
-            .cacheControl(FOREVER_PRIVATE)
-            .body(resource);
+            .cacheControl(FOREVER_PRIVATE);
     }
 }

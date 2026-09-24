@@ -2,7 +2,9 @@ package com.atalay.santiye.today;
 
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.media.MediaStats;
+import com.atalay.santiye.pin.SitePins;
 import com.atalay.santiye.post.PostStats;
+import com.atalay.santiye.site.SiteEvents;
 import com.atalay.santiye.visit.SiteVisitService;
 import java.time.Instant;
 import java.util.List;
@@ -19,11 +21,15 @@ class TodayStats {
     private final PostStats posts;
     private final MediaStats media;
     private final SiteVisitService visits;
+    private final SiteEvents events;
+    private final SitePins pins;
 
-    TodayStats(PostStats posts, MediaStats media, SiteVisitService visits) {
+    TodayStats(PostStats posts, MediaStats media, SiteVisitService visits, SiteEvents events, SitePins pins) {
         this.posts = posts;
         this.media = media;
         this.visits = visits;
+        this.events = events;
+        this.pins = pins;
     }
 
     DayStats collect(CurrentUser user, List<UUID> siteIds, Instant startOfDay) {
@@ -35,6 +41,8 @@ class TodayStats {
             visits.unreadPosts(user.userId(), siteIds, startOfDay),
             posts.openIssues(siteIds),
             posts.oldestOpenIssueAt(siteIds),
-            media.recentPhotoThumbnails(siteIds, startOfDay, PHOTO_STRIP));
+            media.recentPhotoThumbnails(siteIds, startOfDay, PHOTO_STRIP),
+            events.latestBySite(siteIds),
+            pins.pinnedAt(user.userId()));
     }
 }

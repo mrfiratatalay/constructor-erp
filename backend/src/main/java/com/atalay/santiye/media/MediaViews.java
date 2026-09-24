@@ -30,6 +30,7 @@ public class MediaViews {
         String base = "/api/media/" + item.getId();
         String url = ready ? base : null;
         String thumbnailUrl = ready && item.getKind().hasThumbnail() ? base + "/thumbnail" : null;
-        return new MediaView(item.getId(), item.getKind(), item.getStatus(), item.getDurationSeconds(), url, thumbnailUrl);
+        return new MediaView(item.getId(), item.getKind(), item.getStatus(), item.getDurationSeconds(), url, thumbnailUrl,
+            item.getFileName(), item.getSizeBytes(), item.getCreatedAt());
     }
 }

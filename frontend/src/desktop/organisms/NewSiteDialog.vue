@@ -1,78 +1,55 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MemberView } from '@/core/api/generated/model'
-import type { NewSiteForm } from '@/core/sites/useSiteCreation'
+import type { NewPerson, NewSiteForm } from '@/core/sites/useSiteCreation'
+import NewSiteDetails from '@/desktop/molecules/NewSiteDetails.vue'
+import NewSiteMembers from '@/desktop/molecules/NewSiteMembers.vue'
 
 /**
- * Yeni şantiye, WhatsApp'ta grup kurmak gibi: ad ver, sorumluyu seç, bitir. Sorumlu ya ekipten seçilir
- * ya da burada oluşturulur; "Sonra atarım" da geçerli bir cevaptır.
+ * Yeni şantiye, WhatsApp'ta grup kurmanın iki adımı: 1) katılımcılar, 2) fotoğraf ve ad. Oluşturunca
+ * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve davet düğmeleri hazır durur.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { leads, saving } = defineProps<{ leads: MemberView[]; saving: boolean }>()
+const { people, saving } = defineProps<{ people: MemberView[]; saving: boolean }>()
 const emit = defineEmits<{ submit: [form: NewSiteForm] }>()
 
-/** Sorumlu seçimi: kişinin kimliği, yeni kişi için 'new', boş bırakmak için ''. */
-const LATER = ''
-const NEW_LEAD = 'new'
-
+const step = ref<1 | 2>(1)
 const formRef = ref<FormInstance>()
-const form = reactive({ name: '', address: '', lead: LATER, leadName: '', leadPhone: '' })
-const rules: FormRules = {
-  name: [{ required: true, message: 'Şantiye adı gerekli', trigger: 'blur' }],
-  leadName: [{ required: true, message: 'Ad soyad gerekli', trigger: 'blur' }],
-}
+const form = reactive({ memberIds: [] as string[], newPeople: [] as NewPerson[], name: '', address: '', photo: null as File | null })
+const rules: FormRules = { name: [{ required: true, message: 'Şantiye adı gerekli', trigger: 'blur' }] }
+const memberCount = computed(() => form.memberIds.length + form.newPeople.length)
 
 watch(show, (open) => {
-  if (open) Object.assign(form, { name: '', address: '', lead: LATER, leadName: '', leadPhone: '' })
+  if (!open) return
+  step.value = 1
+  Object.assign(form, { memberIds: [], newPeople: [], name: '', address: '', photo: null })
 })
 
 async function submit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
-  emit('submit', {
-    name: form.name,
-    address: form.address || null,
-    leadId: form.lead === NEW_LEAD || form.lead === LATER ? null : form.lead,
-    newLead: form.lead === NEW_LEAD ? { fullName: form.leadName, phone: form.leadPhone || null } : null,
-  })
+  emit('submit', { ...form, name: form.name.trim(), address: form.address.trim() || null })
 }
 </script>
 
 <template>
-  <el-dialog v-model="show" title="Yeni şantiye" width="480px">
+  <el-dialog v-model="show" :title="step === 1 ? 'Katılımcı ekle · 1/2' : 'Yeni şantiye · 2/2'" width="520px">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
-      <el-form-item label="Ad" prop="name">
-        <el-input v-model="form.name" maxlength="120" placeholder="Çamlıca Konutları" />
-      </el-form-item>
-      <el-form-item label="Adres">
-        <el-input v-model="form.address" maxlength="300" placeholder="İsteğe bağlı" />
-      </el-form-item>
-      <el-form-item label="Sorumlu">
-        <el-select v-model="form.lead" class="new-site__select">
-          <el-option v-for="member in leads" :key="member.id" :label="member.fullName" :value="member.id" />
-          <el-option label="Yeni kişi ekle" :value="NEW_LEAD" />
-          <el-option label="Sonra atarım" :value="LATER" />
-        </el-select>
-      </el-form-item>
-      <template v-if="form.lead === NEW_LEAD">
-        <el-form-item label="Ad soyad" prop="leadName">
-          <el-input v-model="form.leadName" maxlength="120" placeholder="Ahmet Yılmaz" />
-        </el-form-item>
-        <el-form-item label="Telefon">
-          <el-input v-model="form.leadPhone" maxlength="20" placeholder="Davet için" />
-        </el-form-item>
-      </template>
+      <NewSiteMembers v-if="step === 1" v-model:member-ids="form.memberIds" v-model:new-people="form.newPeople"
+        :people="people" />
+      <NewSiteDetails v-else v-model:name="form.name" v-model:address="form.address" v-model:photo="form.photo"
+        :member-count="memberCount" />
     </el-form>
     <template #footer>
-      <el-button @click="show = false">Vazgeç</el-button>
-      <el-button type="primary" :loading="saving" @click="submit">Oluştur</el-button>
+      <template v-if="step === 1">
+        <el-button @click="show = false">Vazgeç</el-button>
+        <el-button type="primary" @click="step = 2">İleri{{ memberCount ? ` · ${memberCount} kişi` : '' }}</el-button>
+      </template>
+      <template v-else>
+        <el-button @click="step = 1">Geri</el-button>
+        <el-button type="primary" :loading="saving" @click="submit">Oluştur</el-button>
+      </template>
     </template>
   </el-dialog>
 </template>
-
-<style scoped>
-.new-site__select {
-  width: 100%;
-}
-</style>

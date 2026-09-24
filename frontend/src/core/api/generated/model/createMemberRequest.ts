@@ -15,9 +15,8 @@ export interface CreateMemberRequest {
   /**
    * @minLength 0
    * @maxLength 20
-   * @nullable
    */
-  phone?: string | null
+  phone: string
   role: CreateMemberRequestRole
   siteIds: string[]
 }

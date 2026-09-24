@@ -20,6 +20,7 @@ final class FfmpegCommands {
             case PHOTO -> List.of(photo(files, limits), thumbnail(files, limits));
             case VIDEO -> List.of(video(files, limits), thumbnail(files, limits));
             case AUDIO -> List.of(audio(files, limits));
+            case DOCUMENT -> List.of();
         };
     }
 
