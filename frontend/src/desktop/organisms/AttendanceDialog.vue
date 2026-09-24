@@ -6,6 +6,7 @@ import { errorMessage } from '@/core/api/errors'
 import type { CreateWorkerRequest } from '@/core/api/generated/model'
 import type { AttendanceMark, DraftRow } from '@/core/attendance/attendanceDraft'
 import { ATTENDANCE_STATUS, markLabel } from '@/core/attendance/attendanceLabels'
+import { countsLine } from '@/core/attendance/attendanceSummary'
 import { useAttendanceDraft } from '@/core/attendance/useAttendanceDraft'
 import { fullDate } from '@/core/format/dates'
 import StatusTag from '@/desktop/atoms/StatusTag.vue'
@@ -31,7 +32,7 @@ const addingWorker = ref(false)
 watch(show, (open) => open && draft.reset())
 
 const title = computed(() => `Yoklama — ${fullDate(day)}`)
-const summary = computed(() => `${counts.value.present} geldi · ${counts.value.absent} gelmedi · ${counts.value.excused} izinli`)
+const summary = computed(() => countsLine(counts.value))
 const detailOf = (row: DraftRow) => [row.worker.trade, row.mark.note].filter(Boolean).join(' · ')
 
 function applyMark(mark: AttendanceMark) {

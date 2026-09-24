@@ -2,9 +2,9 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGetAttendanceOverview } from '@/core/api/generated/attendance/attendance'
-import type { SiteAttendanceOverview } from '@/core/api/generated/model'
+import { todayLine } from '@/core/attendance/attendanceSummary'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { dayTitle, shortDay, todayIsoDate } from '@/core/format/dates'
+import { dayTitle, todayIsoDate } from '@/core/format/dates'
 import StatusTag from '@/desktop/atoms/StatusTag.vue'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
 import ListRow from '@/desktop/molecules/ListRow.vue'
@@ -24,13 +24,6 @@ const { data: sites, isLoading } = useGetAttendanceOverview()
 const siteId = computed(() => (route.params.siteId ? String(route.params.siteId) : null))
 const workerId = computed(() => (route.params.workerId ? String(route.params.workerId) : null))
 const selected = computed(() => sites.value?.find((site) => site.siteId === siteId.value) ?? null)
-
-/** "Bugün 10 geldi · 2 gelmedi · 0 izinli"; bugün alınmadıysa son yoklama günü; hiç alınmadıysa hiçbir şey. */
-function todayLine(site: SiteAttendanceOverview): string {
-  const today = site.today
-  if (today) return `Bugün ${today.present} geldi · ${today.absent} gelmedi · ${today.excused} izinli`
-  return site.lastDay ? `Son yoklama: ${shortDay(site.lastDay)}` : ''
-}
 </script>
 
 <template>

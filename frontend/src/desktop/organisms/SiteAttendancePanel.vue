@@ -3,10 +3,9 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useGetSiteAttendanceMonth } from '@/core/api/generated/attendance/attendance'
-import type { AttendanceCounts } from '@/core/api/generated/model'
-import { presenceRate } from '@/core/attendance/attendanceDraft'
+import { countsLine, monthSummary } from '@/core/attendance/attendanceSummary'
 import { useMonthParam } from '@/core/attendance/useMonthParam'
-import { dayTitle, fullDate, monthKey, monthTitle, todayIsoDate } from '@/core/format/dates'
+import { dayTitle, fullDate, monthKey, todayIsoDate } from '@/core/format/dates'
 import StatusTag from '@/desktop/atoms/StatusTag.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import ListRow from '@/desktop/molecules/ListRow.vue'
@@ -27,12 +26,7 @@ const openDay = ref<string | null>(null)
 const editingDay = ref<string | null>(null)
 
 /** "Eylül 2026 · 25 yoklama günü · %92 geldi": ayrı rapor ekranı yerine tek satır özet. */
-const summary = computed(() => {
-  const value = history.value
-  const rate = value ? presenceRate(value.totals) : null
-  return value?.days.length && rate !== null ? `${monthTitle(month.value)} · ${value.days.length} yoklama günü · %${rate} geldi` : ''
-})
-const countsLine = (counts: AttendanceCounts) => `${counts.present} geldi · ${counts.absent} gelmedi · ${counts.excused} izinli`
+const summary = computed(() => monthSummary(history.value))
 
 function edit(day: string) {
   openDay.value = null

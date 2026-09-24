@@ -5,6 +5,7 @@ import { errorMessage } from '@/core/api/errors'
 import type { CreateWorkerRequest } from '@/core/api/generated/model'
 import type { AttendanceMark, DraftRow } from '@/core/attendance/attendanceDraft'
 import { ATTENDANCE_STATUS, markLabel } from '@/core/attendance/attendanceLabels'
+import { countsLine } from '@/core/attendance/attendanceSummary'
 import { useAttendanceDraft } from '@/core/attendance/useAttendanceDraft'
 import { fullDate } from '@/core/format/dates'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
@@ -29,7 +30,7 @@ const addingWorker = ref(false)
 // Her açılışta kaydedilmemiş işaretler atılır: pencere kayıttaki (ya da varsayılan) hâliyle gelir.
 watch(show, (open) => open && draft.reset())
 
-const summary = computed(() => `${counts.value.present} geldi · ${counts.value.absent} gelmedi · ${counts.value.excused} izinli`)
+const summary = computed(() => countsLine(counts.value))
 const detailOf = (row: DraftRow) => [row.worker.trade, row.mark.note].filter(Boolean).join(' · ')
 
 function applyMark(mark: AttendanceMark) {
