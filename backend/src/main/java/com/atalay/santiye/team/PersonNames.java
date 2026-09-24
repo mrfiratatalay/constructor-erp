@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
  * Yalnızca tamamı büyük ya da tamamı küçük kelimeye dokunulur; "McAllister" gibi bilerek karışık
  * yazılmış ad olduğu gibi kalır. Liste, girilen yazıma göre dağınık görünmesin diye.
  */
-final class PersonNames {
+public final class PersonNames {
 
     private static final Locale TURKISH = Locale.forLanguageTag("tr");
 
     private PersonNames() {
     }
 
-    static String tidy(String fullName) {
+    public static String tidy(String fullName) {
         return Arrays.stream(fullName.trim().split("\\s+"))
             .map(PersonNames::tidyWord)
             .collect(Collectors.joining(" "));
