@@ -6,15 +6,18 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** Durum listesinden geldi / gelmedi / izinli sayıları. */
+/** Geldi / gelmedi / izinli sayıları: tek tek durumlardan ya da gruplanmış sayımlardan. */
 final class Tally {
 
     private Tally() {
     }
 
     static AttendanceCounts of(Collection<AttendanceStatus> statuses) {
-        Map<AttendanceStatus, Long> byStatus = statuses.stream()
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        return ofCounts(statuses.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting())));
+    }
+
+    /** Veritabanında gruplanmış sayımlardan (durum → kişi sayısı). */
+    static AttendanceCounts ofCounts(Map<AttendanceStatus, Long> byStatus) {
         return new AttendanceCounts(count(byStatus, AttendanceStatus.PRESENT), count(byStatus, AttendanceStatus.ABSENT),
             count(byStatus, AttendanceStatus.EXCUSED));
     }
