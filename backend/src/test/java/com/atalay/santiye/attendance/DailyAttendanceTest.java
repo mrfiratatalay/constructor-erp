@@ -70,6 +70,23 @@ class DailyAttendanceTest extends ApiTestSupport {
         assertThat(JsonPath.<List<Integer>>read(corrected, sheetOf(camlica) + ".day.counts.present")).containsExactly(1);
     }
 
+    /** Tamamlanan şantiye bugünün listesine gelmez ama yoklaması alınmış geçmiş gününde gelir (sayı ile liste tutsun). */
+    @Test
+    void aFinishedSiteStillShowsOnADayItWasTaken() {
+        Cookie owner = loginAsOwner();
+        String finished = createSite(owner, "Biten " + UUID.randomUUID());
+        String ali = addWorker(owner, finished, "Ali Usta");
+        LocalDate lastWeek = TODAY.minusDays(7);
+        assertThat(putJson("/api/attendance/days/" + lastWeek, owner,
+            "{\"sites\": [%s]}".formatted(site(finished, ali, "PRESENT", null)))).hasStatusOk();
+        assertThat(putJson("/api/sites/" + finished, owner, "{\"name\": \"Biten\", \"status\": \"COMPLETED\"}"))
+            .hasStatusOk();
+
+        String past = contentOf(get("/api/attendance/days/" + lastWeek, owner));
+        assertThat(JsonPath.<List<Integer>>read(past, sheetOf(finished) + ".day.counts.present")).containsExactly(1);
+        assertThat(JsonPath.<List<Object>>read(contentOf(get(TODAY_URI, owner)), sheetOf(finished))).isEmpty();
+    }
+
     /** Hepsi ya da hiçbiri: ikinci şantiyenin listesi hatalıysa birincininki de yazılmaz. */
     @Test
     void oneInvalidSiteSavesNothing() {
