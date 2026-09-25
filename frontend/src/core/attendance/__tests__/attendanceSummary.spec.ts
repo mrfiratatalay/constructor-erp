@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SiteAttendanceOverview } from '@/core/api/generated/model'
-import { monthSummary, todayLine } from '@/core/attendance/attendanceSummary'
+import { dayCountsLine, monthSummary, todayLine } from '@/core/attendance/attendanceSummary'
 
 const site = (fields: Partial<SiteAttendanceOverview>): SiteAttendanceOverview => ({
   siteId: 's',
@@ -10,6 +10,11 @@ const site = (fields: Partial<SiteAttendanceOverview>): SiteAttendanceOverview =
 })
 
 describe('yoklama özetleri', () => {
+  it('Geçmiş satırı "3 geldi · 1 gelmedi"; izinli yalnızca varsa yazılır', () => {
+    expect(dayCountsLine({ present: 3, absent: 1, excused: 0 })).toBe('3 geldi · 1 gelmedi')
+    expect(dayCountsLine({ present: 3, absent: 0, excused: 2 })).toBe('3 geldi · 0 gelmedi · 2 izinli')
+  })
+
   it('ana sayfa satırı: bugünün sayıları, yoksa son yoklama günü, o da yoksa hiçbir şey', () => {
     expect(todayLine(site({ today: { present: 10, absent: 2, excused: 0 } }))).toBe('Bugün 10 geldi · 2 gelmedi · 0 izinli')
     expect(todayLine(site({ lastDay: '2026-09-23' }))).toBe('Son yoklama: 23 Eyl')

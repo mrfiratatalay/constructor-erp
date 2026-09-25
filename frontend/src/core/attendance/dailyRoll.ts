@@ -40,6 +40,17 @@ export function splitRoll(rows: RollRow[]): { came: RollRow[]; away: RollRow[] }
   }
 }
 
+/** Tek liste: önce gelenler, sonra gelmeyenler; her biri kendi içinde alfabe sırasıyla. */
+export function orderRoll(rows: RollRow[]): RollRow[] {
+  const { came, away } = splitRoll(rows)
+  return [...came, ...away]
+}
+
+/** Geçmiş bir gün: yalnızca o gün kaydedilmiş liste (sonradan eklenen personel o güne karışmaz). */
+export function recordedRoll(sheets: SiteAttendanceSheet[]): RollRow[] {
+  return orderRoll(buildRoll(sheets.map((sheet) => ({ ...sheet, workers: [] })), []))
+}
+
 export function quickMark(choice: QuickChoice, note: string | null): AttendanceMark {
   return choice === 'PRESENT' ? { ...CAME, note } : absenceMark(choice, note)
 }

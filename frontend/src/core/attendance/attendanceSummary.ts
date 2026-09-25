@@ -7,6 +7,12 @@ export function countsLine(counts: AttendanceCounts): string {
   return `${counts.present} geldi · ${counts.absent} gelmedi · ${counts.excused} izinli`
 }
 
+/** Yoklama ekranının Geçmiş'inde bir gün: "3 geldi · 1 gelmedi"; izinli yalnızca varsa yazılır (İlke 3). */
+export function dayCountsLine(counts: AttendanceCounts): string {
+  const base = `${counts.present} geldi · ${counts.absent} gelmedi`
+  return counts.excused ? `${base} · ${counts.excused} izinli` : base
+}
+
 /** Yoklama ana sayfasında şantiyenin satırı: bugünün durumu; alınmadıysa son yoklama günü; hiç yoksa hiçbir şey. */
 export function todayLine(site: SiteAttendanceOverview): string {
   if (site.today) return `Bugün ${countsLine(site.today)}`

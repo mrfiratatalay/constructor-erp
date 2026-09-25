@@ -8,18 +8,30 @@ import {
 } from '@/core/api/generated/attendance/attendance'
 import type { CreateWorkerRequest, SiteAttendanceEntries } from '@/core/api/generated/model'
 import { CAME, countMarks } from '@/core/attendance/attendanceDraft'
-import { buildRoll, pendingSites, quickMark, splitRoll, type QuickChoice, type RollRow } from '@/core/attendance/dailyRoll'
+import { buildRoll, orderRoll, pendingSites, quickMark, splitRoll, type QuickChoice, type RollRow } from '@/core/attendance/dailyRoll'
 import { useAttendanceRefresh } from '@/core/attendance/useAttendanceDraft'
 import { todayIsoDate } from '@/core/format/dates'
 
+/** Kaydedilecek şantiyeleri veren kaynak: liste tazelenince gönderilecekler yeniden hesaplanır. */
+interface PendingSource {
+  refetch: () => Promise<unknown>
+  pending: () => SiteAttendanceEntries[]
+}
+
 /** Personel ekleme ve kaydetme; kayıttan sonra ekran hemen cevaptaki listeyi gösterir, öteki yoklama ekranları yenilenir. */
-function useDailyWrites(day: string, touched: Ref<RollRow[]>) {
+function useDailyWrites(day: string, touched: Ref<RollRow[]>, source: PendingSource) {
   const queryClient = useQueryClient()
   const refresh = useAttendanceRefresh()
   const add = useAddSiteWorker()
   const saveAll = useSaveDailyAttendance()
 
-  async function save(sites: SiteAttendanceEntries[]) {
+  /**
+   * Kaydetmeden önce liste tazelenir: ekran açıkken bir şef aynı şantiyenin yoklamasını aldıysa, onun işaretleri
+   * "alınmamış" sanılıp varsayılan "Geldi" ile ezilmez; yalnızca bu ekranda dokunulan kişiler kaydı geçer.
+   */
+  async function save() {
+    await source.refetch()
+    const sites = source.pending()
     if (!sites.length) return
     const sheets = await saveAll.mutateAsync({ day, data: { sites } })
     queryClient.setQueryData(getGetDailyAttendanceQueryKey(day), sheets)
@@ -48,7 +60,7 @@ export function useDailyAttendance() {
   const touched = ref<RollRow[]>([])
   const rows = computed(() => buildRoll(sheets.value, touched.value))
   const pending = computed(() => pendingSites(sheets.value, rows.value, touched.value))
-  const writes = useDailyWrites(day, touched)
+  const writes = useDailyWrites(day, touched, { refetch: query.refetch, pending: () => pending.value })
   const siteName = (siteId: string) => sheets.value.find((sheet) => sheet.siteId === siteId)?.siteName ?? ''
   const remember = (row: RollRow) => {
     touched.value = [...touched.value.filter((item) => item.worker.id !== row.worker.id), row]
@@ -58,6 +70,7 @@ export function useDailyAttendance() {
     day,
     rows,
     groups: computed(() => splitRoll(rows.value)),
+    ordered: computed(() => orderRoll(rows.value)),
     counts: computed(() => countMarks(rows.value.map((row) => row.mark))),
     sites: computed(() => sheets.value.map((sheet) => ({ id: sheet.siteId, name: sheet.siteName }))),
     isLoading: query.isPending,
@@ -67,13 +80,6 @@ export function useDailyAttendance() {
     mark: (row: RollRow, choice: QuickChoice) => remember({ ...row, mark: quickMark(choice, row.mark.note) }),
     addWorker: async (siteId: string, form: CreateWorkerRequest) =>
       remember({ worker: await writes.addWorker(siteId, form), mark: CAME, siteId, siteName: siteName(siteId) }),
-    /**
-     * Kaydetmeden önce liste tazelenir: ekran açıkken bir şef aynı şantiyenin yoklamasını aldıysa, onun işaretleri
-     * "alınmamış" sanılıp varsayılan "Geldi" ile ezilmez; yalnızca bu ekranda dokunulan kişiler kaydı geçer.
-     */
-    save: async () => {
-      await query.refetch()
-      await writes.save(pending.value)
-    },
+    save: writes.save,
   }
 }

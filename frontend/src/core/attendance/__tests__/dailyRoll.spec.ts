@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { AttendanceEntryView, SiteAttendanceSheet, WorkerView } from '@/core/api/generated/model'
-import { buildRoll, pendingSites, quickMark, reasonLabel, splitRoll, type RollRow } from '@/core/attendance/dailyRoll'
+import { markLabel } from '@/core/attendance/attendanceLabels'
+import {
+  buildRoll,
+  orderRoll,
+  pendingSites,
+  quickMark,
+  recordedRoll,
+  splitRoll,
+  type RollRow,
+} from '@/core/attendance/dailyRoll'
 
 const worker = (id: string, fullName: string): WorkerView => ({ id, fullName })
 const ALI = worker('ali', 'Ali Usta')
@@ -33,11 +42,11 @@ describe('buildRoll', () => {
 })
 
 describe('splitRoll ve etiketler', () => {
-  it('gelenler ve gelmeyenler (izinli dahil) ayrılır; gelmeyenin yanında yalnızca nedeni yazar', () => {
+  it('gelenler ve gelmeyenler (izinli dahil) ayrılır; satırda durum ve nedeni yazar', () => {
     const rows = buildRoll([sheet('s', [ALI, CEM, VELI], [came(ALI), sick(CEM), { worker: VELI, status: 'EXCUSED' }])], [])
     const { came: here, away } = splitRoll(rows)
     expect(names(here)).toEqual(['Ali Usta'])
-    expect(away.map((row) => reasonLabel(row.mark))).toEqual(['Hasta', 'İzinli'])
+    expect(away.map((row) => markLabel(row.mark.status, row.mark.reason))).toEqual(['Gelmedi · Hasta', 'İzinli'])
   })
 
   it('küçük seçim işarete çevrilir: İzinli ayrı durumdur, diğerleri "Gelmedi" + neden', () => {
@@ -64,5 +73,18 @@ describe('pendingSites', () => {
 
   it('personeli olmayan şantiye gönderilmez', () => {
     expect(pendingSites([sheet('bos', [])], [], [])).toEqual([])
+  })
+})
+
+describe('orderRoll ve recordedRoll', () => {
+  it('tek listede önce gelenler, sonra gelmeyenler gelir', () => {
+    const rows = buildRoll([sheet('s', [ALI, CEM, VELI], [sick(ALI), came(CEM), came(VELI)])], [])
+    expect(names(orderRoll(rows))).toEqual(['Cem Kaya', 'Veli Kaya', 'Ali Usta'])
+  })
+
+  it('geçmiş gün yalnızca o günün kaydıdır; sonradan eklenen personel ve kaydı olmayan şantiye gelmez', () => {
+    const rows = recordedRoll([sheet('avrupa', [VELI, CEM], [sick(VELI)]), sheet('camlica', [ALI])])
+    expect(names(rows)).toEqual(['Veli Kaya'])
+    expect(rows[0]?.mark.status).toBe('ABSENT')
   })
 })
