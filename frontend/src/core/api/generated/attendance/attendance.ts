@@ -21,6 +21,7 @@ import { computed, toValue, unref } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 
 import type {
+  AttendanceDaySummary,
   AttendanceDayView,
   CreateWorkerRequest,
   GetSiteAttendanceMonthParams,
@@ -815,6 +816,72 @@ export function useGetAttendanceOverview<
   queryClient?: QueryClient,
 ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetAttendanceOverviewQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const getRecentAttendanceDays = (
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  return apiRequest<AttendanceDaySummary[]>(
+    { url: `/api/attendance/days`, method: 'GET', signal },
+    options,
+  )
+}
+
+export const getGetRecentAttendanceDaysQueryKey = () => {
+  return ['api', 'attendance', 'days'] as const
+}
+
+export const getGetRecentAttendanceDaysQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRecentAttendanceDays>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getRecentAttendanceDays>>, TError, TData>
+  >
+  request?: SecondParameter<typeof apiRequest>
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getGetRecentAttendanceDaysQueryKey()
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecentAttendanceDays>>> = ({
+    signal,
+  }) => getRecentAttendanceDays(requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRecentAttendanceDays>>,
+    TError,
+    TData
+  >
+}
+
+export type GetRecentAttendanceDaysQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRecentAttendanceDays>>
+>
+export type GetRecentAttendanceDaysQueryError = unknown
+
+export function useGetRecentAttendanceDays<
+  TData = Awaited<ReturnType<typeof getRecentAttendanceDays>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecentAttendanceDays>>, TError, TData>
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetRecentAttendanceDaysQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>
