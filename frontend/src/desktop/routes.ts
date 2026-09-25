@@ -14,7 +14,8 @@ export const routes = buildRoutes({
   siteFeed: sitesPage,
   siteField: sitesPage,
   siteTasks: sitesPage,
-  attendance: attendanceHistoryPage,
+  // Yoklama menüsü doğrudan bugünün yoklamasını açar (şantiye seçilmez); geçmiş başlıktaki "Geçmiş"tedir.
+  attendance: () => import('./pages/DailyAttendancePage.vue'),
   attendanceHistory: attendanceHistoryPage,
   siteAttendance: attendanceHistoryPage,
   workerAttendance: attendanceHistoryPage,
