@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 import { ClipboardCheck } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
@@ -8,19 +7,21 @@ import type { CreateWorkerRequest } from '@/core/api/generated/model'
 import { countsLine } from '@/core/attendance/attendanceSummary'
 import { QUICK_CHOICES, type QuickChoice, type RollRow } from '@/core/attendance/dailyRoll'
 import { useDailyAttendance } from '@/core/attendance/useDailyAttendance'
+import { useRecentDays } from '@/core/attendance/useRecentDays'
 import { dayTitle } from '@/core/format/dates'
 import DailyRollGroup from '@/mobile/organisms/DailyRollGroup.vue'
+import RecentDaysList from '@/mobile/organisms/RecentDaysList.vue'
 import WorkerFormPopup from '@/mobile/organisms/WorkerFormPopup.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Alt sekmedeki Yoklama: doğrudan BUGÜNÜN yoklaması, şantiye seçmeden. Üstte "3 geldi · 1 gelmedi · 1 izinli",
- * altında Gelenler ve Gelmeyenler; kişiye dokununca alttan küçük seçim (Geldi · Hastalık · İzinli · Habersiz ·
- * Diğer). "Yoklamayı Kaydet" bütün şantiyeleri tek seferde yazar. Geçmiş başlıktaki "Geçmiş"tedir.
+ * Alt sekmedeki Yoklama: her şey tek ekranda, başka sayfaya gidilmez. Üstte "2 geldi · 1 gelmedi · 0 izinli";
+ * "Bugün" listesinde herkes durumuyla (dokununca alttan küçük seçim: Geldi · Hastalık · İzinli · Habersiz · Diğer;
+ * şantiye seçilmez); altında "Geçmiş": son günler, güne dokununca o günün listesi aynı yerde açılır.
  */
-const router = useRouter()
 const daily = useDailyAttendance()
-const { rows, groups, counts, sites, isLoading, isSaving, isSaved } = daily
+const { rows, ordered, counts, sites, isLoading, isSaving, isSaved } = daily
+const { days, openDay, openRows, isOpening, toggle } = useRecentDays()
 const choosing = ref<RollRow | null>(null)
 const adding = ref(false)
 /** Listede birden çok şantiyenin personeli varsa kişinin şantiyesi satırda yazar; tek şantiyede gürültüdür. */
@@ -54,20 +55,16 @@ async function save() {
 
 <template>
   <MobilePage title="Yoklama" :subtitle="dayTitle(daily.day)">
-    <template #action>
-      <van-button size="small" round plain @click="router.push({ name: 'attendanceHistory' })">Geçmiş</van-button>
-    </template>
     <p v-if="rows.length" class="daily__summary">{{ countsLine(counts) }}</p>
     <van-skeleton v-if="isLoading" :row="6" />
     <template v-else>
-      <DailyRollGroup v-if="groups.came.length" title="Gelenler" :rows="groups.came" :show-site="showSite"
-        @choose="choosing = $event" />
-      <DailyRollGroup v-if="groups.away.length" title="Gelmeyenler" :rows="groups.away" :show-site="showSite"
+      <DailyRollGroup v-if="rows.length" title="Bugün" :rows="ordered" :show-site="showSite"
         @choose="choosing = $event" />
       <van-empty v-if="!rows.length" :description="sites.length ? 'Henüz personel yok. Aşağıdan ekle.' : 'Aktif şantiye yok.'">
         <template #image><ClipboardCheck :size="48" class="daily__empty-icon" /></template>
       </van-empty>
       <van-button v-if="sites.length" round block plain type="primary" @click="adding = true">＋ Personel ekle</van-button>
+      <RecentDaysList :days="days" :open-day="openDay" :open-rows="openRows" :opening="isOpening" @toggle="toggle" />
     </template>
     <template v-if="rows.length" #footer>
       <van-button type="primary" round block :loading="isSaving" :disabled="isSaved" @click="save">
