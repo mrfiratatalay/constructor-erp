@@ -25,7 +25,7 @@ export const ABSENCE_REASON: Record<AbsenceReason, string> = {
 export type AbsenceChoice = AbsenceReason | 'EXCUSED'
 
 export const ABSENCE_CHOICES: { value: AbsenceChoice; label: string }[] = [
-  { value: 'SICK', label: 'Hasta' },
+  { value: 'SICK', label: 'Hastalık' },
   { value: 'EXCUSED', label: 'İzinli' },
   { value: 'UNEXCUSED', label: 'Habersiz' },
   { value: 'OTHER', label: 'Diğer' },
