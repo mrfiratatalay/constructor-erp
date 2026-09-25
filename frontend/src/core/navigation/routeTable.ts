@@ -21,8 +21,10 @@ export const ROUTES = {
   // Şantiyenin Saha sekmesi (günlük); Sohbet ile aynı sayfadır, yalnızca sekme değişir.
   siteField: { path: '/santiyeler/:siteId/saha', meta: { detail: true, title: 'Saha' } },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
-  // Yoklama ayrı modüldür (sohbete gitmez): şantiyelerin bugünü, bir şantiyenin geçmişi, bir personelin ayı.
+  // Yoklama ayrı modüldür (sohbete gitmez): /yoklama bugünün yoklamasıdır (şantiye seçilmez); geçmiş ayrı adreste:
+  // şantiyeler, bir şantiyenin ayı, bir personelin ayı.
   attendance: { path: '/yoklama', meta: { title: 'Yoklama' } },
+  attendanceHistory: { path: '/yoklama/gecmis', meta: { detail: true, title: 'Yoklama geçmişi' } },
   siteAttendance: { path: '/yoklama/:siteId', meta: { detail: true, title: 'Yoklama' } },
   workerAttendance: { path: '/yoklama/:siteId/personel/:workerId', meta: { detail: true, title: 'Yoklama' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },

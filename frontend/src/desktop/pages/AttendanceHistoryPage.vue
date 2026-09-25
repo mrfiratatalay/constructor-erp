@@ -14,8 +14,8 @@ import WorkerAttendancePanel from '@/desktop/organisms/WorkerAttendancePanel.vue
 import SplitView from '@/desktop/templates/SplitView.vue'
 
 /**
- * Yoklama (sol menüde Şantiyeler'in altında), Şantiyeler ekranıyla aynı kalıp: solda şantiyeler ve BUGÜNÜN
- * durumu, sağda seçili şantiyenin geçmişi ya da bir personelin ayı. /yoklama, /yoklama/:siteId ve
+ * Yoklama geçmişi (Yoklama ekranındaki "Geçmiş"), Şantiyeler ekranıyla aynı kalıp: solda şantiyeler ve BUGÜNÜN
+ * durumu, sağda seçili şantiyenin ayı ya da bir personelin ayı. /yoklama/gecmis, /yoklama/:siteId ve
  * /yoklama/:siteId/personel/:workerId aynı sayfadır: liste yerinde kalır, yalnızca sağ taraf değişir.
  */
 const route = useRoute()
@@ -29,7 +29,7 @@ const selected = computed(() => sites.value?.find((site) => site.siteId === site
 <template>
   <SplitView>
     <template #list-header>
-      <ListHeader title="Yoklama" :meta="dayTitle(todayIsoDate())" />
+      <ListHeader title="Yoklama geçmişi" :meta="dayTitle(todayIsoDate())" />
     </template>
     <template #list>
       <el-skeleton v-if="isLoading" :rows="6" animated class="attendance-page__skeleton" />

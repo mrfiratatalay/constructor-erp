@@ -8,8 +8,9 @@ import StatusTag from '@/mobile/atoms/StatusTag.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Alt sekmedeki Yoklama: şantiyeler ve BUGÜNÜN durumu ("Bugün 10 geldi · 2 gelmedi · 0 izinli"; alınmadıysa
- * son yoklama günü). Gelmeyen varsa sağda kırmızı etiketle görünür. Şantiyeye dokununca ay ay geçmişi açılır.
+ * Yoklama geçmişi (Yoklama ekranındaki "Geçmiş"): şantiyeler ve BUGÜNÜN durumu ("Bugün 10 geldi · 2 gelmedi ·
+ * 0 izinli"; alınmadıysa son yoklama günü). Gelmeyen varsa sağda kırmızı etiketle görünür. Şantiyeye dokununca ay ay
+ * geçmişi açılır.
  */
 const router = useRouter()
 const { data: sites, isLoading } = useGetAttendanceOverview()
@@ -17,7 +18,7 @@ const open = (siteId: string) => router.push({ name: 'siteAttendance', params: {
 </script>
 
 <template>
-  <MobilePage title="Yoklama" :subtitle="dayTitle(todayIsoDate())">
+  <MobilePage title="Yoklama geçmişi" :subtitle="dayTitle(todayIsoDate())" back>
     <van-skeleton v-if="isLoading" :row="5" />
     <van-cell-group v-else-if="sites?.length" inset>
       <van-cell v-for="site in sites" :key="site.siteId" :title="site.siteName" :label="todayLine(site) || undefined"

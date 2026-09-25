@@ -30,6 +30,7 @@ const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
   siteFeed: 'sites',
   siteField: 'sites',
   siteTasks: 'sites',
+  attendanceHistory: 'attendance',
   siteAttendance: 'attendance',
   workerAttendance: 'attendance',
 }
