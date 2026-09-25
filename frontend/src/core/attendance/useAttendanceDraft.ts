@@ -55,38 +55,59 @@ function useAttendanceWrites(siteId: MaybeRefOrGetter<string>, day: MaybeRefOrGe
 }
 
 /**
+ * Pencerenin listesi. Yalnızca bu pencerede elle yapılan işaretler (ve eklenen kişiler) ayrıca tutulur: personel
+ * ile günün kaydı hangi sırayla gelirse gelsin dokunulmamış herkes kayıttaki hâlini alır, dokunulan korunur.
+ */
+function useDraftRows(sources: ReturnType<typeof useAttendanceSources>, day: MaybeRefOrGetter<string>) {
+  const rows = ref<DraftRow[]>([])
+  const touched = ref<DraftRow[]>([])
+
+  function rebuild() {
+    const recorded = sources.recorded.data.value?.entries ?? []
+    const withRoster = toValue(day) === todayIsoDate()
+    rows.value = buildDraft({ workers: sources.workers.data.value ?? [], recorded, current: touched.value, withRoster })
+  }
+  watch([sources.workers.data, sources.recorded.data], rebuild, { immediate: true })
+
+  function remember(row: DraftRow) {
+    touched.value = [...touched.value.filter((item) => item.worker.id !== row.worker.id), row]
+    rebuild()
+  }
+
+  function mark(workerId: string, next: AttendanceMark) {
+    const row = rows.value.find((item) => item.worker.id === workerId)
+    if (row) remember({ ...row, mark: next })
+  }
+
+  function reset() {
+    touched.value = []
+    rebuild()
+  }
+
+  return { rows, remember, mark, reset }
+}
+
+/**
  * Bir şantiyenin bir günlük yoklama penceresi: liste (herkes varsayılan "Geldi"), kişi işaretleme, personel
  * ekleme, kaydetme. O gün yoklama zaten alınmışsa (isRecorded) aynı liste düzenlenir; ikinci yoklama açılmaz.
  */
 export function useAttendanceDraft(siteId: MaybeRefOrGetter<string>, day: MaybeRefOrGetter<string>,
   open: MaybeRefOrGetter<boolean>) {
-  const { workers, recorded, isLoading, isRecorded } = useAttendanceSources(siteId, day, open)
+  const sources = useAttendanceSources(siteId, day, open)
   const writes = useAttendanceWrites(siteId, day)
-  const rows = ref<DraftRow[]>([])
-
-  /** current: pencerede o ana kadar yapılan işaretler; veri yenilense de korunur. */
-  function rebuild(current: DraftRow[]) {
-    const entries = recorded.data.value?.entries ?? []
-    const withRoster = toValue(day) === todayIsoDate()
-    rows.value = buildDraft({ workers: workers.data.value ?? [], recorded: entries, current, withRoster })
-  }
-  watch([workers.data, recorded.data], () => rebuild(rows.value), { immediate: true })
-
-  function mark(workerId: string, next: AttendanceMark) {
-    rows.value = rows.value.map((row) => (row.worker.id === workerId ? { ...row, mark: next } : row))
-  }
+  const draft = useDraftRows(sources, day)
 
   return {
-    rows,
-    counts: computed(() => countMarks(rows.value.map((row) => row.mark))),
-    isLoading,
-    isRecorded,
+    rows: draft.rows,
+    counts: computed(() => countMarks(draft.rows.value.map((row) => row.mark))),
+    isLoading: sources.isLoading,
+    isRecorded: sources.isRecorded,
     isSaving: writes.isSaving,
-    mark,
+    mark: draft.mark,
     /** Yeni kişi hemen kaydedilir ve listeye "Geldi" olarak girer. */
-    addWorker: async (form: CreateWorkerRequest) => rebuild([...rows.value, { worker: await writes.addWorker(form), mark: CAME }]),
-    save: () => writes.saveDay(rows.value, isRecorded.value),
+    addWorker: async (form: CreateWorkerRequest) => draft.remember({ worker: await writes.addWorker(form), mark: CAME }),
+    save: () => writes.saveDay(draft.rows.value, sources.isRecorded.value),
     /** Pencere yeniden açılınca kaydedilmemiş işaretler atılır, liste veriden baştan kurulur. */
-    reset: () => rebuild([]),
+    reset: draft.reset,
   }
 }
