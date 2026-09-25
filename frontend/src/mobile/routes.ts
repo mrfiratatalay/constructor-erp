@@ -11,7 +11,8 @@ export const routes = buildRoutes({
   siteFeed: siteFeedPage,
   siteField: siteFeedPage,
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
-  attendance: () => import('./pages/AttendanceHistoryPage.vue'),
+  // Yoklama sekmesi doğrudan bugünün yoklamasını açar (şantiye seçilmez); geçmiş başlıktaki "Geçmiş"tedir.
+  attendance: () => import('./pages/DailyAttendancePage.vue'),
   attendanceHistory: () => import('./pages/AttendanceHistoryPage.vue'),
   siteAttendance: () => import('./pages/SiteAttendancePage.vue'),
   workerAttendance: () => import('./pages/WorkerAttendancePage.vue'),
