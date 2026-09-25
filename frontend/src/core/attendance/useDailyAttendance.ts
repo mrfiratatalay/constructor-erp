@@ -67,6 +67,13 @@ export function useDailyAttendance() {
     mark: (row: RollRow, choice: QuickChoice) => remember({ ...row, mark: quickMark(choice, row.mark.note) }),
     addWorker: async (siteId: string, form: CreateWorkerRequest) =>
       remember({ worker: await writes.addWorker(siteId, form), mark: CAME, siteId, siteName: siteName(siteId) }),
-    save: () => writes.save(pending.value),
+    /**
+     * Kaydetmeden önce liste tazelenir: ekran açıkken bir şef aynı şantiyenin yoklamasını aldıysa, onun işaretleri
+     * "alınmamış" sanılıp varsayılan "Geldi" ile ezilmez; yalnızca bu ekranda dokunulan kişiler kaydı geçer.
+     */
+    save: async () => {
+      await query.refetch()
+      await writes.save(pending.value)
+    },
   }
 }
