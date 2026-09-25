@@ -1,5 +1,6 @@
 package com.atalay.santiye.attendance;
 
+import com.atalay.santiye.attendance.dto.AttendanceDaySummary;
 import com.atalay.santiye.attendance.dto.SiteAttendanceMonth;
 import com.atalay.santiye.attendance.dto.SiteAttendanceOverview;
 import com.atalay.santiye.attendance.dto.WorkerAttendanceMonth;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Yoklama geçmişi: ana sayfa, şantiyenin ayı, personelin ayı. Ay "2026-09" biçimindedir. */
+/** Yoklama geçmişi: son günler, genel bakış, şantiyenin ayı, personelin ayı. Ay "2026-09" biçimindedir. */
 @RestController
 @Tag(name = "Attendance")
 public class AttendanceHistoryController {
@@ -27,6 +28,12 @@ public class AttendanceHistoryController {
     AttendanceHistoryController(AttendanceHistory history, AttendanceOverview overview) {
         this.history = history;
         this.overview = overview;
+    }
+
+    /** Yoklama ekranının "Geçmiş"i: bütün şantiyelerin son günleri, gün gün toplam (bugün hariç). */
+    @GetMapping("/attendance/days")
+    public List<AttendanceDaySummary> getRecentAttendanceDays(@AuthenticationPrincipal CurrentUser user) {
+        return history.recentDays(user);
     }
 
     @GetMapping("/attendance/overview")

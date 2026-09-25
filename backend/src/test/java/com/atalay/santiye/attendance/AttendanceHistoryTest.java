@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,6 +74,29 @@ class AttendanceHistoryTest extends ApiTestSupport {
         assertThat(JsonPath.<List<String>>read(overview, site.formatted(taken) + ".lastDay")).containsExactly(TODAY.toString());
         assertThat(JsonPath.<List<Integer>>read(overview, site.formatted(taken) + ".workerCount")).containsExactly(1);
         assertThat(JsonPath.<List<Object>>read(overview, site.formatted(untouched) + ".today")).containsExactly((Object) null);
+    }
+
+    /** Yoklama ekranının Geçmiş'i: bütün şantiyelerin günleri toplanır; bugün ve iki haftadan eskisi gelmez. */
+    @Test
+    void recentDaysSumEverySiteAndLeaveTodayOut() {
+        Cookie owner = loginAsOwner();
+        String camlica = createSite(owner, "Son günler " + UUID.randomUUID());
+        String avrupa = createSite(owner, "Son günler " + UUID.randomUUID());
+        String ali = addWorker(owner, camlica, "Ali Usta");
+        String veli = addWorker(owner, avrupa, "Veli Kaya");
+        LocalDate tenDaysAgo = TODAY.minusDays(10);
+        take(owner, camlica, tenDaysAgo, "[%s]".formatted(mark(ali, "PRESENT", null)));
+        take(owner, avrupa, tenDaysAgo, "[%s]".formatted(mark(veli, "ABSENT", "SICK")));
+        take(owner, camlica, TODAY.minusDays(20), "[%s]".formatted(mark(ali, "PRESENT", null)));
+        take(owner, avrupa, TODAY, "[%s]".formatted(mark(veli, "PRESENT", null)));
+
+        String days = contentOf(get("/api/attendance/days", owner));
+        String day = "$[?(@.day == '%s')]";
+        assertThat(JsonPath.<List<Integer>>read(days, day.formatted(tenDaysAgo) + ".counts.present")).containsExactly(1);
+        assertThat(JsonPath.<List<Integer>>read(days, day.formatted(tenDaysAgo) + ".counts.absent")).containsExactly(1);
+        assertThat(JsonPath.<List<Object>>read(days, day.formatted(TODAY.minusDays(20)))).isEmpty();
+        assertThat(JsonPath.<List<Object>>read(days, day.formatted(TODAY))).isEmpty();
+        assertThat(JsonPath.<List<String>>read(days, "$[*].day")).isSortedAccordingTo(Comparator.reverseOrder());
     }
 
     /** Firmadaki herkes her şantiyenin geçmişini görür; bulunmayan kayıt 404, bozuk ay 400'dür. */
