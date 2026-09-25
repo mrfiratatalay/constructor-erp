@@ -13,7 +13,6 @@ export const routes = buildRoutes({
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   attendance: () => import('./pages/AttendancePage.vue'),
   siteAttendance: () => import('./pages/SiteAttendancePage.vue'),
-  // Kişinin geçmişi sonraki commit'te gelir; o zamana kadar bu adres Yoklama listesine yönlenir.
-  workerAttendance: { redirectTo: 'attendance' },
+  workerAttendance: () => import('./pages/WorkerAttendancePage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })
