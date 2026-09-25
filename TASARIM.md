@@ -146,6 +146,48 @@ bir günlüktür: kutucuk, sayaç ve ayrı bölümler yoktur; tek dikey akış v
 | Sahaya ekle | Şef alışkanlıkla "Beton döküldü" + fotoğrafı sohbete atar. Mesaja uzun bas (masaüstünde ⋯) → **Sahaya ekle**: mesaj atıldığı zamandaki yerine, yazarıyla günlüğe girer. Sabitleme gibi şantiyeyi gören herkes ekler ve çıkarır (şef de patron da). Otomatik ekleme (her fotoğraflı mesaj) konuşuldu, reddedildi: günlüğe çöp girer. |
 | İki taslak | Sohbet ve Saha çubuğunun taslakları ayrıdır: yarım yazılan mesaj sekme değişince kaybolmaz. |
 
+## Yoklama (günlük personel yoklaması)
+
+24 Eylül'de kararlaştırıldı (Musa). Patronun her sabah sorduğu soru: **"Bugün kim geldi, kim gelmedi, neden?"**
+Yoklama bir mesaj değil, bir kayıttır: sohbete düşmez, kendi modülünde saklanır ve sayılır.
+
+```
+┌──────────────────────────────────────────────┐
+│ Yoklama — 25 Eylül 2026                    ✕ │
+│ Avrupa Konutları · 12 personel               │
+│ ⓘ 25 Eylül 2026 yoklaması zaten alınmış.     │  yalnızca aynı gün
+│   Değiştirip kaydedebilirsin.                │  yeniden açılınca
+│ Ali Usta · Kalıpçı                    Geldi  │  herkes "Geldi" başlar
+│ Veli Kaya · Sabah aradı     Gelmedi · Hasta  │  dokununca: Geldi / Gelmedi
+│ Hasan Demir                          İzinli  │  + neden + not
+│ [ ＋ Personel ekle                        ]  │
+│        10 geldi · 1 gelmedi · 1 izinli       │
+│ [          Yoklamayı Kaydet               ]  │
+└──────────────────────────────────────────────┘
+```
+
+| Parça | Karar |
+|---|---|
+| Nereden başlar | Sohbetteki ＋ → **Yoklama** (Fotoğraf ve video · Belge (PDF) · Yoklama). WhatsApp'ta karşılığı ＋'daki Anket: sohbetin ＋'sından açılan, düz mesaj olmayan bir araç (İlke 1). Farkı: yoklama sohbete düşmez. Yoklama sekmesindeki şantiye sayfasından da alınır (telefonda "Yoklama al", masaüstünde "Bugünün yoklaması"). Saha sekmesinin ＋'sında yoktur. |
+| Neden sohbete gitmez | Her gün 12 satırlık bir liste konuşmayı boğar; sayılamaz, ay ay toplanamaz. Kaydedince onay çıkar: "Yoklama kaydedildi" · **Yoklama kayıtlarını görüntüle** / **Kapat**. Sohbette iz kalmaz. |
+| Varsayılan "Geldi" | Şef yalnızca gelmeyene dokunur: 12 kişilik ekipte 2-3 dokunuş. Kaydetmeden önce altta "10 geldi · 1 gelmedi · 1 izinli" yazar. |
+| Gelmedi nedeni | Gelmedi seçilince neden zorunludur: Hasta · İzinli · Habersiz · Diğer; not isteğe bağlı ("Sabah aradı"). **İzinli ayrı bir durumdur** (bilinen, onaylı yokluk; turuncu), diğerleri "Gelmedi" (kırmızı) + neden. Sayım hep "geldi · gelmedi · izinli" üçlüsüdür; izinli, gelmedi sayılmaz. |
+| Günde bir yoklama | Aynı gün ikinci yoklama olmaz. ＋ → Yoklama tekrar açılırsa kayıtlı yoklama dolu gelir, üstte "zaten alınmış; değiştirip kaydedebilirsin" yazar: engel değil, düzeltme kapısı. İleri bir günün yoklaması alınmaz. Kimin aldığı, kimin düzenlediği saklanır. |
+| Personel | Uygulamayı kullanmayan işçi ve ustalar: şantiyeye bağlı basit bir liste (Ad Soyad, Görevi). Giriş, rol, davet yoktur. Yoklama penceresindeki "＋ Personel ekle" ile eklenir; ayrı bir personel ekranı yoktur. Her gün kendi fotoğrafıdır: sonradan eklenen kişi eski günlerde görünmez. |
+| Kim alır | Şantiyeyi gören herkes (firmadaki herkes, bkz. Kişiler): patron da şef de alır ve düzeltir. |
+| Renk | Geldi yeşil, Gelmedi kırmızı, İzinli turuncu; yanında her zaman yazısı (İlke 2). |
+
+**Yoklama modülü (geçmiş).** Menüde Şantiyeler'in yanında: telefonda alt sekme (Şantiyeler · Yoklama · Ben),
+masaüstünde sol menü.
+
+| Ekran | Karar |
+|---|---|
+| Yoklama | Şantiyeler alt alta, **bugünün** durumuyla: "Bugün 10 geldi · 2 gelmedi · 0 izinli"; bugün alınmadıysa "Son yoklama: 23 Eylül"; hiç alınmadıysa ikinci satır yok (İlke 3). Gelmeyen varsa sağda kırmızı "2 gelmedi", yoksa "12 personel". Aylık adam-gün toplamı ("Gelen: 230") gösterilmez: patron onunla bir şey yapmaz (İlke 4). |
+| Şantiyenin ayı | `‹ Eylül 2026 ›` ay seçici (gelecek aya gidilmez), tek satır özet "Eylül 2026 · 25 yoklama günü · %92 geldi", altında yoklama alınan günler, en yeni üstte. Takvim yok, liste var. Seçili ay adreste durur (`?ay=2026-09`): geri tuşu ve paylaşılan bağlantı aynı ayı açar. |
+| Gün | Güne dokununca gün detayı (telefonda alttan, masaüstünde yandan): kim aldı, saat kaç, kişi kişi durum ve not; **Düzenle** o günün yoklamasını açar. |
+| Kişinin ayı | Gün detayında kişiye dokununca: "20 gün geldi · 2 gün gelmedi · 1 gün izinli", altında gün gün durum ve not. |
+| Adresler | `/yoklama`, `/yoklama/:siteId`, `/yoklama/:siteId/personel/:workerId`. Masaüstünde üçü tek sayfadır (solda liste yerinde kalır, sağ taraf değişir), telefonda ayrı sayfalar. |
+
 ## Şantiye bilgisi (WhatsApp'taki grup bilgisi)
 
 Başlığa dokununca: telefonda alttan açılır, masaüstünde akışın sağında panel olur (akış kararmaz).
@@ -231,7 +273,8 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 | | Patron | Şef |
 |---|---|---|
 | 1 | Şantiyeler | Şantiyeler (tek şantiyesi olsa da liste) |
-| 2 | Ben | Ben |
+| 2 | Yoklama | Yoklama |
+| 3 | Ben | Ben |
 
 Ayrı bir Ekip ekranı yoktur: kişiler firmanın bağlantısıyla gelir, şantiye bilgisindeki Katılımcılar'dan
 yönetilir (bkz. Kişiler). Şantiye ayarları da
@@ -268,3 +311,5 @@ bildirim göndereceği (ör. akşam 17:00'de rapor göndermemiş şefe hatırlat
 - **Görevler** (Musa): şantiye bilgisinde duruyor; WhatsApp'ta karşılığı olmayan yeni bir kavram (İlke 1),
   kalıp kalmayacağı konuşulacak.
 - İlk açılış: sıfır şantiye, sıfır kişiyken patronun ilk on dakikası.
+- **Yoklama, sonraya bırakılanlar** (Musa): personeli düzenleme ve listeden çıkarma, "en çok gelmeyenler",
+  haftalık/yıllık süzgeç, takvim görünümü, sohbete günlük yoklama özeti.
