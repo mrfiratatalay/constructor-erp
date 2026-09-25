@@ -1,5 +1,7 @@
 package com.atalay.santiye.attendance;
 
+import com.atalay.santiye.attendance.dto.SaveAttendanceRequest;
+import com.atalay.santiye.attendance.dto.SaveDailyAttendanceRequest;
 import com.atalay.santiye.attendance.dto.SiteAttendanceSheet;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.site.SiteAccess;
@@ -11,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Yoklama ekranı: firmanın bütün aktif şantiyelerinin bir günü, tek listede. Kullanıcı şantiye seçmez; veri yine
- * şantiye şantiye durur (her şantiyenin kendi yoklaması). Tamamlanan şantiyeler ekrana gelmez: orada artık
- * yoklama alınmaz.
+ * şantiye şantiye durur (her şantiyenin kendi yoklaması), kaydederken her şantiyeninki ayrı ayrı alınır ya da
+ * düzenlenir. Tamamlanan şantiyeler ekrana gelmez: orada artık yoklama alınmaz.
  */
 @Service
 public class DailyAttendance {
@@ -34,5 +36,13 @@ public class DailyAttendance {
             .map(site -> new SiteAttendanceSheet(site.getId(), site.getName(), workers.listWorkers(user, site.getId()),
                 attendance.getDay(user, site.getId(), day)))
             .toList();
+    }
+
+    /** Hepsi ya da hiçbiri: bir şantiyenin listesi hatalıysa hiçbir şantiyeninki yazılmaz. */
+    @Transactional
+    public List<SiteAttendanceSheet> save(CurrentUser user, LocalDate day, SaveDailyAttendanceRequest request) {
+        request.sites().forEach(site ->
+            attendance.saveDay(user, site.siteId(), day, new SaveAttendanceRequest(site.entries())));
+        return sheets(user, day);
     }
 }

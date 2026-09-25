@@ -64,6 +64,13 @@ public class AttendanceService {
         return views.of(attendance);
     }
 
+    /** Yoklama ekranından: o gün alınmamışsa alınır, alınmışsa düzenlenir (ekran "zaten alınmış" hatası vermez). */
+    @Transactional
+    public AttendanceDayView saveDay(CurrentUser user, UUID siteId, LocalDate day, SaveAttendanceRequest request) {
+        boolean taken = attendances.existsBySiteIdAndDay(siteAccess.requireVisible(user, siteId).getId(), day);
+        return taken ? updateDay(user, siteId, day, request) : createDay(user, siteId, day, request);
+    }
+
     /** Liste önce doğrulanır, sonra günün eski listesi yenisiyle değiştirilir; kim, ne zaman düzenledi kalır. */
     @Transactional
     public AttendanceDayView updateDay(CurrentUser user, UUID siteId, LocalDate day, SaveAttendanceRequest request) {
