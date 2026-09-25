@@ -26,8 +26,10 @@ import type {
   GetSiteAttendanceMonthParams,
   GetWorkerAttendanceMonthParams,
   SaveAttendanceRequest,
+  SaveDailyAttendanceRequest,
   SiteAttendanceMonth,
   SiteAttendanceOverview,
+  SiteAttendanceSheet,
   WorkerAttendanceMonth,
   WorkerView,
 } from '../model'
@@ -297,6 +299,160 @@ export const useCreateAttendanceDay = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getCreateAttendanceDayMutationOptions(options), queryClient)
+}
+export const getDailyAttendance = (
+  day: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  day = toValue(day)
+
+  return apiRequest<SiteAttendanceSheet[]>(
+    { url: `/api/attendance/days/${day}`, method: 'GET', signal },
+    options,
+  )
+}
+
+export const getGetDailyAttendanceQueryKey = (day: MaybeRefOrGetter<string>) => {
+  return ['api', 'attendance', 'days', day] as const
+}
+
+export const getGetDailyAttendanceQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDailyAttendance>>,
+  TError = unknown,
+>(
+  day: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailyAttendance>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getGetDailyAttendanceQueryKey(day)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDailyAttendance>>> = ({ signal }) =>
+    getDailyAttendance(day, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => toValue(day) !== null && toValue(day) !== undefined),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getDailyAttendance>>, TError, TData>
+}
+
+export type GetDailyAttendanceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDailyAttendance>>
+>
+export type GetDailyAttendanceQueryError = unknown
+
+export function useGetDailyAttendance<
+  TData = Awaited<ReturnType<typeof getDailyAttendance>>,
+  TError = unknown,
+>(
+  day: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailyAttendance>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetDailyAttendanceQueryOptions(day, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const saveDailyAttendance = (
+  day: MaybeRefOrGetter<string>,
+  saveDailyAttendanceRequest: MaybeRefOrGetter<SaveDailyAttendanceRequest>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  day = toValue(day)
+  saveDailyAttendanceRequest = toValue(saveDailyAttendanceRequest)
+
+  return apiRequest<SiteAttendanceSheet[]>(
+    {
+      url: `/api/attendance/days/${day}`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: saveDailyAttendanceRequest,
+      signal,
+    },
+    options,
+  )
+}
+
+export const getSaveDailyAttendanceMutationKey = () => ['saveDailyAttendance'] as const
+
+export const getSaveDailyAttendanceMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof saveDailyAttendance>>,
+    TError,
+    SaveDailyAttendanceMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof saveDailyAttendance>>,
+  TError,
+  SaveDailyAttendanceMutationVariables,
+  TContext
+> => {
+  const mutationKey = getSaveDailyAttendanceMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof saveDailyAttendance>>,
+    SaveDailyAttendanceMutationVariables
+  > = (props) => {
+    const { day, data } = props ?? {}
+
+    return saveDailyAttendance(day, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type SaveDailyAttendanceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof saveDailyAttendance>>
+>
+export type SaveDailyAttendanceMutationBody = SaveDailyAttendanceRequest
+export type SaveDailyAttendanceMutationError = unknown
+export type SaveDailyAttendanceMutationVariables = { day: string; data: SaveDailyAttendanceRequest }
+
+export const useSaveDailyAttendance = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof saveDailyAttendance>>,
+      TError,
+      SaveDailyAttendanceMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof saveDailyAttendance>>,
+  TError,
+  SaveDailyAttendanceMutationVariables,
+  TContext
+> => {
+  return useMutation(getSaveDailyAttendanceMutationOptions(options), queryClient)
 }
 export const listSiteWorkers = (
   siteId: MaybeRefOrGetter<string>,
