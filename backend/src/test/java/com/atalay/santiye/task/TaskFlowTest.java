@@ -34,15 +34,11 @@ class TaskFlowTest extends ApiTestSupport {
         return value == null ? "null" : "\"" + value + "\"";
     }
 
-    private String userIdOf(Cookie session) {
-        return read(contentOf(get("/api/auth/me", session)), "$.id");
-    }
-
     @Test
     void ownerAssignsATaskAndTheSiteLeadCompletesIt() {
         Cookie owner = loginAsOwner();
         String siteId = createSite(owner, "Görev Şantiyesi " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Görevli Usta", siteId);
+        Cookie lead = signedInLead(owner, "Görevli Usta");
 
         MvcTestResult created = createTask(owner, siteId, new Draft("Demir bağlantısı", userIdOf(lead), null));
         assertThat(created).hasStatus(201).bodyJson().extractingPath("$.assignee.fullName").isEqualTo("Görevli Usta");
@@ -57,26 +53,15 @@ class TaskFlowTest extends ApiTestSupport {
     }
 
     @Test
-    void theAssigneeMustBeOnTheSite() {
+    void theAssigneeMustStillBeInTheCompany() {
         Cookie owner = loginAsOwner();
-        String siteId = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        Cookie outsider = signedInSiteLead(owner, "Başka Şantiyeden", otherSite);
+        String siteId = createSite(owner, "Görev " + UUID.randomUUID());
+        String removedId = userIdOf(signedInLead(owner, "Ayrılan Usta"));
+        String removal = "{\"fullName\": \"Ayrılan Usta\", \"role\": \"SITE_LEAD\", \"active\": false}";
+        patchJson("/api/team/members/" + removedId, owner, removal);
 
-        assertThat(createTask(owner, siteId, new Draft("Yanlış kişi", userIdOf(outsider), null))).hasStatus(400)
-            .bodyJson().extractingPath("$.detail").isEqualTo("Görevin sorumlusu bu şantiyede değil.");
-    }
-
-    @Test
-    void aSiteLeadCannotSeeOrChangeTasksOfAnotherSite() {
-        Cookie owner = loginAsOwner();
-        String ownSite = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Sınırlı Usta", ownSite);
-        String taskId = read(contentOf(createTask(owner, otherSite, Draft.titled("Gizli iş"))), "$.id");
-
-        assertThat(get("/api/sites/" + otherSite + "/tasks", lead)).hasStatus(404);
-        assertThat(delete("/api/tasks/" + taskId, lead)).hasStatus(404);
+        assertThat(createTask(owner, siteId, new Draft("Yanlış kişi", removedId, null))).hasStatus(400)
+            .bodyJson().extractingPath("$.detail").isEqualTo("Görevin sorumlusu bulunamadı.");
     }
 
     @Test
@@ -98,7 +83,7 @@ class TaskFlowTest extends ApiTestSupport {
     void onlyTheCreatorOrTheOwnerDeletesATask() {
         Cookie owner = loginAsOwner();
         String siteId = createSite(owner, "Silme " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Silmek İsteyen", siteId);
+        Cookie lead = signedInLead(owner, "Silmek İsteyen");
         String ownerTask = read(contentOf(createTask(owner, siteId, Draft.titled("Patronun işi"))), "$.id");
         String leadTask = read(contentOf(createTask(lead, siteId, Draft.titled("Ustanın işi"))), "$.id");
 

@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] PUBLIC_PATHS = {
-        "/api/auth/login", "/api/auth/logout", "/api/auth/invites/accept", "/api/site-invites/**",
+        "/api/auth/login", "/api/auth/logout", "/api/auth/invites/accept", "/api/join/**",
         "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error",
     };
 

@@ -1,14 +1,17 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="Action extends string">
 import { Ellipsis } from 'lucide-vue-next'
-import type { PostAction, PostMenuItem } from '@/core/posts/postMenu'
+import type { PostMenuItem } from '@/core/posts/postMenu'
 
-/** Mesajın köşesindeki ⋯ menüsü (WhatsApp Masaüstü'ndeki ⌄ gibi); öğeleri core/posts/postMenu belirler. */
-const { items } = defineProps<{ items: PostMenuItem[] }>()
-const emit = defineEmits<{ select: [action: PostAction] }>()
+/**
+ * Mesajın köşesindeki ⋯ menüsü (WhatsApp Masaüstü'ndeki ⌄ gibi). Öğeleri core belirler: sohbette
+ * core/posts/postMenu, Saha'da core/field/fieldMenu.
+ */
+const { items } = defineProps<{ items: PostMenuItem<Action>[] }>()
+const emit = defineEmits<{ select: [action: Action] }>()
 </script>
 
 <template>
-  <el-dropdown v-if="items.length" trigger="click" placement="bottom-end" @command="(action: PostAction) => emit('select', action)">
+  <el-dropdown v-if="items.length" trigger="click" placement="bottom-end" @command="(action: Action) => emit('select', action)">
     <el-button text circle aria-label="Mesaj işlemleri"><Ellipsis :size="18" /></el-button>
     <template #dropdown>
       <el-dropdown-menu>

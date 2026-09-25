@@ -5,6 +5,7 @@ import com.atalay.santiye.site.dto.SiteEventView;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -17,17 +18,23 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Şantiyenin sistem satırları: kuruldu, kişi eklendi, kişi çıkarıldı. Akışta olduğu anın yerinde durur. */
+/**
+ * Şantiyenin sistem satırları: kuruldu, kişi katıldı, kişi çıkarıldı. Akışta olduğu anın yerinde durur
+ * (WhatsApp'taki "Mahmut davet bağlantısıyla katıldı" gibi).
+ */
 @Service
 public class SiteEvents {
 
     private final SiteEventRepository events;
+    private final SiteRepository sites;
     private final UserRepository users;
     private final SiteAccess siteAccess;
     private final Clock clock;
 
-    SiteEvents(SiteEventRepository events, UserRepository users, SiteAccess siteAccess, Clock clock) {
+    SiteEvents(SiteEventRepository events, SiteRepository sites, UserRepository users, SiteAccess siteAccess,
+        Clock clock) {
         this.events = events;
+        this.sites = sites;
         this.users = users;
         this.siteAccess = siteAccess;
         this.clock = clock;
@@ -37,18 +44,34 @@ public class SiteEvents {
         events.save(new SiteEvent(siteId, kind, actorId, subjectId, clock.instant()));
     }
 
+    /**
+     * Kişi firmaya katıldı ya da firmadan çıkarıldı: herkes her şantiyede olduğu için satır her şantiyenin
+     * akışına düşer.
+     */
+    @Transactional
+    public void recordInEverySite(UUID companyId, SiteEventKind kind, UUID actorId, UUID subjectId) {
+        Instant now = clock.instant();
+        events.saveAll(sites.findByCompanyIdOrderByName(companyId).stream()
+            .map(site -> new SiteEvent(site.getId(), kind, actorId, subjectId, now))
+            .toList());
+    }
+
     @Transactional(readOnly = true)
     public List<SiteEventView> list(CurrentUser user, UUID siteId) {
         siteAccess.requireVisible(user, siteId);
         return views(events.findBySite(siteId));
     }
 
-    /** Şantiye başına en son olay; aynı anda birkaç olay varsa biri seçilir. */
+    /**
+     * Listede sayılan sistem satırı: yalnızca kuruluş ("Patron şantiyeyi kurdu"; hiç mesajı olmayan şantiyenin
+     * önizlemesi). Katıldı ve çıkarıldı satırları her şantiyeye birden düşer; sayılsalardı bütün şantiyeler aynı
+     * anda listenin başına zıplar, her satırın önizlemesi aynı cümle olurdu.
+     */
     @Transactional(readOnly = true)
-    public Map<UUID, SiteEventView> latestBySite(Collection<UUID> siteIds) {
-        Map<UUID, SiteEventView> latest = new HashMap<>();
-        views(events.findLatestPerSite(siteIds)).forEach(event -> latest.putIfAbsent(event.siteId(), event));
-        return latest;
+    public Map<UUID, SiteEventView> creationBySite(Collection<UUID> siteIds) {
+        Map<UUID, SiteEventView> creation = new HashMap<>();
+        views(events.findCreationOf(siteIds)).forEach(event -> creation.putIfAbsent(event.siteId(), event));
+        return creation;
     }
 
     private List<SiteEventView> views(List<SiteEvent> rows) {

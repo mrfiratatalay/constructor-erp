@@ -2,29 +2,34 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import { EllipsisVertical, Phone } from 'lucide-vue-next'
+import { EllipsisVertical, Search } from 'lucide-vue-next'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { fullDate, todayIsoDate } from '@/core/format/dates'
-import { firstName } from '@/core/format/names'
-import { telHref } from '@/core/format/phone'
 import { useComposer } from '@/core/posts/useComposer'
-import { firstCallable, participantLine } from '@/core/sites/participants'
+import { callablePeople, participantLine } from '@/core/sites/participants'
+import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
+import CallPopover from '@/desktop/molecules/CallPopover.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
+import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
 import AttendanceDialog from '@/desktop/organisms/AttendanceDialog.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
+import FieldColumn from '@/desktop/organisms/FieldColumn.vue'
+import FieldComposerBar from '@/desktop/organisms/FieldComposerBar.vue'
 import SiteComposerBar from '@/desktop/organisms/SiteComposerBar.vue'
 import SiteInfoPanel from '@/desktop/organisms/SiteInfoPanel.vue'
 import SiteSearchPanel from '@/desktop/organisms/SiteSearchPanel.vue'
-import SiteStartBlock from '@/desktop/organisms/SiteStartBlock.vue'
 import UploadQueueList from '@/desktop/organisms/UploadQueueList.vue'
 import SiteHeading from '@/shared/molecules/SiteHeading.vue'
 
 /**
  * Seçili şantiye, WhatsApp Masaüstü'ndeki sohbet gibi: başlıkta fotoğraf, ad ve "Musa, Sen" (tıklayınca bilgi),
- * sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
- * Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
+ * sağda 🔍 (Bu şantiyede ara; masaüstünde yer bol, gizlenmez), 📞 (kim hangi numarada) ve ⋮ (Şantiye bilgisi,
+ * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
+ * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
+ * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
+ * Sohbetin ＋ menüsündeki Yoklama bugünün yoklama penceresini açar; yoklama sohbete mesaj olarak gitmez.
  */
 type Panel = 'info' | 'search'
 
@@ -33,13 +38,16 @@ const router = useRouter()
 const { data: site } = useGetSite(() => siteId)
 const { data: user } = useCurrentUser()
 const { previousSeenAt } = useSiteVisit(() => siteId)
-const composer = useComposer(() => (site.value ? { id: site.value.id, name: site.value.name } : undefined))
+const { tab, open: openTab } = useSiteTab()
+const target = () => (site.value ? { id: site.value.id, name: site.value.name } : undefined)
+const composer = useComposer(target)
+const fieldComposer = useComposer(target, { fieldUpdate: true })
 const panel = ref<Panel | null>(null)
-const callable = computed(() => (site.value ? firstCallable(site.value, user.value) : null))
+const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
 
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
-/** Aramada bulunan mesaja gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
-const openFound = (postId: string) => router.replace({ query: { mesaj: postId } })
+/** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
+const openFound = (postId: string) => openTab('chat', postId)
 const attendanceOpen = ref(false)
 
 /** Yoklama sohbete gitmez; kaydedilince kayıtlara gitmek isteğe bağlıdır (Yoklama modülü). */
@@ -53,14 +61,15 @@ async function onAttendanceSaved(day: string) {
 
 <template>
   <div class="workspace">
-    <DetailPane bottom class="workspace__main">
+    <DetailPane :bottom="tab === 'chat'" class="workspace__main">
       <template #header>
         <div class="workspace__head">
           <SiteHeading v-if="site" :site="site" :line="participantLine(site, user)" class="workspace__title"
             @open="toggle('info')" />
-          <el-button v-if="callable" tag="a" :href="telHref(callable.phone!)" class="workspace__call">
-            <Phone :size="15" class="workspace__icon" />{{ firstName(callable.fullName) }}
-          </el-button>
+          <el-tooltip content="Bu şantiyede ara" placement="bottom">
+            <el-button circle aria-label="Bu şantiyede ara" @click="toggle('search')"><Search :size="17" /></el-button>
+          </el-tooltip>
+          <CallPopover :people="callable" />
           <el-dropdown trigger="click" @command="toggle">
             <el-button circle aria-label="Diğer"><EllipsisVertical :size="18" /></el-button>
             <template #dropdown>
@@ -72,14 +81,15 @@ async function onAttendanceSaved(day: string) {
           </el-dropdown>
         </div>
       </template>
+      <template #tabs><SiteTabs :active="tab" @change="openTab" /></template>
       <UploadQueueList />
-      <FeedColumn :site-id="siteId" :seen-at="previousSeenAt" @reply="composer.replyTo.value = $event">
-        <template #start="{ empty }">
-          <SiteStartBlock v-if="site" :site="site" :empty="empty" :can-invite="user?.role === 'OWNER'" />
-        </template>
-      </FeedColumn>
+      <FeedColumn v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
+        @reply="composer.replyTo.value = $event" />
+      <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
-        <SiteComposerBar :composer="composer" :site-name="site.name" @attendance="attendanceOpen = true" />
+        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
+          @attendance="attendanceOpen = true" />
+        <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
@@ -111,11 +121,8 @@ async function onAttendanceSaved(day: string) {
   flex: 1;
 }
 
-.workspace__icon {
-  margin-right: 6px;
-}
-
-.workspace__call {
-  text-decoration: none;
+/* Element Plus yan yana düğmelere sol boşluk verir; aralığı gap tek başına belirlesin. */
+.workspace__head :deep(.el-button + .el-button) {
+  margin-left: 0;
 }
 </style>

@@ -9,7 +9,8 @@ import java.util.UUID;
 /**
  * editedAt: düzeltildiyse ne zaman. deletion: silindiyse iz; yazı ve medya o zaman boştur.
  * replyTo: yanıtlanan mesajın alıntısı. forwarded: başka şantiyeden iletildi. pin: sabitlendiyse.
- * seenByAll: yazar dışındaki bütün katılımcılar gördü (WhatsApp'taki mavi ✓✓).
+ * seenByAll: yazar dışındaki bütün katılımcılar gördü (WhatsApp'taki mavi ✓✓). fieldUpdate: Saha sekmesinden
+ * yazılan saha güncellemesi.
  */
 public record PostView(
     UUID id,
@@ -25,5 +26,6 @@ public record PostView(
     @Nullable PostQuote replyTo,
     boolean forwarded,
     @Nullable PostPin pin,
-    boolean seenByAll) {
+    boolean seenByAll,
+    boolean fieldUpdate) {
 }

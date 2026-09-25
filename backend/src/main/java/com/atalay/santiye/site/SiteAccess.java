@@ -8,34 +8,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Görünürlük kuralının tek sahibi: patron firmanın bütün şantiyelerini, şantiye sorumlusu
- * yalnızca kendisine atananları görür. Gönderi, sorun ve Bugün paneli de bu kuralı buradan kullanır.
+ * Görünürlük kuralının tek sahibi: firmadaki herkes firmanın bütün şantiyelerini görür ve hepsine yazar
+ * (herkes her gruptadır). Başka firmanın şantiyesi görünmez. Gönderi, arama ve ana ekran bu kuralı buradan kullanır.
  */
 @Service
 public class SiteAccess {
 
     private final SiteRepository sites;
-    private final SiteMemberRepository members;
 
-    SiteAccess(SiteRepository sites, SiteMemberRepository members) {
+    SiteAccess(SiteRepository sites) {
         this.sites = sites;
-        this.members = members;
     }
 
     @Transactional(readOnly = true)
     public List<Site> visibleSites(CurrentUser user) {
-        if (user.isOwner()) {
-            return sites.findByCompanyIdOrderByName(user.companyId());
-        }
-        return sites.findByCompanyIdAndIdInOrderByName(user.companyId(), members.findSiteIdsByUserId(user.userId()));
+        return sites.findByCompanyIdOrderByName(user.companyId());
     }
 
-    /** Görünmeyen şantiye "bulunamadı" döner: başka şantiyenin varlığı bile belli edilmez. */
+    /** Görünmeyen şantiye "bulunamadı" döner: başka firmanın şantiyesinin varlığı bile belli edilmez. */
     @Transactional(readOnly = true)
     public Site requireVisible(CurrentUser user, UUID siteId) {
-        return visibleSites(user).stream()
-            .filter(site -> site.getId().equals(siteId))
-            .findFirst()
+        return sites.findByIdAndCompanyId(siteId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Şantiye bulunamadı."));
     }
 }

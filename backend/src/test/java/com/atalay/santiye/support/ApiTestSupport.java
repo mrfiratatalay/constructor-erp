@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-/** Testlerde tekrar eden adımlar: giriş yapmak, ekibe kişi eklemek, davet linkini açmak. */
+/** Testlerde tekrar eden adımlar: giriş yapmak, firmanın bağlantısıyla katılmak, giriş linkini açmak. */
 public abstract class ApiTestSupport {
 
     protected static final String OWNER_EMAIL = "patron@kizilkan.local";
@@ -47,13 +47,20 @@ public abstract class ApiTestSupport {
         return sessionCookieOf(postJson("/api/auth/login", null, json));
     }
 
-    /** Patron ekibe bir kişi ekler; dönen JSON'da kişi ve davet linki vardır. */
-    protected String createMember(Cookie owner, String fullName, String role, String... siteIds) {
-        String json = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"%s\", \"siteIds\": %s}"
-            .formatted(fullName, uniquePhone(), role, jsonArray(siteIds));
-        MvcTestResult result = postJson("/api/team/members", owner, json);
-        assertThat(result).hasStatus(201);
-        return contentOf(result);
+    /** Patronun WhatsApp grubuna attığı firma bağlantısının anahtarı. */
+    protected String joinToken(Cookie owner) {
+        String url = read(contentOf(get("/api/company/join-link", owner)), "$.url");
+        return url.substring(url.lastIndexOf('/') + 1);
+    }
+
+    /** Bağlantıyı açan kişi adını ve numarasını yazıp katılır; session doluysa bu telefonda zaten içerideydi. */
+    protected MvcTestResult join(String token, Cookie session, String fullName, String phone) {
+        String json = "{\"fullName\": \"%s\", \"phone\": \"%s\"}".formatted(fullName, phone);
+        return postJson("/api/join/" + token, session, json);
+    }
+
+    protected String userIdOf(Cookie session) {
+        return read(contentOf(get("/api/auth/me", session)), "$.id");
     }
 
     /** Patron şantiye açar; şantiyenin kimliğini döner. */
@@ -63,10 +70,9 @@ public abstract class ApiTestSupport {
         return read(contentOf(result), "$.id");
     }
 
-    /** Kişiyi ekler ve davet linkiyle giriş yaptırır: "o kişinin telefonu". */
-    protected Cookie signedInSiteLead(Cookie owner, String fullName, String... siteIds) {
-        String created = createMember(owner, fullName, "SITE_LEAD", siteIds);
-        return sessionCookieOf(acceptInvite(read(created, "$.invite.url")));
+    /** Firmanın bağlantısıyla katılmış, oturumu açık bir şef: "o kişinin telefonu". Her şantiyeyi görür. */
+    protected Cookie signedInLead(Cookie owner, String fullName) {
+        return sessionCookieOf(join(joinToken(owner), null, fullName, uniquePhone()));
     }
 
     /** Telefonun yaptığı gibi: gönderi kimliği istemcide üretilir, dosyalar aynı istekte gider. */
@@ -85,11 +91,6 @@ public abstract class ApiTestSupport {
     /** Telefon zorunlu ve ekipte tekildir; testler aynı veritabanını paylaştığı için her kişiye rastgele numara. */
     protected static String uniquePhone() {
         return "05%09d".formatted(java.util.concurrent.ThreadLocalRandom.current().nextInt(1_000_000_000));
-    }
-
-    protected static String jsonArray(String... values) {
-        return java.util.Arrays.stream(values).map(v -> "\"" + v + "\"").collect(
-            java.util.stream.Collectors.joining(", ", "[", "]"));
     }
 
     protected MvcTestResult acceptInvite(String inviteUrl) {

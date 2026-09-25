@@ -3,54 +3,47 @@ import { computed, ref } from 'vue'
 import { Phone } from 'lucide-vue-next'
 import { formatPhone, telHref } from '@/core/format/phone'
 import type { Participant } from '@/core/sites/participants'
+import { personMenu, type PersonAction } from '@/core/team/personMenu'
+import { sheetItems } from '@/mobile/postActions'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
- * Şantiyenin katılımcıları (WhatsApp'taki grup bilgisi gibi): en üstte "Sen", yanında rol etiketi; kişinin
- * numarası okunur biçimde ve tek dokunuşla arama. Patron bir kişiye dokununca WhatsApp'taki gibi bir menü:
- * Ara, Giriş linki gönder ("giremiyorum" derse), Düzenle, Şantiyeden çıkar. Kimsenin durumu yazmaz.
+ * Şantiyenin katılımcıları (WhatsApp'taki grup bilgisi gibi): firmanın herkesi, en üstte "Sen", yanında rol
+ * etiketi ve numarası. Patron bir kişiye dokununca alttan menü: Ara, Giriş linki gönder, Düzenle, Patron yap,
+ * Firmadan çıkar; en üstte "＋ Kişi ekle" firmanın bağlantısını açar. Şef dokununca doğrudan arar.
  */
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
-const emit = defineEmits<{
-  add: []
-  link: [participant: Participant]
-  edit: [participant: Participant]
-  remove: [participant: Participant]
-}>()
+const emit = defineEmits<{ add: []; act: [action: PersonAction, participant: Participant] }>()
 const chosen = ref<Participant | null>(null)
-const actions = computed(() => [
-  ...(chosen.value?.phone ? [{ name: `Ara · ${formatPhone(chosen.value.phone)}`, key: 'call' }] : []),
-  { name: 'Giriş linki gönder', key: 'link' },
-  { name: 'Düzenle', key: 'edit' },
-  { name: 'Şantiyeden çıkar', key: 'remove', color: 'var(--status-danger)' },
-])
+const actions = computed(() => {
+  const person = chosen.value
+  if (!person) return []
+  const call = person.phone && !person.isViewer ? [{ name: `Ara · ${formatPhone(person.phone)}`, key: 'call' }] : []
+  return [...call, ...sheetItems(personMenu(person, canManage))]
+})
 
-function choose(participant: Participant) {
-  if (canManage && !participant.isViewer) chosen.value = participant
-}
+const choose = (participant: Participant) => personMenu(participant, canManage).length && (chosen.value = participant)
 
 function onAction(action: { key: string }) {
   const participant = chosen.value
   chosen.value = null
   if (!participant) return
   if (action.key === 'call' && participant.phone) window.location.href = telHref(participant.phone)
-  if (action.key === 'link') emit('link', participant)
-  if (action.key === 'edit') emit('edit', participant)
-  if (action.key === 'remove') emit('remove', participant)
+  else emit('act', action.key as PersonAction, participant)
 }
 </script>
 
 <template>
   <van-cell-group inset class="participants">
-    <van-cell v-if="canManage" title="＋ Katılımcı ekle" clickable @click="emit('add')" />
+    <van-cell v-if="canManage" title="＋ Kişi ekle" clickable @click="emit('add')" />
     <van-cell v-for="participant in participants" :key="participant.id" :title="participant.name" center
-      :label="participant.phone ? formatPhone(participant.phone) : undefined" :clickable="canManage && !participant.isViewer"
-      @click="choose(participant)">
-      <template #icon><UserAvatar :name="participant.isViewer ? 'Sen' : participant.name" :size="40" class="participants__avatar" /></template>
+      :label="participant.phone ? formatPhone(participant.phone) : undefined"
+      :clickable="personMenu(participant, canManage).length > 0" @click="choose(participant)">
+      <template #icon><UserAvatar :name="participant.name" :size="40" class="participants__avatar" /></template>
       <template #value>
-        <span class="participants__role">{{ participant.role }}</span>
-        <van-button v-if="participant.phone && !canManage" round size="mini" type="primary" plain tag="a"
-          :href="telHref(participant.phone)" class="participants__call" @click.stop>
+        <span class="participants__role">{{ participant.roleLabel }}</span>
+        <van-button v-if="participant.phone && !canManage && !participant.isViewer" round size="mini" type="primary"
+          plain tag="a" :href="telHref(participant.phone)" class="participants__call" @click.stop>
           <Phone :size="13" />
         </van-button>
       </template>

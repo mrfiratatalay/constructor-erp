@@ -102,14 +102,16 @@ class AttendanceDayTest extends ApiTestSupport {
             .hasStatus(201).bodyJson().extractingPath("$.entries[0].reason").isNull();
     }
 
+    /** Firmadaki şef de yoklama alır (herkes her şantiyededir); bulunmayan şantiyenin yoklaması 404'tür. */
     @Test
-    void aSiteLeadCannotSeeAnotherSitesAttendance() {
+    void aSiteLeadTakesAttendanceButAnUnknownSiteIsNotFound() {
         Cookie owner = loginAsOwner();
-        String ownSite = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Sınırlı Şef", ownSite);
+        String siteId = createSite(owner, "Şefin yoklaması " + UUID.randomUUID());
+        String ali = addWorker(owner, siteId, "Ali Usta");
+        Cookie lead = signedInLead(owner, "Yoklamacı Şef");
 
-        assertThat(get(dayOf(otherSite, TODAY), lead)).hasStatus(404);
-        assertThat(get(dayOf(ownSite, TODAY), lead)).hasStatusOk();
+        assertThat(postJson(dayOf(siteId, TODAY), lead, body(new Mark(ali, "PRESENT", null)))).hasStatus(201)
+            .bodyJson().extractingPath("$.recordedByName").isEqualTo("Yoklamacı Şef");
+        assertThat(get(dayOf(UUID.randomUUID().toString(), TODAY), lead)).hasStatus(404);
     }
 }

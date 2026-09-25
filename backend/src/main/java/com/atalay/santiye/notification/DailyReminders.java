@@ -4,7 +4,6 @@ import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
 import com.atalay.santiye.post.PostStats;
 import com.atalay.santiye.site.Site;
-import com.atalay.santiye.site.SiteMembershipService;
 import com.atalay.santiye.site.SiteRepository;
 import com.atalay.santiye.site.SiteStatus;
 import com.atalay.santiye.user.AppUser;
@@ -21,43 +20,28 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Günlük hatırlatmalar (İstanbul saatiyle):
- * 17:00 bugün gönderi gelmeyen şantiyenin sorumlusuna "durumu gönder";
- * 18:00 patrona "bugün haber gelmeyen şantiyeler" özeti.
+ * Günlük hatırlatma (İstanbul saatiyle): 18:00 patrona "bugün haber gelmeyen şantiyeler" özeti. Şantiyenin
+ * sorumlusuna 17:00 hatırlatması yoktur: herkes her şantiyededir, "o şantiyenin adamı" diye biri yok; her işçiye
+ * her sessiz şantiye için bildirim gitmesin.
  */
 @Component
 class DailyReminders {
 
     private final CompanyRepository companies;
     private final SiteRepository sites;
-    private final SiteMembershipService memberships;
     private final PostStats postStats;
     private final UserRepository users;
     private final Notifier notifier;
     private final Clock clock;
 
-    DailyReminders(CompanyRepository companies, SiteRepository sites, SiteMembershipService memberships,
-        PostStats postStats, UserRepository users, Notifier notifier, Clock clock) {
+    DailyReminders(CompanyRepository companies, SiteRepository sites, PostStats postStats, UserRepository users,
+        Notifier notifier, Clock clock) {
         this.companies = companies;
         this.sites = sites;
-        this.memberships = memberships;
         this.postStats = postStats;
         this.users = users;
         this.notifier = notifier;
         this.clock = clock;
-    }
-
-    @Scheduled(cron = "0 0 17 * * *", zone = "${app.timezone}")
-    void remindSiteLeads() {
-        for (Company company : companies.findAll()) {
-            List<Site> silent = silentSitesOf(company);
-            Map<UUID, List<UUID>> leads = memberships.userIdsBySite(silent.stream().map(Site::getId).toList());
-            for (Site site : silent) {
-                notifier.deliver(leads.getOrDefault(site.getId(), List.of()), new NotificationContent(
-                    "Bugün henüz gönderi yok", site.getName() + " için bugünün durumunu gönder.",
-                    "/santiyeler/" + site.getId()));
-            }
-        }
     }
 
     @Scheduled(cron = "0 0 18 * * *", zone = "${app.timezone}")

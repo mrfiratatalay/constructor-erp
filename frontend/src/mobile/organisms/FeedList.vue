@@ -23,8 +23,6 @@ import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
  * aralarda sistem satırları ("Patron, Musa'yı ekledi"), en dipte henüz gitmemiş mesajlar (🕓). Yukarı
  * kaydırınca geçmiş gelir ve ekran zıplamaz. seenAt: önceki bakış; sonrasına "buradan aşağısı yeni" çizgisi.
  * Mesaja uzun basınca menü açılır; Yanıtla, gönderme çubuğuna (sayfaya) iletilir.
- *
- * start yuvası akışın en başına girer (davet düğmeleri) ve yalnızca bütün geçmiş yüklendiğinde görünür.
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
 const emit = defineEmits<{ reply: [post: PostView] }>()
@@ -55,7 +53,6 @@ function openPhotos(urls: string[], index: number) {
   <!-- direction="up": yeni gönderi aşağıda olduğu için "daha fazla" yukarıda istenir (WhatsApp gibi). -->
   <van-list v-else :loading="isLoadingMore" :finished="!hasMore" direction="up" finished-text=""
     loading-text="Daha eskiler geliyor…" @load="loadOlder">
-    <slot v-if="!hasMore" name="start" :empty="!posts.length" />
     <section v-for="day in days" :key="day.key" class="feed-list__day">
       <FeedDayTitle :title="day.title" />
       <template v-for="item in day.items" :key="item.key">
@@ -75,10 +72,10 @@ function openPhotos(urls: string[], index: number) {
 </template>
 
 <style scoped>
-/* Sabit mesaj şeridi, başlık çubuğunun hemen altında yapışık durur (WhatsApp gibi). */
+/* Sabit mesaj şeridi, başlık çubuğunun (ve sekmelerin) hemen altında yapışık durur (WhatsApp gibi). */
 .feed-list__pinned {
   position: sticky;
-  top: calc(var(--van-nav-bar-height) + env(safe-area-inset-top, 0px));
+  top: var(--mobile-page-top);
   z-index: 3;
   margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) 0;
   width: auto;
@@ -99,7 +96,7 @@ function openPhotos(urls: string[], index: number) {
 
 /* Gün başlığı sayfanın üstüne değil, sabit başlık çubuğunun altına yapışır; yoksa onun arkasında kalır. */
 .feed-list__day :deep(.feed-day) {
-  top: calc(var(--van-nav-bar-height) + env(safe-area-inset-top, 0px));
+  top: var(--mobile-page-top);
   z-index: 1;
 }
 

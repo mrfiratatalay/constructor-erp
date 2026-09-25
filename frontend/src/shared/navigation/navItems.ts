@@ -28,6 +28,7 @@ export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' |
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
 const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
   siteFeed: 'sites',
+  siteField: 'sites',
   siteTasks: 'sites',
   siteAttendance: 'attendance',
   workerAttendance: 'attendance',

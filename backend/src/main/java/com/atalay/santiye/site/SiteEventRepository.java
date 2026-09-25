@@ -12,8 +12,8 @@ interface SiteEventRepository extends JpaRepository<SiteEvent, UUID> {
     @Query("select e from SiteEvent e where e.siteId = :siteId order by e.createdAt, e.kind")
     List<SiteEvent> findBySite(UUID siteId);
 
-    /** Şantiye başına en son olay: hiç mesajı olmayan şantiyenin satır önizlemesi. */
-    @Query("select e from SiteEvent e where e.siteId in :siteIds and e.createdAt = "
-        + "(select max(f.createdAt) from SiteEvent f where f.siteId = e.siteId) order by e.kind desc")
-    List<SiteEvent> findLatestPerSite(Collection<UUID> siteIds);
+    /** Şantiyelerin kuruluş satırları ("Patron şantiyeyi kurdu"); her şantiyede bir tane. */
+    @Query("select e from SiteEvent e where e.siteId in :siteIds "
+        + "and e.kind = com.atalay.santiye.site.SiteEventKind.CREATED")
+    List<SiteEvent> findCreationOf(Collection<UUID> siteIds);
 }

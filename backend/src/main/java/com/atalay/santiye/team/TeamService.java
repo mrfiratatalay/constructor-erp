@@ -5,71 +5,44 @@ import com.atalay.santiye.auth.InviteLink;
 import com.atalay.santiye.auth.InviteService;
 import com.atalay.santiye.auth.SessionService;
 import com.atalay.santiye.common.error.ApiException;
-import com.atalay.santiye.site.SiteMembershipService;
-import com.atalay.santiye.team.dto.CreateMemberRequest;
-import com.atalay.santiye.team.dto.MemberCreatedResponse;
+import com.atalay.santiye.site.SiteEventKind;
+import com.atalay.santiye.site.SiteEvents;
 import com.atalay.santiye.team.dto.MemberView;
 import com.atalay.santiye.team.dto.UpdateMemberRequest;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Firmanın kişileri. Yeni kişi yalnızca firmanın bağlantısıyla, kendi adını ve numarasını yazarak gelir; patron
+ * numara yazmaz. Patron bir kişiyi düzeltir, patron yapar, firmadan çıkarır ya da ona giriş linki gönderir.
+ */
 @Service
 public class TeamService {
 
     private final UserRepository users;
     private final InviteService invites;
     private final SessionService sessions;
-    private final SiteMembershipService memberships;
+    private final SiteEvents events;
     private final Clock clock;
 
-    TeamService(UserRepository users, InviteService invites, SessionService sessions,
-        SiteMembershipService memberships, Clock clock) {
+    TeamService(UserRepository users, InviteService invites, SessionService sessions, SiteEvents events, Clock clock) {
         this.users = users;
         this.invites = invites;
         this.sessions = sessions;
-        this.memberships = memberships;
+        this.events = events;
         this.clock = clock;
     }
 
-    @Transactional(readOnly = true)
-    public List<MemberView> listMembers(CurrentUser owner) {
-        List<AppUser> members = users.findByCompanyIdOrderByFullName(owner.companyId());
-        List<UUID> ids = members.stream().map(AppUser::getId).toList();
-        Map<UUID, Instant> lastSeen = sessions.lastSeen(ids);
-        Map<UUID, List<UUID>> siteIds = memberships.siteIdsByUser(ids);
-        return members.stream()
-            .map(member -> toView(member, lastSeen.get(member.getId()), siteIds.getOrDefault(member.getId(), List.of())))
-            .toList();
-    }
-
     /**
-     * Aynı numara ekipteyse ikinci kez eklenmez. Ekipten çıkarılmış birinin numarasıysa eski kaydı geri açılır:
-     * yazdıkları zaten şantiyelerde duruyor, kişi aynı kişi.
-     */
-    @Transactional
-    public MemberCreatedResponse createMember(CurrentUser owner, CreateMemberRequest request) {
-        String phone = checkedPhone(request.phone());
-        Optional<AppUser> holder = holderOf(owner.companyId(), phone, null);
-        holder.filter(AppUser::isActive).ifPresent(TeamService::rejectTaken);
-        AppUser member = enroll(holder.orElseGet(() -> newMember(owner.companyId(), request.role())),
-            request.fullName(), phone, request.role());
-        memberships.assign(owner.companyId(), member.getId(), request.siteIds(), owner.userId());
-        return new MemberCreatedResponse(toView(member, null, request.siteIds()), invites.issue(member));
-    }
-
-    /**
-     * Şantiye davet bağlantısıyla gelen kişi kendini ekler (şef olarak). Numara ekipte aktif birinin ise yeni hesap
-     * açılmaz: kimse başkasının numarasını yazıp onun yerine giremesin. O kişi giriş linkiyle girip bağlantıya
-     * yeniden dokunur. Ekipten çıkarılmış birinin numarasıysa eski kaydı geri açılır.
+     * Bağlantıyla gelen kişi kendini şef olarak ekler. Numara firmada aktif birinin ise yeni hesap açılmaz: kimse
+     * başkasının numarasını yazıp onun yerine giremesin; o kişi patrondan giriş linki ister. Firmadan çıkarılmış
+     * birinin numarasıysa eski kaydı geri açılır: yazdıkları zaten şantiyelerde duruyor, kişi aynı kişi.
      */
     @Transactional
     public AppUser joinByLink(UUID companyId, String fullName, String phone) {
@@ -79,39 +52,45 @@ public class TeamService {
         String checked = checkedPhone(phone);
         Optional<AppUser> holder = holderOf(companyId, checked, null);
         if (holder.filter(AppUser::isActive).isPresent()) {
-            throw ApiException.badRequest(
-                "Bu numara zaten kayıtlı. Patronundan giriş linki iste, sonra bu bağlantıya yeniden dokun.");
+            throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
         }
-        return enroll(holder.orElseGet(() -> newMember(companyId, UserRole.SITE_LEAD)), fullName, checked,
-            UserRole.SITE_LEAD);
+        AppUser member = holder.orElseGet(() -> new AppUser(companyId, "", UserRole.SITE_LEAD, clock.instant()));
+        member.updateProfile(PersonNames.tidy(fullName), checked, UserRole.SITE_LEAD);
+        member.setActive(true);
+        return users.save(member);
     }
 
-    /** Ekipten çıkarılan kişi (active=false) her cihazda oturumu kapanır ve bütün şantiyelerden çıkar. */
+    /**
+     * Firmadan çıkarılan kişi (active=false) her cihazda oturumu kapanır, hiçbir şantiyeyi göremez; her şantiyenin
+     * akışına "Patron, Mahmut'u çıkardı" düşer. Patron kendini çıkaramaz ve kendi rolünü değiştiremez: firmada her
+     * zaman en az bir patron kalır.
+     */
     @Transactional
     public MemberView updateMember(CurrentUser owner, UUID memberId, UpdateMemberRequest request) {
         AppUser member = findMember(owner, memberId);
         if (member.getId().equals(owner.userId()) && (!request.active() || request.role() != member.getRole())) {
-            throw ApiException.badRequest("Kendi hesabını pasif yapamaz ya da rolünü değiştiremezsin.");
+            throw ApiException.badRequest("Kendini firmadan çıkaramaz ya da kendi rolünü değiştiremezsin.");
         }
         String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
         if (phone != null) {
             holderOf(owner.companyId(), phone, memberId).ifPresent(TeamService::rejectTaken);
         }
+        boolean leaving = member.isActive() && !request.active();
         member.updateProfile(PersonNames.tidy(request.fullName()), phone, request.role());
         member.setActive(request.active());
-        List<UUID> siteIds = request.active() ? request.siteIds() : List.of();
-        memberships.assign(owner.companyId(), member.getId(), siteIds, owner.userId());
-        if (!request.active()) {
+        if (leaving) {
             sessions.closeAll(member.getId());
+            events.recordInEverySite(owner.companyId(), SiteEventKind.MEMBER_REMOVED, owner.userId(), member.getId());
         }
-        return toView(member, sessions.lastSeen(List.of(memberId)).get(memberId), siteIds);
+        return new MemberView(member.getId(), member.getFullName(), member.getPhone(), member.getRole(),
+            member.isActive());
     }
 
     @Transactional
     public InviteLink issueLoginLink(CurrentUser owner, UUID memberId) {
         AppUser member = findMember(owner, memberId);
         if (!member.isActive()) {
-            throw ApiException.badRequest("Ekipten çıkarılmış bir kişiye giriş linki gönderilemez.");
+            throw ApiException.badRequest("Firmadan çıkarılmış bir kişiye giriş linki gönderilemez.");
         }
         return invites.issue(member);
     }
@@ -129,18 +108,8 @@ public class TeamService {
             .findFirst();
     }
 
-    private AppUser newMember(UUID companyId, UserRole role) {
-        return new AppUser(companyId, "", role, clock.instant());
-    }
-
-    private AppUser enroll(AppUser member, String fullName, String phone, UserRole role) {
-        member.updateProfile(PersonNames.tidy(fullName), phone, role);
-        member.setActive(true);
-        return users.save(member);
-    }
-
     private static void rejectTaken(AppUser holder) {
-        throw ApiException.badRequest("Bu numara zaten ekipte: " + holder.getFullName() + ".");
+        throw ApiException.badRequest("Bu numara zaten kayıtlı: " + holder.getFullName() + ".");
     }
 
     private static String checkedPhone(String phone) {
@@ -148,10 +117,5 @@ public class TeamService {
             throw ApiException.badRequest("Telefon numarası eksik ya da hatalı.");
         }
         return phone.trim();
-    }
-
-    private static MemberView toView(AppUser user, Instant lastSeenAt, List<UUID> siteIds) {
-        return new MemberView(
-            user.getId(), user.getFullName(), user.getPhone(), user.getRole(), user.isActive(), lastSeenAt, siteIds);
     }
 }

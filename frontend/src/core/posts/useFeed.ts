@@ -9,7 +9,7 @@ export const FEED_QUERY_PREFIX = '/api/posts'
 const PAGE_SIZE = 20
 
 /** İşlenen video/ses varsa sık, yoksa 15 saniyede bir yenilenir: mesajlar ve mavi tikler güncel kalır. */
-function refreshInterval(pages: PostPage[] | undefined): number {
+export function feedRefreshInterval(pages: PostPage[] | undefined): number {
   const processing = pages?.some((page) => page.items.some((post) => post.media.some((m) => m.status === 'PROCESSING')))
   return processing ? 4_000 : 15_000
 }
@@ -22,7 +22,7 @@ export function useFeed(siteId: MaybeRefOrGetter<string | undefined>) {
       listPosts({ siteId: toValue(siteId), cursor: pageParam ?? undefined, limit: PAGE_SIZE }, undefined, signal),
     initialPageParam: null as string | null,
     getNextPageParam: (page) => page.nextCursor ?? null,
-    refetchInterval: (current) => refreshInterval(current.state.data?.pages),
+    refetchInterval: (current) => feedRefreshInterval(current.state.data?.pages),
   })
 
   return {

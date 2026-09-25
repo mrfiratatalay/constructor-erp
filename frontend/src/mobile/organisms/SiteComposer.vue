@@ -3,10 +3,9 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { showFailToast } from 'vant'
 import { Camera, Lock, Mic, Plus, SendHorizontal, Trash2 } from 'lucide-vue-next'
 import { durationLabel } from '@/core/format/dates'
-import { useHoldToRecord } from '@/core/gestures/useHoldToRecord'
 import { quoteOf } from '@/core/posts/postPreview'
 import type { Composer } from '@/core/posts/useComposer'
-import { useVoiceRecorder } from '@/core/posts/useVoiceRecorder'
+import { useVoiceNote } from '@/core/posts/useVoiceNote'
 import PhotoSendSheet from '@/mobile/organisms/PhotoSendSheet.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
@@ -22,12 +21,9 @@ const menuOpen = ref(false)
 const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
 const pdfInput = useTemplateRef<HTMLInputElement>('pdf')
 const cameraInput = useTemplateRef<HTMLInputElement>('camera')
-const recorder = useVoiceRecorder((file) => void sendVoice(file))
-const { isRecording, seconds } = recorder
-const hold = useHoldToRecord(recorder, () => showFailToast('Mikrofona izin verilmedi. Tarayıcı ayarlarından mikrofon iznini aç.'))
-const { locked } = hold
+const voice = useVoiceNote(composer, showFailToast)
+const { isRecording, seconds, locked, showMic } = voice
 const hasText = computed(() => body.value.trim() !== '')
-const showMic = computed(() => !hasText.value && recorder.isSupported)
 const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
 const MENU = [{ name: 'Fotoğraf ve video', key: 'gallery' }, { name: 'Belge (PDF)', key: 'pdf' }]
 
@@ -50,12 +46,6 @@ function onMenu(action: { key: string }) {
   menuOpen.value = false
   ;(action.key === 'gallery' ? galleryInput : pdfInput).value?.click()
 }
-
-/** Mikrofon yalnızca yazı yokken görünür: sesli not tek hareketle gider. */
-async function sendVoice(file: File) {
-  await addFiles([file])
-  await composer.submit()
-}
 </script>
 
 <template>
@@ -63,11 +53,11 @@ async function sendVoice(file: File) {
     <QuoteStrip v-if="quote" :quote="quote" closable @close="replyTo = null" />
     <div class="site-composer__bar">
       <template v-if="isRecording && locked">
-        <van-button round class="site-composer__round" aria-label="Kaydı sil" @click="hold.cancel">
+        <van-button round class="site-composer__round" aria-label="Kaydı sil" @click="voice.cancel">
           <Trash2 :size="20" />
         </van-button>
         <p class="site-composer__recording">● {{ durationLabel(seconds) }}</p>
-        <van-button round type="primary" class="site-composer__round" aria-label="Gönder" @click="hold.send">
+        <van-button round type="primary" class="site-composer__round" aria-label="Gönder" @click="voice.send">
           <SendHorizontal :size="20" />
         </van-button>
       </template>
@@ -85,7 +75,7 @@ async function sendVoice(file: File) {
           <Camera :size="22" />
         </van-button>
         <van-button v-if="showMic" round :type="isRecording ? 'danger' : 'primary'"
-          class="site-composer__round site-composer__mic" aria-label="Sesli not için basılı tut" v-bind="hold.handlers">
+          class="site-composer__round site-composer__mic" aria-label="Sesli not için basılı tut" v-bind="voice.handlers">
           <Mic :size="22" />
         </van-button>
         <van-button v-else-if="!isRecording" round type="primary" :disabled="!hasText" class="site-composer__round"

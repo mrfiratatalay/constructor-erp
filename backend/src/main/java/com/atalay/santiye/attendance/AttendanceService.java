@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Günlük yoklama. Şantiyeyi gören herkes (patron ve şefler) yoklama alır ve düzenler. Bir günün yoklaması
- * bir kez alınır; yanlışlık aynı yoklama düzenlenerek düzeltilir. İleri bir günün yoklaması alınmaz.
+ * Günlük yoklama. Şantiyeyi gören herkes (firmadaki herkes; bkz. SiteAccess) yoklama alır ve düzenler.
+ * Bir günün yoklaması bir kez alınır; yanlışlık aynı yoklama düzenlenerek düzeltilir. İleri bir günün yoklaması alınmaz.
  * "Bugün" şantiyenin saatine göredir (app.timezone, ClockConfig).
  */
 @Service

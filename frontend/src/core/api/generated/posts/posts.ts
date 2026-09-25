@@ -24,6 +24,7 @@ import type {
   CorrectPostRequest,
   CreatePostForm,
   ForwardPostRequest,
+  ListFieldUpdatesParams,
   ListPinnedPostsParams,
   ListPostsParams,
   PostPage,
@@ -177,6 +178,152 @@ export const useUnpinPost = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getUnpinPostMutationOptions(options), queryClient)
 }
+export const addPostToField = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<PostView>({ url: `/api/posts/${postId}/field`, method: 'PUT', signal }, options)
+}
+
+export const getAddPostToFieldMutationKey = () => ['addPostToField'] as const
+
+export const getAddPostToFieldMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof addPostToField>>,
+    TError,
+    AddPostToFieldMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof addPostToField>>,
+  TError,
+  AddPostToFieldMutationVariables,
+  TContext
+> => {
+  const mutationKey = getAddPostToFieldMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof addPostToField>>,
+    AddPostToFieldMutationVariables
+  > = (props) => {
+    const { postId } = props ?? {}
+
+    return addPostToField(postId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type AddPostToFieldMutationResult = NonNullable<Awaited<ReturnType<typeof addPostToField>>>
+
+export type AddPostToFieldMutationError = unknown
+export type AddPostToFieldMutationVariables = { postId: string }
+
+export const useAddPostToField = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof addPostToField>>,
+      TError,
+      AddPostToFieldMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof addPostToField>>,
+  TError,
+  AddPostToFieldMutationVariables,
+  TContext
+> => {
+  return useMutation(getAddPostToFieldMutationOptions(options), queryClient)
+}
+export const removePostFromField = (
+  postId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  postId = toValue(postId)
+
+  return apiRequest<PostView>(
+    { url: `/api/posts/${postId}/field`, method: 'DELETE', signal },
+    options,
+  )
+}
+
+export const getRemovePostFromFieldMutationKey = () => ['removePostFromField'] as const
+
+export const getRemovePostFromFieldMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removePostFromField>>,
+    TError,
+    RemovePostFromFieldMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removePostFromField>>,
+  TError,
+  RemovePostFromFieldMutationVariables,
+  TContext
+> => {
+  const mutationKey = getRemovePostFromFieldMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removePostFromField>>,
+    RemovePostFromFieldMutationVariables
+  > = (props) => {
+    const { postId } = props ?? {}
+
+    return removePostFromField(postId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type RemovePostFromFieldMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removePostFromField>>
+>
+
+export type RemovePostFromFieldMutationError = unknown
+export type RemovePostFromFieldMutationVariables = { postId: string }
+
+export const useRemovePostFromField = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removePostFromField>>,
+      TError,
+      RemovePostFromFieldMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof removePostFromField>>,
+  TError,
+  RemovePostFromFieldMutationVariables,
+  TContext
+> => {
+  return useMutation(getRemovePostFromFieldMutationOptions(options), queryClient)
+}
 export const listPosts = (
   params?: MaybeRefOrGetter<ListPostsParams>,
   options?: SecondParameter<typeof apiRequest>,
@@ -261,6 +408,9 @@ export const createPost = (
   }
   if (createPostForm?.replyToId !== undefined && createPostForm.replyToId !== null) {
     formData.append(`replyToId`, createPostForm.replyToId)
+  }
+  if (createPostForm?.fieldUpdate !== undefined && createPostForm.fieldUpdate !== null) {
+    formData.append(`fieldUpdate`, createPostForm.fieldUpdate.toString())
   }
 
   return apiRequest<PostView>(
@@ -810,6 +960,72 @@ export function useListPinnedPosts<
   queryClient?: QueryClient,
 ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getListPinnedPostsQueryOptions(params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const listFieldUpdates = (
+  params: MaybeRefOrGetter<ListFieldUpdatesParams>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  params = toValue(params)
+
+  return apiRequest<PostPage>(
+    { url: `/api/posts/field-updates`, method: 'GET', params, signal },
+    options,
+  )
+}
+
+export const getListFieldUpdatesQueryKey = (params?: MaybeRefOrGetter<ListFieldUpdatesParams>) => {
+  return ['api', 'posts', 'field-updates', ...(params ? [params] : [])] as const
+}
+
+export const getListFieldUpdatesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listFieldUpdates>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<ListFieldUpdatesParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listFieldUpdates>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getListFieldUpdatesQueryKey(params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listFieldUpdates>>> = ({ signal }) =>
+    listFieldUpdates(params, requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listFieldUpdates>>,
+    TError,
+    TData
+  >
+}
+
+export type ListFieldUpdatesQueryResult = NonNullable<Awaited<ReturnType<typeof listFieldUpdates>>>
+export type ListFieldUpdatesQueryError = unknown
+
+export function useListFieldUpdates<
+  TData = Awaited<ReturnType<typeof listFieldUpdates>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<ListFieldUpdatesParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listFieldUpdates>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getListFieldUpdatesQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>

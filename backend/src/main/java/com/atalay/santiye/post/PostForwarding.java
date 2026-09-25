@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * İlet (WhatsApp gibi): mesajın yazısı ve hazır dosyaları başka bir şantiyeye, iletenin adıyla yeni mesaj
  * olarak gider; üstünde "İletildi" yazar. Dosyalar kopyalanır: asıl mesaj silinse de kopya yerinde kalır.
+ * Kopya düz mesajdır: başka şantiyenin saha güncellemesi, bu şantiyenin sahasında olmuş bir şey değildir.
  */
 @Service
 public class PostForwarding {
@@ -44,7 +45,7 @@ public class PostForwarding {
         }
         Site target = siteAccess.requireVisible(user, targetSiteId);
         var draft = new NewPost(UUID.randomUUID(), user.companyId(), target.getId(), user.userId(), source.getBody(),
-            false, null, true);
+            false, null, true, false);
         Post copy = posts.save(new Post(draft, clock.instant()));
         int copied = mediaCopies.copyPostMedia(source.getId(), new MediaOwner(copy.getId(), target.getId(), user.companyId()));
         if (copy.getBody() == null && copied == 0) {

@@ -26,7 +26,7 @@ class MediaProcessingTest extends ApiTestSupport {
     void siteWithLead() {
         Cookie owner = loginAsOwner();
         siteId = createSite(owner, "Medya Şantiyesi " + UUID.randomUUID());
-        lead = signedInSiteLead(owner, "Medya Usta", siteId);
+        lead = signedInLead(owner, "Medya Usta");
     }
 
     @Test

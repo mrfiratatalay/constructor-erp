@@ -21,7 +21,7 @@ class SiteWorkersTest extends ApiTestSupport {
     void theOwnerAndTheSiteLeadAddWorkersWhoAreListedByName() {
         Cookie owner = loginAsOwner();
         String siteId = createSite(owner, "Personel " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Personel Şefi", siteId);
+        Cookie lead = signedInLead(owner, "Personel Şefi");
 
         assertThat(postJson(workersOf(siteId), owner, "{\"fullName\": \"VELİ KAYA\", \"trade\": \"Kalıpçı\"}"))
             .hasStatus(201).bodyJson().extractingPath("$.fullName").isEqualTo("Veli Kaya");
@@ -32,15 +32,14 @@ class SiteWorkersTest extends ApiTestSupport {
         assertThat(JsonPath.<List<String>>read(listed, "$[*].fullName")).containsExactly("Ali Usta", "Veli Kaya");
     }
 
+    /** Firmadaki herkes her şantiyeyi görür (SiteAccess); bulunmayan ya da başka firmanın şantiyesi 404'tür. */
     @Test
-    void aSiteLeadCannotSeeOrAddWorkersOfAnotherSite() {
-        Cookie owner = loginAsOwner();
-        String ownSite = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        Cookie lead = signedInSiteLead(owner, "Sınırlı Şef", ownSite);
+    void anUnknownSiteHasNoWorkerList() {
+        Cookie lead = signedInLead(loginAsOwner(), "Şef");
+        String unknown = UUID.randomUUID().toString();
 
-        assertThat(get(workersOf(otherSite), lead)).hasStatus(404);
-        assertThat(postJson(workersOf(otherSite), lead, "{\"fullName\": \"Gizli Usta\"}")).hasStatus(404);
+        assertThat(get(workersOf(unknown), lead)).hasStatus(404);
+        assertThat(postJson(workersOf(unknown), lead, "{\"fullName\": \"Gizli Usta\"}")).hasStatus(404);
     }
 
     @Test

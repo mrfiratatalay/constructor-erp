@@ -17,6 +17,4 @@ export interface CreateSiteRequest {
    * @nullable
    */
   address?: string | null
-  /** @nullable */
-  memberIds?: string[] | null
 }

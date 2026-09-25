@@ -26,6 +26,14 @@
   --status-neutral: #59636e;
   --status-neutral-bg: #eef0f2;
 
+  /* Saha akışının simgeleri: dolu daire, üstünde beyaz ince simge. Sarı yalnızca gerçekten dikkat isteyen yerde. */
+  --field-done: #2f9e5b;
+  --field-progress: #2563eb;
+  --field-delivery: #a8683a;
+  --field-issue: #f2b705;
+  --field-issue-bg: #fff8e1;
+  --field-quiet: #cbd5e4;
+
   /* Metin ve yüzeyler: soğuk beton grisi ailesi */
   --text-strong: #141a2e;
   --text-muted: #5b6577;
@@ -82,6 +90,7 @@
   --layout-nav-width: 72px; /* masaüstü sol menü kapalıyken: yalnızca ikonlar */
   --layout-nav-width-open: 256px; /* masaüstü sol menü açıkken: ikon + ad */
   --layout-info-width: clamp(320px, 26vw, 400px); /* masaüstü şantiye bilgisi paneli */
+  --layout-subbar-height: 44px; /* mobil: başlığın altındaki sekme çubuğu (şantiyede Sohbet / Saha) */
   /* Tablette tarayıcı çubuğu açılıp kapanınca görünen yükseklik değişir; 100vh altta kalan çubuğu gizler. */
   --layout-app-height: 100dvh;
 }

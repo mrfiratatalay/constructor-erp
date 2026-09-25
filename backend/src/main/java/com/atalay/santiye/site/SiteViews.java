@@ -3,52 +3,54 @@ package com.atalay.santiye.site;
 import com.atalay.santiye.site.dto.SiteLead;
 import com.atalay.santiye.site.dto.SiteView;
 import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
-import java.util.Collection;
+import com.atalay.santiye.user.UserRole;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
-/** Şantiyeyi katılımcılarının adlarıyla birlikte dışarıya verilecek biçime çevirir; tek sorguda toplu yapar. */
+/**
+ * Şantiyeyi katılımcılarıyla birlikte dışarıya verilecek biçime çevirir. Herkes her şantiyede olduğu için
+ * katılımcılar her şantiyede aynıdır ve bir kez sorgulanır. Birlikte istenen şantiyeler hep tek firmanındır
+ * (kişi yalnızca kendi firmasını görür).
+ */
 @Component
 class SiteViews {
 
-    private final SiteMembershipService memberships;
-    private final UserRepository users;
+    private final SitePeople people;
 
-    SiteViews(SiteMembershipService memberships, UserRepository users) {
-        this.memberships = memberships;
-        this.users = users;
+    SiteViews(SitePeople people) {
+        this.people = people;
+    }
+
+    /** Katılımcılar iki gruba ayrılır: patronlar ve şefler (ekranda rol etiketi). */
+    private record Participants(List<SiteLead> owners, List<SiteLead> leads) {
     }
 
     List<SiteView> of(List<Site> sites) {
-        Map<UUID, List<UUID>> leadIds = memberships.userIdsBySite(sites.stream().map(Site::getId).toList());
-        Map<UUID, AppUser> leads = activeUsers(leadIds.values().stream().flatMap(List::stream).toList());
-        return sites.stream().map(site -> toView(site, leadIds.getOrDefault(site.getId(), List.of()), leads)).toList();
+        if (sites.isEmpty()) {
+            return List.of();
+        }
+        List<AppUser> everyone = people.of(sites.getFirst().getCompanyId());
+        Participants participants = new Participants(
+            withRole(everyone, true).stream().map(SiteViews::personOf).toList(),
+            withRole(everyone, false).stream().map(SiteViews::personOf).toList());
+        return sites.stream().map(site -> toView(site, participants)).toList();
     }
 
     SiteView of(Site site) {
         return of(List.of(site)).getFirst();
     }
 
-    private Map<UUID, AppUser> activeUsers(Collection<UUID> ids) {
-        return users.findAllById(ids).stream()
-            .filter(AppUser::isActive)
-            .collect(Collectors.toMap(AppUser::getId, Function.identity()));
+    private static List<AppUser> withRole(List<AppUser> users, boolean owners) {
+        return users.stream().filter(user -> (user.getRole() == UserRole.OWNER) == owners).toList();
     }
 
-    private static SiteView toView(Site site, List<UUID> leadIds, Map<UUID, AppUser> leads) {
-        List<SiteLead> siteLeads = leadIds.stream()
-            .map(leads::get)
-            .filter(user -> user != null)
-            .map(user -> new SiteLead(user.getId(), user.getFullName(), user.getPhone()))
-            .toList();
-        UUID photo = site.getPhotoMediaId();
-        String photoUrl = photo == null ? null : "/api/media/" + photo;
-        return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), siteLeads, photoUrl,
-            photoUrl == null ? null : photoUrl + "/thumbnail");
+    private static SiteLead personOf(AppUser user) {
+        return new SiteLead(user.getId(), user.getFullName(), user.getPhone());
+    }
+
+    private static SiteView toView(Site site, Participants participants) {
+        String photoUrl = site.getPhotoMediaId() == null ? null : "/api/media/" + site.getPhotoMediaId();
+        return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), participants.leads(),
+            participants.owners(), photoUrl, photoUrl == null ? null : photoUrl + "/thumbnail");
     }
 }

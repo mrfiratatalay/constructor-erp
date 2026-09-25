@@ -9,9 +9,10 @@ const attendancePage = () => import('./pages/AttendancePage.vue')
 export const routes = buildRoutes({
   login: () => import('./pages/LoginPage.vue'),
   invite: () => import('./pages/InviteAcceptPage.vue'),
-  siteJoin: () => import('./pages/SiteJoinPage.vue'),
+  join: () => import('./pages/JoinPage.vue'),
   sites: sitesPage,
   siteFeed: sitesPage,
+  siteField: sitesPage,
   siteTasks: sitesPage,
   attendance: attendancePage,
   siteAttendance: attendancePage,

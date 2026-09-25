@@ -4,11 +4,8 @@ import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,11 +56,5 @@ public class SessionService {
     @Transactional
     public void closeAll(UUID userId) {
         sessions.deleteAllByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public Map<UUID, Instant> lastSeen(Collection<UUID> userIds) {
-        return sessions.findLastSeen(userIds).stream()
-            .collect(Collectors.toMap(LastSeen::userId, LastSeen::lastSeenAt));
     }
 }

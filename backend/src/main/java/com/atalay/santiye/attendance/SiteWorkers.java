@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Şantiyenin personel listesi. Şantiyeyi gören herkes (patron ve o şantiyenin şefleri) listeyi görür ve
+ * Şantiyenin personel listesi. Şantiyeyi gören herkes (firmadaki herkes; bkz. SiteAccess) listeyi görür ve
  * yoklama penceresinden kişi ekler; ayrı bir personel yönetim ekranı yoktur.
  */
 @Service

@@ -26,6 +26,17 @@ interface PostRepository extends JpaRepository<Post, UUID> {
         order by p.createdAt desc, p.id desc""")
     List<Post> findOlderThan(Collection<UUID> siteIds, Instant createdAt, UUID id, Pageable page);
 
+    /** Saha akışı: şantiyenin saha güncellemeleri, en yeniden eskiye; silinenler iz olarak yerinde. */
+    @Query("select p from Post p where p.siteId = :siteId and p.fieldUpdate = true "
+        + "order by p.createdAt desc, p.id desc")
+    List<Post> findNewestFieldUpdates(UUID siteId, Pageable page);
+
+    @Query("""
+        select p from Post p where p.siteId = :siteId and p.fieldUpdate = true
+        and (p.createdAt < :createdAt or (p.createdAt = :createdAt and p.id < :id))
+        order by p.createdAt desc, p.id desc""")
+    List<Post> findFieldUpdatesOlderThan(UUID siteId, Instant createdAt, UUID id, Pageable page);
+
     /** En eski en üstte: en uzun bekleyen sorun en çok dikkat ister. */
     @Query("select p from Post p where p.siteId in :siteIds and p.issue = true and p.resolvedAt is null "
         + "and p.deletedAt is null order by p.createdAt asc")

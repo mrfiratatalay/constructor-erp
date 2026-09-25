@@ -1,30 +1,22 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { MemberView } from '@/core/api/generated/model'
 import type { NewSiteForm } from '@/core/sites/useSiteCreation'
 import NewSiteDetails from '@/desktop/molecules/NewSiteDetails.vue'
-import NewSiteMembers from '@/desktop/molecules/NewSiteMembers.vue'
 
 /**
- * Yeni şantiye, WhatsApp'ta grup kurmanın iki adımı: 1) katılımcılar, 2) fotoğraf ve ad. Oluşturunca
- * şantiyenin içine düşülür; orada "Patron şantiyeyi kurdu" satırı ve WhatsApp'tan davet düğmesi hazır durur.
+ * Yeni şantiye, tek adım: fotoğraf, ad, adres. Kişi seçilmez; firmadaki herkes her şantiyededir. Oluşturunca
+ * şantiyenin içine düşülür; akışın başında "Patron şantiyeyi kurdu" yazar.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { people, saving } = defineProps<{ people: MemberView[]; saving: boolean }>()
+const { saving } = defineProps<{ saving: boolean }>()
 const emit = defineEmits<{ submit: [form: NewSiteForm] }>()
 
-const step = ref<1 | 2>(1)
 const formRef = ref<FormInstance>()
-const form = reactive({ memberIds: [] as string[], name: '', address: '', photo: null as File | null })
+const form = reactive({ name: '', address: '', photo: null as File | null })
 const rules: FormRules = { name: [{ required: true, message: 'Şantiye adı gerekli', trigger: 'blur' }] }
-const memberCount = computed(() => form.memberIds.length)
 
-watch(show, (open) => {
-  if (!open) return
-  step.value = 1
-  Object.assign(form, { memberIds: [], name: '', address: '', photo: null })
-})
+watch(show, (open) => open && Object.assign(form, { name: '', address: '', photo: null }))
 
 async function submit() {
   const valid = await formRef.value?.validate().catch(() => false)
@@ -34,21 +26,13 @@ async function submit() {
 </script>
 
 <template>
-  <el-dialog v-model="show" :title="step === 1 ? 'Katılımcı ekle · 1/2' : 'Yeni şantiye · 2/2'" width="520px">
+  <el-dialog v-model="show" title="Yeni şantiye" width="520px">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
-      <NewSiteMembers v-if="step === 1" v-model:member-ids="form.memberIds" :people="people" />
-      <NewSiteDetails v-else v-model:name="form.name" v-model:address="form.address" v-model:photo="form.photo"
-        :member-count="memberCount" />
+      <NewSiteDetails v-model:name="form.name" v-model:address="form.address" v-model:photo="form.photo" />
     </el-form>
     <template #footer>
-      <template v-if="step === 1">
-        <el-button @click="show = false">Vazgeç</el-button>
-        <el-button type="primary" @click="step = 2">İleri{{ memberCount ? ` · ${memberCount} kişi` : '' }}</el-button>
-      </template>
-      <template v-else>
-        <el-button @click="step = 1">Geri</el-button>
-        <el-button type="primary" :loading="saving" @click="submit">Oluştur</el-button>
-      </template>
+      <el-button @click="show = false">Vazgeç</el-button>
+      <el-button type="primary" :loading="saving" @click="submit">Oluştur</el-button>
     </template>
   </el-dialog>
 </template>

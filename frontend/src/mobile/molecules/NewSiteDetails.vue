@@ -4,13 +4,12 @@ import type { UploaderBeforeRead } from 'vant'
 import { Camera } from 'lucide-vue-next'
 
 /**
- * Şantiye kurmanın 2. adımı, WhatsApp'ta grubun adını ve fotoğrafını vermek gibi: yuvarlak fotoğraf
- * (isteğe bağlı), ad (zorunlu), adres (isteğe bağlı).
+ * Şantiye kurmak, WhatsApp'ta grubun adını ve fotoğrafını vermek gibi: yuvarlak fotoğraf (isteğe bağlı), ad
+ * (zorunlu), adres (isteğe bağlı). Kişi seçilmez: firmadaki herkes her şantiyededir.
  */
 const name = defineModel<string>('name', { required: true })
 const address = defineModel<string>('address', { required: true })
 const photo = defineModel<File | null>('photo', { required: true })
-const { memberCount } = defineProps<{ memberCount: number }>()
 
 /** Seçilen fotoğrafın tarayıcı içi geçici adresi; yenisi gelince eskisi bellekten bırakılır. */
 const preview = ref<string | null>(null)
@@ -41,7 +40,7 @@ const pick: UploaderBeforeRead = (file) => {
         :rules="[{ required: true, message: 'Şantiye adı gerekli' }]" />
       <van-field v-model="address" label="Adres" placeholder="İsteğe bağlı" maxlength="300" />
     </van-cell-group>
-    <p class="details__members">Katılımcılar: {{ memberCount ? `${memberCount} kişi ve sen` : 'yalnızca sen' }}</p>
+    <p class="details__note">Firmadaki herkes bu şantiyeyi görür ve yazabilir.</p>
   </div>
 </template>
 
@@ -76,7 +75,7 @@ const pick: UploaderBeforeRead = (file) => {
   --van-cell-background: var(--surface-muted);
 }
 
-.details__members {
+.details__note {
   margin: 0;
   color: var(--text-muted);
   font-size: var(--text-sm);

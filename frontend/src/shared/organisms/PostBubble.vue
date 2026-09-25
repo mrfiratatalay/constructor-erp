@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Forward, Pin } from 'lucide-vue-next'
+import { Forward, MapPin, Pin, TriangleAlert } from 'lucide-vue-next'
 import type { PostView } from '@/core/api/generated/model'
 import { clockTime } from '@/core/format/dates'
 import { postElementId } from '@/core/posts/jumpToPost'
@@ -13,6 +13,7 @@ import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 /**
  * Mesaj baloncuğu, WhatsApp'taki gibi: kendi mesajın sağda ve lacivert zeminde, başkasınınkinde üstte adı.
  * Sıra: "İletildi", alıntı, fotoğraf, yazı, en altta 📌 · saat · tik. Fotoğraflı baloncuk daha dardır (albüm).
+ * Saha sekmesinden yazılan güncellemenin üstünde "Saha" (sorunsa "Sorun") yazar: aynı gönderi Saha'da da durur.
  * Kütüphaneden bağımsızdır (iki kabukta birebir aynı görünür); masaüstündeki ⋯ menüsü yuvadan gelir.
  */
 defineOptions({ inheritAttrs: false })
@@ -30,6 +31,9 @@ const visual = computed(() => post.media.some((item) => item.kind === 'PHOTO' ||
       <p v-if="!mine" class="bubble__author">{{ post.author.fullName }}</p>
       <div v-if="$slots.menu" class="bubble__menu"><slot name="menu" /></div>
       <p v-if="post.forwarded" class="bubble__forwarded"><Forward :size="13" />İletildi</p>
+      <p v-if="post.fieldUpdate" class="bubble__field" :class="{ 'bubble__field--issue': post.issue }">
+        <TriangleAlert v-if="post.issue" :size="13" /><MapPin v-else :size="13" />{{ post.issue ? 'Sorun' : 'Saha' }}
+      </p>
       <QuoteStrip v-if="post.replyTo" :quote="post.replyTo" @open="emit('openQuote', post.replyTo.id)" />
       <PostMedia :media="post.media" @open-photos="(urls, index) => emit('openPhotos', urls, index)" />
       <p v-if="post.body" class="bubble__body">{{ post.body }}</p>
@@ -87,13 +91,15 @@ const visual = computed(() => post.media.some((item) => item.kind === 'PHOTO' ||
 }
 
 .bubble__author,
-.bubble__forwarded {
+.bubble__forwarded,
+.bubble__field {
   margin: 0;
   font-size: var(--text-xs);
 }
 
 .bubble--visual .bubble__author,
 .bubble--visual .bubble__forwarded,
+.bubble--visual .bubble__field,
 .bubble--visual .bubble__body,
 .bubble--visual .bubble__time {
   padding: 0 6px;
@@ -110,6 +116,19 @@ const visual = computed(() => post.media.some((item) => item.kind === 'PHOTO' ||
   gap: 4px;
   color: var(--text-subtle);
   font-style: italic;
+}
+
+.bubble__field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-weight: var(--weight-semibold);
+}
+
+/* Sorunun ⚠'i Saha'daki sarı satırla aynı renk; sarı zeminde yazı okunmaz, bu yüzden yalnızca simge sarı. */
+.bubble__field--issue svg {
+  color: var(--field-issue);
 }
 
 .bubble__body {

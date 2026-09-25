@@ -8,8 +8,8 @@
 
   "compilerOptions": {
     // Vitest runs in a different environment than the application code.
-    // Adjust lib and types accordingly. The language level matches the app (ES2022, @vue/tsconfig):
-    // tests import app code, and an empty lib hid built-ins like Array.prototype.at from it.
+    // Adjust lib and types accordingly. Testler uygulama kodunu içe aktarır: dilin yerleşikleri uygulamayla
+    // aynıdır (ES2022, ör. Array.at); DOM tipleri jsdom'dan gelir.
     "lib": ["ES2022"],
     "types": ["node", "jsdom"],
 

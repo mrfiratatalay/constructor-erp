@@ -10,16 +10,23 @@ export interface ComposeTarget {
   name: string
 }
 
+/** fieldUpdate: çubuk Saha sekmesindedir; giden her gönderi saha güncellemesidir. */
+export interface ComposeOptions {
+  fieldUpdate?: boolean
+}
+
 /**
  * Gönderi hazırlama: yazı, ekler ve varsa yanıtlanan mesaj. Şantiye sabittir: gönderi şantiyenin kendi
  * sayfasından atılır, seçici yoktur. Gönderince kuyruğa girer, form temizlenir.
  */
-export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>) {
+export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>, options: ComposeOptions = {}) {
   const queue = useUploadQueue()
   const files = useAttachments()
   const body = ref('')
   /** Yanıtlanan mesaj: çubuğun üstünde alıntı olarak durur, ✕ ile vazgeçilir (WhatsApp gibi). */
   const replyTo = ref<PostView | null>(null)
+  /** Saha'daki "Sorun bildir": bu gönderi sorun olarak gider; gönderince kapanır. */
+  const issue = ref(false)
 
   const canSend = computed(
     () => !!toValue(target) && (body.value.trim() !== '' || files.attachments.value.length > 0),
@@ -33,18 +40,19 @@ export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>)
       siteId: site.id,
       siteName: site.name,
       body: body.value.trim() || null,
-      // Sunucu alanı bekliyor; "sorun" kavramı arayüzden kalktığı için her gönderi düz nottur.
-      issue: false,
+      issue: issue.value,
       files: files.attachments.value.map((item) => item.file),
       queuedAt: new Date().toISOString(),
       replyToId: replyTo.value?.id ?? null,
+      fieldUpdate: options.fieldUpdate ?? false,
     })
     files.clear()
     body.value = ''
     replyTo.value = null
+    issue.value = false
   }
 
-  return { body, replyTo, canSend, submit, ...files }
+  return { body, replyTo, issue, canSend, submit, ...files }
 }
 
 /** Gönderme çubuğu ile fotoğraf önizleme penceresi aynı taslağı paylaşır. */

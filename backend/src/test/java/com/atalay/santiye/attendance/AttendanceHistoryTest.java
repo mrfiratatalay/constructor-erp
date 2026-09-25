@@ -75,17 +75,17 @@ class AttendanceHistoryTest extends ApiTestSupport {
         assertThat(JsonPath.<List<Object>>read(overview, site.formatted(untouched) + ".today")).containsExactly((Object) null);
     }
 
+    /** Firmadaki herkes her şantiyenin geçmişini görür; bulunmayan kayıt 404, bozuk ay 400'dür. */
     @Test
-    void historyFollowsSiteVisibilityAndNeedsAValidMonth() {
+    void unknownRecordsAreNotFoundAndTheMonthMustBeValid() {
         Cookie owner = loginAsOwner();
-        String ownSite = createSite(owner, "Kendi " + UUID.randomUUID());
-        String otherSite = createSite(owner, "Başka " + UUID.randomUUID());
-        String stranger = addWorker(owner, otherSite, "Yabancı Usta");
-        Cookie lead = signedInSiteLead(owner, "Sınırlı Şef", ownSite);
+        String siteId = createSite(owner, "Geçmiş " + UUID.randomUUID());
+        Cookie lead = signedInLead(owner, "Geçmişe Bakan Şef");
+        String unknown = UUID.randomUUID().toString();
 
-        assertThat(get("/api/workers/" + stranger + "/attendance?month=" + MONTH, lead)).hasStatus(404);
-        assertThat(get("/api/sites/" + otherSite + "/attendance?month=" + MONTH, lead)).hasStatus(404);
-        assertThat(get("/api/sites/" + ownSite + "/attendance?month=eylul", lead)).hasStatus(400);
-        assertThat(contentOf(get("/api/attendance/overview", lead))).contains(ownSite).doesNotContain(otherSite);
+        assertThat(get("/api/workers/" + unknown + "/attendance?month=" + MONTH, lead)).hasStatus(404);
+        assertThat(get("/api/sites/" + unknown + "/attendance?month=" + MONTH, lead)).hasStatus(404);
+        assertThat(get("/api/sites/" + siteId + "/attendance?month=eylul", lead)).hasStatus(400);
+        assertThat(contentOf(get("/api/attendance/overview", lead))).contains(siteId);
     }
 }

@@ -3,10 +3,9 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Mic, Plus, SendHorizontal, Trash2 } from 'lucide-vue-next'
 import { durationLabel } from '@/core/format/dates'
-import { useHoldToRecord } from '@/core/gestures/useHoldToRecord'
 import { quoteOf } from '@/core/posts/postPreview'
 import type { Composer } from '@/core/posts/useComposer'
-import { useVoiceRecorder } from '@/core/posts/useVoiceRecorder'
+import { useVoiceNote } from '@/core/posts/useVoiceNote'
 import EmojiPicker from '@/desktop/molecules/EmojiPicker.vue'
 import PhotoSendDialog from '@/desktop/organisms/PhotoSendDialog.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
@@ -23,12 +22,9 @@ const { body, replyTo } = composer
 const dialogOpen = ref(false)
 const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
 const pdfInput = useTemplateRef<HTMLInputElement>('pdf')
-const recorder = useVoiceRecorder((file) => void sendVoice(file))
-const { isRecording, seconds } = recorder
-const hold = useHoldToRecord(recorder, () => ElMessage.error('Mikrofona izin verilmedi. Tarayıcı ayarlarından mikrofon iznini aç.'))
-const { locked } = hold
+const voice = useVoiceNote(composer, (problem) => ElMessage.error(problem))
+const { isRecording, seconds, locked, showMic } = voice
 const hasText = computed(() => body.value.trim() !== '')
-const showMic = computed(() => !hasText.value && recorder.isSupported)
 const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
 
 async function addFiles(files: File[]) {
@@ -53,19 +49,13 @@ function onAdd(which: string) {
 async function send() {
   if (hasText.value) await composer.submit()
 }
-
-/** Mikrofon yalnızca yazı yokken görünür: sesli not tek hareketle gider. */
-async function sendVoice(file: File) {
-  await addFiles([file])
-  await composer.submit()
-}
 </script>
 
 <template>
   <div class="composer-bar">
     <QuoteStrip v-if="quote" :quote="quote" closable @close="replyTo = null" />
     <div class="composer-bar__row">
-      <el-button v-if="isRecording && locked" circle size="large" aria-label="Kaydı sil" @click="hold.cancel">
+      <el-button v-if="isRecording && locked" circle size="large" aria-label="Kaydı sil" @click="voice.cancel">
         <Trash2 :size="18" />
       </el-button>
       <el-dropdown v-else trigger="click" placement="top-start" @command="onAdd">
@@ -86,11 +76,11 @@ async function sendVoice(file: File) {
           maxlength="4000" placeholder="Bir not yaz…" @keydown.enter.exact.prevent="send" />
         <span class="composer-bar__emoji"><EmojiPicker @pick="body += $event" /></span>
       </div>
-      <el-button v-if="isRecording && locked" circle size="large" type="primary" aria-label="Gönder" @click="hold.send">
+      <el-button v-if="isRecording && locked" circle size="large" type="primary" aria-label="Gönder" @click="voice.send">
         <SendHorizontal :size="18" />
       </el-button>
       <el-button v-else-if="showMic" circle size="large" :type="isRecording ? 'danger' : 'primary'"
-        class="composer-bar__mic" aria-label="Sesli not için basılı tut" v-bind="hold.handlers">
+        class="composer-bar__mic" aria-label="Sesli not için basılı tut" v-bind="voice.handlers">
         <Mic :size="20" />
       </el-button>
       <el-button v-else circle size="large" type="primary" :disabled="!hasText" aria-label="Gönder" @click="send">
