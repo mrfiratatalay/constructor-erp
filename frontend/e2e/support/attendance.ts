@@ -41,6 +41,11 @@ export async function takeToday(request: APIRequestContext, site: SeededSite, ab
   expect(response.status()).toBe(201)
 }
 
+/** Şantiyenin bugünkü kaydı: Yoklama ekranı bütün firmayı gösterdiği için sonuç ekrandan değil buradan okunur. */
+export async function todayOf(request: APIRequestContext, siteId: string) {
+  return (await request.get(`/api/sites/${siteId}/attendance/${TODAY}`)).json()
+}
+
 export async function postCount(request: APIRequestContext, siteId: string): Promise<number> {
   return (await (await request.get(`/api/posts?siteId=${siteId}`)).json()).items.length
 }
@@ -59,5 +64,8 @@ export function attendanceParts(page: Page, mobile: boolean) {
     sites: rowsOf(page.locator(mobile ? '.mobile-page' : '.split-view__list')),
     days: rowsOf(page.locator(mobile ? '.mobile-page' : '.site-attendance__list')),
     day: page.locator(mobile ? '.day-sheet' : '.day-detail'),
+    /** Yoklama ekranı (bugün): kişinin satırı ve ona dokununca açılan küçük seçim. */
+    rollRow: (fullName: string) => rowsOf(page.locator('.roll-group')).filter({ hasText: fullName }),
+    quickMenu: page.locator(mobile ? '.van-action-sheet:visible' : '.el-dropdown-menu:visible'),
   }
 }

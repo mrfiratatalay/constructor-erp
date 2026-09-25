@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { loginAsOwner, shellOf } from './support/app'
-import { attendanceParts, postCount, seedSite, takeToday } from './support/attendance'
+import { attendanceParts, postCount, seedSite, takeToday, todayOf } from './support/attendance'
 
-// Yoklama (TASARIM.md "Yoklama"): sohbetteki ＋'dan alınır ama sohbete düşmez; geçmişi Yoklama menüsündedir.
+// Yoklama (TASARIM.md "Yoklama"): menüden doğrudan bugünün yoklaması (şantiye seçilmez); sohbetteki ＋'dan da alınır
+// ama sohbete düşmez; geçmişi Yoklama ekranındaki "Geçmiş"tedir.
 
 test('sohbetteki ＋ → Yoklama: herkes Geldi başlar, gelmeyen nedeniyle kaydedilir, sohbete mesaj düşmez', async ({
   page,
@@ -55,7 +56,28 @@ test('aynı gün ikinci yoklama olmaz: kayıtlı yoklama dolu açılır, yeni ki
   await expect(ui.sheet.getByText('2 geldi · 1 gelmedi · 0 izinli')).toBeVisible()
 })
 
-test('Yoklama menüsü: bugünün durumu → şantiyenin ayı → gün → kişinin ayı', async ({ page, isMobile }) => {
+test('Yoklama menüsü doğrudan bugünü açar: şantiye seçilmez, gelmeyene neden seçilip kaydedilir', async ({
+  page,
+  isMobile,
+}) => {
+  await loginAsOwner(page)
+  const who = `Deniz ${Date.now() % 100000}`
+  const site = await seedSite(page.request, 'Bugünün yoklaması', [who, `Ece ${Date.now() % 100000}`])
+  const ui = attendanceParts(page, isMobile)
+
+  await shellOf(page, isMobile).getByText('Yoklama', { exact: true }).click()
+  await expect(page).toHaveURL(/\/yoklama$/)
+  await expect(page.getByText(/^Gelenler \d+$/)).toBeVisible()
+  await ui.rollRow(who).click()
+  await ui.quickMenu.getByText('Hastalık', { exact: true }).click()
+  await expect(ui.rollRow(who)).toContainText('Hasta')
+  await expect(page.getByText(/^Gelmeyenler \d+$/)).toBeVisible()
+  await page.getByRole('button', { name: 'Yoklamayı Kaydet' }).click()
+
+  await expect.poll(async () => (await todayOf(page.request, site.id)).counts).toEqual({ present: 1, absent: 1, excused: 0 })
+})
+
+test('Yoklama geçmişi: Geçmiş → şantiye → gün → kişinin ayı', async ({ page, isMobile }) => {
   await loginAsOwner(page)
   const site = await seedSite(page.request, 'Yoklama geçmişi', ['Ali Usta', 'Veli Kaya'])
   await takeToday(page.request, site, { fullName: 'Veli Kaya', reason: 'SICK', note: 'Sabah aradı' })
@@ -63,6 +85,8 @@ test('Yoklama menüsü: bugünün durumu → şantiyenin ayı → gün → kişi
 
   await shellOf(page, isMobile).getByText('Yoklama', { exact: true }).click()
   await expect(page).toHaveURL(/\/yoklama$/)
+  await page.getByRole('button', { name: 'Geçmiş', exact: true }).click()
+  await expect(page).toHaveURL(/\/yoklama\/gecmis$/)
   const siteRow = ui.sites.filter({ hasText: site.name })
   await expect(siteRow).toContainText('Bugün 1 geldi · 1 gelmedi · 0 izinli')
   await siteRow.click()
