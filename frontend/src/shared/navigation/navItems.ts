@@ -22,7 +22,7 @@ export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' |
   const profile: NavItem = { route: 'profile', label: 'Ben', icon: UserRound }
   // Yoklama ayrı modüldür: sohbete gitmez, geçmişi buradan okunur (TASARIM.md "Yoklama").
   const attendance: NavItem = { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck }
-  return platform === 'mobile' ? [sites, profile] : [sites, attendance]
+  return platform === 'mobile' ? [sites, attendance, profile] : [sites, attendance]
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */

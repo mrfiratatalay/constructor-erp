@@ -11,9 +11,9 @@ export const routes = buildRoutes({
   siteFeed: siteFeedPage,
   siteField: siteFeedPage,
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
-  // Yoklamanın mobil ekranları sonraki commit'lerde gelir; o zamana kadar bu adresler Şantiyeler'e yönlenir.
-  attendance: { redirectTo: 'sites' },
-  siteAttendance: { redirectTo: 'sites' },
-  workerAttendance: { redirectTo: 'sites' },
+  attendance: () => import('./pages/AttendancePage.vue'),
+  // Şantiye ve kişi geçmişi sonraki commit'lerde gelir; o zamana kadar bu adresler Yoklama listesine yönlenir.
+  siteAttendance: { redirectTo: 'attendance' },
+  workerAttendance: { redirectTo: 'attendance' },
   profile: () => import('./pages/ProfilePage.vue'),
 })
