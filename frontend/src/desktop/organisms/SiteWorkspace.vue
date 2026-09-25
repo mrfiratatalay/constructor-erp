@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import { EllipsisVertical, Search } from 'lucide-vue-next'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { fullDate, todayIsoDate } from '@/core/format/dates'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
@@ -10,6 +13,7 @@ import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallPopover from '@/desktop/molecules/CallPopover.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
+import AttendanceDialog from '@/desktop/organisms/AttendanceDialog.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
 import FieldColumn from '@/desktop/organisms/FieldColumn.vue'
 import FieldComposerBar from '@/desktop/organisms/FieldComposerBar.vue'
@@ -25,10 +29,12 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
  * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
  * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
+ * Sohbetin ＋ menüsündeki Yoklama bugünün yoklama penceresini açar; yoklama sohbete mesaj olarak gitmez.
  */
 type Panel = 'info' | 'search'
 
 const { siteId } = defineProps<{ siteId: string }>()
+const router = useRouter()
 const { data: site } = useGetSite(() => siteId)
 const { data: user } = useCurrentUser()
 const { previousSeenAt } = useSiteVisit(() => siteId)
@@ -42,6 +48,15 @@ const callable = computed(() => (site.value ? callablePeople(site.value, user.va
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
+const attendanceOpen = ref(false)
+
+/** Yoklama sohbete gitmez; kaydedilince kayıtlara gitmek isteğe bağlıdır (Yoklama modülü). */
+async function onAttendanceSaved(day: string) {
+  const wantsHistory = await ElMessageBox.confirm(`${fullDate(day)} tarihli yoklama kaydedildi.`, 'Yoklama kaydedildi', {
+    confirmButtonText: 'Yoklama kayıtlarını görüntüle', cancelButtonText: 'Kapat', type: 'success',
+  }).then(() => true, () => false)
+  if (wantsHistory) void router.push({ name: 'siteAttendance', params: { siteId } })
+}
 </script>
 
 <template>
@@ -72,12 +87,15 @@ const openFound = (postId: string) => openTab('chat', postId)
         @reply="composer.replyTo.value = $event" />
       <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
-        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
+        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
+          @attendance="attendanceOpen = true" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
     <SiteSearchPanel v-else-if="panel === 'search'" :site-id="siteId" @open="openFound" @close="panel = null" />
+    <AttendanceDialog v-if="site" v-model:show="attendanceOpen" :site-id="siteId" :site-name="site.name"
+      :day="todayIsoDate()" @saved="onAttendanceSaved" />
   </div>
 </template>
 

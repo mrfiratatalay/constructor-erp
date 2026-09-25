@@ -10,11 +10,13 @@ import PhotoSendSheet from '@/mobile/organisms/PhotoSendSheet.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
 /**
- * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video ya da belge), yazı, 📷 (doğrudan kamera),
+ * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video, belge ya da yoklama), yazı, 📷 (doğrudan kamera),
  * 🎤 basılı tut. 🎤'dan yukarı kaydırınca kayıt kilitlenir; sonra 🗑 ya da ➤. Yazı varken 📷 ve 🎤 yerine ➤.
  * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
+/** Yoklama sohbete mesaj göndermez: pencereyi sayfa açar (TASARIM.md "Yoklama"). */
+const emit = defineEmits<{ attendance: [] }>()
 const { body, replyTo } = composer
 const sheetOpen = ref(false)
 const menuOpen = ref(false)
@@ -25,7 +27,11 @@ const voice = useVoiceNote(composer, showFailToast)
 const { isRecording, seconds, locked, showMic } = voice
 const hasText = computed(() => body.value.trim() !== '')
 const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
-const MENU = [{ name: 'Fotoğraf ve video', key: 'gallery' }, { name: 'Belge (PDF)', key: 'pdf' }]
+const MENU = [
+  { name: 'Fotoğraf ve video', key: 'gallery' },
+  { name: 'Belge (PDF)', key: 'pdf' },
+  { name: 'Yoklama', key: 'attendance' },
+]
 
 async function addFiles(files: File[]) {
   const problems = await composer.addFiles(files)
@@ -44,7 +50,8 @@ async function onPicked(event: Event) {
 
 function onMenu(action: { key: string }) {
   menuOpen.value = false
-  ;(action.key === 'gallery' ? galleryInput : pdfInput).value?.click()
+  if (action.key === 'attendance') emit('attendance')
+  else (action.key === 'gallery' ? galleryInput : pdfInput).value?.click()
 }
 </script>
 

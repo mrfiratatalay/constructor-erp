@@ -1,3 +1,4 @@
+export * from './attendance/attendance'
 export * from './auth/auth'
 export * from './issues/issues'
 export * from './join/join'
