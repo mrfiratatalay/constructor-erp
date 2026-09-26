@@ -9,19 +9,22 @@ import { recordLabel, recordTone, type MarkChoice } from '@/core/rollcall/rollCa
 import { rowDetail } from '@/core/rollcall/todayRoll'
 import { useTodayRoll } from '@/core/rollcall/useTodayRoll'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
+import ExcelExportSheet from '@/mobile/molecules/ExcelExportSheet.vue'
 import MarkSheet from '@/mobile/molecules/MarkSheet.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
  * Yoklama sekmesi (yalnızca patron): doğrudan bugün. Bölümler iş bekleyenden başlar: Katılmayanlar
  * (İşaretle), Gelmeyenler, Gelenler (saat · şantiye). Kişiye dokununca takvimi açılır; sağdaki durum ya da
- * "İşaretle" alttan seçimi açar. Çalışanlar sohbetteki yoklama mesajından kendileri katılır.
+ * "İşaretle" alttan seçimi açar. Sağ üstteki Excel ayın dosyasını indirir. Çalışanlar sohbetteki yoklama
+ * mesajından kendileri katılır.
  */
 const router = useRouter()
 const roll = useTodayRoll()
 const { sections, summary, isEmpty, isPending } = roll
 const marking = ref<MemberDayView | null>(null)
 const sheetOpen = ref(false)
+const exportOpen = ref(false)
 const groups = computed(() =>
   [
     { key: 'missing', title: 'Katılmayanlar', members: sections.value.missing },
@@ -50,6 +53,9 @@ const openCalendar = (row: MemberDayView) =>
 
 <template>
   <MobilePage title="Yoklama" :subtitle="dayTitle(roll.day)">
+    <template #action>
+      <van-button size="small" round plain type="primary" @click="exportOpen = true">Excel</van-button>
+    </template>
     <p v-if="summary" class="attendance-page__summary">{{ summary }}</p>
     <van-skeleton v-if="isPending" :row="5" />
     <van-empty v-else-if="isEmpty" image-size="72"
@@ -68,6 +74,7 @@ const openCalendar = (row: MemberDayView) =>
         </template>
       </van-cell>
     </van-cell-group>
+    <ExcelExportSheet v-model:show="exportOpen" />
     <MarkSheet v-model:show="sheetOpen" :title="marking ? `${marking.member.fullName} · bugün` : ''"
       @choose="mark" />
   </MobilePage>

@@ -8,6 +8,7 @@ import { dayTitle } from '@/core/format/dates'
 import type { MarkChoice } from '@/core/rollcall/rollCallLabels'
 import { rowDetail } from '@/core/rollcall/todayRoll'
 import { useTodayRoll } from '@/core/rollcall/useTodayRoll'
+import ExcelExport from '@/desktop/molecules/ExcelExport.vue'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
 import MarkDropdown from '@/desktop/molecules/MarkDropdown.vue'
 import RollMemberRow from '@/desktop/molecules/RollMemberRow.vue'
@@ -17,7 +18,8 @@ import SplitView from '@/desktop/templates/SplitView.vue'
 /**
  * Yoklama (yalnızca patron), Şantiyeler ekranıyla aynı kalıp: solda bugünün listesi, sağda seçili kişinin
  * takvimi. Menüden girince doğrudan bugün açılır. Bölümler iş bekleyenden başlar: Katılmayanlar (işaretle),
- * Gelmeyenler, Gelenler (saat · şantiye). Çalışanlar sohbetteki yoklama mesajından kendileri katılır.
+ * Gelmeyenler, Gelenler (saat · şantiye). Başlıktaki Excel ayın dosyasını indirir. Çalışanlar sohbetteki
+ * yoklama mesajından kendileri katılır.
  */
 const route = useRoute()
 const roll = useTodayRoll()
@@ -44,6 +46,7 @@ async function mark(member: MemberDayView, choice: MarkChoice) {
   <SplitView>
     <template #list-header>
       <ListHeader title="Yoklama" :meta="dayTitle(roll.day)">
+        <template #action><ExcelExport /></template>
         <p v-if="summary" class="attendance-page__summary">{{ summary }}</p>
       </ListHeader>
     </template>
