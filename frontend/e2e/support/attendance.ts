@@ -50,7 +50,9 @@ export async function joinFromLink(page: Page, token: string, fullName: string) 
   await page.getByPlaceholder('Ahmet Yılmaz').fill(fullName)
   await page.getByPlaceholder('0532 123 45 67').fill(uniquePhone())
   await page.getByRole('button', { name: 'Katıl' }).click()
-  await expect(page).toHaveURL(/\/santiyeler$/)
+  // Katılma isteği bütün takım dört cihazda paralel koşarken bir kez 4 sn sürdü (200 döndü); varsayılan 5 sn
+  // bekleme, ardından sayfanın yüklenmesiyle birlikte dar kalıyor.
+  await expect(page).toHaveURL(/\/santiyeler$/, { timeout: 15_000 })
 }
 
 /** Patronun gördüğü bugünkü kaydı: kişi katılmadıysa ve işaretlenmediyse null. */
