@@ -58,9 +58,10 @@ class CompanyJoinFlowTest extends ApiTestSupport {
     }
 
     @Test
-    void onlyTheOwnerSeesTheLink() {
-        Cookie lead = signedInLead(loginAsOwner(), "Yetkisiz Şef");
+    void everyoneSharesTheLinkButOnlyTheOwnerResetsIt() {
+        Cookie lead = signedInLead(loginAsOwner(), "Paylaşan Şef");
 
-        assertThat(get("/api/company/join-link", lead)).hasStatus(403);
+        assertThat(get("/api/company/join-link", lead)).hasStatusOk();
+        assertThat(postJson("/api/company/join-link/reset", lead, "")).hasStatus(403);
     }
 }

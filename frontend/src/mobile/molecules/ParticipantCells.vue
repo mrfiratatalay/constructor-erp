@@ -9,8 +9,8 @@ import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
  * Şantiyenin katılımcıları (WhatsApp'taki grup bilgisi gibi): firmanın herkesi, en üstte "Sen", yanında rol
- * etiketi ve numarası. Patron bir kişiye dokununca alttan menü: Ara, Giriş linki gönder, Düzenle, Patron yap,
- * Firmadan çıkar; en üstte "＋ Kişi ekle" firmanın bağlantısını açar. Şef dokununca doğrudan arar.
+ * etiketi ve numarası. En üstte "＋ Kişi ekle" herkeste, firmanın bağlantısını açar. Patron bir kişiye dokununca
+ * alttan menü: Ara, Giriş linki gönder, Düzenle, Patron yap, Firmadan çıkar. Şef yanındaki 📞 ile arar.
  */
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
 const emit = defineEmits<{ add: []; act: [action: PersonAction, participant: Participant] }>()
@@ -35,7 +35,7 @@ function onAction(action: { key: string }) {
 
 <template>
   <van-cell-group inset class="participants">
-    <van-cell v-if="canManage" title="＋ Kişi ekle" clickable @click="emit('add')" />
+    <van-cell title="＋ Kişi ekle" clickable @click="emit('add')" />
     <van-cell v-for="participant in participants" :key="participant.id" :title="participant.name" center
       :label="participant.phone ? formatPhone(participant.phone) : undefined"
       :clickable="personMenu(participant, canManage).length > 0" @click="choose(participant)">

@@ -20,7 +20,7 @@ import UploadQueueCells from '@/mobile/organisms/UploadQueueCells.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Ana ekran: WhatsApp'ın sohbet listesi. Başlıkta firma adı ve ＋ (patron), altında arama; sabitlenenler üstte,
+ * Ana ekran: WhatsApp'ın sohbet listesi. Başlıkta firma adı ve ＋ (herkes), altında arama; sabitlenenler üstte,
  * sonra akışında en son bir şey olan. Satıra uzun basınca 📌 Sabitle. Tamamlananlar listenin sonunda.
  * ＋, WhatsApp'taki "Yeni sohbet" gibi tek kapıdır: Yeni şantiye · Kişi ekle (firmanın bağlantısı).
  */
@@ -34,7 +34,6 @@ const { togglePin } = useSitePins()
 const rows = computed(() => sitesInListOrder(today.value?.sites ?? []))
 const search = useSearch(rows)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
-const isOwner = computed(() => user.value?.role === 'OWNER')
 const choosing = ref(false)
 const adding = ref(false)
 const inviting = ref(false)
@@ -74,7 +73,7 @@ async function pin() {
 <template>
   <MobilePage :title="user?.companyName ?? 'Şantiyeler'" brand>
     <template #action>
-      <van-button v-if="isOwner" round size="small" class="sites__add" aria-label="Ekle" @click="choosing = true">
+      <van-button round size="small" class="sites__add" aria-label="Ekle" @click="choosing = true">
         <Plus :size="18" />
       </van-button>
     </template>
@@ -88,9 +87,9 @@ async function pin() {
         <SiteRowCell v-for="site in rows" :key="site.siteId" :site="site" :viewer-id="user?.id" @open="open"
           @menu="menuFor = $event" />
       </van-cell-group>
-      <van-empty v-else-if="today" :description="isOwner ? 'Aktif şantiye yok. İlk şantiyeni kur.' : 'Henüz şantiye kurulmadı.'">
+      <van-empty v-else-if="today" description="Aktif şantiye yok. İlk şantiyeni kur.">
         <template #image><HardHat :size="48" class="sites__empty-icon" /></template>
-        <van-button v-if="isOwner" round type="primary" @click="adding = true">İlk şantiyeni kur</van-button>
+        <van-button round type="primary" @click="adding = true">İlk şantiyeni kur</van-button>
       </van-empty>
       <van-cell-group v-if="completed.length" inset>
         <van-cell :title="`Tamamlanan ${completed.length} şantiye`" is-link

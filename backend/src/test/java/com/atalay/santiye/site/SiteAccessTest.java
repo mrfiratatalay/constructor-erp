@@ -25,17 +25,12 @@ class SiteAccessTest extends ApiTestSupport {
     }
 
     @Test
-    void onlyTheOwnerCreatesAndEditsSites() {
-        Cookie owner = loginAsOwner();
-        String siteId = createSite(owner, "Beylikdüzü Villaları");
-        Cookie lead = signedInLead(owner, "Serkan Kalfa");
+    void everyoneCreatesAndEditsSites() {
+        Cookie lead = signedInLead(loginAsOwner(), "Serkan Kalfa");
+        String siteId = createSite(lead, "Beylikdüzü Villaları");
         String edit = "{\"name\": \"Beylikdüzü Villaları\", \"status\": \"COMPLETED\"}";
 
-        assertThat(postJson("/api/sites", lead, "{\"name\": \"Yetkisiz\"}")).hasStatus(403);
-        assertThat(mvc.put().uri("/api/sites/" + siteId).cookie(lead)
-            .contentType("application/json").content(edit)).hasStatus(403);
-        assertThat(mvc.put().uri("/api/sites/" + siteId).cookie(owner)
-            .contentType("application/json").content(edit)).bodyJson()
+        assertThat(putJson("/api/sites/" + siteId, lead, edit)).bodyJson()
             .extractingPath("$.status").isEqualTo("COMPLETED");
     }
 }

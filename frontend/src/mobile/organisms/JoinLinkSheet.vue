@@ -6,11 +6,11 @@ import { copyText } from '@/core/team/loginLink'
 import { useJoinLink } from '@/core/team/useJoinLink'
 
 /**
- * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Patron onu WhatsApp grubuna atar; tıklayan
- * adını ve numarasını yazıp katılır, bütün şantiyeleri görür. Süresi dolmaz; yanlış ellere geçerse sıfırlanır.
+ * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Herkes onu WhatsApp grubuna atar; tıklayan
+ * adını ve numarasını yazıp katılır, bütün şantiyeleri görür. Süresi dolmaz; yanlış ellere geçerse patron sıfırlar.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { url, shareUrl, reset, isResetting } = useJoinLink(show)
+const { url, shareUrl, canReset, reset, isResetting } = useJoinLink(show)
 
 async function copy() {
   if (url.value && (await copyText(url.value))) showSuccessToast('Bağlantı kopyalandı')
@@ -44,7 +44,8 @@ async function confirmReset() {
       <van-button block round plain :disabled="!url" @click="copy">
         <span class="join-link__label"><Copy :size="18" />Kopyala</span>
       </van-button>
-      <van-button block size="small" :loading="isResetting" class="join-link__reset" @click="confirmReset">
+      <van-button v-if="canReset" block size="small" :loading="isResetting" class="join-link__reset"
+        @click="confirmReset">
         Bağlantıyı sıfırla
       </van-button>
     </section>
