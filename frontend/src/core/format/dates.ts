@@ -63,6 +63,17 @@ export function monthKey(isoDate?: string): string {
   return dayjs(isoDate).format('YYYY-MM')
 }
 
+/** Takvim kütüphanelerinin verdiği Date'in günü, yerel saatle: "2026-09-22" (toISOString UTC'ye kayar). */
+export function isoDayOf(date: Date): string {
+  return dayjs(date).format('YYYY-MM-DD')
+}
+
+/** Ayın ilk ve son günü (yerel gece yarısı): takvimin gösterdiği aralık. */
+export function monthBounds(month: string): { first: Date; last: Date } {
+  const first = dayjs(`${month}-01`)
+  return { first: first.toDate(), last: first.endOf('month').startOf('day').toDate() }
+}
+
 /** Önceki ya da sonraki ay: shiftMonth("2026-01", -1) → "2025-12". */
 export function shiftMonth(month: string, by: number): string {
   return dayjs(`${month}-01`).add(by, 'month').format('YYYY-MM')

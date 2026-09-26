@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { calendarClass, calendarIndex, dayDetailLines } from '@/core/rollcall/memberCalendar'
+import {
+  CALENDAR_LEGEND,
+  calendarClass,
+  calendarIndex,
+  canMarkDay,
+  dayDetailLines,
+  daySymbol,
+} from '@/core/rollcall/memberCalendar'
 
 describe('kişinin takvimi', () => {
   it('günün rengi: geldi, gelmedi, izinli, katılmadı; yoklama alınmayan gün boyanmaz', () => {
@@ -32,5 +39,25 @@ describe('kişinin takvimi', () => {
     expect(dayDetailLines({ day: '2026-09-24' })).toEqual([
       'O gün yoklama vardı; katılmadı ve işaretlenmedi.',
     ])
+  })
+})
+
+describe('takvim hücresi ve açıklaması', () => {
+  it('dar hücrede kısa işaret; açıklama her rengin adını yazar', () => {
+    expect(daySymbol({ day: '2026-09-21', record: { status: 'PRESENT' } })).toBe('✓')
+    expect(daySymbol({ day: '2026-09-24' })).toBe('–')
+    expect(daySymbol(undefined)).toBe('')
+    expect(CALENDAR_LEGEND.map((item) => `${item.symbol} ${item.label}`)).toEqual([
+      '✓ Geldi',
+      '✕ Gelmedi',
+      'İ İzinli',
+      '– Katılmadı',
+    ])
+  })
+
+  it('yoklama alınmayan günün detayı ve ileri gün', () => {
+    expect(dayDetailLines(undefined)).toEqual(['O gün yoklama alınmadı.'])
+    expect(canMarkDay('2000-01-01')).toBe(true)
+    expect(canMarkDay('2999-01-01')).toBe(false)
   })
 })

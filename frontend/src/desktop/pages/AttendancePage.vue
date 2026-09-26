@@ -11,6 +11,7 @@ import { useTodayRoll } from '@/core/rollcall/useTodayRoll'
 import ListHeader from '@/desktop/molecules/ListHeader.vue'
 import MarkDropdown from '@/desktop/molecules/MarkDropdown.vue'
 import RollMemberRow from '@/desktop/molecules/RollMemberRow.vue'
+import MemberCalendarPanel from '@/desktop/organisms/MemberCalendarPanel.vue'
 import SplitView from '@/desktop/templates/SplitView.vue'
 
 /**
@@ -63,7 +64,8 @@ async function mark(member: MemberDayView, choice: MarkChoice) {
       </section>
     </template>
     <template #detail>
-      <el-empty class="attendance-page__hint" :image-size="80"
+      <MemberCalendarPanel v-if="selectedId" :key="selectedId" :user-id="selectedId" />
+      <el-empty v-else class="attendance-page__hint" :image-size="80"
         description="Bir kişiye tıklayınca takvimi burada açılır: geldiği günler yeşil, gelmediği kırmızı, izinli sarı." />
     </template>
   </SplitView>
