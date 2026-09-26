@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { showConfirmDialog } from 'vant'
+import { useRoute } from 'vue-router'
+import { showFailToast } from 'vant'
 import { EllipsisVertical } from 'lucide-vue-next'
+import { errorMessage } from '@/core/api/errors'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { fullDate, todayIsoDate } from '@/core/format/dates'
 import { useComposer } from '@/core/posts/useComposer'
+import { useSendRollCall } from '@/core/rollcall/useSendRollCall'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallButton from '@/mobile/molecules/CallButton.vue'
 import SiteTabs from '@/mobile/molecules/SiteTabs.vue'
 import StatusNotice from '@/mobile/molecules/StatusNotice.vue'
-import AttendanceSheet from '@/mobile/organisms/AttendanceSheet.vue'
 import FeedList from '@/mobile/organisms/FeedList.vue'
 import FieldComposer from '@/mobile/organisms/FieldComposer.vue'
 import FieldList from '@/mobile/organisms/FieldList.vue'
@@ -28,10 +28,10 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * sağda 📞 (tek kişiyi doğrudan arar, çok kişide liste) ve ⋮ (Şantiye bilgisi, Bu şantiyede ara; telefonda yer
  * dar, 🔍 dışarı çıkmaz). Başlığın altında iki sekme: Sohbet ve Saha (günlük);
  * /santiyeler/:id ve /santiyeler/:id/saha bu sayfadır. İki sekmenin taslağı ayrıdır. Sayfa açılınca şantiye
- * okunmuş sayılır; alt sekmeler gizlenir.
+ * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette
+ * ona gider: çalışan mesajdan katılır.
  */
 const route = useRoute()
-const router = useRouter()
 const siteId = computed(() => String(route.params.siteId))
 const { data: site } = useGetSite(siteId)
 const { data: user } = useCurrentUser()
@@ -43,7 +43,7 @@ const fieldComposer = useComposer(target, { fieldUpdate: true })
 const infoOpen = ref(false)
 const searchOpen = ref(false)
 const moreOpen = ref(false)
-const attendanceOpen = ref(false)
+const rollCall = useSendRollCall(siteId)
 
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
 const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
@@ -57,15 +57,13 @@ function onMore(action: { key: string }) {
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
 
-/** Yoklama sohbete gitmez; kaydedilince kayıtlara gitmek isteğe bağlıdır (Yoklama sekmesi). */
-async function onAttendanceSaved(day: string) {
-  const wantsHistory = await showConfirmDialog({
-    title: 'Yoklama kaydedildi',
-    message: `${fullDate(day)} tarihli yoklama kaydedildi.`,
-    confirmButtonText: 'Yoklama kayıtlarını görüntüle',
-    cancelButtonText: 'Kapat',
-  }).then(() => true, () => false)
-  if (wantsHistory) void router.push({ name: 'siteAttendance', params: { siteId: siteId.value } })
+/** Bugün zaten atıldıysa yenisi atılmaz: sohbet o mesaja gider, şef orada görür. */
+async function sendRollCall() {
+  try {
+    openTab('chat', await rollCall.send())
+  } catch (error) {
+    showFailToast(errorMessage(error))
+  }
 }
 </script>
 
@@ -88,13 +86,11 @@ async function onAttendanceSaved(day: string) {
     <FieldList v-else-if="site" :site="site" />
     <template v-if="site" #footer>
       <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
-        @attendance="attendanceOpen = true" />
+        @roll-call="sendRollCall" />
       <FieldComposer v-else :composer="fieldComposer" />
     </template>
     <SiteInfoSheet v-if="site" v-model:show="infoOpen" :site="site" />
     <SiteSearchSheet v-model:show="searchOpen" :site-id="siteId" @open="openFound" />
-    <AttendanceSheet v-if="site" v-model:show="attendanceOpen" :site-id="siteId" :site-name="site.name"
-      :day="todayIsoDate()" @saved="onAttendanceSaved" />
     <van-action-sheet v-model:show="moreOpen" :actions="MORE" cancel-text="Vazgeç" teleport="body"
       @select="onMore" />
   </MobilePage>
