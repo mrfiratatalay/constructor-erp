@@ -18,4 +18,9 @@ interface MemberAttendanceRepository extends JpaRepository<MemberAttendance, Mem
 
     @Query("select m from MemberAttendance m where m.id.userId = :userId and m.id.day between :from and :to")
     List<MemberAttendance> findMemberBetween(UUID userId, LocalDate from, LocalDate to);
+
+    /** O aralıkta kaydı olan kişiler: firmadan sonradan çıkarılan biri de ayın dökümünde yer alır. */
+    @Query("select distinct m.id.userId from MemberAttendance m where m.companyId = :companyId "
+        + "and m.id.day between :from and :to")
+    List<UUID> findMembersBetween(UUID companyId, LocalDate from, LocalDate to);
 }
