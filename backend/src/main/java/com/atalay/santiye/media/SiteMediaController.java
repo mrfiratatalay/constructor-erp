@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,18 +36,17 @@ public class SiteMediaController {
         return library.list(user, siteId);
     }
 
+    /** Şantiye fotoğrafını firmadaki herkes değiştirir (WhatsApp'ta grup fotoğrafı gibi); kuran şef de koyabilsin. */
     @PutMapping(value = "/sites/{siteId}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('OWNER')")
-    public void changeSitePhoto(@AuthenticationPrincipal CurrentUser owner, @PathVariable UUID siteId,
+    public void changeSitePhoto(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID siteId,
         @Valid @ModelAttribute SitePhotoForm form) {
-        coverPhotos.change(owner, siteId, form.file());
+        coverPhotos.change(user, siteId, form.file());
     }
 
     @DeleteMapping("/sites/{siteId}/photo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('OWNER')")
-    public void clearSitePhoto(@AuthenticationPrincipal CurrentUser owner, @PathVariable UUID siteId) {
-        coverPhotos.clear(owner, siteId);
+    public void clearSitePhoto(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID siteId) {
+        coverPhotos.clear(user, siteId);
     }
 }

@@ -9,9 +9,9 @@ import SiteAvatar from '@/shared/atoms/SiteAvatar.vue'
 
 /**
  * Bilgi ekranının en üstündeki büyük şantiye fotoğrafı (WhatsApp'taki grup fotoğrafı). Dokununca tam ekran;
- * patron altındaki düğmeyle değiştirir ya da kaldırır.
+ * firmadaki herkes altındaki düğmeyle değiştirir ya da kaldırır.
  */
-const { site, canEdit } = defineProps<{ site: SiteView; canEdit: boolean }>()
+const { site } = defineProps<{ site: SiteView }>()
 const { changePhoto, clearPhoto, isSaving } = useSitePhoto(() => site.id)
 const input = useTemplateRef<HTMLInputElement>('input')
 const menuOpen = ref(false)
@@ -39,7 +39,7 @@ function onMenu(action: { key: string }) {
 
 function openPhoto() {
   if (site.photoUrl) showImagePreview({ images: [site.photoUrl], closeable: true })
-  else if (canEdit) menuOpen.value = true
+  else menuOpen.value = true
 }
 </script>
 
@@ -48,7 +48,7 @@ function openPhoto() {
     <button type="button" class="photo-header__photo" aria-label="Şantiye fotoğrafı" @click="openPhoto">
       <SiteAvatar :photo-url="site.photoThumbnailUrl" :size="112" />
     </button>
-    <van-button v-if="canEdit" size="small" round plain type="primary" :loading="isSaving" @click="menuOpen = true">
+    <van-button size="small" round plain type="primary" :loading="isSaving" @click="menuOpen = true">
       <Camera :size="14" class="photo-header__icon" />Fotoğraf
     </van-button>
     <input ref="input" type="file" accept="image/*" hidden @change="onPicked" />

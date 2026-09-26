@@ -6,16 +6,16 @@ import UserAvatar from '@/shared/atoms/UserAvatar.vue'
 
 /**
  * Şantiyenin katılımcıları (WhatsApp Masaüstü'ndeki grup bilgisi gibi): firmanın herkesi, en üstte "Sen", yanında
- * rol etiketi ve numarası (bilgisayar arayamaz; numara telefondan aranır). Patron satırın ⌄ menüsünden giriş linki
- * gönderir, düzeltir, patron yapar ya da firmadan çıkarır; "＋ Kişi ekle" firmanın bağlantısını açar.
- * Kimsenin durumu yazmaz.
+ * rol etiketi ve numarası (bilgisayar arayamaz; numara telefondan aranır). "＋ Kişi ekle" herkeste, firmanın
+ * bağlantısını açar. Patron satırın ⌄ menüsünden giriş linki gönderir, düzeltir, patron yapar ya da firmadan
+ * çıkarır. Kimsenin durumu yazmaz.
  */
 const { participants, canManage = false } = defineProps<{ participants: Participant[]; canManage?: boolean }>()
 const emit = defineEmits<{ add: []; act: [action: PersonAction, participant: Participant] }>()
 </script>
 
 <template>
-  <el-button v-if="canManage" plain class="participants__add" @click="emit('add')">＋ Kişi ekle</el-button>
+  <el-button plain class="participants__add" @click="emit('add')">＋ Kişi ekle</el-button>
   <ul class="participants">
     <li v-for="participant in participants" :key="participant.id" class="participants__row">
       <UserAvatar :name="participant.name" :size="36" />

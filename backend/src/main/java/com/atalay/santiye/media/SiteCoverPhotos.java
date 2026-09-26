@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Şantiyenin fotoğrafı, WhatsApp'taki grup fotoğrafı gibi: listede satırın solunda, bilgi ekranının en
- * üstünde durur. Yalnızca patron koyar; yenisi gelince eskisinin dosyası silinir.
+ * üstünde durur. Firmadaki herkes koyar ya da kaldırır; yenisi gelince eskisinin dosyası silinir.
  */
 @Service
 public class SiteCoverPhotos {
@@ -27,23 +27,23 @@ public class SiteCoverPhotos {
     }
 
     @Transactional
-    public void change(CurrentUser owner, UUID siteId, MultipartFile file) {
-        Site site = ownSite(owner, siteId);
+    public void change(CurrentUser user, UUID siteId, MultipartFile file) {
+        Site site = companySite(user, siteId);
         UUID previous = site.getPhotoMediaId();
         site.changePhoto(intake.acceptSitePhoto(site.getId(), site.getCompanyId(), file));
         removeIfPresent(previous);
     }
 
     @Transactional
-    public void clear(CurrentUser owner, UUID siteId) {
-        Site site = ownSite(owner, siteId);
+    public void clear(CurrentUser user, UUID siteId) {
+        Site site = companySite(user, siteId);
         UUID previous = site.getPhotoMediaId();
         site.changePhoto(null);
         removeIfPresent(previous);
     }
 
-    private Site ownSite(CurrentUser owner, UUID siteId) {
-        return sites.findByIdAndCompanyId(siteId, owner.companyId())
+    private Site companySite(CurrentUser user, UUID siteId) {
+        return sites.findByIdAndCompanyId(siteId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Şantiye bulunamadı."));
     }
 

@@ -38,18 +38,21 @@ public class SiteService {
         return views.of(access.requireVisible(user, siteId));
     }
 
-    /** Şantiye kurmak grup kurmaktır: akışın başına "şantiyeyi kurdu" yazılır. Kişi seçilmez: herkes içindedir. */
+    /**
+     * Şantiye kurmak grup kurmaktır: firmadaki herkes kurar, akışın başına "Musa şantiyeyi kurdu" yazılır. Kişi
+     * seçilmez: herkes içindedir.
+     */
     @Transactional
-    public SiteView createSite(CurrentUser owner, CreateSiteRequest request) {
-        Site site = new Site(owner.companyId(), request.name().trim(), blankToNull(request.address()), clock.instant());
+    public SiteView createSite(CurrentUser creator, CreateSiteRequest request) {
+        Site site = new Site(creator.companyId(), request.name().trim(), blankToNull(request.address()), clock.instant());
         sites.save(site);
-        events.record(site.getId(), SiteEventKind.CREATED, owner.userId(), null);
+        events.record(site.getId(), SiteEventKind.CREATED, creator.userId(), null);
         return views.of(site);
     }
 
     @Transactional
-    public SiteView updateSite(CurrentUser owner, UUID siteId, UpdateSiteRequest request) {
-        Site site = sites.findByIdAndCompanyId(siteId, owner.companyId())
+    public SiteView updateSite(CurrentUser user, UUID siteId, UpdateSiteRequest request) {
+        Site site = sites.findByIdAndCompanyId(siteId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Şantiye bulunamadı."));
         site.update(request.name().trim(), blankToNull(request.address()), request.status());
         return views.of(site);
