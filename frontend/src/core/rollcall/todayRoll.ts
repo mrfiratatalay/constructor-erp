@@ -31,11 +31,13 @@ export function countsLine(counts: RollCallCounts, unit = ''): string {
 }
 
 /**
- * Gelenin satırındaki ikinci satır: kendisi katıldıysa saati ve şantiyesi ("08:12 · Namık Kemal"),
- * katılmadan patron işaretlediyse kimin işaretlediği.
+ * Satırın ikinci satırı. Gelende: kendisi katıldıysa saati ve şantiyesi ("08:12 · Namık Kemal"). Patronun
+ * işaretlediği satırda (gelmedi, izinli ya da katılmadan geldi): kimin işaretlediği. Katılmayanda boş: bölümün
+ * adı zaten söylüyor (TASARIM.md İlke 3).
  */
-export function presenceLine(record: DayRecord): string {
-  if (record.checkedInAt)
+export function rowDetail(record: DayRecord | null | undefined): string {
+  if (record?.status === 'PRESENT' && record.checkedInAt) {
     return [clockTime(record.checkedInAt), record.siteName].filter(Boolean).join(' · ')
-  return record.markedByName ? `${record.markedByName} işaretledi` : ''
+  }
+  return record?.markedByName ? `${record.markedByName} işaretledi` : ''
 }

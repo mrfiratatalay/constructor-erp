@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { DayRecord, MemberDayView } from '@/core/api/generated/model'
 import { recordLabel } from '@/core/rollcall/rollCallLabels'
-import { countsLine, presenceLine, rollSections } from '@/core/rollcall/todayRoll'
+import { countsLine, rollSections, rowDetail } from '@/core/rollcall/todayRoll'
 
 const member = (fullName: string, record?: Partial<DayRecord>): MemberDayView => ({
   member: { id: fullName, fullName },
@@ -33,11 +33,15 @@ describe('patronun yoklama ekranı', () => {
     )
   })
 
-  it('gelenin satırı: kendisi katıldıysa saat ve şantiye, yoksa kimin işaretlediği', () => {
+  it('satırın ikinci satırı: katıldıysa saat ve şantiye, işaretlendiyse kim işaretledi', () => {
     expect(
-      presenceLine({ status: 'PRESENT', checkedInAt: '2026-09-27T08:12:00', siteName: 'Çamlıca' }),
+      rowDetail({ status: 'PRESENT', checkedInAt: '2026-09-27T08:12:00', siteName: 'Çamlıca' }),
     ).toBe('08:12 · Çamlıca')
-    expect(presenceLine({ status: 'PRESENT', markedByName: 'Patron' })).toBe('Patron işaretledi')
+    expect(rowDetail({ status: 'PRESENT', markedByName: 'Patron' })).toBe('Patron işaretledi')
+    expect(
+      rowDetail({ status: 'EXCUSED', checkedInAt: '2026-09-27T08:12:00', markedByName: 'Patron' }),
+    ).toBe('Patron işaretledi')
+    expect(rowDetail(undefined)).toBe('')
   })
 
   it('durum her zaman yazıyla: gelmeyende nedeni de', () => {

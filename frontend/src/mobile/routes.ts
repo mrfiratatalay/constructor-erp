@@ -12,6 +12,8 @@ export const routes = buildRoutes({
   siteField: siteFeedPage,
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   attendance: () => import('./pages/AttendancePage.vue'),
+  // Kişinin takvimi sayfası gelene kadar bugünün listesi açılır.
+  memberAttendance: { redirectTo: 'attendance' },
   siteAttendance: () => import('./pages/SiteAttendancePage.vue'),
   workerAttendance: () => import('./pages/WorkerAttendancePage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),

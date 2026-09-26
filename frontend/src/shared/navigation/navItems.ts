@@ -20,9 +20,11 @@ const SITES_LABEL: Record<CurrentUserResponseRole, string> = { OWNER: 'Şantiyel
 export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
   const sites: NavItem = { route: 'sites', label: SITES_LABEL[role], icon: HardHat }
   const profile: NavItem = { route: 'profile', label: 'Ben', icon: UserRound }
-  // Yoklama ayrı modüldür: sohbete gitmez, geçmişi buradan okunur (TASARIM.md "Yoklama").
+  // Yoklama patronun modülüdür: kimin gelip gelmediği ve geçmişi. Çalışan sohbetteki mesajdan katılır, menüde
+  // Yoklama'sı yoktur (TASARIM.md "Yoklama").
   const attendance: NavItem = { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck }
-  return platform === 'mobile' ? [sites, attendance, profile] : [sites, attendance]
+  const items = role === 'OWNER' ? [sites, attendance] : [sites]
+  return platform === 'mobile' ? [...items, profile] : items
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
@@ -30,6 +32,7 @@ const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
   siteFeed: 'sites',
   siteField: 'sites',
   siteTasks: 'sites',
+  memberAttendance: 'attendance',
   siteAttendance: 'attendance',
   workerAttendance: 'attendance',
 }
