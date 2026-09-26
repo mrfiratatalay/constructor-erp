@@ -13,7 +13,5 @@ export const routes = buildRoutes({
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   attendance: () => import('./pages/AttendancePage.vue'),
   memberAttendance: () => import('./pages/MemberAttendancePage.vue'),
-  siteAttendance: () => import('./pages/SiteAttendancePage.vue'),
-  workerAttendance: () => import('./pages/WorkerAttendancePage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

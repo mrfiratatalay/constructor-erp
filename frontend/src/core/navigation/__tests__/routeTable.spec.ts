@@ -13,8 +13,6 @@ const PAGES: PageSet = {
   siteTasks: page,
   attendance: page,
   memberAttendance: page,
-  siteAttendance: page,
-  workerAttendance: page,
   profile: page,
 }
 

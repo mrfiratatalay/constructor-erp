@@ -16,8 +16,6 @@ export const routes = buildRoutes({
   siteTasks: sitesPage,
   attendance: attendancePage,
   memberAttendance: attendancePage,
-  siteAttendance: attendancePage,
-  workerAttendance: attendancePage,
   // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
   profile: { redirectTo: 'sites' },
 })

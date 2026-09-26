@@ -28,8 +28,6 @@ export const ROUTES = {
     path: '/yoklama/kisi/:userId',
     meta: { ownerOnly: true, detail: true, title: 'Yoklama' },
   },
-  siteAttendance: { path: '/yoklama/:siteId', meta: { detail: true, title: 'Yoklama' } },
-  workerAttendance: { path: '/yoklama/:siteId/personel/:workerId', meta: { detail: true, title: 'Yoklama' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>
 

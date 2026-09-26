@@ -4,7 +4,7 @@ import {
   useGetMemberRollCallMonth,
   useMarkRollCallMember,
 } from '@/core/api/generated/roll-calls/roll-calls'
-import { useMonthParam } from '@/core/attendance/useMonthParam'
+import { useMonthParam } from '@/core/rollcall/useMonthParam'
 import { calendarIndex } from '@/core/rollcall/memberCalendar'
 import type { MarkChoice } from '@/core/rollcall/rollCallLabels'
 import { refreshRollCalls } from '@/core/rollcall/rollCallQueries'

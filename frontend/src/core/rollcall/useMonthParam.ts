@@ -5,8 +5,8 @@ import { monthKey } from '@/core/format/dates'
 const MONTH = /^\d{4}-\d{2}$/
 
 /**
- * Yoklama geçmişinde seçili ay adreste durur (?ay=2026-09): geri tuşu ve paylaşılan bağlantı aynı ayı açar,
- * gün detayından kişiye geçerken ay korunur. Adreste yoksa (ya da bozuksa) bu ay. Gelecek aya gidilmez.
+ * Kişinin yoklama takviminde seçili ay adreste durur (?ay=2026-09): geri tuşu ve paylaşılan bağlantı aynı ayı
+ * açar. Adreste yoksa (ya da bozuksa) bu ay. Gelecek aya gidilmez.
  */
 export function useMonthParam() {
   const route = useRoute()

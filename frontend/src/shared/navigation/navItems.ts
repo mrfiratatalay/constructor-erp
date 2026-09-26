@@ -33,8 +33,6 @@ const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
   siteField: 'sites',
   siteTasks: 'sites',
   memberAttendance: 'attendance',
-  siteAttendance: 'attendance',
-  workerAttendance: 'attendance',
 }
 
 export function navRouteOf(route: RouteName): RouteName {
