@@ -1,41 +1,88 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ClipboardCheck } from 'lucide-vue-next'
-import { useGetAttendanceOverview } from '@/core/api/generated/attendance/attendance'
-import { todayLine } from '@/core/attendance/attendanceSummary'
-import { dayTitle, todayIsoDate } from '@/core/format/dates'
+import { showFailToast } from 'vant'
+import { errorMessage } from '@/core/api/errors'
+import type { MemberDayView } from '@/core/api/generated/model'
+import { dayTitle } from '@/core/format/dates'
+import { recordLabel, recordTone, type MarkChoice } from '@/core/rollcall/rollCallLabels'
+import { rowDetail } from '@/core/rollcall/todayRoll'
+import { useTodayRoll } from '@/core/rollcall/useTodayRoll'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
+import MarkSheet from '@/mobile/molecules/MarkSheet.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Alt sekmedeki Yoklama: şantiyeler ve BUGÜNÜN durumu ("Bugün 10 geldi · 2 gelmedi · 0 izinli"; alınmadıysa
- * son yoklama günü). Gelmeyen varsa sağda kırmızı etiketle görünür. Şantiyeye dokununca ay ay geçmişi açılır.
+ * Yoklama sekmesi (yalnızca patron): doğrudan bugün. Bölümler iş bekleyenden başlar: Katılmayanlar
+ * (İşaretle), Gelmeyenler, Gelenler (saat · şantiye). Kişiye dokununca takvimi açılır; sağdaki durum ya da
+ * "İşaretle" alttan seçimi açar. Çalışanlar sohbetteki yoklama mesajından kendileri katılır.
  */
 const router = useRouter()
-const { data: sites, isLoading } = useGetAttendanceOverview()
-const open = (siteId: string) => router.push({ name: 'siteAttendance', params: { siteId } })
+const roll = useTodayRoll()
+const { sections, summary, isEmpty, isPending } = roll
+const marking = ref<MemberDayView | null>(null)
+const sheetOpen = ref(false)
+const groups = computed(() =>
+  [
+    { key: 'missing', title: 'Katılmayanlar', members: sections.value.missing },
+    { key: 'absent', title: 'Gelmeyenler', members: sections.value.absent },
+    { key: 'present', title: 'Gelenler', members: sections.value.present },
+  ].filter((group) => group.members.length),
+)
+
+function openMark(row: MemberDayView) {
+  marking.value = row
+  sheetOpen.value = true
+}
+
+async function mark(choice: MarkChoice) {
+  if (!marking.value) return
+  try {
+    await roll.mark(marking.value.member.id, choice)
+  } catch (error) {
+    showFailToast(errorMessage(error))
+  }
+}
+
+const openCalendar = (row: MemberDayView) =>
+  router.push({ name: 'memberAttendance', params: { userId: row.member.id } })
 </script>
 
 <template>
-  <MobilePage title="Yoklama" :subtitle="dayTitle(todayIsoDate())">
-    <van-skeleton v-if="isLoading" :row="5" />
-    <van-cell-group v-else-if="sites?.length" inset>
-      <van-cell v-for="site in sites" :key="site.siteId" :title="site.siteName" :label="todayLine(site) || undefined"
-        center is-link @click="open(site.siteId)">
+  <MobilePage title="Yoklama" :subtitle="dayTitle(roll.day)">
+    <p v-if="summary" class="attendance-page__summary">{{ summary }}</p>
+    <van-skeleton v-if="isPending" :row="5" />
+    <van-empty v-else-if="isEmpty" image-size="72"
+      description="Firmada henüz çalışan yok. Kişi ekle bağlantısıyla katılanlar burada görünür." />
+    <van-cell-group v-for="group in groups" :key="group.key" inset :title="`${group.title} ${group.members.length}`"
+      :data-testid="`roll-${group.key}`">
+      <van-cell v-for="row in group.members" :key="row.member.id" :title="row.member.fullName"
+        :label="rowDetail(row.record) || undefined" center is-link @click="openCalendar(row)">
         <template #value>
-          <StatusTag v-if="site.today?.absent" tone="danger">{{ site.today.absent }} gelmedi</StatusTag>
-          <span v-else>{{ site.workerCount }} personel</span>
+          <button v-if="row.record" type="button" class="attendance-page__status" @click.stop="openMark(row)">
+            <StatusTag :tone="recordTone(row.record)">{{ recordLabel(row.record) }}</StatusTag>
+          </button>
+          <van-button v-else size="small" round plain type="primary" @click.stop="openMark(row)">
+            İşaretle
+          </van-button>
         </template>
       </van-cell>
     </van-cell-group>
-    <van-empty v-else description="Henüz şantiye yok.">
-      <template #image><ClipboardCheck :size="48" class="attendance__empty-icon" /></template>
-    </van-empty>
+    <MarkSheet v-model:show="sheetOpen" :title="marking ? `${marking.member.fullName} · bugün` : ''"
+      @choose="mark" />
   </MobilePage>
 </template>
 
 <style scoped>
-.attendance__empty-icon {
-  color: var(--text-subtle);
+.attendance-page__summary {
+  margin: var(--space-3) var(--space-4) 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.attendance-page__status {
+  padding: 0;
+  border: 0;
+  background: none;
 }
 </style>
