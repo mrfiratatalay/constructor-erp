@@ -7,7 +7,6 @@ import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.rollcall.dto.DayRecord;
 import com.atalay.santiye.rollcall.dto.MarkMemberRequest;
 import com.atalay.santiye.rollcall.dto.MemberDayView;
-import com.atalay.santiye.rollcall.dto.RollCallCounts;
 import com.atalay.santiye.rollcall.dto.RollCallDayView;
 import com.atalay.santiye.rollcall.dto.RollCallMember;
 import com.atalay.santiye.user.AppUser;
@@ -53,7 +52,8 @@ public class RollCallDays {
             .map(member -> new MemberDayView(new RollCallMember(member.getId(), member.getFullName()),
                 byMember.get(new MemberDay(member.getId(), day))))
             .toList();
-        return new RollCallDayView(day, countsOf(members), members);
+        return new RollCallDayView(day, RollCallTally.of(members.stream().map(MemberDayView::record).toList()),
+            members);
     }
 
     @Transactional
@@ -88,17 +88,5 @@ public class RollCallDays {
         if (member.getRole() == UserRole.OWNER) {
             throw ApiException.badRequest("Patron yoklamada sayılmaz.");
         }
-    }
-
-    private static RollCallCounts countsOf(List<MemberDayView> members) {
-        return new RollCallCounts(
-            count(members, AttendanceStatus.PRESENT),
-            count(members, AttendanceStatus.ABSENT),
-            count(members, AttendanceStatus.EXCUSED),
-            members.stream().filter(member -> member.record() == null).count());
-    }
-
-    private static long count(List<MemberDayView> members, AttendanceStatus status) {
-        return members.stream().filter(member -> member.record() != null && member.record().status() == status).count();
     }
 }

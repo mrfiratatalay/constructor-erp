@@ -69,6 +69,11 @@ interface PostRepository extends JpaRepository<Post, UUID> {
     /** Şantiyenin o günkü yoklama mesajı; silinmemiş olan günde bir tanedir (posts_roll_call_uniq). */
     Optional<Post> findBySiteIdAndRollCallDayAndDeletedAtIsNull(UUID siteId, LocalDate rollCallDay);
 
+    /** Firmada yoklama mesajı atılmış günler (silinenler sayılmaz). */
+    @Query("select distinct p.rollCallDay from Post p where p.companyId = :companyId and p.deletedAt is null "
+        + "and p.rollCallDay between :from and :to")
+    List<LocalDate> findRollCallDays(UUID companyId, LocalDate from, LocalDate to);
+
     /** Şantiyenin sabit mesajları, en son sabitlenen önde (akışın üstündeki şerit). */
     @Query("select p from Post p where p.siteId = :siteId and p.pinnedAt is not null order by p.pinnedAt desc")
     List<Post> findPinned(UUID siteId);

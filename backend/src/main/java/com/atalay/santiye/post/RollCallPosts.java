@@ -7,6 +7,7 @@ import com.atalay.santiye.site.Site;
 import com.atalay.santiye.site.SiteAccess;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,12 @@ public class RollCallPosts {
             throw ApiException.notFound("Yoklama mesajı bulunamadı.");
         }
         return new RollCallMessage(post.getId(), post.getSiteId(), post.getRollCallDay());
+    }
+
+    /** Firmada yoklama mesajı atılmış günler: o gün kaydı olmayan kişi "katılmadı" sayılır. */
+    @Transactional(readOnly = true)
+    public List<LocalDate> rollCallDays(UUID companyId, LocalDate from, LocalDate to) {
+        return posts.findRollCallDays(companyId, from, to);
     }
 
     private static NewPost draft(CurrentUser user, Site site) {

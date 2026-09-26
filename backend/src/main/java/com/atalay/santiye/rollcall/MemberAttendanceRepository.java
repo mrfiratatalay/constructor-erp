@@ -15,4 +15,7 @@ interface MemberAttendanceRepository extends JpaRepository<MemberAttendance, Mem
 
     @Query("select m from MemberAttendance m where m.companyId = :companyId and m.id.day = :day")
     List<MemberAttendance> findDay(UUID companyId, LocalDate day);
+
+    @Query("select m from MemberAttendance m where m.id.userId = :userId and m.id.day between :from and :to")
+    List<MemberAttendance> findMemberBetween(UUID userId, LocalDate from, LocalDate to);
 }
