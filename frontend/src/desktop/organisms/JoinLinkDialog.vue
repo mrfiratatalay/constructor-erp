@@ -6,11 +6,11 @@ import { copyText } from '@/core/team/loginLink'
 import { useJoinLink } from '@/core/team/useJoinLink'
 
 /**
- * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Patron onu WhatsApp grubuna atar; tıklayan
- * adını ve numarasını yazıp katılır, bütün şantiyeleri görür. Süresi dolmaz; yanlış ellere geçerse sıfırlanır.
+ * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Herkes onu WhatsApp grubuna atar; tıklayan
+ * adını ve numarasını yazıp katılır, bütün şantiyeleri görür. Süresi dolmaz; yanlış ellere geçerse patron sıfırlar.
  */
 const show = defineModel<boolean>('show', { required: true })
-const { url, shareUrl, reset, isResetting } = useJoinLink(show)
+const { url, shareUrl, canReset, reset, isResetting } = useJoinLink(show)
 
 async function copy() {
   if (url.value && (await copyText(url.value))) ElMessage.success('Bağlantı kopyalandı')
@@ -42,7 +42,8 @@ async function confirmReset() {
         </el-button>
         <el-button :disabled="!url" @click="copy"><Copy :size="16" class="join-link__icon" />Kopyala</el-button>
       </div>
-      <el-button text size="small" :loading="isResetting" class="join-link__reset" @click="confirmReset">
+      <el-button v-if="canReset" text size="small" :loading="isResetting" class="join-link__reset"
+        @click="confirmReset">
         <RotateCcw :size="14" class="join-link__icon" />Bağlantıyı sıfırla
       </el-button>
     </div>

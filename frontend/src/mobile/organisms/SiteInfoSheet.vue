@@ -18,7 +18,8 @@ import SitePhotoHeader from '@/mobile/organisms/SitePhotoHeader.vue'
 
 /**
  * Şantiye bilgisi, WhatsApp'taki grup bilgisi gibi: büyük fotoğraf, ad, "Şantiye · N katılımcı", adres
- * (dokununca harita), medya ve belgeler, görevler, katılımcılar. Patron buradan düzenler, kişi ekler/çıkarır.
+ * (dokununca harita), medya ve belgeler, görevler, katılımcılar. Herkes buradan düzenler ve kişi ekler; kişileri
+ * düzeltmek, patron yapmak ve çıkarmak patronun işidir.
  */
 const show = defineModel<boolean>('show', { required: true })
 const { site } = defineProps<{ site: SiteView }>()
@@ -28,7 +29,6 @@ const library = useSiteLibrary(() => site.id)
 const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const libraryOpen = ref(false)
-const isOwner = computed(() => user.value?.role === 'OWNER')
 const participants = computed(() => siteParticipants(site, user.value))
 
 async function attempt(work: () => Promise<unknown>) {
@@ -53,14 +53,14 @@ function openStripItem(index: number) {
 <template>
   <van-popup v-model:show="show" position="bottom" round closeable teleport="body" safe-area-inset-bottom>
     <section class="site-info">
-      <SitePhotoHeader :site="site" :can-edit="isOwner" />
+      <SitePhotoHeader :site="site" />
       <header class="site-info__head">
         <h2>{{ site.name }}</h2>
         <p>Şantiye · {{ participants.length }} katılımcı{{ site.status === 'COMPLETED' ? ' · Tamamlandı' : '' }}</p>
         <a v-if="site.address" :href="mapsHref(site.address)" target="_blank" rel="noopener" class="site-info__address">
           <MapPin :size="15" />{{ site.address }}
         </a>
-        <van-button v-if="isOwner" size="small" round plain type="primary" @click="editing = true">Düzenle</van-button>
+        <van-button size="small" round plain type="primary" @click="editing = true">Düzenle</van-button>
       </header>
       <SiteMediaRow :count="library.count.value" :strip="library.strip.value" @open="libraryOpen = true"
         @open-photo="openStripItem" />

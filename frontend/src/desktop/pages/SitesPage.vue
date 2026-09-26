@@ -40,7 +40,6 @@ const selectedId = computed(() => (route.params.siteId ? String(route.params.sit
 const ordered = computed(() => sitesInListOrder(today.value?.sites ?? []))
 const search = useSearch(ordered)
 const completed = computed(() => (allSites.value ?? []).filter((site) => site.status === 'COMPLETED'))
-const isOwner = computed(() => user.value?.role === 'OWNER')
 const adding = ref(false)
 const inviting = ref(false)
 
@@ -71,7 +70,7 @@ const openPost = (post: PostView) =>
   <SplitView>
     <template #list-header>
       <ListHeader :title="user?.companyName ?? 'Şantiyeler'">
-        <template v-if="isOwner" #action>
+        <template #action>
           <el-dropdown trigger="click" placement="bottom-end" @command="onAdd">
             <el-button circle type="primary" aria-label="Ekle"><Plus :size="18" /></el-button>
             <template #dropdown>
@@ -95,8 +94,8 @@ const openPost = (post: PostView) =>
         <SiteList v-else :sites="ordered" :selected-id="selectedId" :completed="completed" :viewer-id="user?.id"
           @pin="pin" />
         <el-empty v-if="today && !today.sites.length" :image-size="72"
-          :description="isOwner ? 'Aktif şantiye yok.' : 'Henüz şantiye kurulmadı.'">
-          <el-button v-if="isOwner" type="primary" @click="adding = true">İlk şantiyeni kur</el-button>
+          description="Aktif şantiye yok.">
+          <el-button type="primary" @click="adding = true">İlk şantiyeni kur</el-button>
         </el-empty>
       </template>
     </template>

@@ -14,9 +14,8 @@ import LoginLinkDialog from '@/desktop/organisms/LoginLinkDialog.vue'
 import MemberFormDialog from '@/desktop/organisms/MemberFormDialog.vue'
 
 /**
- * Şantiyenin katılımcıları ve patronun onlarla işleri: kişi ekle (firmanın bağlantısı), giriş linki gönder,
- * düzelt, patron yap, firmadan çıkar. Herkes her şantiyede olduğu için liste her şantiyede aynıdır; ayrı bir Ekip
- * ekranı yoktur.
+ * Şantiyenin katılımcıları: herkes kişi ekler (firmanın bağlantısı); patron giriş linki gönderir, düzeltir, patron
+ * yapar, firmadan çıkarır. Herkes her şantiyede olduğu için liste her şantiyede aynıdır; ayrı bir Ekip ekranı yoktur.
  */
 const { site } = defineProps<{ site: SiteView }>()
 const { data: user } = useCurrentUser()
@@ -36,13 +35,13 @@ const confirm = (title: string, message: string, confirmButtonText: string) =>
   ElMessageBox.confirm(message, title, { confirmButtonText, cancelButtonText: 'Vazgeç', type: 'warning' })
     .then(() => true, () => false)
 
-/** Patron olan şantiye kurar, kişileri yönetir; onay penceresi bunu söyler. */
+/** Patron olan kişileri yönetir ve bağlantıyı sıfırlar; onay penceresi bunu söyler. */
 async function toggleRole(person: Participant) {
   const toOwner = person.role !== 'OWNER'
   const title = `${person.fullName} ${toOwner ? 'patron' : 'şef'} olsun mu?`
   const message = toOwner
-    ? 'Şantiye kurar, kişileri düzeltir ve çıkarır, bağlantıyı paylaşır.'
-    : 'Görmeye ve yazmaya devam eder; şantiye kuramaz, kişileri yönetemez.'
+    ? 'Kişileri düzeltir, patron yapar ve firmadan çıkarır; bağlantıyı sıfırlar.'
+    : 'Görmeye, yazmaya ve şantiye kurmaya devam eder; kişileri yönetemez.'
   if (await confirm(title, message, toOwner ? 'Patron yap' : 'Şef yap')) {
     await attempt(() => people.toggleRole(person), toOwner ? 'Patron yapıldı' : 'Şef yapıldı')
   }

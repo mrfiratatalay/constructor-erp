@@ -9,9 +9,9 @@ import SiteAvatar from '@/shared/atoms/SiteAvatar.vue'
 
 /**
  * Bilgi panelinin en üstündeki büyük şantiye fotoğrafı (WhatsApp'taki grup fotoğrafı). Tıklayınca tam ekran;
- * patron altındaki menüyle değiştirir ya da kaldırır.
+ * firmadaki herkes altındaki menüyle değiştirir ya da kaldırır.
  */
-const { site, canEdit } = defineProps<{ site: SiteView; canEdit: boolean }>()
+const { site } = defineProps<{ site: SiteView }>()
 const { changePhoto, clearPhoto, isSaving } = useSitePhoto(() => site.id)
 const input = useTemplateRef<HTMLInputElement>('input')
 const viewing = ref(false)
@@ -36,10 +36,10 @@ function onCommand(command: 'change' | 'clear') {
 <template>
   <div class="photo-header">
     <button type="button" class="photo-header__photo" aria-label="Şantiye fotoğrafı"
-      @click="site.photoUrl ? (viewing = true) : canEdit && input?.click()">
+      @click="site.photoUrl ? (viewing = true) : input?.click()">
       <SiteAvatar :photo-url="site.photoThumbnailUrl" :size="120" />
     </button>
-    <el-dropdown v-if="canEdit" trigger="click" @command="onCommand">
+    <el-dropdown trigger="click" @command="onCommand">
       <el-button size="small" :loading="isSaving"><Camera :size="14" class="photo-header__icon" />Fotoğraf</el-button>
       <template #dropdown>
         <el-dropdown-menu>

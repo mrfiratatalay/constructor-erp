@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Bağlantıyı yalnızca patron görür ve sıfırlar; açmak ve katılmak herkese açıktır (kimlik bağlantının kendisidir). */
+/**
+ * Bağlantıyı firmadaki herkes paylaşır, yalnızca patron sıfırlar; açmak ve katılmak herkese açıktır (kimlik
+ * bağlantının kendisidir).
+ */
 @RestController
 @Tag(name = "Join")
 public class CompanyJoinController {
@@ -34,12 +37,13 @@ public class CompanyJoinController {
         this.cookies = cookies;
     }
 
+    /** Bağlantıyı firmadaki herkes görür ve paylaşır: çalışan da yeni gelen arkadaşını getirebilsin. */
     @GetMapping("/company/join-link")
-    @PreAuthorize("hasRole('OWNER')")
-    public JoinLink getJoinLink(@AuthenticationPrincipal CurrentUser owner) {
-        return joins.link(owner);
+    public JoinLink getJoinLink(@AuthenticationPrincipal CurrentUser user) {
+        return joins.link(user);
     }
 
+    /** Sıfırlamak yalnızca patronun işi: herkesin elindeki bağlantıyı öldürür, yanlışlıkla basılmasın. */
     @PostMapping("/company/join-link/reset")
     @PreAuthorize("hasRole('OWNER')")
     public JoinLink resetJoinLink(@AuthenticationPrincipal CurrentUser owner) {

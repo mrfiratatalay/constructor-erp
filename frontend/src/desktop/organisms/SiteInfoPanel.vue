@@ -29,7 +29,6 @@ const library = useSiteLibrary(() => site.id)
 const { open: openTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const showingLibrary = ref(false)
-const isOwner = computed(() => user.value?.role === 'OWNER')
 const participants = computed(() => siteParticipants(site, user.value))
 
 async function attempt(work: () => Promise<unknown>) {
@@ -53,12 +52,12 @@ const save = (form: SiteForm) =>
     <el-scrollbar class="info-panel__body">
       <SiteLibraryPanel v-if="showingLibrary" :site-id="site.id" @back="showingLibrary = false" />
       <div v-else class="info-panel__content">
-        <SitePhotoHeader :site="site" :can-edit="isOwner" />
+        <SitePhotoHeader :site="site" />
         <div class="info-panel__head">
           <h2>{{ site.name }}</h2>
           <p>Şantiye · {{ participants.length }} katılımcı{{ site.status === 'COMPLETED' ? ' · Tamamlandı' : '' }}</p>
           <a v-if="site.address" :href="mapsHref(site.address)" target="_blank" rel="noopener"><MapPin :size="14" />{{ site.address }}</a>
-          <el-button v-if="isOwner" size="small" @click="editing = true">Düzenle</el-button>
+          <el-button size="small" @click="editing = true">Düzenle</el-button>
         </div>
         <el-divider />
         <button type="button" class="info-panel__row" @click="showingLibrary = true">

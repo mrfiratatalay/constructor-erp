@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Firmaya katılma bağlantısı, WhatsApp'taki grup bağlantısı gibi: firma başına tek, süresiz, çok kullanımlık.
- * Patron onu WhatsApp grubuna atar; tıklayan adını ve numarasını yazar, katılır ve bütün şantiyeleri görür.
- * Sızarsa patron sıfırlar; eski bağlantı çalışmaz. Patron istediği zaman yeniden paylaşabilsin diye anahtarın
- * kendisi saklanır (oturum ve giriş linkinde olduğu gibi yalnızca özeti değil).
+ * Firmadaki herkes onu WhatsApp grubuna atabilir; tıklayan adını ve numarasını yazar, katılır ve bütün
+ * şantiyeleri görür. Sızarsa patron sıfırlar; eski bağlantı çalışmaz. İstendiği zaman yeniden paylaşılabilsin
+ * diye anahtarın kendisi saklanır (oturum ve giriş linkinde olduğu gibi yalnızca özeti değil).
  */
 @Service
 public class CompanyJoinService {
@@ -40,10 +40,10 @@ public class CompanyJoinService {
         this.properties = properties;
     }
 
-    /** İlk istendiğinde üretilir, sonra hep aynıdır. */
+    /** İlk istendiğinde üretilir, sonra hep aynıdır. Firmadaki herkes paylaşır. */
     @Transactional
-    public JoinLink link(CurrentUser owner) {
-        Company company = companyOf(owner);
+    public JoinLink link(CurrentUser user) {
+        Company company = companyOf(user);
         if (company.getJoinToken() == null) {
             company.renewJoinToken(SecureTokens.generate());
         }
@@ -78,8 +78,8 @@ public class CompanyJoinService {
         return new Joined(newcomer);
     }
 
-    private Company companyOf(CurrentUser owner) {
-        return companies.findById(owner.companyId()).orElseThrow(() -> ApiException.notFound("Firma bulunamadı."));
+    private Company companyOf(CurrentUser user) {
+        return companies.findById(user.companyId()).orElseThrow(() -> ApiException.notFound("Firma bulunamadı."));
     }
 
     private Company byToken(String token) {

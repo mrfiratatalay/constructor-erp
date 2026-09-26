@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,17 +40,20 @@ public class SiteController {
         return sites.getSite(user, siteId);
     }
 
+    /**
+     * Şantiyeyi firmadaki herkes kurar ve düzenler (WhatsApp'ta grubun adını her katılımcı değiştirebildiği gibi):
+     * sahaya ilk giden şef de kurabilsin, yazım hatasını kendisi düzeltebilsin.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('OWNER')")
-    public SiteView createSite(@AuthenticationPrincipal CurrentUser owner, @Valid @RequestBody CreateSiteRequest request) {
-        return sites.createSite(owner, request);
+    public SiteView createSite(@AuthenticationPrincipal CurrentUser creator,
+        @Valid @RequestBody CreateSiteRequest request) {
+        return sites.createSite(creator, request);
     }
 
     @PutMapping("/{siteId}")
-    @PreAuthorize("hasRole('OWNER')")
-    public SiteView updateSite(@AuthenticationPrincipal CurrentUser owner, @PathVariable UUID siteId,
+    public SiteView updateSite(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID siteId,
         @Valid @RequestBody UpdateSiteRequest request) {
-        return sites.updateSite(owner, siteId, request);
+        return sites.updateSite(user, siteId, request);
     }
 }
