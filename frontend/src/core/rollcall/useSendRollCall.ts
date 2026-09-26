@@ -9,7 +9,9 @@ import { refreshPostViews } from '@/core/posts/refreshPostViews'
  */
 export function useSendRollCall(siteId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
-  const open = useOpenTodaysRollCall({ mutation: { onSuccess: () => refreshPostViews(queryClient, toValue(siteId)) } })
+  const open = useOpenTodaysRollCall({
+    mutation: { onSuccess: () => refreshPostViews(queryClient, toValue(siteId)) },
+  })
   return {
     send: async () => (await open.mutateAsync({ siteId: toValue(siteId) })).id,
     isSending: open.isPending,

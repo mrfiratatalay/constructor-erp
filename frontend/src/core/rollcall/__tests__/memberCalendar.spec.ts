@@ -29,6 +29,8 @@ describe('kişinin takvimi', () => {
         },
       }),
     ).toEqual(['Yoklamaya kendisi katıldı · 08:12 · Çamlıca', 'Patron işaretledi · 22 Eylül 10:40'])
-    expect(dayDetailLines({ day: '2026-09-24' })).toEqual(['O gün yoklama vardı; katılmadı ve işaretlenmedi.'])
+    expect(dayDetailLines({ day: '2026-09-24' })).toEqual([
+      'O gün yoklama vardı; katılmadı ve işaretlenmedi.',
+    ])
   })
 })

@@ -1,6 +1,9 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
-import { useGetMemberRollCallMonth, useMarkRollCallMember } from '@/core/api/generated/roll-calls/roll-calls'
+import {
+  useGetMemberRollCallMonth,
+  useMarkRollCallMember,
+} from '@/core/api/generated/roll-calls/roll-calls'
 import { useMonthParam } from '@/core/attendance/useMonthParam'
 import { calendarIndex } from '@/core/rollcall/memberCalendar'
 import type { MarkChoice } from '@/core/rollcall/rollCallLabels'
@@ -14,8 +17,12 @@ import { countsLine } from '@/core/rollcall/todayRoll'
 export function useMemberMonth(userId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
   const { month, setMonth, isCurrentMonth } = useMonthParam()
-  const { data, isPending, error } = useGetMemberRollCallMonth(userId, () => ({ month: month.value }))
-  const mark = useMarkRollCallMember({ mutation: { onSuccess: () => refreshRollCalls(queryClient) } })
+  const { data, isPending, error } = useGetMemberRollCallMonth(userId, () => ({
+    month: month.value,
+  }))
+  const mark = useMarkRollCallMember({
+    mutation: { onSuccess: () => refreshRollCalls(queryClient) },
+  })
   return {
     month,
     setMonth,

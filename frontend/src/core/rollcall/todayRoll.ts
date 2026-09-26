@@ -21,7 +21,11 @@ export function rollSections(members: MemberDayView[]): RollSections {
 
 /** "8 geldi · 1 gelmedi · 1 izinli · 2 katılmadı"; katılmayan yoksa son parça yazılmaz. */
 export function countsLine(counts: RollCallCounts, unit = ''): string {
-  const parts = [`${counts.present}${unit} geldi`, `${counts.absent}${unit} gelmedi`, `${counts.excused}${unit} izinli`]
+  const parts = [
+    `${counts.present}${unit} geldi`,
+    `${counts.absent}${unit} gelmedi`,
+    `${counts.excused}${unit} izinli`,
+  ]
   if (counts.missing) parts.push(`${counts.missing}${unit} katılmadı`)
   return parts.join(' · ')
 }
@@ -31,6 +35,7 @@ export function countsLine(counts: RollCallCounts, unit = ''): string {
  * katılmadan patron işaretlediyse kimin işaretlediği.
  */
 export function presenceLine(record: DayRecord): string {
-  if (record.checkedInAt) return [clockTime(record.checkedInAt), record.siteName].filter(Boolean).join(' · ')
+  if (record.checkedInAt)
+    return [clockTime(record.checkedInAt), record.siteName].filter(Boolean).join(' · ')
   return record.markedByName ? `${record.markedByName} işaretledi` : ''
 }

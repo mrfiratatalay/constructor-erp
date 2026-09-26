@@ -1,4 +1,8 @@
-import type { DayRecord, MarkMemberRequest, MarkMemberRequestReason } from '@/core/api/generated/model'
+import type {
+  DayRecord,
+  MarkMemberRequest,
+  MarkMemberRequestReason,
+} from '@/core/api/generated/model'
 import type { StatusTone } from '@/core/format/statusTone'
 
 /** Üretilen tip "neden yok"u (null) da içerir; neden adları için yalnızca gerçek nedenler. */

@@ -21,7 +21,11 @@ export function dayDetailLines(day: MemberCalendarDay): string[] {
   if (!record) return ['O gün yoklama vardı; katılmadı ve işaretlenmedi.']
   const lines: string[] = []
   if (record.checkedInAt) {
-    lines.push(['Yoklamaya kendisi katıldı', clockTime(record.checkedInAt), record.siteName].filter(Boolean).join(' · '))
+    lines.push(
+      ['Yoklamaya kendisi katıldı', clockTime(record.checkedInAt), record.siteName]
+        .filter(Boolean)
+        .join(' · '),
+    )
   }
   if (record.markedByName && record.markedAt) {
     lines.push(`${record.markedByName} işaretledi · ${dateTime(record.markedAt)}`)

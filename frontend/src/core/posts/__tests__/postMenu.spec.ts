@@ -21,13 +21,24 @@ const post = (fields: Partial<PostView> = {}): PostView => ({
 
 describe('yoklama mesajı', () => {
   it('menüsünde yalnızca sabitle, bilgi ve sil: yazısı yok, iletilmez, sahaya girmez', () => {
-    const actions = postMenu(post({ body: null, rollCallDay: '2026-09-27' }), lead).map((item) => item.action)
+    const actions = postMenu(post({ body: null, rollCallDay: '2026-09-27' }), lead).map(
+      (item) => item.action,
+    )
     expect(actions).toEqual(['pin', 'info', 'delete'])
   })
 
   it('düz mesajın menüsü değişmez', () => {
     const actions = postMenu(post(), lead).map((item) => item.action)
-    expect(actions).toEqual(['reply', 'copy', 'forward', 'pin', 'field', 'info', 'correct', 'delete'])
+    expect(actions).toEqual([
+      'reply',
+      'copy',
+      'forward',
+      'pin',
+      'field',
+      'info',
+      'correct',
+      'delete',
+    ])
   })
 
   it('listede ve sabit şeritte adıyla görünür', () => {

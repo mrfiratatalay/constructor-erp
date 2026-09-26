@@ -15,10 +15,17 @@ export function useRollCallCard(post: MaybeRefOrGetter<PostView>) {
   const { data: user } = useCurrentUser()
   const postId = computed(() => toValue(post).id)
   const { data: view } = useGetRollCall(postId)
-  const checkIn = useCheckInToRollCall({ mutation: { onSuccess: () => refreshRollCalls(queryClient) } })
+  const checkIn = useCheckInToRollCall({
+    mutation: { onSuccess: () => refreshRollCalls(queryClient) },
+  })
   const card = computed(() => {
     const current = toValue(post)
-    return rollCallCard(current.rollCallDay ?? '', view.value, user.value?.role === 'OWNER', current.site.name)
+    return rollCallCard(
+      current.rollCallDay ?? '',
+      view.value,
+      user.value?.role === 'OWNER',
+      current.site.name,
+    )
   })
   return {
     card,
