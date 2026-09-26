@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +33,7 @@ public class Post {
     private UUID pinnedBy;
     @Column(name = "is_field_update")
     private boolean fieldUpdate;
+    private LocalDate rollCallDay;
 
     protected Post() {
     }
@@ -47,6 +49,17 @@ public class Post {
         this.forwarded = post.forwarded();
         this.fieldUpdate = post.fieldUpdate();
         this.createdAt = createdAt;
+    }
+
+    /** Sohbetteki yoklama mesajı: yazısı yoktur, günün yoklamasını açar (RollCallPosts). */
+    static Post rollCall(NewPost post, LocalDate day, Instant createdAt) {
+        Post rollCall = new Post(post, createdAt);
+        rollCall.rollCallDay = day;
+        return rollCall;
+    }
+
+    boolean isRollCall() {
+        return rollCallDay != null;
     }
 
     public boolean isOpenIssue() {
@@ -169,5 +182,9 @@ public class Post {
 
     public boolean isFieldUpdate() {
         return fieldUpdate;
+    }
+
+    public LocalDate getRollCallDay() {
+        return rollCallDay;
     }
 }

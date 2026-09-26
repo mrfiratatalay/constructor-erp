@@ -3,8 +3,10 @@ package com.atalay.santiye.post;
 import com.atalay.santiye.common.persistence.SiteCount;
 import com.atalay.santiye.common.persistence.SiteMoment;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,6 +65,9 @@ interface PostRepository extends JpaRepository<Post, UUID> {
         + "where p.siteId in :siteIds and p.issue = true and p.resolvedAt is null and p.deletedAt is null "
         + "group by p.siteId")
     List<SiteMoment> findOldestOpenIssueAt(Collection<UUID> siteIds);
+
+    /** Şantiyenin o günkü yoklama mesajı; silinmemiş olan günde bir tanedir (posts_roll_call_uniq). */
+    Optional<Post> findBySiteIdAndRollCallDayAndDeletedAtIsNull(UUID siteId, LocalDate rollCallDay);
 
     /** Şantiyenin sabit mesajları, en son sabitlenen önde (akışın üstündeki şerit). */
     @Query("select p from Post p where p.siteId = :siteId and p.pinnedAt is not null order by p.pinnedAt desc")

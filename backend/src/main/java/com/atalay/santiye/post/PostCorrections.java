@@ -57,6 +57,9 @@ public class PostCorrections {
         if (post.isDeleted()) {
             throw ApiException.conflict("Silinmiş gönderi düzeltilemez.");
         }
+        if (post.isRollCall()) {
+            throw ApiException.conflict("Yoklama mesajı düzeltilemez.");
+        }
     }
 
     /** Çözülmüş sorunun işareti değişmez; yazısı silinen gönderinin de fotoğrafı ya da sesi kalmalı. */
