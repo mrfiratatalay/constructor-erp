@@ -9,9 +9,7 @@ import com.atalay.santiye.rollcall.dto.RollCallView;
 import com.atalay.santiye.site.Site;
 import com.atalay.santiye.site.SiteRepository;
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,17 +51,9 @@ public class RollCallCheckIns {
         }
         MemberDay id = new MemberDay(user.userId(), message.day());
         MemberAttendance day = attendance.findById(id).orElseGet(() -> new MemberAttendance(id, user.companyId()));
-        day.checkIn(message.siteId(), now());
+        day.checkIn(message.siteId(), clock.instant());
         attendance.save(day);
         return viewOf(user, message);
-    }
-
-    /**
-     * Saniyeye kırpılır: veritabanı saati mikro saniyeye yuvarlar; kırpılmasa katılınca dönen saat, sonraki
-     * okumalardakinden birkaç nanosaniye farklı olurdu.
-     */
-    private Instant now() {
-        return clock.instant().truncatedTo(ChronoUnit.SECONDS);
     }
 
     private RollCallView viewOf(CurrentUser user, RollCallMessage message) {

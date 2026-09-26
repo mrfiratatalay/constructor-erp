@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
@@ -47,7 +48,7 @@ class MemberAttendance {
         this.reason = null;
         if (checkedInAt == null) {
             this.siteId = atSiteId;
-            this.checkedInAt = at;
+            this.checkedInAt = toSeconds(at);
         }
     }
 
@@ -56,11 +57,15 @@ class MemberAttendance {
         this.status = newStatus;
         this.reason = newReason;
         this.markedBy = by;
-        this.markedAt = at;
+        this.markedAt = toSeconds(at);
     }
 
-    boolean hasCheckedIn() {
-        return checkedInAt != null && status == AttendanceStatus.PRESENT;
+    /**
+     * Saatler saniyeye kırpılır: veritabanı mikro saniyeye yuvarlar; kırpılmasa kaydedince dönen saat, sonraki
+     * okumalardakinden birkaç nanosaniye farklı olurdu.
+     */
+    private static Instant toSeconds(Instant at) {
+        return at.truncatedTo(ChronoUnit.SECONDS);
     }
 
     MemberDay getId() {
