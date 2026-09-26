@@ -21,11 +21,17 @@ const REASONS: Record<AbsenceReason, string> = {
   OTHER: 'Diğer',
 }
 
+export interface MarkChoice {
+  key: string
+  label: string
+  request: MarkMemberRequest
+}
+
 /**
  * Patronun küçük seçimi, tek dokunuş: gelmeme nedeni ayrı bir adım değildir, seçeneğin kendisidir. İzinli
  * arka planda ayrı bir durumdur (EXCUSED) ama kullanıcı onu "neden gelmedi?" sorusunun cevabı olarak görür.
  */
-export const MARK_CHOICES: { key: string; label: string; request: MarkMemberRequest }[] = [
+export const MARK_CHOICES: MarkChoice[] = [
   { key: 'PRESENT', label: 'Geldi', request: { status: 'PRESENT' } },
   { key: 'SICK', label: 'Hastalık', request: { status: 'ABSENT', reason: 'SICK' } },
   { key: 'EXCUSED', label: 'İzinli', request: { status: 'EXCUSED' } },
