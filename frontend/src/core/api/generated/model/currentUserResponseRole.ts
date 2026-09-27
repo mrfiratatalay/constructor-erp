@@ -11,4 +11,5 @@ export type CurrentUserResponseRole =
 export const CurrentUserResponseRole = {
   OWNER: 'OWNER',
   SITE_LEAD: 'SITE_LEAD',
+  WORKER: 'WORKER',
 } as const

@@ -1,95 +1,49 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { showFailToast } from 'vant'
-import { errorMessage } from '@/core/api/errors'
-import type { MemberDayView } from '@/core/api/generated/model'
-import { dayTitle } from '@/core/format/dates'
-import { recordLabel, recordTone, type MarkChoice } from '@/core/rollcall/rollCallLabels'
-import { rowDetail } from '@/core/rollcall/todayRoll'
-import { useTodayRoll } from '@/core/rollcall/useTodayRoll'
-import StatusTag from '@/mobile/atoms/StatusTag.vue'
-import ExcelExportSheet from '@/mobile/molecules/ExcelExportSheet.vue'
-import MarkSheet from '@/mobile/molecules/MarkSheet.vue'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { dayTitle, todayIsoDate } from '@/core/format/dates'
+import { usePuantajTab, type PuantajTab } from '@/core/puantaj/usePuantajTab'
+import MonthPanel from '@/mobile/organisms/MonthPanel.vue'
+import RosterEntrySheet from '@/mobile/organisms/RosterEntrySheet.vue'
+import TodayPanel from '@/mobile/organisms/TodayPanel.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Yoklama sekmesi (yalnızca patron): doğrudan bugün. Bölümler iş bekleyenden başlar: Katılmayanlar
- * (İşaretle), Gelmeyenler, Gelenler (saat · şantiye). Kişiye dokununca takvimi açılır; sağdaki durum ya da
- * "İşaretle" alttan seçimi açar. Sağ üstteki Excel ayın dosyasını indirir. Çalışanlar sohbetteki yoklama
- * mesajından kendileri katılır.
+ * Yoklama sekmesi (patron ve şef): firmanın puantajı, şantiyeye bağlı değil. Bugün sekmesi şefin sabahı
+ * ("Seç" ile toplu işaretleme), Puantaj sekmesi ay sonunun özeti. ＋ uygulaması olmayan kişiyi ya da taşeron
+ * ekibi listeye ekler. Bir ada dokununca o kişinin ya da ekibin ayı açılır.
  */
+const route = useRoute()
 const router = useRouter()
-const roll = useTodayRoll()
-const { sections, summary, isEmpty, isPending } = roll
-const marking = ref<MemberDayView | null>(null)
-const sheetOpen = ref(false)
-const exportOpen = ref(false)
-const groups = computed(() =>
-  [
-    { key: 'missing', title: 'Katılmayanlar', members: sections.value.missing },
-    { key: 'absent', title: 'Gelmeyenler', members: sections.value.absent },
-    { key: 'present', title: 'Gelenler', members: sections.value.present },
-  ].filter((group) => group.members.length),
-)
+const { tab, setTab } = usePuantajTab()
+const selecting = ref(false)
+const formOpen = ref(false)
 
-function openMark(row: MemberDayView) {
-  marking.value = row
-  sheetOpen.value = true
-}
+watch(tab, () => (selecting.value = false))
 
-async function mark(choice: MarkChoice) {
-  if (!marking.value) return
-  try {
-    await roll.mark(marking.value.member.id, choice)
-  } catch (error) {
-    showFailToast(errorMessage(error))
-  }
-}
-
-const openCalendar = (row: MemberDayView) =>
-  router.push({ name: 'memberAttendance', params: { userId: row.member.id } })
+const openEntry = (entryId: string) =>
+  router.push({ name: 'memberAttendance', params: { entryId }, query: route.query })
 </script>
 
 <template>
-  <MobilePage title="Yoklama" :subtitle="dayTitle(roll.day)">
+  <MobilePage title="Yoklama" :subtitle="dayTitle(todayIsoDate())">
     <template #action>
-      <van-button size="small" round plain type="primary" @click="exportOpen = true">Excel</van-button>
+      <van-space :size="8">
+        <van-button v-if="tab === 'today'" size="small" round plain type="primary" @click="selecting = !selecting">
+          {{ selecting ? 'Bitti' : 'Seç' }}
+        </van-button>
+        <van-button size="small" round type="primary" icon="plus" aria-label="Kişi ya da ekip ekle"
+          @click="formOpen = true" />
+      </van-space>
     </template>
-    <p v-if="summary" class="attendance-page__summary">{{ summary }}</p>
-    <van-skeleton v-if="isPending" :row="5" />
-    <van-empty v-else-if="isEmpty" image-size="72"
-      description="Firmada henüz çalışan yok. Kişi ekle bağlantısıyla katılanlar burada görünür." />
-    <van-cell-group v-for="group in groups" :key="group.key" inset :title="`${group.title} ${group.members.length}`"
-      :data-testid="`roll-${group.key}`">
-      <van-cell v-for="row in group.members" :key="row.member.id" :title="row.member.fullName"
-        :label="rowDetail(row.record) || undefined" center is-link @click="openCalendar(row)">
-        <template #value>
-          <button v-if="row.record" type="button" class="attendance-page__status" @click.stop="openMark(row)">
-            <StatusTag :tone="recordTone(row.record)">{{ recordLabel(row.record) }}</StatusTag>
-          </button>
-          <van-button v-else size="small" round plain type="primary" @click.stop="openMark(row)">
-            İşaretle
-          </van-button>
-        </template>
-      </van-cell>
-    </van-cell-group>
-    <ExcelExportSheet v-model:show="exportOpen" />
-    <MarkSheet v-model:show="sheetOpen" :title="marking ? `${marking.member.fullName} · bugün` : ''"
-      @choose="mark" />
+    <van-tabs :active="tab" @update:active="(name: PuantajTab) => setTab(name)">
+      <van-tab title="Bugün" name="today">
+        <TodayPanel :selecting="selecting" @open="openEntry" @done="selecting = false" />
+      </van-tab>
+      <van-tab title="Puantaj" name="month">
+        <MonthPanel @open="openEntry" />
+      </van-tab>
+    </van-tabs>
+    <RosterEntrySheet v-model:show="formOpen" />
   </MobilePage>
 </template>
-
-<style scoped>
-.attendance-page__summary {
-  margin: var(--space-3) var(--space-4) 0;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-}
-
-.attendance-page__status {
-  padding: 0;
-  border: 0;
-  background: none;
-}
-</style>

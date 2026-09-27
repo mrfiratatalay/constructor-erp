@@ -1,11 +1,13 @@
 import type { PostMenuItem } from '@/core/posts/postMenu'
 import type { Participant } from '@/core/sites/participants'
+import { roleActions, type RoleAction } from '@/core/team/roleChange'
 
-export type PersonAction = 'loginLink' | 'edit' | 'toggleRole' | 'remove'
+export type PersonAction = 'loginLink' | 'edit' | RoleAction | 'remove'
 
 /**
  * Katılımcıya dokununca (masaüstünde ⌄) patronun menüsü. Kendi satırında yalnızca kendi adı ve numarası: patron
- * kendini çıkaramaz, kendi rolünü değiştiremez (firmada her zaman bir patron kalır). Şef bu menüyü görmez; arar.
+ * kendini çıkaramaz, kendi rolünü değiştiremez (firmada her zaman bir patron kalır). Kişinin sahip olmadığı iki
+ * rol seçilebilir (Patron, Şef, Çalışan). Şef ve çalışan bu menüyü görmez; arar.
  */
 export function personMenu(person: Participant, canManage: boolean): PostMenuItem<PersonAction>[] {
   if (!canManage) return []
@@ -13,7 +15,7 @@ export function personMenu(person: Participant, canManage: boolean): PostMenuIte
   return [
     { action: 'loginLink', label: 'Giriş linki gönder' },
     { action: 'edit', label: 'Düzenle' },
-    { action: 'toggleRole', label: person.role === 'OWNER' ? 'Şef yap' : 'Patron yap' },
+    ...roleActions(person.role),
     { action: 'remove', label: 'Firmadan çıkar', danger: true },
   ]
 }

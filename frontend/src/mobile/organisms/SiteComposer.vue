@@ -10,13 +10,11 @@ import PhotoSendSheet from '@/mobile/organisms/PhotoSendSheet.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
 /**
- * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video, belge ya da yoklama), yazı, 📷 (doğrudan kamera),
+ * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video ya da belge), yazı, 📷 (doğrudan kamera),
  * 🎤 basılı tut. 🎤'dan yukarı kaydırınca kayıt kilitlenir; sonra 🗑 ya da ➤. Yazı varken 📷 ve 🎤 yerine ➤.
  * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
-/** Yoklama bir ek değildir: sohbete günün yoklama mesajını ister; mesajı sayfa atar (TASARIM.md "Yoklama"). */
-const emit = defineEmits<{ rollCall: [] }>()
 const { body, replyTo } = composer
 const sheetOpen = ref(false)
 const menuOpen = ref(false)
@@ -30,7 +28,6 @@ const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
 const MENU = [
   { name: 'Fotoğraf ve video', key: 'gallery' },
   { name: 'Belge (PDF)', key: 'pdf' },
-  { name: 'Yoklama', key: 'rollCall' },
 ]
 
 async function addFiles(files: File[]) {
@@ -50,8 +47,8 @@ async function onPicked(event: Event) {
 
 function onMenu(action: { key: string }) {
   menuOpen.value = false
-  if (action.key === 'rollCall') emit('rollCall')
-  else (action.key === 'gallery' ? galleryInput : pdfInput).value?.click()
+  const input = action.key === 'gallery' ? galleryInput : pdfInput
+  input.value?.click()
 }
 </script>
 

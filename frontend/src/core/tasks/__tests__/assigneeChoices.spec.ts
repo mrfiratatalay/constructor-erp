@@ -10,6 +10,7 @@ const SITE: SiteView = {
     { id: 'ahmet', fullName: 'Ahmet Usta' },
     { id: 'mehmet', fullName: 'Mehmet Kalfa' },
   ],
+  workers: [],
   owners: [{ id: 'patron', fullName: 'Patron' }],
 }
 const OWNER: CurrentUserResponse = { id: 'patron', fullName: 'Patron', role: 'OWNER', companyName: 'Kızılkan' }

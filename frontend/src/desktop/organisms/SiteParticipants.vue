@@ -7,6 +7,7 @@ import { useCurrentUser } from '@/core/auth/currentUser'
 import { siteParticipants, type Participant } from '@/core/sites/participants'
 import type { MemberForm } from '@/core/team/memberForm'
 import type { PersonAction } from '@/core/team/personMenu'
+import { ROLE_OF_ACTION, roleChangeCopy, type RoleAction } from '@/core/team/roleChange'
 import { usePeople } from '@/core/team/usePeople'
 import ParticipantList from '@/desktop/molecules/ParticipantList.vue'
 import JoinLinkDialog from '@/desktop/organisms/JoinLinkDialog.vue'
@@ -14,8 +15,8 @@ import LoginLinkDialog from '@/desktop/organisms/LoginLinkDialog.vue'
 import MemberFormDialog from '@/desktop/organisms/MemberFormDialog.vue'
 
 /**
- * Şantiyenin katılımcıları: herkes kişi ekler (firmanın bağlantısı); patron giriş linki gönderir, düzeltir, patron
- * yapar, firmadan çıkarır. Herkes her şantiyede olduğu için liste her şantiyede aynıdır; ayrı bir Ekip ekranı yoktur.
+ * Şantiyenin katılımcıları: herkes kişi ekler (firmanın bağlantısı); patron giriş linki gönderir, düzeltir, rolünü
+ * değiştirir (patron, şef, çalışan), firmadan çıkarır. Herkes her şantiyede olduğu için liste her şantiyede aynıdır; ayrı bir Ekip ekranı yoktur.
  */
 const { site } = defineProps<{ site: SiteView }>()
 const { data: user } = useCurrentUser()
@@ -35,15 +36,12 @@ const confirm = (title: string, message: string, confirmButtonText: string) =>
   ElMessageBox.confirm(message, title, { confirmButtonText, cancelButtonText: 'Vazgeç', type: 'warning' })
     .then(() => true, () => false)
 
-/** Patron olan kişileri yönetir ve bağlantıyı sıfırlar; onay penceresi bunu söyler. */
-async function toggleRole(person: Participant) {
-  const toOwner = person.role !== 'OWNER'
-  const title = `${person.fullName} ${toOwner ? 'patron' : 'şef'} olsun mu?`
-  const message = toOwner
-    ? 'Kişileri düzeltir, patron yapar ve firmadan çıkarır; bağlantıyı sıfırlar.'
-    : 'Görmeye, yazmaya ve şantiye kurmaya devam eder; kişileri yönetemez.'
-  if (await confirm(title, message, toOwner ? 'Patron yap' : 'Şef yap')) {
-    await attempt(() => people.toggleRole(person), toOwner ? 'Patron yapıldı' : 'Şef yapıldı')
+/** Rolün ne getirdiğini onay penceresi söyler: patron kişileri yönetir, şef yoklamayı alır, çalışan sayılır. */
+async function changeRole(person: Participant, action: RoleAction) {
+  const role = ROLE_OF_ACTION[action]
+  const copy = roleChangeCopy(person.fullName, role)
+  if (await confirm(copy.title, copy.message, copy.confirm)) {
+    await attempt(() => people.setRole(person, role), copy.done)
   }
 }
 
@@ -58,7 +56,9 @@ async function remove(person: Participant) {
 const HANDLERS: Record<PersonAction, (person: Participant) => unknown> = {
   loginLink: (person) => attempt(() => people.sendLoginLink(person)),
   edit: (person) => (editing.value = person),
-  toggleRole,
+  makeOwner: (person) => changeRole(person, 'makeOwner'),
+  makeLead: (person) => changeRole(person, 'makeLead'),
+  makeWorker: (person) => changeRole(person, 'makeWorker'),
   remove,
 }
 

@@ -21,12 +21,12 @@ export const ROUTES = {
   // Şantiyenin Saha sekmesi (günlük); Sohbet ile aynı sayfadır, yalnızca sekme değişir.
   siteField: { path: '/santiyeler/:siteId/saha', meta: { detail: true, title: 'Saha' } },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
-  // Yoklama modülü yalnızca patronundur: bugünün listesi ve bir kişinin takvimi. Çalışanlar sohbetteki yoklama
-  // mesajından katılır.
-  attendance: { path: '/yoklama', meta: { ownerOnly: true, title: 'Yoklama' } },
+  // Yoklama firmanındır, şantiyenin değil: şef her sabah alır, patron ay sonunda puantajı görür. Sekme ve ay
+  // adreste durur (?sekme=puantaj&ay=2026-09). Kişi ya da ekibin ayı: telefonda ayrı sayfa, masaüstünde sağdan panel.
+  attendance: { path: '/yoklama', meta: { rollCallOnly: true, title: 'Yoklama' } },
   memberAttendance: {
-    path: '/yoklama/kisi/:userId',
-    meta: { ownerOnly: true, detail: true, title: 'Yoklama' },
+    path: '/yoklama/kisi/:entryId',
+    meta: { rollCallOnly: true, detail: true, title: 'Yoklama' },
   },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>

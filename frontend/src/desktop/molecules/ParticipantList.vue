@@ -23,7 +23,7 @@ const emit = defineEmits<{ add: []; act: [action: PersonAction, participant: Par
         <strong>{{ participant.name }}</strong>
         <small v-if="participant.phone">{{ formatPhone(participant.phone) }}</small>
       </span>
-      <span class="participants__role">{{ participant.roleLabel }}</span>
+      <span v-if="participant.roleLabel" class="participants__role">{{ participant.roleLabel }}</span>
       <el-dropdown v-if="personMenu(participant, canManage).length" trigger="click"
         @command="(action: PersonAction) => emit('act', action, participant)">
         <el-button text size="small" aria-label="Kişi menüsü">⌄</el-button>

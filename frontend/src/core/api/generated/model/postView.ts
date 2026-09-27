@@ -30,6 +30,4 @@ export interface PostView {
   pin?: PostPin
   seenByAll: boolean
   fieldUpdate: boolean
-  /** @nullable */
-  rollCallDay?: string | null
 }

@@ -84,8 +84,7 @@ class PostViews {
             post.isForwarded(),
             pinOf(post, lookups.people()),
             seenByAll(post, lookups.participants().getOrDefault(post.getSiteId(), List.of())),
-            post.isFieldUpdate(),
-            post.getRollCallDay());
+            post.isFieldUpdate());
     }
 
     private static PostAuthorRef authorOf(AppUser author) {

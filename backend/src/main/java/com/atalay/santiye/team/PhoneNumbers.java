@@ -4,7 +4,7 @@ package com.atalay.santiye.team;
  * Aynı numara farklı yazılabilir: "0532 123 45 67", "+90 532 123 4567" ve "5321234567" aynı kişidir.
  * Karşılaştırma ülke kodu ve baştaki sıfır atılmış rakamlarla yapılır.
  */
-final class PhoneNumbers {
+public final class PhoneNumbers {
 
     private static final int MIN_DIGITS = 10;
     private static final int MAX_DIGITS = 15;
@@ -12,7 +12,7 @@ final class PhoneNumbers {
     private PhoneNumbers() {
     }
 
-    static boolean looksValid(String phone) {
+    public static boolean looksValid(String phone) {
         int digits = digitsOf(phone).length();
         return digits >= MIN_DIGITS && digits <= MAX_DIGITS;
     }

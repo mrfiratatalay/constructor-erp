@@ -12,7 +12,6 @@ import { usePinnedPosts } from '@/core/posts/usePinnedPosts'
 import { useSiteTimeline } from '@/core/posts/useSiteTimeline'
 import { eventLine } from '@/core/sites/siteEvents'
 import PostActionSheet from '@/mobile/organisms/PostActionSheet.vue'
-import RollCallCard from '@/mobile/organisms/RollCallCard.vue'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
 import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
 import PinnedBanner from '@/shared/molecules/PinnedBanner.vue'
@@ -61,11 +60,7 @@ function openPhotos(urls: string[], index: number) {
         <template v-else>
           <van-divider v-if="item.post.id === dividerBefore" class="feed-list__new">Buradan aşağısı yeni</van-divider>
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id" v-bind="pressHandlers(item.post)"
-            @open-photos="openPhotos" @open-quote="jump">
-            <template v-if="item.post.rollCallDay && !item.post.deletion" #card>
-              <RollCallCard :post="item.post" />
-            </template>
-          </PostBubble>
+            @open-photos="openPhotos" @open-quote="jump" />
         </template>
       </template>
     </section>

@@ -3,7 +3,6 @@ package com.atalay.santiye.post.dto;
 import com.atalay.santiye.media.dto.MediaView;
 import jakarta.annotation.Nullable;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +10,7 @@ import java.util.UUID;
  * editedAt: düzeltildiyse ne zaman. deletion: silindiyse iz; yazı ve medya o zaman boştur.
  * replyTo: yanıtlanan mesajın alıntısı. forwarded: başka şantiyeden iletildi. pin: sabitlendiyse.
  * seenByAll: yazar dışındaki bütün katılımcılar gördü (WhatsApp'taki mavi ✓✓). fieldUpdate: Saha sekmesinden
- * yazılan saha güncellemesi. rollCallDay: yoklama mesajıysa hangi günün yoklaması (baloncukta "Yoklamaya Katıl").
+ * yazılan saha güncellemesi.
  */
 public record PostView(
     UUID id,
@@ -28,6 +27,5 @@ public record PostView(
     boolean forwarded,
     @Nullable PostPin pin,
     boolean seenByAll,
-    boolean fieldUpdate,
-    @Nullable LocalDate rollCallDay) {
+    boolean fieldUpdate) {
 }

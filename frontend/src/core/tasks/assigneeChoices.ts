@@ -6,13 +6,14 @@ export interface AssigneeChoice {
 }
 
 /**
- * Görev kime verilebilir: şantiyenin sorumluları, patron bakıyorsa kendisi de. Backend yalnızca şantiyeyi
- * gören kişiyi kabul eder; buradaki liste de tam olarak onlardır.
+ * Görev kime verilebilir: patron olmayan katılımcılar (şefler ve çalışanlar), patron bakıyorsa kendisi de.
+ * Backend yalnızca şantiyeyi gören kişiyi kabul eder; buradaki liste de tam olarak onlardır.
  */
 export function assigneeChoices(site: SiteView, user: CurrentUserResponse | undefined): AssigneeChoice[] {
-  const others = site.leads
-    .filter((lead) => lead.id !== user?.id)
-    .map((lead) => ({ id: lead.id, label: lead.fullName }))
-  const canTakeItSelf = !!user && (user.role === 'OWNER' || site.leads.some((lead) => lead.id === user.id))
+  const team = [...site.leads, ...site.workers]
+  const others = team
+    .filter((person) => person.id !== user?.id)
+    .map((person) => ({ id: person.id, label: person.fullName }))
+  const canTakeItSelf = !!user && (user.role === 'OWNER' || team.some((person) => person.id === user.id))
   return canTakeItSelf ? [{ id: user.id, label: 'Ben' }, ...others] : others
 }

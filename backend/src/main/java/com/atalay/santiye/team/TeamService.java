@@ -40,7 +40,7 @@ public class TeamService {
     }
 
     /**
-     * Bağlantıyla gelen kişi kendini şef olarak ekler. Numara firmada aktif birinin ise yeni hesap açılmaz: kimse
+     * Bağlantıyla gelen kişi kendini çalışan olarak ekler; şefi patron seçer. Numara firmada aktif birinin ise yeni hesap açılmaz: kimse
      * başkasının numarasını yazıp onun yerine giremesin; o kişi patrondan giriş linki ister. Firmadan çıkarılmış
      * birinin numarasıysa eski kaydı geri açılır: yazdıkları zaten şantiyelerde duruyor, kişi aynı kişi.
      */
@@ -54,8 +54,8 @@ public class TeamService {
         if (holder.filter(AppUser::isActive).isPresent()) {
             throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
         }
-        AppUser member = holder.orElseGet(() -> new AppUser(companyId, "", UserRole.SITE_LEAD, clock.instant()));
-        member.updateProfile(PersonNames.tidy(fullName), checked, UserRole.SITE_LEAD);
+        AppUser member = holder.orElseGet(() -> new AppUser(companyId, "", UserRole.WORKER, clock.instant()));
+        member.updateProfile(PersonNames.tidy(fullName), checked, UserRole.WORKER);
         member.setActive(true);
         return users.save(member);
     }

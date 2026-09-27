@@ -11,4 +11,5 @@ export type UpdateMemberRequestRole =
 export const UpdateMemberRequestRole = {
   OWNER: 'OWNER',
   SITE_LEAD: 'SITE_LEAD',
+  WORKER: 'WORKER',
 } as const

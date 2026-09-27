@@ -13,24 +13,26 @@ export interface Participant {
   isViewer: boolean
 }
 
+/** Çalışanın etiketi yazılmaz: WhatsApp'ta da yalnızca yöneticinin etiketi olur, kişilerin çoğu çalışandır. */
 const participantOf = (person: SiteLead, role: MemberViewRole, viewerId: string | undefined): Participant => ({
   id: person.id,
   fullName: person.fullName,
   name: person.id === viewerId ? 'Sen' : person.fullName,
   role,
-  roleLabel: ROLE_LABELS[role],
+  roleLabel: role === 'WORKER' ? '' : ROLE_LABELS[role],
   phone: person.phone ?? null,
   isViewer: person.id === viewerId,
 })
 
 /**
  * Şantiyenin katılımcıları: firmanın bütün kişileri (herkes her şantiyededir), bakan kişi en üstte "Sen" olarak,
- * sonra patronlar, sonra şefler. Rol etiketi firmadaki rolüdür (Patron / Şef).
+ * sonra patronlar, şefler ve çalışanlar. Rol etiketi firmadaki rolüdür (Patron / Şef).
  */
 export function siteParticipants(site: SiteView, viewer: CurrentUserResponse | undefined): Participant[] {
   const people = [
     ...site.owners.map((owner) => participantOf(owner, 'OWNER', viewer?.id)),
     ...site.leads.map((lead) => participantOf(lead, 'SITE_LEAD', viewer?.id)),
+    ...site.workers.map((worker) => participantOf(worker, 'WORKER', viewer?.id)),
   ]
   return [...people.filter((person) => person.isViewer), ...people.filter((person) => !person.isViewer)]
 }
