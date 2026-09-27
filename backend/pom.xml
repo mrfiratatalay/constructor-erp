@@ -21,6 +21,7 @@
         <springdoc.version>3.1.1</springdoc.version>
         <checkstyle.version>14.1.0</checkstyle.version>
         <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
+        <fastexcel.version>0.20.2</fastexcel.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,13 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- Yoklama dökümü (.xlsx). Yalnızca yazar, küçüktür (~130 KB); Apache POI'nin okuma yükünü getirmez. -->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
+            <version>${fastexcel.version}</version>
         </dependency>
 
         <!-- Test: gerçek PostgreSQL'e karşı, Testcontainers ile -->

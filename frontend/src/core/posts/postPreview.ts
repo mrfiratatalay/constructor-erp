@@ -21,8 +21,12 @@ function mediaLabel(media: MediaView[]): { icon: string; label: string } | null 
   return document ? { icon: '📄', label: document.fileName ?? 'Belge' } : null
 }
 
-/** Mesajın kendisi tek satırda: yazının ilk satırı, dosya varsa önünde simgesi. Yazı yoksa dosyanın adı. */
-export function postSummary(post: Pick<PostView, 'body' | 'media'>): string {
+/**
+ * Mesajın kendisi tek satırda: yazının ilk satırı, dosya varsa önünde simgesi. Yazı yoksa dosyanın adı.
+ * Yoklama mesajının yazısı yoktur; WhatsApp'taki "📊 Anket" gibi adıyla görünür.
+ */
+export function postSummary(post: Pick<PostView, 'body' | 'media' | 'rollCallDay'>): string {
+  if (post.rollCallDay) return '📋 Yoklama'
   const firstLine = post.body?.split('\n').find((line) => line.trim())?.trim()
   const media = mediaLabel(post.media)
   if (!media) return firstLine ?? ''

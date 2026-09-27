@@ -43,6 +43,9 @@ public class PostForwarding {
         if (source.isDeleted()) {
             throw ApiException.conflict("Silinmiş mesaj iletilemez.");
         }
+        if (source.isRollCall()) {
+            throw ApiException.conflict("Yoklama mesajı iletilemez: her şantiye kendi yoklamasını açar.");
+        }
         Site target = siteAccess.requireVisible(user, targetSiteId);
         var draft = new NewPost(UUID.randomUUID(), user.companyId(), target.getId(), user.userId(), source.getBody(),
             false, null, true, false);

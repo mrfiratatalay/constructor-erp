@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { EllipsisVertical, Search } from 'lucide-vue-next'
+import { errorMessage } from '@/core/api/errors'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
-import { fullDate, todayIsoDate } from '@/core/format/dates'
 import { useComposer } from '@/core/posts/useComposer'
+import { useSendRollCall } from '@/core/rollcall/useSendRollCall'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallPopover from '@/desktop/molecules/CallPopover.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
-import AttendanceDialog from '@/desktop/organisms/AttendanceDialog.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
 import FieldColumn from '@/desktop/organisms/FieldColumn.vue'
 import FieldComposerBar from '@/desktop/organisms/FieldComposerBar.vue'
@@ -29,12 +28,11 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
  * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
  * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
- * Sohbetin ＋ menüsündeki Yoklama bugünün yoklama penceresini açar; yoklama sohbete mesaj olarak gitmez.
+ * Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette ona gider: çalışan mesajdan katılır.
  */
 type Panel = 'info' | 'search'
 
 const { siteId } = defineProps<{ siteId: string }>()
-const router = useRouter()
 const { data: site } = useGetSite(() => siteId)
 const { data: user } = useCurrentUser()
 const { previousSeenAt } = useSiteVisit(() => siteId)
@@ -48,14 +46,15 @@ const callable = computed(() => (site.value ? callablePeople(site.value, user.va
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
-const attendanceOpen = ref(false)
+const rollCall = useSendRollCall(() => siteId)
 
-/** Yoklama sohbete gitmez; kaydedilince kayıtlara gitmek isteğe bağlıdır (Yoklama modülü). */
-async function onAttendanceSaved(day: string) {
-  const wantsHistory = await ElMessageBox.confirm(`${fullDate(day)} tarihli yoklama kaydedildi.`, 'Yoklama kaydedildi', {
-    confirmButtonText: 'Yoklama kayıtlarını görüntüle', cancelButtonText: 'Kapat', type: 'success',
-  }).then(() => true, () => false)
-  if (wantsHistory) void router.push({ name: 'siteAttendance', params: { siteId } })
+/** Bugün zaten atıldıysa yenisi atılmaz: sohbet o mesaja gider, şef orada görür. */
+async function sendRollCall() {
+  try {
+    openTab('chat', await rollCall.send())
+  } catch (error) {
+    ElMessage.error(errorMessage(error))
+  }
 }
 </script>
 
@@ -88,14 +87,12 @@ async function onAttendanceSaved(day: string) {
       <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
         <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
-          @attendance="attendanceOpen = true" />
+          @roll-call="sendRollCall" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
     <SiteSearchPanel v-else-if="panel === 'search'" :site-id="siteId" @open="openFound" @close="panel = null" />
-    <AttendanceDialog v-if="site" v-model:show="attendanceOpen" :site-id="siteId" :site-name="site.name"
-      :day="todayIsoDate()" @saved="onAttendanceSaved" />
   </div>
 </template>
 

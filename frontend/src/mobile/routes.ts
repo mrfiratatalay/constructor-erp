@@ -12,7 +12,6 @@ export const routes = buildRoutes({
   siteField: siteFeedPage,
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   attendance: () => import('./pages/AttendancePage.vue'),
-  siteAttendance: () => import('./pages/SiteAttendancePage.vue'),
-  workerAttendance: () => import('./pages/WorkerAttendancePage.vue'),
+  memberAttendance: () => import('./pages/MemberAttendancePage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

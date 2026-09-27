@@ -13,11 +13,11 @@ import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 /**
  * Gönderme çubuğu, WhatsApp Masaüstü gibi: ＋ (fotoğraf-video, belge ya da yoklama), yazı ve 😊, 🎤 basılı tut
  * (yukarı kaydırınca kilitlenir). Enter gönderir, Shift+Enter yeni satır. Yazı varken 🎤 yerine ➤.
- * Yoklama bir ek değildir, sohbete mesaj göndermez: yalnızca yoklama penceresini ister (attendance).
+ * Yoklama bir ek değildir: sohbete günün yoklama mesajını ister (rollCall); çalışan mesajdan kendisi katılır.
  * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
-const emit = defineEmits<{ attendance: [] }>()
+const emit = defineEmits<{ rollCall: [] }>()
 const { body, replyTo } = composer
 const dialogOpen = ref(false)
 const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
@@ -42,7 +42,7 @@ async function onPicked(event: Event) {
 }
 
 function onAdd(which: string) {
-  if (which === 'attendance') emit('attendance')
+  if (which === 'rollCall') emit('rollCall')
   else (which === 'pdf' ? pdfInput : galleryInput).value?.click()
 }
 
@@ -64,7 +64,7 @@ async function send() {
           <el-dropdown-menu>
             <el-dropdown-item command="gallery">Fotoğraf ve video</el-dropdown-item>
             <el-dropdown-item command="pdf">Belge (PDF)</el-dropdown-item>
-            <el-dropdown-item command="attendance" divided>Yoklama</el-dropdown-item>
+            <el-dropdown-item command="rollCall" divided>Yoklama</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

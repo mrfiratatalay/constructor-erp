@@ -81,6 +81,10 @@ public class AppUser {
         return role;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
     public boolean isActive() {
         return active;
     }
