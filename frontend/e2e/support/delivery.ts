@@ -9,8 +9,8 @@ export const WORK_PHOTO = path.join(
 )
 
 /**
- * İş teslimi iki kabukta aynı akıştır; yalnızca parçaların yeri farklıdır (mobil Vant, masaüstü Element Plus).
- * Açılır pencereler mobilde alttan (van-popup), masaüstünde ortada (el-dialog) açılır.
+ * Görev ve iş teslimi iki kabukta aynı akıştır; yalnızca parçaların yeri farklıdır (mobil Vant, masaüstü Element
+ * Plus). Açılır pencereler mobilde alttan (van-popup), masaüstünde ortada (el-dialog) açılır.
  */
 export function deliveryParts(page: Page, mobile: boolean) {
   const composer = page.locator(mobile ? '.site-composer' : '.composer-bar')
@@ -18,13 +18,32 @@ export function deliveryParts(page: Page, mobile: boolean) {
     mobile
       ? page.locator('.van-popup:not(.van-action-sheet)').filter({ hasText: text })
       : page.getByRole('dialog').filter({ hasText: text })
+  const assignPanel = panel('Görevi ver')
+  /** Sohbetin ＋ menüsünü açar; menüyü döner. */
+  const plusMenu = async () => {
+    await composer.getByRole('button', { name: 'Ekle', exact: true }).click()
+    return page.locator(mobile ? '.van-action-sheet:visible' : '.el-dropdown-menu:visible')
+  }
   return {
     cards: page.getByTestId('delivery-card'),
-    /** Sohbetin ＋ menüsünden "İş Teslim Et" penceresini açar. */
-    openFromPlus: async () => {
-      await composer.getByRole('button', { name: 'Ekle', exact: true }).click()
-      const menu = page.locator(mobile ? '.van-action-sheet' : '.el-dropdown-menu:visible')
-      await menu.getByText('✅ İş Teslim Et').click()
+    taskCards: page.getByTestId('task-card'),
+    plusMenu,
+    /** Sohbetin ＋ menüsünden bir pencere açar ("✅ İş Teslim Et" ya da "📋 Görev"). */
+    openFromPlus: async (item = '✅ İş Teslim Et') => {
+      await (await plusMenu()).getByText(item).click()
+    },
+    /** "📋 Görev" penceresindeki üç soru: ne yapılacak, kim yapacak (listeden), ne zaman (Yarın). */
+    assignTask: async (title: string, assignee: string) => {
+      await assignPanel.getByPlaceholder('Kalıp sökülecek').fill(title)
+      await (
+        mobile ? assignPanel.getByText('Kişi seç') : assignPanel.locator('.assign__select')
+      ).click()
+      const people = mobile
+        ? '.van-action-sheet__item:visible'
+        : '.el-select-dropdown__item:visible'
+      await page.locator(people, { hasText: assignee }).click()
+      await assignPanel.getByText('Yarın', { exact: true }).click()
+      await assignPanel.getByRole('button', { name: '📋 Görevi ver' }).click()
     },
     deliverPanel: panel('İŞİ TESLİM ET'),
     reviewPanel: panel('EKSİK VAR'),

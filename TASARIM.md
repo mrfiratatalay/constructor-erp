@@ -93,7 +93,7 @@ Herkes aynı listeyi görür; tek şantiyesi olan şef de. Sekmenin adı herkes 
 | Başlık | Şantiye fotoğrafı, ad, altında katılımcıların ilk adları ve "Sen". Başlığa dokununca bilgi açılır; sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Altında Sohbet · Saha sekmeleri. |
 | 📞 | 25 Eylül'de kararlaştırıldı. Aranabilecekler: patron ve katılımcılar, numarası olanlar, kişinin kendisi hariç (şef patronu da buradan arar). Tek kişi varsa doğrudan onu arar (dayının en sık işi tek dokunuş); birden fazlaysa alttan liste açılır: ad, rol, numara. Önceden "telefonu olan ilk katılımcı" aranıyordu: ikinci şef buradan hiç aranamıyordu. |
 | Sistem satırları | "Patron şantiyeyi kurdu", "Mahmut davet bağlantısıyla katıldı", "Patron, Mahmut'u çıkardı" (WhatsApp gibi). Katılma ve çıkarma firmanın her şantiyesine düşer: herkes her şantiyededir. Şantiye başına üyelik varken yazılmış eski satırlar ("Patron, Musa'yı ekledi", "Musa eklendi") olduğu gibi durur. |
-| Gönderme çubuğu | `[＋] [yazı] 📷 🎤` (iPhone WhatsApp). ＋: Fotoğraf ve video · Belge (PDF) · ✅ İş Teslim Et (bkz. İş teslimi). 📷 doğrudan kamera. Yazı varken 📷 ve 🎤 yerine ➤. Masaüstünde `[＋] [yazı 😊] 🎤`. |
+| Gönderme çubuğu | `[＋] [yazı] 📷 🎤` (iPhone WhatsApp). ＋: Fotoğraf ve video · Belge (PDF) · 📋 Görev (patron ve şefte) · ✅ İş Teslim Et (bkz. Görev kartı, İş teslimi). 📷 doğrudan kamera. Yazı varken 📷 ve 🎤 yerine ➤. Masaüstünde `[＋] [yazı 😊] 🎤`. |
 | Sesli not | Basılı tut, bırak → gider. Basılıyken yukarı kaydırınca kilitlenir: 🗑 ya da ➤. Dinlerken 1× / 1,5× / 2×. |
 | Fotoğraflar | Baloncuk boyunda (ekranın ~3/4'ü, en çok 320px). Çok fotoğraf 2×2 albüm; dörtten fazlasında "+N". Dokununca tam ekran. |
 | Mesaj menüsü | Uzun bas (masaüstünde ⋯): Yanıtla, Kopyala, İlet, Sabitle, Sahaya ekle (bkz. Saha sekmesi), Bilgi (yalnızca kendi mesajında), Düzelt, Sil. İş teslimi ve şefin cevabında yalnızca Yanıtla, Sabitle, Bilgi ve (fotoğraflı teslimde) Sahaya ekle. |
@@ -221,6 +221,35 @@ yazılmaz. Renk yalnızca bileşenin kendi tonundan gelir: Geldi yeşil, Yarım 
 mavi (marka rengi; telefonda çerçeveli), İşaretlenmedi gri. Etiketin içinde her zaman yazı ya da ayrı şekilli bir
 işaret vardır, anlam yalnızca renge kalmaz (İlke 2).
 
+## Görev kartı (görev sohbette verilir, sohbette izlenir)
+
+28 Eylül'de kararlaştırıldı (Musa). Şef görevi WhatsApp'ta yazar gibi verir: **ne, kim, ne zaman.** Görev sohbete
+kart olarak düşer; teslim, eksik ve onay o kartın altına yanıt olarak dizilir. Yeni ekran yoktur: görev şantiye
+bilgisindeki mevcut Görevler'in aynısıdır, sohbet yalnızca onun ikinci kapısıdır.
+
+```
+Şef: ＋ → 📋 Görev                  Sohbette (görev kartı)            Çalışanda aynı kart
+┌──────────────────────────────┐   ┌───────────────────────────┐   ┌───────────────────────────┐
+│ 📋 Görev                   ✕ │   │ 📋 GÖREV                   │   │ 📋 GÖREV                   │
+│ Ne yapılacak?                │   │ Kalıp sökülecek           │   │ Kalıp sökülecek           │
+│ [Kalıp sökülecek          ]  │   │ 👤 Ali Usta                │   │ 👤 Ali Usta                │
+│ Kim yapacak?                 │   │ 🕐 Yarın                   │   │ 🕐 Yarın                   │
+│ [Ali Usta               › ]  │   │ Bekliyor                  │   │ Bekliyor                  │
+│ Ne zaman?                    │   └───────────────────────────┘   │ [ ✅ İŞİ TESLİM ET ]       │
+│ (Bugün) (Yarın) (Tarih seç)  │                                   └───────────────────────────┘
+│ [      📋 Görevi ver      ]  │
+└──────────────────────────────┘
+```
+
+| Parça | Karar |
+|---|---|
+| Nereden | Sohbetin ＋'sı, yalnızca patron ve şefte: Fotoğraf ve video · Belge (PDF) · **📋 Görev** · ✅ İş Teslim Et. Şantiye bilgisindeki Görevler'den açılan görev de aynı kartı düşürür: iki kapı, tek görev. Çalışanın ＋'sında 📋 Görev yoktur (Görevler sayfasının kuralı değişmedi). |
+| Pencere | Yalnızca üç soru: **Ne yapılacak?** · **Kim yapacak?** (şantiyenin şefleri ve çalışanları; veren kendini "Ben" diye seçebilir) · **Ne zaman?** (Bugün · Yarın · Tarih seç). Öncelik ve not sorulmaz (Normal, boş); gerekirse Görevler'den düzenlenir. Telefonda kişi listesi ＋ menüsü gibi alttan açılır, "Tarih seç" tarih çarkını açar; geçmiş gün seçilemez. |
+| Kart | Görev açılınca sohbete "📋 Görev: Kalıp sökülecek" mesajı düşer (liste önizlemesi ve arama bu yazıyı kullanır), baloncukta kart yazar: 📋 GÖREV, iş, 👤 kim, 🕐 ne zaman (Bugün, Yarın, "3 gün gecikti", "12 Eki"; iş bitince yazılmaz) ve durum. |
+| Durum | Zincir ilerledikçe kart kendiliğinden değişir: **Bekliyor** → teslimde **Kontrol bekliyor** → eksikte **Eksik var** → onayda **Tamamlandı**. Kart 15 sn'de bir tazelenir, kendi yaptığın değişiklikte hemen. |
+| Teslim | İşin sorumlusu teslim edilebilir işte kartta büyük **✅ İŞİ TESLİM ET**'i görür; teslim penceresi iş seçili açılır (bkz. İş teslimi). Teslim mesajı görev kartının yanıtı, şefin cevabı teslimin yanıtı olarak düşer: tek zincir. |
+| Yazı | Görev mesajının yazısı görevden gelir: düzeltilmez, iletilmez (görev düzenlenir). Görev silinirse baloncukta kartın yerine mesajın yazısı kalır. |
+
 ## İş teslimi (işim bitti → fotoğraf → teslim)
 
 28 Eylül'de kararlaştırıldı (Musa). Usta işini bitirince uzun rapor yazmaz: **işi seçer, fotoğraf çeker, teslim
@@ -228,21 +257,21 @@ eder.** Şef fotoğrafa bakar, yalnızca iki şey der: **Onayla** ya da **Eksik 
 şantiye bilgisindeki mevcut görevin bir adımıdır; şefin ayrı bir ekranı da yoktur, sohbet onun ekranıdır.
 
 ```
-Çalışan: ＋ → ✅ İş Teslim Et            Sohbette (teslim mesajı)             Şefin cevabı (yanıt olarak)
+Çalışan: görev kartında ✅ İŞİ TESLİM ET  Sohbette (teslim mesajı)            Şefin cevabı (yanıt olarak)
 ┌──────────────────────────────┐      ┌───────────────────────────┐      ┌──────────────────────────────┐
-│ ✅ İş Teslim Et            ✕ │      │ [foto] [foto]             │      │ ↳ Ali: İş teslim edildi: …   │
-│ 1. Hangi iş?                 │      │ ✅ İş teslim edildi        │      │ ❌ İş tamamlanmadı            │
-│ (•) ⚡ 3. Kat Elektrik        │      │ 📍 B Blok · ⚡ 3. Kat El.  │      │ 📍 B Blok · ⚡ 3. Kat El.     │
-│ ( ) 🚿 Banyo tesisatı  Eksik │      │ 👤 Ali Usta · 📷 2 fotoğraf│      │ Eksik: Buradaki kablo eksik  │
-│ 2. 📷 İşin fotoğrafı          │      │ Kontrol bekliyor          │      │ [foto, üstünde 🔴]            │
-│ [foto ✕] [📷 Fotoğraf çek]   │      │ [ İNCELE ]   (şefte)      │      │ [ ✅ İş Teslim Et ] (ustada)  │
-│ [   ✅ İŞİ TESLİM ET      ]  │      └───────────────────────────┘      └──────────────────────────────┘
-└──────────────────────────────┘
+│ ✅ İş Teslim Et            ✕ │      │ ↳ Mehmet: 📋 Görev: …      │      │ ↳ Ali: İş teslim edildi: …   │
+│ 1. Hangi iş?                 │      │ [foto] [foto]             │      │ ❌ İŞ TAMAMLANMADI            │
+│ (•) ⚡ 3. Kat Elektrik        │      │ ✅ İŞ TESLİM EDİLDİ        │      │ Eksik: Buradaki kablo eksik  │
+│ ( ) 🚿 Banyo tesisatı  Eksik │      │ ⚡ 3. Kat Elektrik         │      │ 📍 B Blok · ⚡ 3. Kat El.     │
+│ 2. 📷 İşin fotoğrafı          │      │ 👤 Ali Usta · 📷 2 fotoğraf│      │ [foto, üstünde 🔴]            │
+│ [foto ✕] [📷 Fotoğraf çek]   │      │ Kontrol bekliyor          │      │ [ ✅ İŞİ TESLİM ET ] (ustada) │
+│ [   ✅ İŞİ TESLİM ET      ]  │      │ [ İNCELE ]   (şefte)      │      └──────────────────────────────┘
+└──────────────────────────────┘      └───────────────────────────┘
 ```
 
 | Parça | Karar |
 |---|---|
-| Nereden | Sohbetin ＋'sı: Fotoğraf ve video · Belge (PDF) · **✅ İş Teslim Et**. Eksik dönen işin kartındaki "✅ İş Teslim Et" de aynı pencereyi açar, iş seçili gelir. |
+| Nereden | Görev kartındaki **✅ İŞİ TESLİM ET** (bkz. Görev kartı) ya da sohbetin ＋'sındaki **✅ İş Teslim Et**. Eksik dönen işin kartındaki "✅ İŞİ TESLİM ET" de aynı pencereyi açar; karttan açılınca iş seçili gelir. |
 | Hangi iş | Bu şantiyede kişiye verilmiş, bitmemiş ve kontrolde olmayan görevler; eksiği dönen en üstte ("Eksik var" etiketli). Tek açık iş varsa seçili gelir. Hiç yoksa "Sana verilmiş açık iş yok." |
 | Simge | Görevin simgesi başlığından okunur (banyo/tesisat 🚿, elektrik/kablo ⚡, duvar/tuğla 🧱, boya/badana 🎨, diğerleri 📋): kullanıcıya tür seçtirilmez, görevde "tür" alanı yoktur (Saha'daki simgeler gibi). |
 | Fotoğraf | 1-4 fotoğraf, yalnızca fotoğraf. Seçilince küçültülür (sohbetteki fotoğraflar gibi). Yazı istenmez: mesajın yazısını ("✅ İş teslim edildi: 3. Kat Elektrik") sunucu koyar; liste önizlemesi ve arama onu kullanır, baloncukta kart yazar. |
@@ -250,7 +279,7 @@ eder.** Şef fotoğrafa bakar, yalnızca iki şey der: **Onayla** ya da **Eksik 
 | Durum | Görev teslim edilince **Kontrolde**, eksik dönünce **Eksik var**, onaylanınca **Tamamlandı**. İkisi görev penceresinde elle seçilmez; görev listesinde etiket olarak görünür. |
 | İNCELE | Şefte teslim kartının düğmesi: fotoğraflar büyük (dokununca tam ekran), altta yalnızca **✅ ONAYLA** ve **❌ EKSİK VAR**. |
 | Eksik var | Aynı pencerede "Neresi eksik?": fotoğraf seçilir, üstüne dokunulur, **🔴 nokta** oraya konur (isteğe bağlı; yeniden dokununca yer değiştirir), kısa not zorunlu ("Buradaki kablo eksik"), **GÖNDER**. Nokta fotoğrafa oranla saklanır: her ekranda aynı yere düşer. |
-| Cevap | Şefin cevabı sohbete teslim mesajının yanıtı olarak düşer: onayda "✅ Tamamlandı · Onaylayan", eksikte "❌ İş tamamlanmadı · Eksik: …" ve noktalı fotoğraf. Usta bildirimi ve okunmadı rozetini sohbetten alır, yeniden teslimi kartın düğmesiyle yapar. |
+| Cevap | Teslim mesajı görev kartının, şefin cevabı teslim mesajının yanıtı olarak düşer: onayda "✅ TAMAMLANDI · Onaylayan", eksikte "❌ İŞ TAMAMLANMADI · Eksik: …" ve noktalı fotoğraf. Usta bildirimi ve okunmadı rozetini sohbetten alır, yeniden teslimi kartın düğmesiyle yapar. Görev kartının durumu da birlikte değişir. |
 | Kayıt | Her teslim ayrı saklanır: kim ne zaman teslim etti, fotoğrafları, kim ne zaman inceledi, eksik notu ve nokta. İş kaç kez gidip gelse de geçmişi kalır; onaylanınca görevin tamamlanma tarihi dolar. |
 | Kanıt | Teslim mesajı ve şefin cevabı silinmez, düzeltilmez, iletilmez, kopyalanmaz; yanıtlanır ve sabitlenir, fotoğraflı teslim Saha'ya eklenebilir. |
 | Tazelenme | Kart kendini tazeler: fotoğraf sunucuda işlenirken 4 sn'de bir, sonra 15 sn'de bir (sohbetin akışı gibi). Ayrıntı gelene kadar baloncukta mesajın kendi yazısı durur. |
@@ -267,7 +296,7 @@ Başlığa dokununca: telefonda alttan açılır, masaüstünde akışın sağı
 | Fotoğraf | En üstte büyük; patron değiştirir ya da kaldırır. |
 | Künye | Ad, "Şantiye · N katılımcı", adres (dokununca harita), patronda Düzenle (ad, adres, tamamlandı). |
 | Medya ve belgeler | "Medya ve belgeler · N ›" ve son fotoğrafların şeridi. İçeride Medya ve Belgeler sekmeleri, aylara ayrılmış; şantiyenin bütün geçmişi. |
-| Görevler | Görevler satırı (Musa'nın özelliği; ürün kararı Musa'yla konuşulacak). Görevin sorumlusu işi sohbetten fotoğrafla teslim eder, şef onaylar ya da eksiğini gösterir (bkz. İş teslimi). |
+| Görevler | Görevler satırı (Musa'nın özelliği; ürün kararı Musa'yla konuşulacak). Buradan açılan görev de sohbete görev kartı düşürür; görevin sorumlusu işi karttan fotoğrafla teslim eder, şef onaylar ya da eksiğini gösterir (bkz. Görev kartı, İş teslimi). |
 | Katılımcılar | "Katılımcılar · N": firmanın herkesi (her şantiyede aynı liste); en üstte "Sen", sonra patronlar, sonra şefler; yanında rolü (Patron / Şef) ve numarası (`0552 813 78 50`). Durum yazısı yok. Patronda "＋ Kişi ekle" (firmanın bağlantısı) ve kişiye dokununca menü (bkz. Kişiler). |
 
 "Sorumlu" kelimesi kullanılmaz: şantiyenin "sorumlusu" yoktur, herkes her şantiyededir. Kişi şantiyenin
@@ -401,7 +430,8 @@ bildirim göndereceği (ör. akşam 17:00'de rapor göndermemiş şefe hatırlat
 ## Sonraki turda konuşulacaklar
 
 - **Görevler** (Musa): şantiye bilgisinde duruyor; WhatsApp'ta karşılığı olmayan yeni bir kavram (İlke 1),
-  kalıp kalmayacağı konuşulacak.
+  kalıp kalmayacağı konuşulacak. 28 Eylül'den beri görev sohbetin ＋'sından da verilir ve sohbette kart olarak
+  izlenir (bkz. Görev kartı); Görevler satırının ayrıca gerekip gerekmediği bu konuşmanın parçası.
 - İlk açılış: sıfır şantiye, sıfır kişiyken patronun ilk on dakikası.
 - **Yoklama, sonraya bırakılanlar:** yevmiye tutarı (gün × ücret, yalnızca patrona), sabah hatırlatması
   (işaretlenmeyen varken şefe), çalışana "Bugün Geldi olarak yazıldın" bildirimi (bildirimler HTTPS ister).
