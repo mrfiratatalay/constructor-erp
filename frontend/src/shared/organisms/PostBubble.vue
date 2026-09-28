@@ -14,7 +14,9 @@ import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
  * Mesaj baloncuğu, WhatsApp'taki gibi: kendi mesajın sağda ve lacivert zeminde, başkasınınkinde üstte adı.
  * Sıra: "İletildi", alıntı, fotoğraf, yazı, en altta 📌 · saat · tik. Fotoğraflı baloncuk daha dardır (albüm).
  * Saha sekmesinden yazılan güncellemenin üstünde "Saha" (sorunsa "Sorun") yazar: aynı gönderi Saha'da da durur.
- * Kütüphaneden bağımsızdır (iki kabukta birebir aynı görünür); masaüstündeki ⋯ menüsü yuvadan gelir.
+ * Kütüphaneden bağımsızdır (iki kabukta birebir aynı görünür); masaüstündeki ⋯ menüsü ve iş teslimi kartı
+ * yuvadan gelir (kartın düğmeleri kabuğun kütüphanesiyle çizilir). Kart varsa mesajın yazısı yazılmaz: kart aynı
+ * şeyi düzenli söyler; yazı liste önizlemesi ve arama içindir.
  */
 defineOptions({ inheritAttrs: false })
 
@@ -36,7 +38,8 @@ const visual = computed(() => post.media.some((item) => item.kind === 'PHOTO' ||
       </p>
       <QuoteStrip v-if="post.replyTo" :quote="post.replyTo" @open="emit('openQuote', post.replyTo.id)" />
       <PostMedia :media="post.media" @open-photos="(urls, index) => emit('openPhotos', urls, index)" />
-      <p v-if="post.body" class="bubble__body">{{ post.body }}</p>
+      <slot name="card" />
+      <p v-if="post.body && !$slots.card" class="bubble__body">{{ post.body }}</p>
       <span class="bubble__time">
         <Pin v-if="post.pin" :size="12" aria-label="Sabitlendi" />
         <span v-if="post.editedAt">düzenlendi · </span>

@@ -33,3 +33,20 @@ describe('mesaj menüsü', () => {
     ])
   })
 })
+
+describe('iş teslimi mesajının menüsü', () => {
+  it('yanıtla, sabitle, sahaya ekle ve bilgi; kanıt olduğu için kopyalanmaz, iletilmez, düzeltilmez, silinmez', () => {
+    const delivery = post({ deliveryId: 'd', media: [{ id: 'm' } as PostView['media'][number]] })
+    expect(postMenu(delivery, lead).map((item) => item.action)).toEqual([
+      'reply',
+      'pin',
+      'field',
+      'info',
+    ])
+  })
+
+  it("şefin yazılı cevabı Saha'ya eklenmez", () => {
+    const reply = post({ deliveryId: 'd', author: { id: 'sef', fullName: 'Şef' } })
+    expect(postMenu(reply, lead).map((item) => item.action)).toEqual(['reply', 'pin'])
+  })
+})
