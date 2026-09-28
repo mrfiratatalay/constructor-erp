@@ -25,6 +25,14 @@ public class MediaViews {
             .collect(Collectors.groupingBy(Media::getPostId, Collectors.mapping(MediaViews::toView, Collectors.toList())));
     }
 
+    /** İmalat girişlerinin dosyaları (Saha'ya yansıtılmış olsun olmasın). */
+    @Transactional(readOnly = true)
+    public Map<UUID, List<MediaView>> byProductionEntry(Collection<UUID> entryIds) {
+        return media.findByProductionEntryIdInOrderByPosition(entryIds).stream()
+            .collect(Collectors.groupingBy(Media::getProductionEntryId,
+                Collectors.mapping(MediaViews::toView, Collectors.toList())));
+    }
+
     static MediaView toView(Media item) {
         boolean ready = item.getStatus() == MediaStatus.READY;
         String base = "/api/media/" + item.getId();
