@@ -19,8 +19,11 @@ final class DeliveryRules {
         return DELIVERABLE.contains(status);
     }
 
+    static boolean isReviewer(CurrentUser user) {
+        return user.role() == UserRole.OWNER || user.role() == UserRole.SITE_LEAD;
+    }
+
     static boolean canReview(CurrentUser user, TaskDelivery delivery) {
-        boolean reviewer = user.role() == UserRole.OWNER || user.role() == UserRole.SITE_LEAD;
-        return reviewer && delivery.isPending() && !delivery.getDeliveredBy().equals(user.userId());
+        return isReviewer(user) && delivery.isPending() && !delivery.getDeliveredBy().equals(user.userId());
     }
 }
