@@ -16,6 +16,14 @@ const { materials, canCreate, disabled = false } = defineProps<{
 }>()
 const emit = defineEmits<{ create: [name: string] }>()
 const typed = ref('')
+const select = ref<{ blur: () => void }>()
+
+/** Liste kapanır, yazılan ad kart formuna gider (liste arkada açık kalmasın). */
+function create() {
+  const name = typed.value.trim()
+  select.value?.blur()
+  emit('create', name)
+}
 const selected = () => materials.find((material) => material.id === model.value)
 const filter = (query: string) => (typed.value = query)
 const visible = () => {
@@ -25,7 +33,7 @@ const visible = () => {
 </script>
 
 <template>
-  <el-select v-model="model" filterable :filter-method="filter" placeholder="Malzeme seç ya da ara" size="large"
+  <el-select ref="select" v-model="model" filterable :filter-method="filter" placeholder="Malzeme seç ya da ara" size="large"
     :disabled="disabled" no-match-text="Bu adla malzeme yok" @visible-change="(open: boolean) => open && (typed = '')">
     <template #prefix><MaterialGlyph v-if="selected()" :name="selected()!.name" :size="22" /></template>
     <el-option v-for="material in visible()" :key="material.id" :value="material.id" :label="material.name">
@@ -35,7 +43,7 @@ const visible = () => {
       </el-row>
     </el-option>
     <template v-if="canCreate" #footer>
-      <el-button text type="primary" :icon="Plus" style="width: 100%" @click="emit('create', typed.trim())">
+      <el-button text type="primary" :icon="Plus" style="width: 100%" @click="create">
         {{ typed.trim() ? `“${typed.trim()}” adıyla yeni malzeme oluştur` : 'Yeni malzeme oluştur' }}
       </el-button>
     </template>
