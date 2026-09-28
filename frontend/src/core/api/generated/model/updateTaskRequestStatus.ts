@@ -11,5 +11,7 @@ export type UpdateTaskRequestStatus =
 export const UpdateTaskRequestStatus = {
   TODO: 'TODO',
   IN_PROGRESS: 'IN_PROGRESS',
+  SUBMITTED: 'SUBMITTED',
+  RETURNED: 'RETURNED',
   DONE: 'DONE',
 } as const

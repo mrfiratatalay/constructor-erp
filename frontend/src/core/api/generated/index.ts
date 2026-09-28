@@ -1,5 +1,6 @@
 export * from './attendance/attendance'
 export * from './auth/auth'
+export * from './deliveries/deliveries'
 export * from './issues/issues'
 export * from './join/join'
 export * from './library/library'

@@ -5,9 +5,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type TaskViewStatus = (typeof TaskViewStatus)[keyof typeof TaskViewStatus]
+export type TaskDeliveryViewTaskStatus =
+  (typeof TaskDeliveryViewTaskStatus)[keyof typeof TaskDeliveryViewTaskStatus]
 
-export const TaskViewStatus = {
+export const TaskDeliveryViewTaskStatus = {
   TODO: 'TODO',
   IN_PROGRESS: 'IN_PROGRESS',
   SUBMITTED: 'SUBMITTED',

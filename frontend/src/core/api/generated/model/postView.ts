@@ -30,4 +30,6 @@ export interface PostView {
   pin?: PostPin
   seenByAll: boolean
   fieldUpdate: boolean
+  /** @nullable */
+  deliveryId?: string | null
 }

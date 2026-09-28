@@ -2,20 +2,22 @@
 import { computed } from 'vue'
 import type { TaskView } from '@/core/api/generated/model'
 import { dueLabel } from '@/core/tasks/dueLabel'
-import { priorityTag, TASK_STATUS } from '@/core/tasks/taskLabels'
+import { priorityTag, statusTag } from '@/core/tasks/taskLabels'
 import StatusTag from '@/desktop/atoms/StatusTag.vue'
 import ListRow from '@/desktop/molecules/ListRow.vue'
 
 /**
  * Görev listesindeki satır; şantiye ve ekip listelerindeki satırın aynısı: başlık, sağda termin, altında kime
- * verildiği. "Yapılacak" varsayılandır, yazılmaz; yalnızca "Devam ediyor" ve sıradan sapan öncelik etiket olur.
+ * verildiği. "Yapılacak" varsayılandır, yazılmaz; "Devam ediyor", "Kontrolde", "Eksik var" ve sıradan sapan
+ * öncelik etiket olur.
  */
 const { task, selected = false } = defineProps<{ task: TaskView; selected?: boolean }>()
 const emit = defineEmits<{ select: [] }>()
 
 const due = computed(() => dueLabel(task))
 const priority = computed(() => priorityTag(task.priority))
-const hasDetail = computed(() => !!task.assignee || task.status === 'IN_PROGRESS' || !!priority.value)
+const status = computed(() => statusTag(task.status))
+const hasDetail = computed(() => !!task.assignee || !!status.value || !!priority.value)
 </script>
 
 <template>
@@ -28,9 +30,7 @@ const hasDetail = computed(() => !!task.assignee || task.status === 'IN_PROGRESS
     </template>
     <template v-if="hasDetail">
       <span v-if="task.assignee">{{ task.assignee.fullName }}</span>
-      <StatusTag v-if="task.status === 'IN_PROGRESS'" :tone="TASK_STATUS.IN_PROGRESS.tone">
-        {{ TASK_STATUS.IN_PROGRESS.label }}
-      </StatusTag>
+      <StatusTag v-if="status" :tone="status.tone">{{ status.label }}</StatusTag>
       <StatusTag v-if="priority" :tone="priority.tone">{{ priority.label }}</StatusTag>
     </template>
   </ListRow>
