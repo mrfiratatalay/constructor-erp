@@ -8,6 +8,7 @@ import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallPopover from '@/desktop/molecules/CallPopover.vue'
+import DeliverTaskDialog from '@/desktop/organisms/DeliverTaskDialog.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
@@ -25,7 +26,7 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
  * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
  * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
- * Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette ona gider: çalışan mesajdan katılır.
+ * Sohbetin ＋ menüsündeki "İş Teslim Et" teslim penceresini açar; teslim edilince sohbet teslim mesajına gider.
  */
 type Panel = 'info' | 'search'
 
@@ -43,6 +44,14 @@ const callable = computed(() => (site.value ? callablePeople(site.value, user.va
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
+const delivering = ref(false)
+const deliveringTaskId = ref<string | null>(null)
+
+/** ＋ → İş Teslim Et (iş seçilecek) ya da eksik dönen işin kartından (iş seçili gelir). */
+function openDelivery(taskId: string | null = null) {
+  deliveringTaskId.value = taskId
+  delivering.value = true
+}
 </script>
 
 <template>
@@ -70,15 +79,17 @@ const openFound = (postId: string) => openTab('chat', postId)
       <template #tabs><SiteTabs :active="tab" @change="openTab" /></template>
       <UploadQueueList />
       <FeedColumn v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
-        @reply="composer.replyTo.value = $event" />
+        @reply="composer.replyTo.value = $event" @redeliver="openDelivery" />
       <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
-        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
+        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
+          @deliver="openDelivery()" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
     <SiteSearchPanel v-else-if="panel === 'search'" :site-id="siteId" @open="openFound" @close="panel = null" />
+    <DeliverTaskDialog v-model:show="delivering" :site-id="siteId" :task-id="deliveringTaskId" @delivered="openFound" />
   </div>
 </template>
 

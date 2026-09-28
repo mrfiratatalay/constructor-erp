@@ -11,6 +11,7 @@ import { usePinnedPosts } from '@/core/posts/usePinnedPosts'
 import { useSiteTimeline } from '@/core/posts/useSiteTimeline'
 import { eventLine } from '@/core/sites/siteEvents'
 import PostMenu from '@/desktop/molecules/PostMenu.vue'
+import DeliveryCard from '@/desktop/organisms/DeliveryCard.vue'
 import ForwardDialog from '@/desktop/organisms/ForwardDialog.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
 import PostInfoDialog from '@/desktop/organisms/PostInfoDialog.vue'
@@ -28,7 +29,7 @@ import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
  * Yoklama mesajının baloncuğunda kartı durur ("Yoklamaya Katıl").
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
-const emit = defineEmits<{ reply: [post: PostView] }>()
+const emit = defineEmits<{ reply: [post: PostView]; redeliver: [taskId: string] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
 const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
@@ -60,6 +61,9 @@ const loadOlder = () => keepPosition(scroller(), () => loadMore())
           <el-divider v-if="item.post.id === dividerBefore" class="feed-column__new">Buradan aşağısı yeni</el-divider>
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id"
             @open-photos="(urls, index) => (viewer = { urls, index })" @open-quote="jump">
+            <template v-if="item.post.deliveryId && !item.post.deletion" #card>
+              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('redeliver', taskId)" />
+            </template>
             <template v-if="!item.post.deletion" #menu>
               <PostMenu :items="postMenu(item.post, user)" @select="(action) => run(action, item.post)" />
             </template>

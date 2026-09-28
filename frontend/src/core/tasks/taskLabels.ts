@@ -35,13 +35,17 @@ export function statusTag(status: TaskViewStatus): { label: string; tone: Status
   return status === 'TODO' || status === 'DONE' ? null : TASK_STATUS[status]
 }
 
-export const TASK_PRIORITY_OPTIONS = (Object.keys(TASK_PRIORITY) as TaskViewPriority[]).map((priority) => ({
-  value: priority,
-  label: TASK_PRIORITY[priority],
-}))
+export const TASK_PRIORITY_OPTIONS = (Object.keys(TASK_PRIORITY) as TaskViewPriority[]).map(
+  (priority) => ({
+    value: priority,
+    label: TASK_PRIORITY[priority],
+  }),
+)
 
 /** Normal öncelik bilgi taşımaz, yazılmaz (TASARIM.md İlke 3); yalnızca sıradan sapan öncelik görünür. */
-export function priorityTag(priority: TaskViewPriority): { label: string; tone: StatusTone } | null {
+export function priorityTag(
+  priority: TaskViewPriority,
+): { label: string; tone: StatusTone } | null {
   if (priority === 'HIGH') return { label: 'Yüksek öncelik', tone: 'warning' }
   if (priority === 'LOW') return { label: 'Düşük öncelik', tone: 'neutral' }
   return null

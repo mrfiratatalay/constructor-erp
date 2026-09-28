@@ -6,6 +6,7 @@ import { taskName } from '@/core/tasks/taskIcon'
 /** review: şefin "İNCELE" düğmesi. redeliver: çalışanın "İş Teslim Et" düğmesi (eksik dönmüş işte). */
 export type DeliveryAction = 'review' | 'redeliver' | null
 
+/** showMark: şefin eksik cevabında noktalı fotoğraf gösterilir (çalışan eksik olan yeri görsün). */
 export interface DeliveryCard {
   title: string
   task: string
@@ -13,6 +14,7 @@ export interface DeliveryCard {
   lines: string[]
   status: { label: string; tone: StatusTone } | null
   action: DeliveryAction
+  showMark: boolean
 }
 
 const DELIVERY_STATUS: Record<TaskDeliveryView['status'], { label: string; tone: StatusTone }> = {
@@ -27,7 +29,7 @@ const DELIVERY_STATUS: Record<TaskDeliveryView['status'], { label: string; tone:
  * Cevap kartı: onaylandıysa "Tamamlandı" ve onaylayan; eksik varsa not ve çalışanda "İş Teslim Et".
  */
 export function deliveryCard(view: TaskDeliveryView, postId: string): DeliveryCard {
-  const base = { task: taskName(view.taskTitle), place: `📍 ${view.siteName}` }
+  const base = { task: taskName(view.taskTitle), place: `📍 ${view.siteName}`, showMark: false }
   if (postId === view.postId) {
     return {
       ...base,
@@ -44,6 +46,7 @@ export function deliveryCard(view: TaskDeliveryView, postId: string): DeliveryCa
       lines: [`Eksik: ${view.missingNote ?? ''}`],
       status: null,
       action: view.canRedeliver ? 'redeliver' : null,
+      showMark: !!view.mark,
     }
   }
   const reviewer = view.reviewedBy ? `Onaylayan: ${view.reviewedBy.fullName}` : ''

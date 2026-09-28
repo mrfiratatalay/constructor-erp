@@ -68,6 +68,7 @@ describe('sohbetteki teslim kartı', () => {
       lines: ['👤 Ali Usta', '📷 2 fotoğraf'],
       status: { label: 'Kontrol bekliyor', tone: 'warning' },
       action: 'review',
+      showMark: false,
     })
   })
 
@@ -76,11 +77,13 @@ describe('sohbetteki teslim kartı', () => {
       status: 'RETURNED',
       missingNote: 'Kablo bağlantısı',
       canRedeliver: true,
+      mark: { mediaId: 'p1', x: 0.5, y: 0.5 },
     })
     expect(deliveryCard(returned, 'cevap')).toMatchObject({
       title: '❌ İş tamamlanmadı',
       lines: ['Eksik: Kablo bağlantısı'],
       action: 'redeliver',
+      showMark: true,
     })
   })
 

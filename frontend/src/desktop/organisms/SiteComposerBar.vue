@@ -11,11 +11,12 @@ import PhotoSendDialog from '@/desktop/organisms/PhotoSendDialog.vue'
 import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 
 /**
- * Gönderme çubuğu, WhatsApp Masaüstü gibi: ＋ (fotoğraf-video ya da belge), yazı ve 😊, 🎤 basılı tut
+ * Gönderme çubuğu, WhatsApp Masaüstü gibi: ＋ (fotoğraf-video, belge ya da iş teslimi), yazı ve 😊, 🎤 basılı tut
  * (yukarı kaydırınca kilitlenir). Enter gönderir, Shift+Enter yeni satır. Yazı varken 🎤 yerine ➤.
- * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
+ * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur. "İş Teslim Et" bir ek değildir: teslim penceresini ister.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
+const emit = defineEmits<{ deliver: [] }>()
 const { body, replyTo } = composer
 const dialogOpen = ref(false)
 const galleryInput = useTemplateRef<HTMLInputElement>('gallery')
@@ -40,6 +41,7 @@ async function onPicked(event: Event) {
 }
 
 function onAdd(which: string) {
+  if (which === 'deliver') return emit('deliver')
   const input = which === 'pdf' ? pdfInput : galleryInput
   input.value?.click()
 }
@@ -62,6 +64,7 @@ async function send() {
           <el-dropdown-menu>
             <el-dropdown-item command="gallery">Fotoğraf ve video</el-dropdown-item>
             <el-dropdown-item command="pdf">Belge (PDF)</el-dropdown-item>
+            <el-dropdown-item command="deliver" divided>✅ İş Teslim Et</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

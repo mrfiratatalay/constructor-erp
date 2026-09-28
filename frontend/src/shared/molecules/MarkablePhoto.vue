@@ -46,7 +46,7 @@ function place(event: MouseEvent) {
 .markable-photo img {
   display: block;
   max-width: 100%;
-  max-height: 60vh;
+  max-height: 50vh;
   border-radius: var(--radius-md);
   user-select: none;
 }
