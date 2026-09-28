@@ -1,4 +1,9 @@
-import type { CurrentUserResponse, MemberViewRole, SiteLead, SiteView } from '@/core/api/generated/model'
+import type {
+  CurrentUserResponse,
+  MemberViewRole,
+  SiteLead,
+  SiteView,
+} from '@/core/api/generated/model'
 import { firstName } from '@/core/format/names'
 import { ROLE_LABELS } from '@/core/team/roles'
 
@@ -14,7 +19,11 @@ export interface Participant {
 }
 
 /** Çalışanın etiketi yazılmaz: WhatsApp'ta da yalnızca yöneticinin etiketi olur, kişilerin çoğu çalışandır. */
-const participantOf = (person: SiteLead, role: MemberViewRole, viewerId: string | undefined): Participant => ({
+const participantOf = (
+  person: SiteLead,
+  role: MemberViewRole,
+  viewerId: string | undefined,
+): Participant => ({
   id: person.id,
   fullName: person.fullName,
   name: person.id === viewerId ? 'Sen' : person.fullName,
@@ -26,21 +35,31 @@ const participantOf = (person: SiteLead, role: MemberViewRole, viewerId: string 
 
 /**
  * Şantiyenin katılımcıları: firmanın bütün kişileri (herkes her şantiyededir), bakan kişi en üstte "Sen" olarak,
- * sonra patronlar, şefler ve çalışanlar. Rol etiketi firmadaki rolüdür (Patron / Şef).
+ * sonra patronlar, şefler, depo sorumluları ve çalışanlar. Rol etiketi firmadaki rolüdür (Patron / Şef / Depo
+ * Sorumlusu).
  */
-export function siteParticipants(site: SiteView, viewer: CurrentUserResponse | undefined): Participant[] {
+export function siteParticipants(
+  site: SiteView,
+  viewer: CurrentUserResponse | undefined,
+): Participant[] {
   const people = [
     ...site.owners.map((owner) => participantOf(owner, 'OWNER', viewer?.id)),
     ...site.leads.map((lead) => participantOf(lead, 'SITE_LEAD', viewer?.id)),
+    ...site.storekeepers.map((keeper) => participantOf(keeper, 'WAREHOUSE', viewer?.id)),
     ...site.workers.map((worker) => participantOf(worker, 'WORKER', viewer?.id)),
   ]
-  return [...people.filter((person) => person.isViewer), ...people.filter((person) => !person.isViewer)]
+  return [
+    ...people.filter((person) => person.isViewer),
+    ...people.filter((person) => !person.isViewer),
+  ]
 }
 
 /** Başlığın altındaki satır, WhatsApp'taki gibi ilk adlar ve en sonda "Sen": "Musa, Ahmet, Sen". */
 export function participantLine(site: SiteView, viewer: CurrentUserResponse | undefined): string {
   const others = siteParticipants(site, viewer).filter((person) => !person.isViewer)
-  return [...others.map((person) => firstName(person.fullName)), ...(viewer ? ['Sen'] : [])].join(', ')
+  return [...others.map((person) => firstName(person.fullName)), ...(viewer ? ['Sen'] : [])].join(
+    ', ',
+  )
 }
 
 /** Başlıktaki 📞 ile aranabilecek biri: adı, firmadaki rolü, numarası. */
@@ -52,7 +71,10 @@ export interface Callable {
 }
 
 /** Başlıktaki 📞'nun listesi: numarası olan katılımcılar, patronlar önde; kişi kendini aramaz. */
-export function callablePeople(site: SiteView, viewer: CurrentUserResponse | undefined): Callable[] {
+export function callablePeople(
+  site: SiteView,
+  viewer: CurrentUserResponse | undefined,
+): Callable[] {
   return siteParticipants(site, viewer).flatMap(({ id, fullName, roleLabel, phone, isViewer }) =>
     phone && !isViewer ? [{ id, fullName, role: roleLabel, phone }] : [],
   )

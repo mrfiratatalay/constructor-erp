@@ -20,7 +20,8 @@ public class MaterialSummaries {
           count(*) filter (where status in ('AWAITING_RETURN', 'PARTIALLY_RETURNED')) as awaiting_returns,
           count(*) filter (where status in ('AWAITING_RETURN', 'PARTIALLY_RETURNED')
                            and expected_return_date < :today) as overdue_returns,
-          count(*) filter (where status in ('IN_TRANSIT', 'PENDING_CHECK')) as awaiting_delivery
+          count(*) filter (where status in ('IN_TRANSIT', 'PENDING_CHECK')) as awaiting_delivery,
+          count(*) as movement_count
         from material_movements where company_id = :company and status <> 'CANCELLED'
         """;
 

@@ -10,11 +10,24 @@ const SITE: SiteView = {
     { id: 'ahmet', fullName: 'Ahmet Usta' },
     { id: 'mehmet', fullName: 'Mehmet Kalfa' },
   ],
+  storekeepers: [],
   workers: [],
   owners: [{ id: 'patron', fullName: 'Patron' }],
 }
-const OWNER: CurrentUserResponse = { id: 'patron', fullName: 'Patron', role: 'OWNER', companyName: 'Kızılkan' }
-const AHMET: CurrentUserResponse = { id: 'ahmet', fullName: 'Ahmet Usta', role: 'SITE_LEAD', companyName: 'Kızılkan' }
+const OWNER: CurrentUserResponse = {
+  id: 'patron',
+  fullName: 'Patron',
+  role: 'OWNER',
+  companyName: 'Kızılkan',
+  permissions: [],
+}
+const AHMET: CurrentUserResponse = {
+  id: 'ahmet',
+  fullName: 'Ahmet Usta',
+  role: 'SITE_LEAD',
+  companyName: 'Kızılkan',
+  permissions: [],
+}
 
 describe('assigneeChoices', () => {
   it('patron görevi kendine ya da şantiyenin sorumlularına verebilir', () => {

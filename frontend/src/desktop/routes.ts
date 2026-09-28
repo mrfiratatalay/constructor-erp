@@ -17,6 +17,7 @@ export const routes = buildRoutes({
   attendance: attendancePage,
   memberAttendance: attendancePage,
   myPuantaj: () => import('./pages/MyPuantajPage.vue'),
+  materials: () => import('./pages/MaterialsPage.vue'),
   // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
   profile: { redirectTo: 'sites' },
 })

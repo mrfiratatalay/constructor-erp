@@ -38,6 +38,11 @@ export function shortDay(isoDate: string): string {
   return dayjs(isoDate).format('D MMM')
 }
 
+/** "28 Eyl 2026": tablolarda yılıyla kısa gün. */
+export function dayWithYear(isoDate: string): string {
+  return dayjs(isoDate).format('D MMM YYYY')
+}
+
 /** "14:20". */
 export function clockTime(isoDate: string): string {
   return dayjs(isoDate).format('HH:mm')
