@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
-import { movementFields } from '@/core/materials/movementFields'
-import { emptyMovementForm, movementFormError, type MovementForm } from '@/core/materials/movementForm'
+import type { MovementForm } from '@/core/materials/movementForm'
 import { withUnit } from '@/core/materials/quantity'
-import { useAwaitingReturns } from '@/core/materials/useAwaitingReturns'
-import { useMaterialOptions } from '@/core/materials/useMaterialOptions'
 import { useMaterialPermissions } from '@/core/materials/useMaterialPermissions'
-import { savedSummary, useMovementSave } from '@/core/materials/useMovementSave'
-import { useStockRows } from '@/core/materials/useStockRows'
+import { useMovementEditor } from '@/core/materials/useMovementEditor'
+import { savedSummary } from '@/core/materials/useMovementSave'
 import DocumentPicker from '@/desktop/molecules/DocumentPicker.vue'
 import LoanPicker from '@/desktop/molecules/LoanPicker.vue'
 import MaterialPicker from '@/desktop/molecules/MaterialPicker.vue'
-import TypeChooser from '@/desktop/molecules/TypeChooser.vue'
 import MovementFields from '@/desktop/organisms/MovementFields.vue'
+import MovementTypeCards from '@/shared/molecules/MovementTypeCards.vue'
 
 /**
  * "+ Malzeme Hareketi": sağdan geniş çekmece. Önce işlem türü, sonra yalnızca o türün alanları. Birim malzemeden gelir;
@@ -24,40 +20,18 @@ import MovementFields from '@/desktop/organisms/MovementFields.vue'
 const open = defineModel<boolean>('open', { required: true })
 const { initial = null } = defineProps<{ initial?: MovementForm | null }>()
 const emit = defineEmits<{ createMaterial: [name: string] }>()
-const form = ref<MovementForm>(emptyMovementForm())
-const options = useMaterialOptions()
-const stock = useStockRows()
-const loans = useAwaitingReturns()
+const editor = useMovementEditor(open, () => initial)
+const { form, fields, material, available, touchesSite, options, loans } = editor
 const { can } = useMaterialPermissions()
-const { save, isSaving } = useMovementSave()
-
-const fields = computed(() => movementFields(form.value.type, form.value.purpose))
-const material = computed(() => options.materialOf(form.value.materialId))
-const loan = computed(() => (form.value.type === 'RETURN' ? loans.loanOf(form.value.returnOfId) : null))
-const available = computed(() => (fields.value.source ? stock.availableAt(form.value.materialId, form.value.sourceId) : null))
-const touchesSite = computed(() =>
-  [form.value.sourceId, form.value.destinationId].some((id) => options.locationOf(id)?.kind === 'SITE'),
-)
-
-watch(open, (isOpen) => isOpen && (form.value = initial ? { ...initial } : emptyMovementForm()))
-/** Ödünç seçilince malzeme, kalan miktar ve (boşsa) dönüş lokasyonu olarak çıktığı yer gelir. */
-watch(loan, (picked) => {
-  if (!picked) return
-  Object.assign(form.value, { materialId: picked.materialId, quantity: picked.remaining })
-  form.value.destinationId ??= picked.sourceId
-})
 
 /** Yeni oluşturulan malzeme kartı forma seçili gelir (sayfa kartı kaydedince çağırır). */
-const pickMaterial = (materialId: string) => (form.value.materialId = materialId)
-defineExpose({ pickMaterial })
+defineExpose({ pickMaterial: editor.pickMaterial })
 
 async function submit() {
-  const context = { available: available.value, unit: material.value?.unit ?? '', loan: loan.value }
-  const problem = movementFormError(form.value, context)
+  const problem = editor.problem()
   if (problem) return ElMessage.warning(problem)
   try {
-    const detail = await save({ ...form.value, reflectToField: touchesSite.value && form.value.reflectToField },
-      options.parties.value)
+    const detail = await editor.submit()
     ElNotification.success({ title: 'Malzeme hareketi kaydedildi', message: savedSummary(detail) })
     open.value = false
   } catch (error) {
@@ -75,7 +49,7 @@ async function submit() {
       </el-space>
     </template>
     <el-form label-position="top" require-asterisk-position="right" @submit.prevent="submit">
-      <el-form-item label="İşlem Türü"><TypeChooser v-model="form.type" :locked="!!initial?.returnOfId" /></el-form-item>
+      <el-form-item label="İşlem Türü"><MovementTypeCards v-model="form.type" :locked="!!initial?.returnOfId" /></el-form-item>
       <el-form-item v-if="fields.returnOf" label="İlgili ödünç çıkışı" required>
         <LoanPicker v-model="form.returnOfId" :loans="loans.rows.value" />
       </el-form-item>
@@ -117,7 +91,7 @@ async function submit() {
       <el-row :gutter="12">
         <el-col :span="12"><el-button size="large" style="width: 100%" @click="open = false">İptal</el-button></el-col>
         <el-col :span="12">
-          <el-button type="primary" size="large" style="width: 100%" :loading="isSaving" @click="submit">
+          <el-button type="primary" size="large" style="width: 100%" :loading="editor.isSaving.value" @click="submit">
             Hareketi Kaydet
           </el-button>
         </el-col>

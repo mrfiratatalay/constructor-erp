@@ -7,7 +7,7 @@ import {
 import type { ListMaterialMovementsParams, MovementTypeCounts } from '@/core/api/generated/model'
 import type { MovementType } from '@/core/materials/materialLabels'
 
-const NO_COUNTS: MovementTypeCounts = {
+export const NO_COUNTS: MovementTypeCounts = {
   all: 0,
   inbound: 0,
   toSite: 0,
@@ -18,7 +18,7 @@ const NO_COUNTS: MovementTypeCounts = {
   adjustment: 0,
 }
 
-const COUNT_OF: Record<MovementType, keyof MovementTypeCounts> = {
+export const COUNT_OF: Record<MovementType, keyof MovementTypeCounts> = {
   INBOUND: 'inbound',
   TO_SITE: 'toSite',
   USED: 'used',

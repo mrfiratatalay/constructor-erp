@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { CircleDot, Package, Search, Store } from 'lucide-vue-next'
 import type { LocationView, MaterialView, PartyView } from '@/core/api/generated/model'
 import type { DatePreset, DateRange } from '@/core/materials/dateRanges'
 import { STATUS_LOOKS, type MovementStatus } from '@/core/materials/materialLabels'
 import type { MovementFilters } from '@/core/materials/movementQuery'
+import { useSearchText } from '@/core/materials/useSearchText'
 import DateFilter from '@/desktop/molecules/DateFilter.vue'
 import LocationSelect from '@/desktop/molecules/LocationSelect.vue'
 
@@ -23,14 +24,7 @@ const STATUSES = Object.keys(STATUS_LOOKS) as MovementStatus[]
 const SELECT = { width: '190px' }
 const range = computed<DateRange>(() => ({ from: filters.from, to: filters.to }))
 const set = <K extends keyof MovementFilters>(key: K) => (value: MovementFilters[K]) => emit('update', { [key]: value })
-/** Arama kutusu kendi yazısını tutar; adres (süzgeç) yazmayı bırakınca güncellenir. */
-const text = ref(filters.q)
-watch(() => filters.q, (value) => (text.value = value))
-let searchTimer: ReturnType<typeof setTimeout> | undefined
-watch(text, (value) => {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => value !== filters.q && emit('update', { q: value }), 300)
-})
+const text = useSearchText(() => filters.q, (q) => emit('update', { q }))
 </script>
 
 <template>
