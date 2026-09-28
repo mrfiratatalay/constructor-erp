@@ -64,8 +64,16 @@ public class Task {
         status = next;
     }
 
+    boolean isAssignedTo(UUID userId) {
+        return userId.equals(assigneeId);
+    }
+
     public UUID getId() {
         return id;
+    }
+
+    public UUID getCompanyId() {
+        return companyId;
     }
 
     public UUID getSiteId() {

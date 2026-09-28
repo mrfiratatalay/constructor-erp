@@ -38,6 +38,9 @@ public class PostDeletions {
         if (post.isDeleted()) {
             throw ApiException.conflict("Bu gönderi zaten silinmiş.");
         }
+        if (post.isDeliveryRecord()) {
+            throw ApiException.conflict("İş teslimi silinmez: işin kanıtıdır.");
+        }
         post.delete(user.userId(), clock.instant());
         mediaRemoval.removeForPost(post.getId());
         return views.of(post);

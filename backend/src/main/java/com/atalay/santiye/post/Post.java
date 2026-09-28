@@ -32,6 +32,7 @@ public class Post {
     private UUID pinnedBy;
     @Column(name = "is_field_update")
     private boolean fieldUpdate;
+    private UUID deliveryId;
 
     protected Post() {
     }
@@ -47,6 +48,18 @@ public class Post {
         this.forwarded = post.forwarded();
         this.fieldUpdate = post.fieldUpdate();
         this.createdAt = createdAt;
+    }
+
+    /** İş teslimi ya da şefin cevabı: mesaj bir teslime bağlıdır, baloncukta kartı çizilir (DeliveryPosts). */
+    static Post forDelivery(NewPost post, UUID deliveryId, Instant createdAt) {
+        Post message = new Post(post, createdAt);
+        message.deliveryId = deliveryId;
+        return message;
+    }
+
+    /** Teslim ve cevabı işin kanıtıdır: silinmez, düzeltilmez, iletilmez. */
+    boolean isDeliveryRecord() {
+        return deliveryId != null;
     }
 
     public boolean isOpenIssue() {
@@ -169,5 +182,9 @@ public class Post {
 
     public boolean isFieldUpdate() {
         return fieldUpdate;
+    }
+
+    public UUID getDeliveryId() {
+        return deliveryId;
     }
 }
