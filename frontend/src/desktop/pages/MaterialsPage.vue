@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import { ArrowRightLeft, Boxes } from 'lucide-vue-next'
 import type { MovementRow } from '@/core/api/generated/model'
-import type { MovementForm } from '@/core/materials/movementForm'
+import { emptyMovementForm, returnFormOf, type MovementForm } from '@/core/materials/movementForm'
+import { useAwaitingReturns } from '@/core/materials/useAwaitingReturns'
 import { ROLE_LABELS } from '@/core/team/roles'
 import { useMaterialPermissions } from '@/core/materials/useMaterialPermissions'
 import { useMaterialsView, type MaterialsTab } from '@/core/materials/useMaterialsView'
@@ -10,6 +11,7 @@ import { useMaterialSummary } from '@/core/materials/useMovementList'
 import { useMovementFilters } from '@/core/materials/useMovementFilters'
 import { useMovementPrompts } from '@/desktop/movementPrompts'
 import MaterialsHeader from '@/desktop/molecules/MaterialsHeader.vue'
+import MovementDetailDrawer from '@/desktop/organisms/MovementDetailDrawer.vue'
 import MovementDrawer from '@/desktop/organisms/MovementDrawer.vue'
 import MovementsBoard from '@/desktop/organisms/MovementsBoard.vue'
 import SummaryCards from '@/desktop/organisms/SummaryCards.vue'
@@ -27,6 +29,7 @@ const { summary } = useMaterialSummary()
 const { can, user } = useMaterialPermissions()
 const { update } = useMovementFilters()
 const prompts = useMovementPrompts()
+const loans = useAwaitingReturns()
 const movementOpen = ref(false)
 const initial = ref<MovementForm | null>(null)
 const role = computed(() => (user.value ? ROLE_LABELS[user.value.role] : ''))
@@ -36,10 +39,16 @@ function createMovement(form: MovementForm | null = null) {
   movementOpen.value = true
 }
 
+/** İade boş formdan değil ödünç çıkışından başlar: malzeme, firma ve kalan miktar oradan gelir. */
+function takeReturn(loanId: string) {
+  const loan = loans.loanOf(loanId)
+  createMovement(loan ? returnFormOf(loan) : { ...emptyMovementForm('RETURN'), returnOfId: loanId })
+}
+
 function onSummary(key: 'materials' | 'toSite' | 'outbound' | 'returns') {
   if (key === 'materials') return view.setTab('stock')
   view.setTab('movements')
-  if (key === 'toSite') update({ type: 'TO_SITE', preset: 'thisMonth', ...{} })
+  if (key === 'toSite') update({ type: 'TO_SITE', preset: 'thisMonth' })
   if (key === 'outbound') update({ type: 'OUTBOUND', preset: 'thisMonth' })
 }
 
@@ -47,6 +56,7 @@ function onCommand(command: Command, row: MovementRow) {
   if (command === 'open') return view.openMovement(row.id)
   if (command === 'deliver') return prompts.deliver(row)
   if (command === 'cancel') return prompts.cancel(row)
+  takeReturn(row.id)
 }
 </script>
 
@@ -70,4 +80,6 @@ function onCommand(command: Command, row: MovementRow) {
     </el-main>
   </el-scrollbar>
   <MovementDrawer v-model:open="movementOpen" :initial="initial" />
+  <MovementDetailDrawer :movement-id="view.movementId.value" @close="view.closeMovement" @open="view.openMovement"
+    @take-return="takeReturn" />
 </template>
