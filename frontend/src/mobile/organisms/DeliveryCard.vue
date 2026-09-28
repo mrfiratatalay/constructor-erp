@@ -11,7 +11,8 @@ import MarkablePhoto from '@/shared/molecules/MarkablePhoto.vue'
 /**
  * Sohbetteki iş teslimi kartı (fotoğraflar baloncukta üstte). Teslim mesajında: iş, şantiye, kim, kaç fotoğraf,
  * durum; şef ya da patronda büyük "İNCELE". Şefin cevabında: "Tamamlandı" ya da "İş tamamlanmadı" + eksik notu ve
- * noktalı fotoğraf; işin sorumlusunda "✅ İş Teslim Et" (eksiğini tamamlayıp yeniden teslim eder).
+ * noktalı fotoğraf; işin sorumlusunda "✅ İş Teslim Et" (eksiğini tamamlayıp yeniden teslim eder). Teslimin
+ * ayrıntısı gelene kadar (internet yavaş ya da istek düştü) mesajın kendi yazısı görünür: baloncuk boş kalmaz.
  */
 const { post } = defineProps<{ post: PostView }>()
 const emit = defineEmits<{ redeliver: [taskId: string] }>()
@@ -50,6 +51,7 @@ const onSendBack = (request: ReturnDeliveryRequest) => review(() => returnWith(r
     <DeliveryReviewSheet v-if="card.action === 'review'" v-model:show="reviewing" :delivery="view"
       :busy="isReviewing" @approve="onApprove" @send-back="onSendBack" />
   </van-space>
+  <span v-else>{{ post.body }}</span>
 </template>
 
 <style scoped>
