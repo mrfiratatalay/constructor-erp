@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/vue-query'
+import { FEED_QUERY_PREFIX } from '@/core/posts/useFeed'
 
 /**
  * Malzemenin bütün sorguları bu öneklerle başlar (üretilen anahtarlar). Bir hareket kaydedilince, iptal edilince ya
@@ -10,7 +11,8 @@ const MATERIAL_QUERY_PREFIXES = [
   ['api', 'materials'],
   ['api', 'material-parties'],
   ['api', 'stock-locations'],
-  ['api', 'posts'],
+  // Saha'ya yansıyan hareket şantiyenin akışına (Sohbet ve Saha) düşer.
+  [FEED_QUERY_PREFIX],
 ]
 
 export function refreshMaterials(queryClient: QueryClient) {
