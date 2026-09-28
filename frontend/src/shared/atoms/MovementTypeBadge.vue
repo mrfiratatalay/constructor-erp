@@ -14,8 +14,9 @@ const look = computed(() => TYPE_LOOKS[type])
 
 <template>
   <span class="movement-badge" :class="[`movement-badge--${look.tone}`, `movement-badge--${size}`]">
-    <component :is="TYPE_ICONS[type]" :size="size === 'small' ? 13 : 15" :stroke-width="2.25" aria-hidden="true" />
-    {{ look.label }}
+    <component :is="TYPE_ICONS[type]" :size="size === 'small' ? 13 : 15" :stroke-width="2.25" aria-hidden="true"
+      class="movement-badge__icon" />
+    <span class="movement-badge__label">{{ look.label }}</span>
   </span>
 </template>
 
@@ -33,6 +34,16 @@ const look = computed(() => TYPE_LOOKS[type])
   font-weight: var(--weight-semibold);
   line-height: 18px;
   white-space: nowrap;
+}
+
+/* Dar sütunda simge büzülmez, yazı "…" ile kısalır: tür simgeden de okunur. */
+.movement-badge__icon {
+  flex: none;
+}
+
+.movement-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .movement-badge--small {

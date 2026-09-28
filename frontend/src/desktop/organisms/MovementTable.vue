@@ -47,7 +47,7 @@ const rowClass = ({ row }: { row: unknown }) => (rowOf(row).status === 'CANCELLE
     <el-table-column prop="materialName" label="Malzeme" min-width="150" sortable="custom">
       <template #default="{ row }"><MaterialCell :name="row.materialName" :code="row.materialCode" /></template>
     </el-table-column>
-    <el-table-column label="Hareket" min-width="184">
+    <el-table-column label="Hareket" min-width="196">
       <template #default="{ row }"><MovementTypeBadge :type="row.type" /></template>
     </el-table-column>
     <el-table-column label="Nereden" min-width="124" show-overflow-tooltip>
@@ -62,7 +62,7 @@ const rowClass = ({ row }: { row: unknown }) => (rowOf(row).status === 'CANCELLE
     <el-table-column label="Durum" min-width="150">
       <template #default="{ row }"><MovementStatusTag :status="row.status" /></template>
     </el-table-column>
-    <el-table-column label="Açıklama" min-width="140" show-overflow-tooltip>
+    <el-table-column label="Açıklama" min-width="128" show-overflow-tooltip>
       <template #default="{ row }">
         <el-space :size="6">
           <el-text v-if="row.documentCount" type="info"><Paperclip :size="14" aria-label="Belgesi var" /></el-text>
