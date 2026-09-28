@@ -11,6 +11,7 @@ import { useJumpTarget } from '@/core/posts/useJumpTarget'
 import { usePinnedPosts } from '@/core/posts/usePinnedPosts'
 import { useSiteTimeline } from '@/core/posts/useSiteTimeline'
 import { eventLine } from '@/core/sites/siteEvents'
+import DeliveryCard from '@/mobile/organisms/DeliveryCard.vue'
 import PostActionSheet from '@/mobile/organisms/PostActionSheet.vue'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
 import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
@@ -25,7 +26,7 @@ import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
  * Mesaja uzun basınca menü açılır; Yanıtla, gönderme çubuğuna (sayfaya) iletilir.
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
-const emit = defineEmits<{ reply: [post: PostView] }>()
+const emit = defineEmits<{ reply: [post: PostView]; redeliver: [taskId: string] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
 const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
@@ -60,7 +61,11 @@ function openPhotos(urls: string[], index: number) {
         <template v-else>
           <van-divider v-if="item.post.id === dividerBefore" class="feed-list__new">Buradan aşağısı yeni</van-divider>
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id" v-bind="pressHandlers(item.post)"
-            @open-photos="openPhotos" @open-quote="jump" />
+            @open-photos="openPhotos" @open-quote="jump">
+            <template v-if="item.post.deliveryId && !item.post.deletion" #card>
+              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('redeliver', taskId)" />
+            </template>
+          </PostBubble>
         </template>
       </template>
     </section>

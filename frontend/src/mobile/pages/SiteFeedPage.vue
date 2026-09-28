@@ -11,6 +11,7 @@ import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallButton from '@/mobile/molecules/CallButton.vue'
 import SiteTabs from '@/mobile/molecules/SiteTabs.vue'
 import StatusNotice from '@/mobile/molecules/StatusNotice.vue'
+import DeliverTaskSheet from '@/mobile/organisms/DeliverTaskSheet.vue'
 import FeedList from '@/mobile/organisms/FeedList.vue'
 import FieldComposer from '@/mobile/organisms/FieldComposer.vue'
 import FieldList from '@/mobile/organisms/FieldList.vue'
@@ -25,8 +26,8 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * sağda 📞 (tek kişiyi doğrudan arar, çok kişide liste) ve ⋮ (Şantiye bilgisi, Bu şantiyede ara; telefonda yer
  * dar, 🔍 dışarı çıkmaz). Başlığın altında iki sekme: Sohbet ve Saha (günlük);
  * /santiyeler/:id ve /santiyeler/:id/saha bu sayfadır. İki sekmenin taslağı ayrıdır. Sayfa açılınca şantiye
- * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette
- * ona gider: çalışan mesajdan katılır.
+ * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki "İş Teslim Et" teslim sayfasını açar; teslim
+ * edilince sohbet teslim mesajına gider.
  */
 const route = useRoute()
 const siteId = computed(() => String(route.params.siteId))
@@ -52,6 +53,14 @@ function onMore(action: { key: string }) {
 
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
+const delivering = ref(false)
+const deliveringTaskId = ref<string | null>(null)
+
+/** ＋ → İş Teslim Et (iş seçilecek) ya da eksik dönen işin kartından (iş seçili gelir). */
+function openDelivery(taskId: string | null = null) {
+  deliveringTaskId.value = taskId
+  delivering.value = true
+}
 </script>
 
 <template>
@@ -69,14 +78,15 @@ const openFound = (postId: string) => openTab('chat', postId)
     <template #subbar><SiteTabs :active="tab" @change="openTab" /></template>
     <StatusNotice v-if="site?.status === 'COMPLETED'" tone="neutral" text="Bu şantiye tamamlandı." />
     <FeedList v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
-      @reply="composer.replyTo.value = $event" />
+      @reply="composer.replyTo.value = $event" @redeliver="openDelivery" />
     <FieldList v-else-if="site" :site="site" />
     <template v-if="site" #footer>
-      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
+      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" @deliver="openDelivery()" />
       <FieldComposer v-else :composer="fieldComposer" />
     </template>
     <SiteInfoSheet v-if="site" v-model:show="infoOpen" :site="site" />
     <SiteSearchSheet v-model:show="searchOpen" :site-id="siteId" @open="openFound" />
+    <DeliverTaskSheet v-model:show="delivering" :site-id="siteId" :task-id="deliveringTaskId" @delivered="openFound" />
     <van-action-sheet v-model:show="moreOpen" :actions="MORE" cancel-text="Vazgeç" teleport="body"
       @select="onMore" />
   </MobilePage>

@@ -12,9 +12,11 @@ import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 /**
  * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video ya da belge), yazı, 📷 (doğrudan kamera),
  * 🎤 basılı tut. 🎤'dan yukarı kaydırınca kayıt kilitlenir; sonra 🗑 ya da ➤. Yazı varken 📷 ve 🎤 yerine ➤.
- * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur.
+ * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur. ＋'daki "İş Teslim Et" bir ek değildir: teslim sayfasını
+ * ister.
  */
 const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
+const emit = defineEmits<{ deliver: [] }>()
 const { body, replyTo } = composer
 const sheetOpen = ref(false)
 const menuOpen = ref(false)
@@ -28,6 +30,7 @@ const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
 const MENU = [
   { name: 'Fotoğraf ve video', key: 'gallery' },
   { name: 'Belge (PDF)', key: 'pdf' },
+  { name: '✅ İş Teslim Et', key: 'deliver' },
 ]
 
 async function addFiles(files: File[]) {
@@ -47,6 +50,7 @@ async function onPicked(event: Event) {
 
 function onMenu(action: { key: string }) {
   menuOpen.value = false
+  if (action.key === 'deliver') return emit('deliver')
   const input = action.key === 'gallery' ? galleryInput : pdfInput
   input.value?.click()
 }
