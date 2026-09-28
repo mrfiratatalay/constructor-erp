@@ -8,7 +8,8 @@ import java.util.UUID;
 
 /**
  * İadesi beklenen ödünç çıkışı: "ABC İnşaat · Kalıp Malzemesi · verilen 100, dönen 60, kalan 40 Adet · 05.10.2026".
- * "İade Al" bu satırdan girilir; malzeme ve firma çıkıştan gelir, yanlış ilişki kurulamaz.
+ * "İade Al" bu satırdan girilir; malzeme ve firma çıkıştan gelir, yanlış ilişki kurulamaz. sourceId: malzemenin
+ * çıktığı lokasyon; iade formunda dönüş lokasyonu olarak önerilir.
  */
 public record ReturnRow(
     UUID movementId,
@@ -18,6 +19,7 @@ public record ReturnRow(
     String materialName,
     String unit,
     @Nullable String partyName,
+    UUID sourceId,
     String sourceName,
     BigDecimal quantity,
     BigDecimal returned,

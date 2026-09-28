@@ -40,7 +40,12 @@ const touchesSite = computed(() =>
 )
 
 watch(open, (isOpen) => isOpen && (form.value = initial ? { ...initial } : emptyMovementForm()))
-watch(loan, (picked) => picked && Object.assign(form.value, { materialId: picked.materialId, quantity: picked.remaining }))
+/** Ödünç seçilince malzeme, kalan miktar ve (boşsa) dönüş lokasyonu olarak çıktığı yer gelir. */
+watch(loan, (picked) => {
+  if (!picked) return
+  Object.assign(form.value, { materialId: picked.materialId, quantity: picked.remaining })
+  form.value.destinationId ??= picked.sourceId
+})
 
 /** Yeni oluşturulan malzeme kartı forma seçili gelir (sayfa kartı kaydedince çağırır). */
 const pickMaterial = (materialId: string) => (form.value.materialId = materialId)
@@ -95,7 +100,7 @@ async function submit() {
       <MovementFields v-model="form" :locations="options.locations.value" :parties="options.parties.value" />
       <el-form-item :label="fields.descriptionLabel">
         <el-input v-model="form.description" type="textarea" :rows="3" maxlength="500" show-word-limit
-          placeholder="Kısa bir not: ne için, kim teslim aldı…" />
+          :placeholder="fields.descriptionHint" />
       </el-form-item>
       <el-form-item label="Belge / İrsaliye Ekle"><DocumentPicker v-model="form.files" /></el-form-item>
       <el-form-item v-if="touchesSite">

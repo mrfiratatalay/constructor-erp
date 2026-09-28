@@ -15,6 +15,7 @@ export interface ReturnRow {
   unit: string
   /** @nullable */
   partyName?: string | null
+  sourceId: string
   sourceName: string
   quantity: number
   returned: number

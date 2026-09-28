@@ -18,6 +18,8 @@ export interface PartyField {
  * malzemesini oradan alır.
  */
 export interface MovementFields {
+  /** Açıklama kutusunun ipucu: iadede malzemenin hangi durumda döndüğü sorulur. */
+  descriptionHint: string
   source: EndField | null
   destination: EndField | null
   party: PartyField | null
@@ -43,6 +45,7 @@ const BASE: MovementFields = {
   check: false,
   returnOf: false,
   descriptionLabel: 'Açıklama',
+  descriptionHint: 'Kısa bir not: ne için, kim teslim aldı…',
 }
 
 const FROM: EndField = { label: 'Nereden', sitesOnly: false }
@@ -72,6 +75,7 @@ const FIELDS: Record<Exclude<MovementType, 'ADJUSTMENT'>, Partial<MovementFields
     destination: { label: 'Dönüş lokasyonu', sitesOnly: false },
     returnOf: true,
     descriptionLabel: 'Kalite notu',
+    descriptionHint: 'Malzeme hangi durumda döndü? Eksik ya da hasarlı var mı?',
   },
 }
 

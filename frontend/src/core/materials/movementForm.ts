@@ -57,6 +57,7 @@ export const returnFormOf = (loan: ReturnRow): MovementForm => ({
   returnOfId: loan.movementId,
   materialId: loan.materialId,
   quantity: loan.remaining,
+  destinationId: loan.sourceId,
 })
 
 /** Formun bildiği dış bilgiler: kaynaktaki kullanılabilir stok ve seçilen ödüncün kalanı. */

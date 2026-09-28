@@ -24,7 +24,7 @@ public class MaterialInsights {
 
     private static final String RETURNS = """
         select o.id as movement_id, o.number, o.day, o.material_id, m.name as material_name, m.unit,
-               p.name as party_name, coalesce(sl.name, ss.name) as source_name, o.quantity,
+               p.name as party_name, o.source_id, coalesce(sl.name, ss.name) as source_name, o.quantity,
                coalesce(r.returned, 0) as returned, o.quantity - coalesce(r.returned, 0) as remaining,
                o.expected_return_date, o.return_note, o.status
         from material_movements o
