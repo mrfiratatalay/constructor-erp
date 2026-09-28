@@ -13,6 +13,7 @@ import { useSiteTimeline } from '@/core/posts/useSiteTimeline'
 import { eventLine } from '@/core/sites/siteEvents'
 import DeliveryCard from '@/mobile/organisms/DeliveryCard.vue'
 import PostActionSheet from '@/mobile/organisms/PostActionSheet.vue'
+import TaskCard from '@/mobile/organisms/TaskCard.vue'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
 import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
 import PinnedBanner from '@/shared/molecules/PinnedBanner.vue'
@@ -23,10 +24,11 @@ import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
  * Şantiyenin akışı, WhatsApp'taki sohbet gibi: üstte sabit mesaj şeridi, en eski üstte, en yenisi altta,
  * aralarda sistem satırları ("Patron, Musa'yı ekledi"), en dipte henüz gitmemiş mesajlar (🕓). Yukarı
  * kaydırınca geçmiş gelir ve ekran zıplamaz. seenAt: önceki bakış; sonrasına "buradan aşağısı yeni" çizgisi.
- * Mesaja uzun basınca menü açılır; Yanıtla, gönderme çubuğuna (sayfaya) iletilir.
+ * Mesaja uzun basınca menü açılır; Yanıtla, gönderme çubuğuna (sayfaya) iletilir. Görev ve iş teslimi
+ * mesajlarının baloncuğunda kartları durur; ikisinin "İŞİ TESLİM ET"i de teslim sayfasını iş seçili açtırır.
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
-const emit = defineEmits<{ reply: [post: PostView]; redeliver: [taskId: string] }>()
+const emit = defineEmits<{ reply: [post: PostView]; deliver: [taskId: string] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
 const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
@@ -63,7 +65,10 @@ function openPhotos(urls: string[], index: number) {
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id" v-bind="pressHandlers(item.post)"
             @open-photos="openPhotos" @open-quote="jump">
             <template v-if="item.post.deliveryId && !item.post.deletion" #card>
-              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('redeliver', taskId)" />
+              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('deliver', taskId)" />
+            </template>
+            <template v-else-if="item.post.taskId && !item.post.deletion" #card>
+              <TaskCard :post="item.post" @deliver="(taskId) => emit('deliver', taskId)" />
             </template>
           </PostBubble>
         </template>

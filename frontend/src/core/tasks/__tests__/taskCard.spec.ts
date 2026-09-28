@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 import type { CurrentUserResponse, TaskView } from '@/core/api/generated/model'
 import { dueDateOf, isPastDay } from '@/core/tasks/dueChoice'
+import { EMPTY_QUICK_TASK, isQuickTaskReady, quickTaskForm } from '@/core/tasks/quickTask'
 import { taskCard } from '@/core/tasks/taskCard'
 import { canAssignTasks } from '@/core/tasks/taskPermissions'
 
@@ -66,6 +67,27 @@ describe('görev penceresi', () => {
     expect(dueDateOf('date', null, today)).toBeNull()
     expect(isPastDay(new Date(2026, 8, 27), today)).toBe(true)
     expect(isPastDay(new Date(2026, 8, 28), today)).toBe(false)
+  })
+
+  it('üç soru cevaplanınca görev verilir; öncelik Normal, not yok', () => {
+    const answered = {
+      title: '  Kalıp sökülecek ',
+      assigneeId: 'ali',
+      due: 'tomorrow' as const,
+      date: null,
+    }
+    expect(isQuickTaskReady(EMPTY_QUICK_TASK)).toBe(false)
+    expect(isQuickTaskReady({ ...answered, title: '   ' })).toBe(false)
+    expect(isQuickTaskReady({ ...answered, assigneeId: undefined })).toBe(false)
+    expect(isQuickTaskReady({ ...answered, due: 'date' })).toBe(false)
+    expect(isQuickTaskReady({ ...answered, due: 'date', date: '2026-10-05' })).toBe(true)
+    expect(quickTaskForm(answered, today)).toEqual({
+      title: 'Kalıp sökülecek',
+      note: null,
+      assigneeId: 'ali',
+      dueDate: '2026-09-29',
+      priority: 'NORMAL',
+    })
   })
 
   it('＋ menüsündeki Görev patronda ve şefte, çalışanda değil', () => {

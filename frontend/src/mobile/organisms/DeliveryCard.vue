@@ -9,10 +9,11 @@ import DeliveryReviewSheet from '@/mobile/organisms/DeliveryReviewSheet.vue'
 import MarkablePhoto from '@/shared/molecules/MarkablePhoto.vue'
 
 /**
- * Sohbetteki iş teslimi kartı (fotoğraflar baloncukta üstte). Teslim mesajında: iş, şantiye, kim, kaç fotoğraf,
- * durum; şef ya da patronda büyük "İNCELE". Şefin cevabında: "Tamamlandı" ya da "İş tamamlanmadı" + eksik notu ve
- * noktalı fotoğraf; işin sorumlusunda "✅ İş Teslim Et" (eksiğini tamamlayıp yeniden teslim eder). Teslimin
- * ayrıntısı gelene kadar (internet yavaş ya da istek düştü) mesajın kendi yazısı görünür: baloncuk boş kalmaz.
+ * Sohbetteki iş teslimi kartı (fotoğraflar baloncukta üstte), görev kartına yanıt olarak düşer. Teslim mesajında:
+ * iş, kim, kaç fotoğraf, durum; şef ya da patronda büyük "İNCELE". Şefin cevabında: "✅ TAMAMLANDI" ya da "❌ İŞ
+ * TAMAMLANMADI" + eksik notu ve noktalı fotoğraf; işin sorumlusunda "✅ İŞİ TESLİM ET" (eksiğini tamamlayıp
+ * yeniden teslim eder). Teslimin ayrıntısı gelene kadar (internet yavaş ya da istek düştü) mesajın kendi yazısı
+ * görünür: baloncuk boş kalmaz.
  */
 const { post } = defineProps<{ post: PostView }>()
 const emit = defineEmits<{ redeliver: [taskId: string] }>()
@@ -45,7 +46,7 @@ const onSendBack = (request: ReturnDeliveryRequest) => review(() => returnWith(r
     </van-button>
     <van-button v-else-if="card.action === 'redeliver'" type="success" block round
       @click="emit('redeliver', view.taskId)">
-      ✅ İş Teslim Et
+      ✅ İŞİ TESLİM ET
     </van-button>
     <DeliveryReviewSheet v-if="card.action === 'review'" v-model:show="reviewing" :delivery="view"
       :busy="isReviewing" @approve="onApprove" @send-back="onSendBack" />

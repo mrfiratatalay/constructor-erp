@@ -7,10 +7,12 @@ import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
+import { canAssignTasks } from '@/core/tasks/taskPermissions'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallButton from '@/mobile/molecules/CallButton.vue'
 import SiteTabs from '@/mobile/molecules/SiteTabs.vue'
 import StatusNotice from '@/mobile/molecules/StatusNotice.vue'
+import AssignTaskSheet from '@/mobile/organisms/AssignTaskSheet.vue'
 import DeliverTaskSheet from '@/mobile/organisms/DeliverTaskSheet.vue'
 import FeedList from '@/mobile/organisms/FeedList.vue'
 import FieldComposer from '@/mobile/organisms/FieldComposer.vue'
@@ -26,8 +28,8 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * sağda 📞 (tek kişiyi doğrudan arar, çok kişide liste) ve ⋮ (Şantiye bilgisi, Bu şantiyede ara; telefonda yer
  * dar, 🔍 dışarı çıkmaz). Başlığın altında iki sekme: Sohbet ve Saha (günlük);
  * /santiyeler/:id ve /santiyeler/:id/saha bu sayfadır. İki sekmenin taslağı ayrıdır. Sayfa açılınca şantiye
- * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki "İş Teslim Et" teslim sayfasını açar; teslim
- * edilince sohbet teslim mesajına gider.
+ * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki "📋 Görev" görev penceresini (patron, şef),
+ * "İş Teslim Et" teslim sayfasını açar; teslim edilince sohbet teslim mesajına gider.
  */
 const route = useRoute()
 const siteId = computed(() => String(route.params.siteId))
@@ -53,10 +55,12 @@ function onMore(action: { key: string }) {
 
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
+const canAssign = computed(() => canAssignTasks(user.value))
+const assigning = ref(false)
 const delivering = ref(false)
 const deliveringTaskId = ref<string | null>(null)
 
-/** ＋ → İş Teslim Et (iş seçilecek) ya da eksik dönen işin kartından (iş seçili gelir). */
+/** ＋ → İş Teslim Et (iş seçilecek) ya da görev kartından, eksik dönen işin kartından (iş seçili gelir). */
 function openDelivery(taskId: string | null = null) {
   deliveringTaskId.value = taskId
   delivering.value = true
@@ -78,14 +82,16 @@ function openDelivery(taskId: string | null = null) {
     <template #subbar><SiteTabs :active="tab" @change="openTab" /></template>
     <StatusNotice v-if="site?.status === 'COMPLETED'" tone="neutral" text="Bu şantiye tamamlandı." />
     <FeedList v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
-      @reply="composer.replyTo.value = $event" @redeliver="openDelivery" />
+      @reply="composer.replyTo.value = $event" @deliver="openDelivery" />
     <FieldList v-else-if="site" :site="site" />
     <template v-if="site" #footer>
-      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" @deliver="openDelivery()" />
+      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" :can-assign="canAssign"
+        @assign="assigning = true" @deliver="openDelivery()" />
       <FieldComposer v-else :composer="fieldComposer" />
     </template>
     <SiteInfoSheet v-if="site" v-model:show="infoOpen" :site="site" />
     <SiteSearchSheet v-model:show="searchOpen" :site-id="siteId" @open="openFound" />
+    <AssignTaskSheet v-if="site && canAssign" v-model:show="assigning" :site="site" />
     <DeliverTaskSheet v-model:show="delivering" :site-id="siteId" :task-id="deliveringTaskId" @delivered="openFound" />
     <van-action-sheet v-model:show="moreOpen" :actions="MORE" cancel-text="Vazgeç" teleport="body"
       @select="onMore" />

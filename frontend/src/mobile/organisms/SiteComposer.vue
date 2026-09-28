@@ -12,11 +12,15 @@ import QuoteStrip from '@/shared/molecules/QuoteStrip.vue'
 /**
  * Gönderme çubuğu, iPhone'daki WhatsApp gibi: ＋ (fotoğraf-video ya da belge), yazı, 📷 (doğrudan kamera),
  * 🎤 basılı tut. 🎤'dan yukarı kaydırınca kayıt kilitlenir; sonra 🗑 ya da ➤. Yazı varken 📷 ve 🎤 yerine ➤.
- * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur. ＋'daki "İş Teslim Et" bir ek değildir: teslim sayfasını
- * ister.
+ * Yanıtlanan mesaj çubuğun üstünde alıntı olarak durur. ＋'daki "📋 Görev" ve "İş Teslim Et" ek değildir: kendi
+ * pencerelerini isterler. "📋 Görev" yalnızca görevi verenlerde (patron, şef) görünür.
  */
-const { composer, siteName } = defineProps<{ composer: Composer; siteName: string }>()
-const emit = defineEmits<{ deliver: [] }>()
+const { composer, siteName, canAssign = false } = defineProps<{
+  composer: Composer
+  siteName: string
+  canAssign?: boolean
+}>()
+const emit = defineEmits<{ assign: []; deliver: [] }>()
 const { body, replyTo } = composer
 const sheetOpen = ref(false)
 const menuOpen = ref(false)
@@ -27,11 +31,12 @@ const voice = useVoiceNote(composer, showFailToast)
 const { isRecording, seconds, locked, showMic } = voice
 const hasText = computed(() => body.value.trim() !== '')
 const quote = computed(() => (replyTo.value ? quoteOf(replyTo.value) : null))
-const MENU = [
+const menu = computed(() => [
   { name: 'Fotoğraf ve video', key: 'gallery' },
   { name: 'Belge (PDF)', key: 'pdf' },
+  ...(canAssign ? [{ name: '📋 Görev', key: 'assign' }] : []),
   { name: '✅ İş Teslim Et', key: 'deliver' },
-]
+])
 
 async function addFiles(files: File[]) {
   const problems = await composer.addFiles(files)
@@ -50,6 +55,7 @@ async function onPicked(event: Event) {
 
 function onMenu(action: { key: string }) {
   menuOpen.value = false
+  if (action.key === 'assign') return emit('assign')
   if (action.key === 'deliver') return emit('deliver')
   const input = action.key === 'gallery' ? galleryInput : pdfInput
   input.value?.click()
@@ -96,7 +102,7 @@ function onMenu(action: { key: string }) {
     <input ref="pdf" type="file" accept="application/pdf" multiple hidden @change="onPicked" />
     <input ref="camera" type="file" accept="image/*" capture="environment" hidden @change="onPicked" />
   </div>
-  <van-action-sheet v-model:show="menuOpen" :actions="MENU" cancel-text="Vazgeç" teleport="body" @select="onMenu" />
+  <van-action-sheet v-model:show="menuOpen" :actions="menu" cancel-text="Vazgeç" teleport="body" @select="onMenu" />
   <PhotoSendSheet v-model:show="sheetOpen" :composer="composer" :site-name="siteName" @add-files="addFiles" />
 </template>
 
