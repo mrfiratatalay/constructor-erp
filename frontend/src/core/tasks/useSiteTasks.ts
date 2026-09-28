@@ -27,8 +27,7 @@ export function formOf(task: TaskView): TaskForm {
 /** Bir şantiyenin görevleri ve bütün işleri; kabuklar yalnızca görüntüler. Her değişiklikten sonra liste yenilenir. */
 export function useSiteTasks(siteId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
-  const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: getListSiteTasksQueryKey(toValue(siteId)) })
+  const refresh = () => queryClient.invalidateQueries({ queryKey: getListSiteTasksQueryKey(toValue(siteId)) })
   const list = useListSiteTasks(siteId)
   const create = useCreateTask({ mutation: { onSuccess: refresh } })
   const update = useUpdateTask({ mutation: { onSuccess: refresh } })

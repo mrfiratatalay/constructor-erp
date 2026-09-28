@@ -7,10 +7,7 @@ import type { StatusTone } from '@/core/format/statusTone'
  * Terminin ne anlama geldiği yazıyla (TASARIM.md İlke 2): "3 gün gecikti", "Bugün teslim", "Termin 12 Eki".
  * Tamamlanan ya da termini olmayan görevde yazılacak bir şey yoktur (İlke 3).
  */
-export function dueLabel(
-  task: TaskView,
-  today = dayjs(),
-): { label: string; tone: StatusTone } | null {
+export function dueLabel(task: TaskView, today = dayjs()): { label: string; tone: StatusTone } | null {
   if (!task.dueDate || task.status === 'DONE') return null
   const due = dayjs(task.dueDate)
   const daysLeft = due.startOf('day').diff(today.startOf('day'), 'day')

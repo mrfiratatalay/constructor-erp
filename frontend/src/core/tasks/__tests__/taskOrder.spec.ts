@@ -21,12 +21,7 @@ describe('openTasks', () => {
       task('yakin-normal', { dueDate: '2026-09-25' }),
       task('yakin-yuksek', { dueDate: '2026-09-25', priority: 'HIGH' }),
     ]
-    expect(openTasks(tasks).map((t) => t.id)).toEqual([
-      'yakin-yuksek',
-      'yakin-normal',
-      'sonra',
-      'terminsiz',
-    ])
+    expect(openTasks(tasks).map((t) => t.id)).toEqual(['yakin-yuksek', 'yakin-normal', 'sonra', 'terminsiz'])
   })
 
   it('tamamlananları açık listeye almaz; onlar en son tamamlanan üstte ayrı durur', () => {
