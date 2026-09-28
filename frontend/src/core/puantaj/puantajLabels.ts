@@ -13,20 +13,22 @@ export type Tone = 'success' | 'warning' | 'danger' | 'primary' | 'info'
 
 export interface StatusLook {
   label: string
+  /** Dar yerlerde (telefonun sayı çipleri, toplu işaretleme çubuğu) tek kelime. */
+  brief: string
   tone: Tone
   /** Ayın cetvelinde hücreye sığan işaret; şekli de farklıdır, yalnızca renge kalmaz. */
   short: string
 }
 
 export const STATUS_LOOKS: Record<DayStatus, StatusLook> = {
-  PRESENT: { label: 'Geldi', tone: 'success', short: '✓' },
-  HALF_DAY: { label: 'Yarım gün', tone: 'warning', short: '½' },
-  ABSENT: { label: 'Gelmedi', tone: 'danger', short: '✕' },
-  LEAVE: { label: 'İzinli', tone: 'primary', short: 'İ' },
+  PRESENT: { label: 'Geldi', brief: 'Geldi', tone: 'success', short: '✓' },
+  HALF_DAY: { label: 'Yarım gün', brief: 'Yarım', tone: 'warning', short: '½' },
+  ABSENT: { label: 'Gelmedi', brief: 'Gelmedi', tone: 'danger', short: '✕' },
+  LEAVE: { label: 'İzinli', brief: 'İzinli', tone: 'primary', short: 'İ' },
 }
 
-/** Kaydı olmayan gün: "Gelmedi" değildir, şef henüz bakmamıştır. */
-export const UNMARKED: StatusLook = { label: 'İşaretlenmedi', tone: 'info', short: '–' }
+/** Kaydı olmayan gün: "Gelmedi" değildir, şef henüz bakmamıştır. Boş halka: daha doldurulmamış. */
+export const UNMARKED: StatusLook = { label: 'İşaretlenmedi', brief: 'Kalan', tone: 'info', short: '○' }
 
 export const lookOf = (mark?: MarkLike | null): StatusLook => (mark ? STATUS_LOOKS[mark.status] : UNMARKED)
 
@@ -38,16 +40,21 @@ export function statusChoices(kind: RosterEntryView['kind']): DayStatus[] {
 /** Türkçe yazımla saat: "2", "1,5". */
 export const hoursText = (hours: number): string => String(hours).replace('.', ',')
 
-/** Etiketin yazısı: "Geldi"; mesai varsa "Geldi +2 s". */
-export function markText(mark?: MarkLike | null): string {
+/**
+ * İşaretin uzun boyu, tek günün gösterildiği yerlerde (bugünün sütunu, satır, gün ayrıntısı): "Geldi", mesai varsa
+ * "Geldi · +2 s", kaydı yoksa "İşaretlenmedi". Şekil (✓ ½ ✕ İ) yazıya eklenmez: anlamı kelime taşır, "İ İzinli"
+ * yazım hatası gibi okunuyordu. Şekil yalnızca kısa boydadır (cetvel, takvim): MarkDot.
+ */
+export function markLabel(mark?: MarkLike | null): string {
   const look = lookOf(mark)
-  return mark?.overtimeHours ? `${look.label} +${hoursText(mark.overtimeHours)} s` : look.label
+  const overtime = mark?.overtimeHours ? ` · +${hoursText(mark.overtimeHours)} s` : ''
+  return `${look.label}${overtime}`
 }
 
-/** Ayın cetvelindeki dar hücre: "✓", mesai varsa "✓+2". */
-export function shortText(mark: MarkLike): string {
-  const short = STATUS_LOOKS[mark.status].short
-  return mark.overtimeHours ? `${short}+${hoursText(mark.overtimeHours)}` : short
+/** Kısa boyun açıklaması: üstüne gelince ve ekran okuyucuda "Geldi, 2 saat mesai". */
+export function markTitle(mark?: MarkLike | null): string {
+  const look = lookOf(mark)
+  return mark?.overtimeHours ? `${look.label}, ${hoursText(mark.overtimeHours)} saat mesai` : look.label
 }
 
 /** Satırın kalın adı: kişide adı, ekipte iş kolu ("Demirci"); iş kolu yazılmadıysa ekip başının adı. */

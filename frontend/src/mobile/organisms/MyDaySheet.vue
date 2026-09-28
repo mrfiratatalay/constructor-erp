@@ -17,10 +17,7 @@ const { day, mark = undefined } = defineProps<{ day: string; mark?: MyDayView }>
   <van-action-sheet v-model:show="show" :title="dayTitle(day)" teleport="body">
     <van-cell-group inset title="Kaydın">
       <van-cell title="Durum" center>
-        <template #value>
-          <MarkTag v-if="mark" :mark="mark" />
-          <span v-else>İşaretlenmedi</span>
-        </template>
+        <template #value><MarkTag :mark="mark" /></template>
       </van-cell>
       <van-cell v-if="mark?.overtimeHours" title="Mesai" :value="`${hoursText(mark.overtimeHours)} saat`" />
     </van-cell-group>

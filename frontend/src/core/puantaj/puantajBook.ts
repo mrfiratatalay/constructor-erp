@@ -26,6 +26,15 @@ export function bookOf(view: PuantajView | undefined): PuantajBook {
   }
 }
 
+/**
+ * Günlerden en az bir kalemin işaretlendikleri, sırası korunarak. Bugünün cetvelinde yalnızca bunlar sütun olur:
+ * kimsenin işaretlenmediği gün (Pazar, yeni kurulan firmanın geçmişi) boş bir tire sütunu olarak yer kaplamaz.
+ */
+export function markedDays(book: PuantajBook, days: string[]): string[] {
+  const rows = [...book.people, ...book.crews]
+  return days.filter((day) => rows.some((row) => row.marks[day]))
+}
+
 export type DayCounts = Record<DayStatus, number> & { unmarked: number }
 
 /** Bir günün sayımı. Listeden çıkmış kalem işaretlenmediyse "işaretlenmedi" sayılmaz: onu kimse işaretlemez. */
@@ -37,6 +46,13 @@ export function dayCounts(rows: PuantajRow[], day: string): DayCounts {
     else if (!row.entry.archived) counts.unmarked += 1
   }
   return counts
+}
+
+/** Bugünün ilerlemesi: listedekilerin kaçı işaretlendi. Halka ve çubuk bunu gösterir; kalan sıfırsa yoklama tamam. */
+export function dayProgress(counts: DayCounts): { marked: number; total: number; percent: number } {
+  const marked = counts.PRESENT + counts.HALF_DAY + counts.ABSENT + counts.LEAVE
+  const total = marked + counts.unmarked
+  return { marked, total, percent: total ? Math.round((marked / total) * 100) : 0 }
 }
 
 /** Ayın toplamları. Çalıştığı gün: geldiği günler artı yarım günlerin yarısı (yevmiye buna göre). */
@@ -61,6 +77,12 @@ export function totalsOf(marks: MarkLike[]): RowTotals {
     leave: count('LEAVE'),
     overtime: marks.reduce((sum, mark) => sum + (mark.overtimeHours ?? 0), 0),
   }
+}
+
+/** Defterin aramaya uyan kalemleri; bölümler (Personel, Taşeron ekipler) ayrı kalır. */
+export function searchBook(book: PuantajBook, query: string): PuantajBook {
+  const keep = (row: PuantajRow) => matchesQuery(row.entry, query)
+  return { people: book.people.filter(keep), crews: book.crews.filter(keep) }
 }
 
 /** Arama: adda, görevde ya da ekip başında geçen (Türkçe büyük-küçük harf). */

@@ -4,6 +4,10 @@
  */
 html:root {
   --van-primary-color: var(--brand-primary);
+  /* Durum renkleri: Vant'ın varsayılanları (WeChat yeşili, açık turuncu) beyaz işareti ve yazıyı taşımıyordu. */
+  --van-success-color: var(--status-success);
+  --van-warning-color: var(--status-warning);
+  --van-danger-color: var(--status-danger);
   --van-text-color: var(--text-strong);
   --van-text-color-2: var(--text-muted);
   --van-text-color-3: var(--text-subtle);
@@ -62,6 +66,12 @@ html .van-tag--default {
   background: var(--status-neutral-bg);
 }
 
+/* Mavi (izinli) de öbürleri gibi yumuşak: dolu lacivert yanlarındaki açık etiketlerin arasında bağırıyordu. */
+html .van-tag--primary {
+  color: var(--brand-primary);
+  background: var(--brand-tint);
+}
+
 html:root {
   --van-tag-padding: 2px var(--space-2);
   --van-tag-font-size: var(--text-xs);
@@ -82,9 +92,10 @@ html .van-popup--bottom {
 
 /*
  * Vant hücresinde başlık ve değer sütunu alanı yarı yarıya paylaşır; değer kısa bir etiket ya da
- * düğmeyken başlık boşuna daralıp satırlara bölünüyordu. Değer artık içeriği kadar yer kaplar.
+ * düğmeyken başlık boşuna daralıp satırlara bölünüyordu. Değer artık içeriği kadar yer kaplar. Yazı alanı
+ * (van-field) hariç: onun değeri kutunun kendisidir, daralınca not kutusu ekranın yarısına sıkışıyordu.
  */
-html .van-cell__value {
+html .van-cell__value:not(.van-field__value) {
   flex: none;
   max-width: 55%;
 }

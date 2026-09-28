@@ -32,10 +32,82 @@ html:root {
   --el-box-shadow: var(--shadow-md);
 }
 
-/* Tablolar: satırlar daha ferah, başlık satırı sakin. */
+/*
+ * Durum renkleri (success, warning, danger, info) kütüphanenin soluk varsayılanlarında kalınca etiketlerde açık zemine
+ * açık yazı düşüyordu. Bizim koyu durum tonlarımız hem dolu dairede beyaz işarete hem açık zeminde yazıya yeter.
+ * `error` ElMessage ve el-alert'in adıdır, danger ile aynı renktir.
+ */
 html:root {
+  --el-color-success: var(--status-success);
+  --el-color-success-light-3: color-mix(in srgb, var(--status-success), #fff 30%);
+  --el-color-success-light-5: color-mix(in srgb, var(--status-success), #fff 50%);
+  --el-color-success-light-7: color-mix(in srgb, var(--status-success), #fff 70%);
+  --el-color-success-light-8: color-mix(in srgb, var(--status-success), #fff 80%);
+  --el-color-success-light-9: var(--status-success-bg);
+  --el-color-success-dark-2: color-mix(in srgb, var(--status-success), #000 20%);
+
+  --el-color-warning: var(--status-warning);
+  --el-color-warning-light-3: color-mix(in srgb, var(--status-warning), #fff 30%);
+  --el-color-warning-light-5: color-mix(in srgb, var(--status-warning), #fff 50%);
+  --el-color-warning-light-7: color-mix(in srgb, var(--status-warning), #fff 70%);
+  --el-color-warning-light-8: color-mix(in srgb, var(--status-warning), #fff 80%);
+  --el-color-warning-light-9: var(--status-warning-bg);
+  --el-color-warning-dark-2: color-mix(in srgb, var(--status-warning), #000 20%);
+
+  --el-color-danger: var(--status-danger);
+  --el-color-danger-light-3: color-mix(in srgb, var(--status-danger), #fff 30%);
+  --el-color-danger-light-5: color-mix(in srgb, var(--status-danger), #fff 50%);
+  --el-color-danger-light-7: color-mix(in srgb, var(--status-danger), #fff 70%);
+  --el-color-danger-light-8: color-mix(in srgb, var(--status-danger), #fff 80%);
+  --el-color-danger-light-9: var(--status-danger-bg);
+  --el-color-danger-dark-2: color-mix(in srgb, var(--status-danger), #000 20%);
+  --el-color-error: var(--el-color-danger);
+  --el-color-error-light-3: var(--el-color-danger-light-3);
+  --el-color-error-light-5: var(--el-color-danger-light-5);
+  --el-color-error-light-7: var(--el-color-danger-light-7);
+  --el-color-error-light-8: var(--el-color-danger-light-8);
+  --el-color-error-light-9: var(--el-color-danger-light-9);
+
+  --el-color-info: var(--status-neutral);
+  --el-color-info-light-3: color-mix(in srgb, var(--status-neutral), #fff 30%);
+  --el-color-info-light-5: color-mix(in srgb, var(--status-neutral), #fff 50%);
+  --el-color-info-light-7: color-mix(in srgb, var(--status-neutral), #fff 70%);
+  --el-color-info-light-8: color-mix(in srgb, var(--status-neutral), #fff 80%);
+  --el-color-info-light-9: var(--status-neutral-bg);
+  --el-color-info-dark-2: color-mix(in srgb, var(--status-neutral), #000 20%);
+}
+
+/*
+ * Bileşen değişkenleri: Element Plus bunları :root'ta değil bileşenin kendi öğesinde tanımlar, bu yüzden
+ * :root'tan verilen değer hiç işlemiyordu. Bileşen seçicisiyle verilir.
+ */
+html .el-table {
   --el-table-header-bg-color: var(--surface-muted);
   --el-table-header-text-color: var(--text-muted);
   --el-table-border-color: var(--border-soft);
   --el-table-row-hover-bg-color: var(--brand-tint);
+}
+
+/* Kartlar yumuşak köşeli; sayılar okunaklı ve kalın (özet kartları, kişinin ayı). */
+html .el-card {
+  --el-card-border-radius: var(--radius-md);
+  --el-card-border-color: var(--border-soft);
+}
+
+html .el-statistic {
+  --el-statistic-content-font-size: var(--text-2xl);
+  --el-statistic-content-font-weight: var(--weight-bold);
+  --el-statistic-content-color: var(--text-strong);
+  --el-statistic-title-font-size: var(--text-sm);
+  --el-statistic-title-color: var(--text-muted);
+}
+
+/* Takvim hücresi (Element Plus bu değişkeni hücre yüksekliği olarak kullanır): 85 px'te çoğu boş kalıp sayfayı uzatıyordu. */
+html .el-calendar {
+  --el-calendar-cell-width: 64px;
+}
+
+/* Bağlantı olarak çizilen düğme (tag="a", ör. Excel indir) tarayıcının alt çizgisini almaz. */
+html a.el-button {
+  text-decoration: none;
 }

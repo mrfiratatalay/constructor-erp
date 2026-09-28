@@ -1,7 +1,9 @@
 import { ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
-import type { DayMarkView, MarkRequest } from '@/core/api/generated/model'
-import type { DayStatus } from '@/core/puantaj/puantajLabels'
+import type { DayMarkView } from '@/core/api/generated/model'
+import { draftOf, requestOf, type MarkDraft } from '@/core/puantaj/markDraft'
 import { usePuantajMarking } from '@/core/puantaj/usePuantajMarking'
+
+export type { MarkDraft } from '@/core/puantaj/markDraft'
 
 /** Düzenlenen gün: hangi kalemin hangi günü, şimdiki işareti. */
 export interface EditedDay {
@@ -9,26 +11,6 @@ export interface EditedDay {
   day: string
   mark?: DayMarkView
 }
-
-/** Formdaki hâli: durum seçilmemişse mesai ve not bekler (işaretsiz güne not yazılmaz). */
-export interface MarkDraft {
-  status: DayStatus | null
-  overtimeHours: number
-  note: string
-}
-
-const draftOf = (mark?: DayMarkView): MarkDraft => ({
-  status: mark?.status ?? null,
-  overtimeHours: mark?.overtimeHours ?? 0,
-  note: mark?.note ?? '',
-})
-
-/** Mesai yalnızca Geldi gününe yazılır: başka duruma geçince düşer. */
-const requestOf = (draft: MarkDraft & { status: DayStatus }): MarkRequest => ({
-  status: draft.status,
-  overtimeHours: draft.status === 'PRESENT' && draft.overtimeHours > 0 ? draft.overtimeHours : null,
-  note: draft.note.trim() || null,
-})
 
 /**
  * Bir günü ayrıntısıyla işaretlemek: önce durum, gerekiyorsa mesai ve not. Her değişiklik anında kaydedilir

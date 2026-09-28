@@ -24,14 +24,30 @@ export function monthRange(month: string): { from: string; to: string } {
   return { from: first.format('YYYY-MM-DD'), to: first.endOf('month').format('YYYY-MM-DD') }
 }
 
-/** Sütun başlığı: "Pzt". */
-export const weekdayShort = (isoDate: string): string => dayjs(isoDate).format('ddd')
+/** Dar sütunun başlığı, iki harf: "Pt", "Cu", "Pz". Üç harfli kısaltmalar ("Cum.", "Pts") eşit genişlikte durmuyordu. */
+export const weekdayShort = (isoDate: string): string => dayjs(isoDate).format('dd')
 
 /** Sütun başlığı: "28". */
 export const dayOfMonth = (isoDate: string): string => dayjs(isoDate).format('D')
 
 /** Pazar günleri cetvelde ayrışır: çoğu şantiyede tatil. */
 export const isSunday = (isoDate: string): boolean => dayjs(isoDate).day() === 0
+
+/** Ay seçicinin listesi: bu ay ve ondan önceki aylar, yeniden eskiye ("2026-09", "2026-08", …). */
+export function monthsBack(month: string, count: number): string[] {
+  return Array.from({ length: count }, (_, index) => dayjs(`${month}-01`).subtract(index, 'month').format('YYYY-MM'))
+}
+
+/**
+ * Ayın bugüne kadarki iş günleri (Pazar hariç): çalışılan günün oranı buna göre. Geçmiş ayda ayın tamamı, gelecek
+ * ayda hiç.
+ */
+export function workingDaysSoFar(month: string, today: string): number {
+  const { from, to } = monthRange(month)
+  const last = to < today ? to : today
+  if (last < from) return 0
+  return isoDays(from, last).filter((day) => !isSunday(day)).length
+}
 
 /**
  * Bu gün işaretlenebilir mi? İleri gün hiç; şef yalnızca bugünü, patron geçmişi de düzeltir. Sunucu aynı kuralı

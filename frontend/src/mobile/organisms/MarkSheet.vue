@@ -1,52 +1,46 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { PuantajRow } from '@/core/puantaj/puantajBook'
-import { entryTitle, STATUS_LOOKS, statusChoices, type DayStatus } from '@/core/puantaj/puantajLabels'
+import { entrySubtitle, entryTitle, statusChoices, type DayStatus } from '@/core/puantaj/puantajLabels'
+import MarkChoices from '@/mobile/molecules/MarkChoices.vue'
 
 /**
- * Satıra dokununca alttan seçim, tek dokunuş: Geldi · Yarım gün · Gelmedi · İzinli (ekipte yalnızca Geldi ve
- * Gelmedi). Altında mesai ve not, işareti kaldırmak ve kişinin ayı. Seçili durumun altında "Seçili" yazar.
+ * Satıra dokununca alttan seçim, tek dokunuş: üstte büyük renkli düğmeler (Geldi · Yarım gün · Gelmedi · İzinli;
+ * ekipte ikisi), seçili olan dolu. Altında ikincil işler: mesai ve not, işareti kaldırmak, kişinin ayı. Seçim
+ * kaydedilince pencere kapanır: şef bir sonraki satıra geçer.
  */
 const show = defineModel<boolean>('show', { required: true })
 const { row, day } = defineProps<{ row: PuantajRow | null; day: string }>()
 const emit = defineEmits<{ choose: [status: DayStatus]; details: []; clear: []; calendar: [] }>()
 
-interface SheetAction {
-  name: string
-  key: string
-  subname?: string
-}
-
-const actions = computed<SheetAction[]>(() => {
-  if (!row) return []
-  const current = row.marks[day]?.status
-  return [
-    ...statusChoices(row.entry.kind).map((status) => ({
-      name: STATUS_LOOKS[status].label,
-      key: status,
-      subname: status === current ? 'Seçili' : undefined,
-    })),
-    { name: row.entry.kind === 'CREW' ? 'Not yaz' : 'Mesai ve not', key: 'details' },
-    ...(current ? [{ name: 'İşaretlemeyi kaldır', key: 'clear' }] : []),
-    { name: 'Ayın takvimi', key: 'calendar' },
-  ]
-})
-
-const OTHER: Record<string, () => void> = {
-  details: () => emit('details'),
-  clear: () => emit('clear'),
-  calendar: () => emit('calendar'),
-}
-
-function onSelect(action: SheetAction) {
+function run(action: () => void) {
   show.value = false
-  const other = OTHER[action.key]
-  if (other) other()
-  else emit('choose', action.key as DayStatus)
+  action()
+}
+
+/** Başlığın altında: "Kalıpçı · bugün"; görevi yazılmamışsa yalnızca "Bugün". */
+const descriptionOf = (target: PuantajRow) => {
+  const subtitle = entrySubtitle(target.entry)
+  return subtitle ? `${subtitle} · bugün` : 'Bugün'
 }
 </script>
 
 <template>
-  <van-action-sheet v-model:show="show" :actions="actions" :description="row ? `${entryTitle(row.entry)} · bugün` : ''"
-    cancel-text="Vazgeç" teleport="body" @select="onSelect" />
+  <van-action-sheet v-model:show="show" :title="row ? entryTitle(row.entry) : ''"
+    :description="row ? descriptionOf(row) : ''" teleport="body">
+    <template v-if="row">
+      <van-cell>
+        <template #title>
+          <MarkChoices :choices="statusChoices(row.entry.kind)" :current="row.marks[day]?.status"
+            @choose="(status: DayStatus) => run(() => emit('choose', status))" />
+        </template>
+      </van-cell>
+      <van-cell-group inset>
+        <van-cell :title="row.entry.kind === 'CREW' ? 'Not yaz' : 'Mesai ve not'" icon="edit" is-link
+          @click="run(() => emit('details'))" />
+        <van-cell title="Ayın takvimi" icon="calendar-o" is-link @click="run(() => emit('calendar'))" />
+        <van-cell v-if="row.marks[day]" title="İşaretlemeyi kaldır" icon="revoke" clickable
+          @click="run(() => emit('clear'))" />
+      </van-cell-group>
+    </template>
+  </van-action-sheet>
 </template>

@@ -186,21 +186,32 @@ Yoklama · 28 Eylül Pazartesi                              [+ Kişi ya da ekip 
 
 | Parça | Karar |
 |---|---|
-| Özet | Dört kart: Geldi (yarım gün altında yazar), Gelmedi, İzinli, İşaretlenmedi; sıfıra inen "İşaretlenmedi" "Bugünün yoklaması tamam" der. Raporda sayı kartı yoktur (İlke 4). |
-| Renk açıklaması | Çipler hem açıklama hem süzgeç: "İşaretlenmedi"ye basınca yalnızca kalanlar görünür. Yanında arama (ad, görev, ekip başı). |
-| Satır | Avatar, kalın ad, altında gri görev (ekipte "Ekip başı · Hasan Usta"). Son beş gün yalnızca okunur (şef dünü görerek işaretler); bugünün sütununda seçenekler açıktadır, **tek tıkla** işaretlenir. ⋯: Mesai ve not · İşaretlemeyi kaldır. |
-| Toplu işaretleme | Satırlar seçilince süzgecin yerine "5 satır seçildi" çubuğu gelir: Geldi · Yarım gün · Gelmedi · İzinli (seçimde ekip varsa yalnızca Geldi · Gelmedi). Notlar yerinde kalır. |
-| Telefonda | Dört renkli sayı, arama, Personel ve Taşeron ekipler. Satıra dokununca alttan seçim (tek dokunuş); ayrıca "Mesai ve not", "İşaretlemeyi kaldır", "Ayın takvimi". Sağ üstte **Seç** toplu işaretlemeyi açar (altta renkli düğmeler), **＋** kişi ya da ekip ekler. |
+| İlke (28 Eylül, masaüstü baştan) | Hiçbir şey gizli değil (tıklanan şey tıklanır görünür); satır işaretlenince şekil değiştirmez; satır kâğıt puantajın bir satırı gibi bir form satırıdır; seçim araçları sayfayı itmez. Önceki deneme (tıklanabilir kartlar, işaretlenince etikete küçülen satır, araya giren toplu çubuk) fark edilmedi, boşluk bıraktı, sayfayı bozdu. |
+| Özet | Yalnızca gösterge, tıklanmaz. Solda geniş **Bugünün yoklaması** kartı: halka kaçının işaretlendiğini gösterir ("2/6"), yanında kaç kişinin beklediği; bitince yeşil "Yoklama tamam". Yanında dört eşit durum kartı: büyük sayı ve o durumun listedeki payı (kendi renginde ince çubuk). Raporda sayı kartı yoktur (İlke 4). |
+| Süzgeç | Listenin üstünde sekme görünüşlü tek kontrol (`el-segmented`): **Tümü · Bekleyen · Geldi · Yarım gün · Gelmedi · İzinli**, her birinde sayısı ve dairesi. Sabahın asıl süzgeci "Bekleyen". **Arama sayfa başlığında** (ad, görev, ekip başı), iki sekmeyi de süzer. |
+| Satır | Avatar, kalın ad, altında gri görev (ekipte "Ekip başı · Hasan Usta"). **Son günler** tek sütunda yan yana küçük daireler (yalnızca birinin işaretlendiği günler; kaydı yoksa gri halka; üstüne gelince gün ve durum, tıklayınca o gün açılır). **Bugün**: düğme grubu hep açık, seçili olan kendi renginde dolu, tek tıkla değişir. **Mesai**: Geldi gününde satırda yarım saatlik sayı kutusu, başka durumda "—". **Not**: satırda gerçek yazı kutusu, Enter'la ya da çıkınca kaydedilir. İşaretsiz satırda mesai ve not boş (göz düğmelere gider). Bir alan değişince öbürleri yerinde kalır. En sağda sabit ⋯: Ayın takvimi · Bugünün işaretini kaldır. 1470 px dizüstünde satırın tamamı kaydırmadan sığar. |
+| Toplu işaretleme | Yalnızca işaretlenmemiş satırlar seçilebilir ("tümünü seç" kalanları alır; bir "Gelmedi"yi ezmez, seçiliyken tek tek işaretlenen satır seçimden düşer). Seçili satırın zemini hafif lacivert. Seçim varken **alttan şerit** kayar (`el-drawer`, arkayı kilitlemez, sayfayı itmez; listenin dibinde onun kadar pay kalır): "4 seçildi:" ve adlar (× ile çıkar), "Bugün:" ve kendi renginde büyük düğmeler, "Vazgeç". Akış: Bekleyen → tümünü seç → Geldi. Seçimde ekip varsa yalnızca Geldi · Gelmedi. |
+| Telefonda | Başlığın altında sabit Bugün · Puantaj sekmeleri. Halka kaçının işaretlendiğini gösterir ("10/15", bitince yeşil), altında renkli sayılar (süzgeç: "○ 5 Kalan"). Arama. Sağ üstte **Seç**: toplu işaretleme, alttaki çubuk sekme çubuğunun üstüne biner. Satıra dokununca alttan büyük renkli düğmeler (tek dokunuş); altında "Mesai ve not", "Ayın takvimi", "İşaretlemeyi kaldır". Sağ üstte **＋** kişi ya da ekip ekler. |
 
-**Puantaj sekmesi, ay sonu.** Ay seçici (gelecek ay yok; ay adreste `?ay=2026-09`, sekme `?sekme=puantaj`),
-işaretlerin açıklaması, patrona **Excel indir**. Personel cetveli: satırda kişi, sütunda ayın günleri, hücrede
-✓ ½ ✕ İ (mesaiyle "✓+2"); sağda sabit **Çalıştığı gün** (yarım gün yarım sayılır, yevmiye buna göre) ve
-**Mesai**; en altta ayın toplamı. Taşeron ekipler cetvelinde **Geldiği gün**. Telefonda cetvel yerine liste:
-"Ali Usta · 22,5 gün", altında mesai, yarım gün, gelmedi, izinli.
+**Puantaj sekmesi, ay sonu.** Ay seçici takvim uygulamalarının kalıbıyla: ‹ › ve yanında "Eylül 2026 ▾" (son on
+iki ay; gelecek ay yok; ay adreste `?ay=2026-09`, sekme `?sekme=puantaj`), işaretlerin açıklaması, patrona **Excel
+indir**. Personel cetveli ızgara çizgili ve **rahat boyda** (sıkı boy dizüstünde "çok ufak" kaldı, 28 Eylül): gün
+sütunları esnek, geniş ekranda kartın tamamına yayılır; sığmayan ekranda cetvel açılınca bugüne kayar. Bugünün
+başlığı lacivert, gelecek günler ve Pazar soluk. Hücrede kısa
+işaret (✓ ½ ✕ İ dairesi; mesai köşesinde nokta, saati üstüne gelince); sağda sabit **Çalıştığı gün** (yarım gün yarım
+sayılır, yevmiye buna göre), **Mesai**, **Gelmedi** ve **İzinli** (başlıkları daire); en altta ayın toplamı. Taşeron
+ekipler cetvelinde **Geldiği gün** ve Gelmedi. **Bir hücreye tıklayınca kişinin ayı o gün seçili açılır** (adres
+`?gun=2026-09-09`); Bugün cetvelindeki geçmiş gün hücreleri de öyle. Telefonda cetvel yerine liste: "Ali Usta ·
+22,5 gün", altında mesai, yarım gün, gelmedi, izinli ve ince bir ay çubuğu (çalıştığı günün ayın bugüne kadarki iş
+günlerine oranı, Pazar hariç).
 
-**Kişinin ya da ekibin ayı.** Ada dokununca: masaüstünde sağdan panel (liste yerinde kalır), telefonda ayrı sayfa
-(`/yoklama/kisi/:entryId`). Toplamlar, takvim (her günde renkli işaret), güne dokununca ayrıntı: durum (büyük
-düğmeler), mesai, not ve "Kaydedildi · 08:17 · Patron" izi. Uygulaması olmayan kişi ya da ekip buradan düzeltilir
+**Kişinin ya da ekibin ayı.** Ada dokununca: masaüstünde sağdan geniş panel (liste yerinde kalır; üstte toplamlar
+"19 gün", altta solda sıkı takvim "‹ Eylül 2026 ›", sağda seçili günün ayrıntısı, kaydırmadan), telefonda ayrı sayfa
+(`/yoklama/kisi/:entryId`). Toplamlar, takvim (her günde kısa işaret; telefonda Vant takvimi, ‹ › ile ay değişir,
+altında "Ayın özeti" aynı dairelerle ve takvimin açıklaması da odur), güne dokununca ayrıntı: durum (satırdaki
+renkli düğmelerin aynısı), mesai (yalnızca Geldi gününde) ve not (durum seçilince; öncesinde kilitli boş kutu yerine
+"Durumu seçince mesai ve not yazılır") ve "Kaydedildi · 08:17 · Patron" izi. Ayrı bir kayıt geçmişi listesi yoktur
+(28 Eylül'de denendi, kaldırıldı): kimin işaretlediği günün ayrıntısında yazar. Uygulaması olmayan kişi ya da ekip buradan düzeltilir
 ve **listeden çıkarılır** (geçmiş günleri puantajda kalır). Uygulamadaki çalışanın yalnızca görevi düzeltilir;
 listeden Katılımcılar'dan çıkar (firmadan çıkar ya da şef yap).
 
@@ -216,10 +227,20 @@ Uygulaması olmayan kişi ve taşeron ekip görmez; patron ve şef yoklamada say
 **Excel** (`puantaj-2026-09.xlsx`): "Personel" ve "Ekipler" cetvelleri (G / Y / X / İ, mesaiyle "G+2", ekrandaki
 renklerle, sağda toplamlar) ve gün gün tam liste "Kayıtlar" (tür, görev, durum, mesai, not, işaretleyen, saat).
 
-**Görünüş.** Masaüstü yalnızca Element Plus, telefon yalnızca Vant bileşenleriyle kurulur; bu modülde elle CSS
-yazılmaz. Renk yalnızca bileşenin kendi tonundan gelir: Geldi yeşil, Yarım gün sarı, Gelmedi kırmızı, İzinli
-mavi (marka rengi; telefonda çerçeveli), İşaretlenmedi gri. Etiketin içinde her zaman yazı ya da ayrı şekilli bir
-işaret vardır, anlam yalnızca renge kalmaz (İlke 2).
+**Görünüş (28 Eylül, estetik turu).** Masaüstü yalnızca Element Plus, telefon yalnızca Vant bileşenleriyle kurulur;
+bu modülde elle CSS yazılmaz (boşluk ve genişlik de bileşenlerin kendi seçenekleriyle verilir: `title-style`,
+`badge-style`, `el-space` genişliği). Renk
+yalnızca bileşenin kendi tonundan gelir; durum tonları iki kütüphaneye de bizim koyu durum renklerimizle bağlıdır
+(`theme.css`): Geldi yeşil, Yarım gün sarı-turuncu, Gelmedi kırmızı, İzinli mavi (marka rengi), İşaretlenmedi gri.
+İşaretin **tek dili, iki boyu** vardır:
+
+| Boy | Nerede | Nasıl |
+|---|---|---|
+| Kısa (`MarkDot`) | Cetvel, takvim, açıklama, sayı kartları | Renkli dolu daire, içinde beyaz ✓ ½ ✕ İ (kaydı yoksa gri ○). Hep aynı genişlik: göz ritmi yakalar. Mesai köşede lacivert nokta. |
+| Uzun (`MarkTag`) | Tek günün gösterildiği yer: bugünün sütunu, telefon satırı, gün ayrıntısı | Açık zemin, koyu yazı: "✓ Geldi · +2 s", "○ İşaretlenmedi". |
+
+Durum seçimi her yerde aynı: yan yana (telefonda 2×2 büyük) düğmeler, seçili olan kendi renginde dolu. Etiketin
+içinde her zaman yazı ya da ayrı şekilli bir işaret vardır, anlam yalnızca renge kalmaz (İlke 2).
 
 ## Şantiye bilgisi (WhatsApp'taki grup bilgisi)
 
