@@ -74,6 +74,12 @@ public class ProductionReads {
             .toList();
     }
 
+    /** Excel'in "Günlük girişler" sayfası: silinmemiş imalatların bütün girişleri, günün sırasıyla. */
+    @Transactional(readOnly = true)
+    public List<ProductionEntryView> allEntries(UUID siteId) {
+        return lookups.entries(entries.findAllOfSite(siteId));
+    }
+
     ProductionItemView view(CurrentUser user, ProductionItem item) {
         return view(user, item, entries.findByItemIdAndDeletedAtIsNullOrderByDayDescCreatedAtDesc(item.getId()));
     }
