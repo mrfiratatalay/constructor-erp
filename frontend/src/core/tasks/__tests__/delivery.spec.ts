@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { MediaView, TaskDeliveryView, TaskView } from '@/core/api/generated/model'
 import { deliverableTasks } from '@/core/tasks/deliverableTasks'
-import { deliveryCard, markedPhoto } from '@/core/tasks/deliveryCard'
+import { deliveryCard, deliveryRefreshInterval, markedPhoto } from '@/core/tasks/deliveryCard'
 import { taskIcon, taskName } from '@/core/tasks/taskIcon'
 
 const photo = (id: string) => ({ id, kind: 'PHOTO', status: 'READY' }) as MediaView
@@ -103,5 +103,14 @@ describe('sohbetteki teslim kartı', () => {
   it('eksik gösterilen fotoğraf şefin noktayı koyduğu fotoğraftır', () => {
     expect(markedPhoto(delivery({ mark: { mediaId: 'p2', x: 0.4, y: 0.6 } }))?.id).toBe('p2')
     expect(markedPhoto(delivery())).toBeNull()
+  })
+})
+
+describe('kartın tazelenmesi', () => {
+  it('fotoğraf işlenirken sık, sonra seyrek', () => {
+    const processing = { id: 'p3', kind: 'PHOTO', status: 'PROCESSING' } as MediaView
+    expect(deliveryRefreshInterval(delivery({ photos: [photo('p1'), processing] }))).toBe(4_000)
+    expect(deliveryRefreshInterval(delivery())).toBe(15_000)
+    expect(deliveryRefreshInterval(undefined)).toBe(15_000)
   })
 })

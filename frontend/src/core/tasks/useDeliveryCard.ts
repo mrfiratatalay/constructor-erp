@@ -6,7 +6,7 @@ import {
   useReturnDelivery,
 } from '@/core/api/generated/deliveries/deliveries'
 import type { PostView, ReturnDeliveryRequest } from '@/core/api/generated/model'
-import { deliveryCard, markedPhoto } from '@/core/tasks/deliveryCard'
+import { deliveryCard, deliveryRefreshInterval, markedPhoto } from '@/core/tasks/deliveryCard'
 import { refreshDeliveries } from '@/core/tasks/deliveryQueries'
 
 /**
@@ -16,7 +16,9 @@ import { refreshDeliveries } from '@/core/tasks/deliveryQueries'
 export function useDeliveryCard(post: MaybeRefOrGetter<PostView>) {
   const queryClient = useQueryClient()
   const deliveryId = computed(() => toValue(post).deliveryId ?? '')
-  const { data: view } = useGetDelivery(deliveryId)
+  const { data: view } = useGetDelivery(deliveryId, {
+    query: { refetchInterval: (query) => deliveryRefreshInterval(query.state.data) },
+  })
   const refresh = () => refreshDeliveries(queryClient, toValue(post).site.id)
   const approval = useApproveDelivery({ mutation: { onSuccess: refresh } })
   const sendBack = useReturnDelivery({ mutation: { onSuccess: refresh } })

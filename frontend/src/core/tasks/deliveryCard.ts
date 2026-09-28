@@ -59,3 +59,11 @@ export function markedPhoto(view: TaskDeliveryView): MediaView | null {
   if (!view.mark) return null
   return view.photos.find((photo) => photo.id === view.mark?.mediaId) ?? null
 }
+
+/**
+ * Kart kendini tazeler (sohbetin akışı gibi): fotoğraf sunucuda işlenirken sık (4 sn; "Hazırlanıyor" kalmasın),
+ * sonra seyrek (15 sn; öbür telefondaki şefin cevabı karttaki durumu değiştirir).
+ */
+export function deliveryRefreshInterval(view: TaskDeliveryView | undefined): number {
+  return view?.photos.some((photo) => photo.status === 'PROCESSING') ? 4_000 : 15_000
+}
