@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter } from 'vue'
+import type { CrewRef } from '@/core/api/generated/model'
 import {
   getListProductionCrewsQueryKey,
   useListProductionCrews,
@@ -27,5 +28,11 @@ export function useProductionCrews(enabled: MaybeRefOrGetter<boolean>) {
     return crew.id
   }
 
-  return { crews: computed(() => crews.data.value ?? []), addCrew, isAdding: add.isPending }
+  /** Seçilen taşeron: listedeyse kimliği; listede olmayan yazı yeni taşeronun adıdır, eklenir ve kimliği döner. */
+  async function resolve(value: string | undefined, known: CrewRef[]): Promise<string | undefined> {
+    if (!value || known.some((crew) => crew.id === value)) return value
+    return addCrew(value)
+  }
+
+  return { crews: computed(() => crews.data.value ?? []), resolve, isAdding: add.isPending }
 }

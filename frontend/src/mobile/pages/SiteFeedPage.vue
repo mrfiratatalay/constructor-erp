@@ -6,7 +6,7 @@ import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
-import { useSiteTab } from '@/core/sites/useSiteTab'
+import { siteTabsFor, useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallButton from '@/mobile/molecules/CallButton.vue'
 import SiteTabs from '@/mobile/molecules/SiteTabs.vue'
@@ -42,6 +42,8 @@ const searchOpen = ref(false)
 const moreOpen = ref(false)
 
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
+// Telefonun İmalat ekranı bir sonraki adımda gelir; o zamana kadar sekme gösterilmez.
+const tabs = computed(() => siteTabsFor(user.value?.role).filter((item) => item.tab !== 'production'))
 const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
 
 function onMore(action: { key: string }) {
@@ -66,7 +68,7 @@ const openFound = (postId: string) => openTab('chat', postId)
         <EllipsisVertical :size="18" />
       </van-button>
     </template>
-    <template #subbar><SiteTabs :active="tab" @change="openTab" /></template>
+    <template #subbar><SiteTabs :active="tab" :tabs="tabs" @change="openTab" /></template>
     <StatusNotice v-if="site?.status === 'COMPLETED'" tone="neutral" text="Bu şantiye tamamlandı." />
     <FeedList v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
       @reply="composer.replyTo.value = $event" />

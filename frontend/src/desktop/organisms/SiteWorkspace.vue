@@ -5,7 +5,7 @@ import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
-import { useSiteTab } from '@/core/sites/useSiteTab'
+import { siteTabsFor, useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallPopover from '@/desktop/molecules/CallPopover.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
@@ -13,6 +13,7 @@ import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
 import FeedColumn from '@/desktop/organisms/FeedColumn.vue'
 import FieldColumn from '@/desktop/organisms/FieldColumn.vue'
 import FieldComposerBar from '@/desktop/organisms/FieldComposerBar.vue'
+import ProductionPanel from '@/desktop/organisms/ProductionPanel.vue'
 import SiteComposerBar from '@/desktop/organisms/SiteComposerBar.vue'
 import SiteInfoPanel from '@/desktop/organisms/SiteInfoPanel.vue'
 import SiteSearchPanel from '@/desktop/organisms/SiteSearchPanel.vue'
@@ -23,8 +24,8 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * Seçili şantiye, WhatsApp Masaüstü'ndeki sohbet gibi: başlıkta fotoğraf, ad ve "Musa, Sen" (tıklayınca bilgi),
  * sağda 🔍 (Bu şantiyede ara; masaüstünde yer bol, gizlenmez), 📞 (kim hangi numarada) ve ⋮ (Şantiye bilgisi,
  * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
- * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
- * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
+ * Başlığın altında sekmeler: Sohbet, Saha (günlük) ve patron, şef, depo sorumlusunda İmalat (geniş panel, yazma
+ * çubuğu yok). Sohbet ve Saha'nın taslağı ayrıdır: sohbete yazılan yarım mesaj Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
  * Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette ona gider: çalışan mesajdan katılır.
  */
 type Panel = 'info' | 'search'
@@ -39,6 +40,7 @@ const composer = useComposer(target)
 const fieldComposer = useComposer(target, { fieldUpdate: true })
 const panel = ref<Panel | null>(null)
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
+const tabs = computed(() => siteTabsFor(user.value?.role))
 
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
@@ -47,7 +49,7 @@ const openFound = (postId: string) => openTab('chat', postId)
 
 <template>
   <div class="workspace">
-    <DetailPane :bottom="tab === 'chat'" class="workspace__main">
+    <DetailPane :bottom="tab === 'chat'" :wide="tab === 'production'" class="workspace__main">
       <template #header>
         <div class="workspace__head">
           <SiteHeading v-if="site" :site="site" :line="participantLine(site, user)" class="workspace__title"
@@ -67,12 +69,13 @@ const openFound = (postId: string) => openTab('chat', postId)
           </el-dropdown>
         </div>
       </template>
-      <template #tabs><SiteTabs :active="tab" @change="openTab" /></template>
+      <template #tabs><SiteTabs :active="tab" :tabs="tabs" @change="openTab" /></template>
       <UploadQueueList />
       <FeedColumn v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
         @reply="composer.replyTo.value = $event" />
+      <ProductionPanel v-else-if="tab === 'production'" :site-id="siteId" />
       <FieldColumn v-else-if="site" :site="site" />
-      <template v-if="site" #footer>
+      <template v-if="site && tab !== 'production'" #footer>
         <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>

@@ -86,6 +86,7 @@
    */
   --layout-phone-column: 640px; /* mobil kabuk: telefonda tam genişlik, tablette bu genişlikte ortalı */
   --layout-reading-width: 760px; /* masaüstü sağ panel: akışın okunaklı genişliği */
+  --layout-board-width: 1180px; /* masaüstü sağ panel: kartlı takip ekranı (İmalat) */
   --layout-list-width: clamp(280px, 28vw, 360px); /* masaüstü liste: dar pencerede incelir */
   --layout-nav-width: 72px; /* masaüstü sol menü kapalıyken: yalnızca ikonlar */
   --layout-nav-width-open: 256px; /* masaüstü sol menü açıkken: ikon + ad */

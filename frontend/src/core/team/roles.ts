@@ -1,4 +1,5 @@
 import type { MemberViewRole } from '@/core/api/generated/model'
+import { canSeeProduction } from '@/core/production/productionRoles'
 
 export const ROLE_LABELS: Record<MemberViewRole, string> = {
   OWNER: 'Patron',
@@ -17,9 +18,12 @@ export const takesRollCall = (role: MemberViewRole | undefined) => role === 'OWN
 export const isCountedInPuantaj = (role: MemberViewRole | undefined) =>
   role === 'WORKER' || role === 'STOREKEEPER'
 
-/** Adresin rol kısıtı: Yoklama patron ve şefin, Puantajım yoklamada sayılanların. */
-export function roleAllows(meta: { rollCallOnly?: boolean; workerOnly?: boolean }, role: MemberViewRole): boolean {
+type RoleMeta = { rollCallOnly?: boolean; workerOnly?: boolean; productionOnly?: boolean }
+
+/** Adresin rol kısıtı: Yoklama patron ve şefin, Puantajım yoklamada sayılanların, İmalat onu görenlerin. */
+export function roleAllows(meta: RoleMeta, role: MemberViewRole): boolean {
   if (meta.rollCallOnly) return takesRollCall(role)
   if (meta.workerOnly) return isCountedInPuantaj(role)
+  if (meta.productionOnly) return canSeeProduction(role)
   return true
 }

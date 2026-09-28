@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 import type { ProductionEntryView, ProductionItemView } from '@/core/api/generated/model'
-import { canEnterProduction, canSeeProduction } from '@/core/production/productionAccess'
+import { canEnterProduction, canSeeProduction } from '@/core/production/productionRoles'
 import { entryFileProblem } from '@/core/production/entryFiles'
 import {
   emptyEntryForm,
@@ -16,6 +16,7 @@ import {
   itemRequestOf,
   tradeChoices,
 } from '@/core/production/itemForm'
+import { parseQuantity, quantityProblem } from '@/core/production/quantityInput'
 
 const today = dayjs('2026-09-28')
 const demir = {
@@ -40,9 +41,10 @@ describe('kim ne yapar', () => {
 
 describe('Yeni İmalat formu', () => {
   it('tür, toplam ve birim ister; bitiş başlangıçtan önce olamaz', () => {
-    const filled = { ...EMPTY_ITEM_FORM, trade: 'Sıva', total: 12000, unit: 'm²' }
+    const filled = { ...EMPTY_ITEM_FORM, trade: 'Sıva', total: '12.000', unit: 'm²' }
     expect(itemFormProblem(EMPTY_ITEM_FORM)).toBe('İmalat türünü seç ya da yaz.')
-    expect(itemFormProblem({ ...filled, total: 0 })).toBe('Toplam miktarı yaz.')
+    expect(itemFormProblem({ ...filled, total: '' })).toBe('Toplam miktarı yaz.')
+    expect(itemFormProblem({ ...filled, total: '0' })).toBe('Toplam miktar sıfırdan büyük olmalı.')
     expect(itemFormProblem({ ...filled, startDate: '2026-10-10', plannedEnd: '2026-10-01' })).toBe(
       'Planlanan bitiş, başlangıçtan önce olamaz.',
     )
@@ -54,7 +56,7 @@ describe('Yeni İmalat formu', () => {
       ...EMPTY_ITEM_FORM,
       trade: ' Sıva ',
       title: '  ',
-      total: 12000,
+      total: '12.000',
       unit: 'm²',
       note: '',
     }
@@ -62,6 +64,7 @@ describe('Yeni İmalat formu', () => {
       trade: 'Sıva',
       title: null,
       crewId: null,
+      totalQuantity: 12000,
       note: null,
     })
     expect(tradeChoices([{ trade: 'Asansör' } as ProductionItemView])).toContain('Asansör')
@@ -76,8 +79,11 @@ describe('Günlük İmalat Güncellemesi', () => {
     const form = emptyEntryForm(today)
     expect(form).toMatchObject({ day: '2026-09-28', onField: false })
     expect(entryFormProblem(form, today)).toBe('Bugün yapılan miktarı yaz.')
-    expect(entryFormProblem({ ...form, quantity: 0 }, today)).toBeNull()
-    expect(entryFormProblem({ ...form, quantity: 1, day: '2026-09-29' }, today)).toBe(
+    expect(entryFormProblem({ ...form, quantity: '0' }, today)).toBeNull()
+    expect(entryFormProblem({ ...form, quantity: '2 ton' }, today)).toBe(
+      'Miktarı sayı olarak yaz: 3,5 ya da 12.000',
+    )
+    expect(entryFormProblem({ ...form, quantity: '1', day: '2026-09-29' }, today)).toBe(
       'İleri bir güne giriş yapılmaz.',
     )
   })
@@ -89,8 +95,8 @@ describe('Günlük İmalat Güncellemesi', () => {
     )
   })
 
-  it('gönderilen form: miktar üç haneye yuvarlanır, boş not gitmez', () => {
-    const form = { ...emptyEntryForm(today), quantity: 0.1 + 0.2, note: ' ' }
+  it('gönderilen form: Türkçe yazılan miktar sayı olur, üç haneye yuvarlanır; boş not gitmez', () => {
+    const form = { ...emptyEntryForm(today), quantity: '0,3004', note: ' ' }
     expect(entryPayload(form, [], 'giris')).toEqual({
       id: 'giris',
       day: '2026-09-28',
@@ -122,5 +128,21 @@ describe('Günlük İmalat Güncellemesi', () => {
       ['28 Eylül 2026', 3.5, 2],
       ['27 Eylül 2026', 4.2, 1],
     ])
+  })
+})
+
+describe('Türkçe yazılan miktar', () => {
+  it('virgül ondalık, nokta binliktir; noktalı ondalık da anlaşılır', () => {
+    expect(parseQuantity('3,5')).toBe(3.5)
+    expect(parseQuantity('3.5')).toBe(3.5)
+    expect(parseQuantity('12.000')).toBe(12000)
+    expect(parseQuantity('12.000,5')).toBe(12000.5)
+    expect(parseQuantity(' 250 ')).toBe(250)
+    expect(parseQuantity('0')).toBe(0)
+    expect(parseQuantity('')).toBeUndefined()
+    expect(parseQuantity('-2')).toBeUndefined()
+    expect(parseQuantity('3,5,2')).toBeUndefined()
+    expect(parseQuantity('üç')).toBeUndefined()
+    expect(quantityProblem('abc', 'Yaz.')).toBe('Miktarı sayı olarak yaz: 3,5 ya da 12.000')
   })
 })

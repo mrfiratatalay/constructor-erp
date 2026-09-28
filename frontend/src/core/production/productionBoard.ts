@@ -1,5 +1,9 @@
 import dayjs from 'dayjs'
-import type { ProductionItemView, ProductionItemViewStatus } from '@/core/api/generated/model'
+import type {
+  ProductionEntryView,
+  ProductionItemView,
+  ProductionItemViewStatus,
+} from '@/core/api/generated/model'
 
 /** Üstteki durum düğmeleri: Tümü ve dört durum. */
 export type StatusFilter = 'ALL' | ProductionItemViewStatus
@@ -103,4 +107,21 @@ export function filterOptions(items: ProductionItemView[]) {
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name, 'tr')),
   }
+}
+
+/** "Son günlük girişler" tablosunun satırı: giriş ve imalatı (silinmiş imalatın girişi gelmez). */
+export interface RecentRow {
+  entry: ProductionEntryView
+  item: ProductionItemView
+}
+
+export function recentRows(
+  entries: ProductionEntryView[],
+  items: ProductionItemView[],
+): RecentRow[] {
+  const byId = new Map(items.map((item) => [item.id, item]))
+  return entries.flatMap((entry) => {
+    const item = byId.get(entry.itemId)
+    return item ? [{ entry, item }] : []
+  })
 }

@@ -4,15 +4,13 @@ import { clockTime, shortDay } from '@/core/format/dates'
 import type { TagTone } from '@/core/format/statusTone'
 
 /** İmalatın durumları ekranda: Devam ediyor mavi, Bitmeye yakın turuncu, Gecikiyor kırmızı, Tamamlandı yeşil. */
-export const PRODUCTION_STATUS: Record<
-  ProductionItemViewStatus,
-  { label: string; tone: TagTone }
-> = {
-  IN_PROGRESS: { label: 'Devam ediyor', tone: 'progress' },
-  NEARLY_DONE: { label: 'Bitmeye yakın', tone: 'warning' },
-  DELAYED: { label: 'Gecikiyor', tone: 'danger' },
-  COMPLETED: { label: 'Tamamlandı', tone: 'success' },
-}
+export const PRODUCTION_STATUS: Record<ProductionItemViewStatus, { label: string; tone: TagTone }> =
+  {
+    IN_PROGRESS: { label: 'Devam ediyor', tone: 'progress' },
+    NEARLY_DONE: { label: 'Bitmeye yakın', tone: 'warning' },
+    DELAYED: { label: 'Gecikiyor', tone: 'danger' },
+    COMPLETED: { label: 'Tamamlandı', tone: 'success' },
+  }
 
 const QUANTITY = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 3 })
 const PERCENT = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 })

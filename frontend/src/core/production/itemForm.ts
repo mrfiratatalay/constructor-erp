@@ -1,4 +1,6 @@
 import type { ProductionItemRequest, ProductionItemView } from '@/core/api/generated/model'
+import { quantityLabel } from '@/core/production/productionFormat'
+import { parseQuantity, quantityProblem } from '@/core/production/quantityInput'
 
 /** İmalat türünün hazır seçenekleri; listede olmayan yeni bir tür yazılabilir ("Diğer" yerine). */
 export const TRADE_PRESETS = [
@@ -22,7 +24,8 @@ export interface ItemForm {
   trade: string
   title: string
   crewId: string | undefined
-  total: number | undefined
+  /** Yazı: "12.000" ya da "58,5" (quantityInput). */
+  total: string
   unit: string
   startDate: string | null
   plannedEnd: string | null
@@ -33,7 +36,7 @@ export const EMPTY_ITEM_FORM: ItemForm = {
   trade: '',
   title: '',
   crewId: undefined,
-  total: undefined,
+  total: '',
   unit: 'ton',
   startDate: null,
   plannedEnd: null,
@@ -45,7 +48,7 @@ export function itemFormOf(item: ProductionItemView): ItemForm {
     trade: item.trade,
     title: item.title ?? '',
     crewId: item.crew?.id,
-    total: item.totalQuantity,
+    total: quantityLabel(item.totalQuantity),
     unit: item.unit,
     startDate: item.startDate ?? null,
     plannedEnd: item.plannedEnd ?? null,
@@ -56,7 +59,9 @@ export function itemFormOf(item: ProductionItemView): ItemForm {
 /** Kaydedilemeyecek formun nedeni (düğmenin altında yazar); kaydedilebiliyorsa null. */
 export function itemFormProblem(form: ItemForm): string | null {
   if (!form.trade.trim()) return 'İmalat türünü seç ya da yaz.'
-  if (!form.total || form.total <= 0) return 'Toplam miktarı yaz.'
+  const total = quantityProblem(form.total, 'Toplam miktarı yaz.')
+  if (total) return total
+  if (!parseQuantity(form.total)) return 'Toplam miktar sıfırdan büyük olmalı.'
   if (!form.unit.trim()) return 'Birimi seç.'
   if (form.startDate && form.plannedEnd && form.plannedEnd < form.startDate) {
     return 'Planlanan bitiş, başlangıçtan önce olamaz.'
@@ -71,7 +76,7 @@ export function itemRequestOf(form: ItemForm): ProductionItemRequest {
     trade: form.trade.trim(),
     title: optional(form.title),
     crewId: form.crewId ?? null,
-    totalQuantity: form.total ?? 0,
+    totalQuantity: parseQuantity(form.total) ?? 0,
     unit: form.unit.trim(),
     startDate: form.startDate,
     plannedEnd: form.plannedEnd,

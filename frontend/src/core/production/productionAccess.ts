@@ -1,14 +1,6 @@
 import type { QueryClient } from '@tanstack/vue-query'
-import type { MemberViewRole } from '@/core/api/generated/model'
 import { getGetProductionBoardQueryKey } from '@/core/api/generated/production/production'
 import { refreshPostViews } from '@/core/posts/refreshPostViews'
-
-/** İmalatı patron, şef ve depo sorumlusu görür; çalışanın İmalat sekmesi yoktur (Musa'nın kararı). */
-export const canSeeProduction = (role: MemberViewRole | undefined) =>
-  role === 'OWNER' || role === 'SITE_LEAD' || role === 'STOREKEEPER'
-
-/** Veriyi yalnızca şantiye şefi girer: imalat açar, düzeltir, siler ve günlük girişleri yapar. */
-export const canEnterProduction = (role: MemberViewRole | undefined) => role === 'SITE_LEAD'
 
 /** Excel raporu: düz bir bağlantıyla iner, oturum çerezle gider (puantaj Excel'i gibi). */
 export const productionExportUrl = (siteId: string) => `/api/sites/${siteId}/production/export`

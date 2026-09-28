@@ -10,6 +10,7 @@ const PAGES: PageSet = {
   sites: page,
   siteFeed: page,
   siteField: page,
+  siteProduction: page,
   siteTasks: page,
   attendance: page,
   memberAttendance: page,

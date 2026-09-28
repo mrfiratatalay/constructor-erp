@@ -1,13 +1,15 @@
 import dayjs from 'dayjs'
 import type { ProductionEntryForm, ProductionItemView } from '@/core/api/generated/model'
 import { quantityLabel } from '@/core/production/productionFormat'
+import { parseQuantity, quantityProblem } from '@/core/production/quantityInput'
 
 /**
  * "Günlük İmalat Güncellemesi" penceresinin alanları. Birim sorulmaz: imalat açılırken belirlendi. Tarih bugünle
- * gelir, geçmiş güne değiştirilebilir. Saha'ya yansıtma kapalı gelir: Saha'yı çalışanlar da görür.
+ * gelir, geçmiş güne değiştirilebilir. Saha'ya yansıtma kapalı gelir: Saha'yı çalışanlar da görür. Miktar yazıdır
+ * ("3,5"): Türkçe ondalık virgülü sayı kutusundan geçmez (quantityInput).
  */
 export interface EntryForm {
-  quantity: number | undefined
+  quantity: string
   workerCount: number | undefined
   day: string
   note: string
@@ -16,7 +18,7 @@ export interface EntryForm {
 
 export function emptyEntryForm(today = dayjs()): EntryForm {
   return {
-    quantity: undefined,
+    quantity: '',
     workerCount: undefined,
     day: today.format('YYYY-MM-DD'),
     note: '',
@@ -26,8 +28,8 @@ export function emptyEntryForm(today = dayjs()): EntryForm {
 
 /** Kaydedilemeyecek formun nedeni; kaydedilebiliyorsa null. 0 geçerlidir: "çalışma yapılmadı". */
 export function entryFormProblem(form: EntryForm, today = dayjs()): string | null {
-  if (form.quantity === undefined || form.quantity === null || form.quantity < 0)
-    return 'Bugün yapılan miktarı yaz.'
+  const quantity = quantityProblem(form.quantity, 'Bugün yapılan miktarı yaz.')
+  if (quantity) return quantity
   if (!form.day) return 'Tarihi seç.'
   if (dayjs(form.day).isAfter(today, 'day')) return 'İleri bir güne giriş yapılmaz.'
   return null
@@ -51,7 +53,7 @@ export function entryPayload(form: EntryForm, files: File[], id: string): Produc
   return {
     id,
     day: form.day,
-    quantity: rounded(form.quantity ?? 0),
+    quantity: rounded(parseQuantity(form.quantity) ?? 0),
     workerCount: form.workerCount ?? null,
     note: form.note.trim() || null,
     onField: form.onField,
