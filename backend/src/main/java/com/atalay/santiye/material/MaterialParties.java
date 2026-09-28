@@ -33,6 +33,10 @@ public class MaterialParties {
             .toList();
     }
 
+    String nameOf(UUID partyId) {
+        return parties.findById(partyId).map(MaterialParty::getName).orElse(null);
+    }
+
     /** Seçilen taraf, yoksa yazılan ad; ikisi de boşsa taraf yok (null). */
     UUID resolve(UUID companyId, UUID partyId, String partyName) {
         if (partyId != null) {

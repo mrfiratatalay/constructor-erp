@@ -132,6 +132,10 @@ class MaterialMovement {
         return partyId;
     }
 
+    LocalDate day() {
+        return day;
+    }
+
     UUID getReturnOfId() {
         return returnOfId;
     }
