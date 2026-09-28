@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -33,9 +34,11 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /** Yetkiler: rol (hasRole) ve rolün açtığı işler (hasAuthority, bkz. Permission). */
     private void signIn(CurrentUser user) {
-        var authority = new SimpleGrantedAuthority("ROLE_" + user.role().name());
-        var authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(authority));
+        List<SimpleGrantedAuthority> authorities = Stream.concat(Stream.of("ROLE_" + user.role().name()),
+            Permission.grantedTo(user.role()).stream().map(Permission::name)).map(SimpleGrantedAuthority::new).toList();
+        var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);

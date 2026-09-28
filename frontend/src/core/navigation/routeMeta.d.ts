@@ -1,4 +1,5 @@
 import 'vue-router'
+import type { CurrentUserResponsePermissionsItem } from '@/core/api/generated/model'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -10,6 +11,8 @@ declare module 'vue-router' {
     rollCallOnly?: boolean
     /** Yalnızca çalışan görür (Puantajım): yoklamada sayılan odur. */
     workerOnly?: boolean
+    /** Adresin istediği izin (Malzemeler: VIEW_MATERIALS); izni olmayan kendi ana sayfasına döner. */
+    permission?: CurrentUserResponsePermissionsItem
     /** Adres gösterilmez; kullanıcı rolüne göre kendi ana sayfasına yönlendirilir. */
     resolveHome?: boolean
     /** Bir listenin içindeki detay sayfası: mobilde alt sekmeler gizlenir (WhatsApp'ta sohbetin içi gibi). */

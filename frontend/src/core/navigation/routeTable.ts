@@ -30,6 +30,9 @@ export const ROUTES = {
   },
   // Çalışanın kendi ayı: kaydını o gün görür, yanlışsa işaretleyeni arar. Patron ve şef yoklamada sayılmaz.
   myPuantaj: { path: '/puantajim', meta: { workerOnly: true, title: 'Puantajım' } },
+  // Malzemeler firmanındır, şantiyenin değil: hareketler ve stok aynı sayfada sekmedir (?sekme=stok). Süzgeçler ve
+  // açık hareket adreste durur (?tur=TO_SITE&hareket=…): Saha kartı hareketin ayrıntısına buradan bağlanır.
+  materials: { path: '/malzemeler', meta: { permission: 'VIEW_MATERIALS', title: 'Malzemeler' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>
 

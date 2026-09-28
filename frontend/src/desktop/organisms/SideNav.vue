@@ -20,7 +20,7 @@ const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { open, floating, toggle, closeFloating } = useNavMenu()
-const items = computed<NavItem[]>(() => (user.value ? mainNavItems(user.value.role, 'desktop') : []))
+const items = computed<NavItem[]>(() => (user.value ? mainNavItems(user.value, 'desktop') : []))
 /** Seçili öğe adresten gelir: şantiye sayfası da "Şantiyeler"i yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 

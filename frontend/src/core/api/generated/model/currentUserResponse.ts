@@ -4,6 +4,7 @@
  * Kızılkan Şantiye API
  * OpenAPI spec version: 1.0
  */
+import type { CurrentUserResponsePermissionsItem } from './currentUserResponsePermissionsItem'
 import type { CurrentUserResponseRole } from './currentUserResponseRole'
 
 export interface CurrentUserResponse {
@@ -11,4 +12,5 @@ export interface CurrentUserResponse {
   fullName: string
   role: CurrentUserResponseRole
   companyName: string
+  permissions: CurrentUserResponsePermissionsItem[]
 }

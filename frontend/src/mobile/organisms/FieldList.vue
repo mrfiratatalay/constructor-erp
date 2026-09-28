@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { showImagePreview } from 'vant'
 import { Ellipsis } from 'lucide-vue-next'
 import type { PostView, SiteView } from '@/core/api/generated/model'
 import { dayDividerText } from '@/core/field/fieldDays'
 import { fieldSummary } from '@/core/field/fieldSummary'
 import { useFieldUpdates } from '@/core/field/useFieldUpdates'
+import { useFieldMaterialRefs } from '@/core/materials/useFieldMaterialRefs'
 import FieldActionSheet from '@/mobile/organisms/FieldActionSheet.vue'
 import FieldDayTitle from '@/shared/molecules/FieldDayTitle.vue'
 import FieldHero from '@/shared/molecules/FieldHero.vue'
@@ -20,6 +22,9 @@ const { site } = defineProps<{ site: SiteView }>()
 const { days, isEmpty, isLoading, hasMore, isLoadingMore, loadMore } = useFieldUpdates(() => site.id)
 const summary = computed(() => fieldSummary(days.value, site.photoUrl ?? null))
 const acting = ref<PostView | null>(null)
+const materials = useFieldMaterialRefs(() => site.id)
+const router = useRouter()
+const openMaterial = (movementId: string) => router.push({ name: 'materials', query: { hareket: movementId } })
 
 function openPhotos(urls: string[], index: number) {
   showImagePreview({ images: urls, startPosition: index, closeable: true })
@@ -39,7 +44,8 @@ onMounted(() => window.scrollTo({ top: 0 }))
     <section v-for="(day, index) in days" :key="day.key" class="field-list__day">
       <FieldDayTitle :text="index === 0 ? day.title : dayDividerText(day)" :lead="index === 0" />
       <QueuedFieldEntry v-for="post in day.pending" :key="post.id" :post="post" />
-      <FieldEntry v-for="post in day.entries" :key="post.id" :post="post" @open-photos="openPhotos">
+      <FieldEntry v-for="post in day.entries" :key="post.id" :post="post" :material="materials.refOf(post.id)"
+        @open-photos="openPhotos" @open-material="openMaterial">
         <template #menu>
           <button type="button" class="field-list__more" aria-label="Güncelleme işlemleri" @click="acting = post">
             <Ellipsis :size="18" />

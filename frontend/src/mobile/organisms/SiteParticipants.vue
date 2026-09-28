@@ -57,6 +57,7 @@ const HANDLERS: Record<PersonAction, (person: Participant) => unknown> = {
   edit: (person) => (editing.value = person),
   makeOwner: (person) => changeRole(person, 'makeOwner'),
   makeLead: (person) => changeRole(person, 'makeLead'),
+  makeStorekeeper: (person) => changeRole(person, 'makeStorekeeper'),
   makeWorker: (person) => changeRole(person, 'makeWorker'),
   remove,
 }
