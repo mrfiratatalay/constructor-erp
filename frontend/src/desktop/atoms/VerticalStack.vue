@@ -1,17 +1,17 @@
 <script setup lang="ts">
 /**
- * Sayfanın dikey düzeni: bölümler alt alta, aralarında eşit boşluk. Izgara sütunu içerikten geniş olamaz
+ * Dikey düzen: bölümler alt alta, aralarında eşit boşluk. Izgara sütunu içerikten geniş olamaz
  * (minmax(0, 1fr)): geniş bir tablo sayfayı yana taşırmaz, kendi içinde kayar.
  */
 const { gap = 16 } = defineProps<{ gap?: number }>()
 </script>
 
 <template>
-  <div class="page-stack" :style="{ gap: `${gap}px` }"><slot /></div>
+  <div class="vertical-stack" :style="{ gap: `${gap}px` }"><slot /></div>
 </template>
 
 <style scoped>
-.page-stack {
+.vertical-stack {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;

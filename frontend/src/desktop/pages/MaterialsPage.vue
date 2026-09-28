@@ -13,7 +13,7 @@ import MaterialsHeader from '@/desktop/molecules/MaterialsHeader.vue'
 import MovementDrawer from '@/desktop/organisms/MovementDrawer.vue'
 import MovementsBoard from '@/desktop/organisms/MovementsBoard.vue'
 import SummaryCards from '@/desktop/organisms/SummaryCards.vue'
-import PageStack from '@/desktop/templates/PageStack.vue'
+import VerticalStack from '@/desktop/atoms/VerticalStack.vue'
 
 type Command = 'open' | 'deliver' | 'takeReturn' | 'cancel'
 
@@ -53,7 +53,7 @@ function onCommand(command: Command, row: MovementRow) {
 <template>
   <el-scrollbar>
     <el-main>
-      <PageStack :gap="24">
+      <VerticalStack :gap="24">
         <MaterialsHeader :role="role" :can-export="can('EXPORT_MATERIALS')"
           :can-create="can('CREATE_MATERIAL_MOVEMENT')" @create="createMovement()" />
         <SummaryCards :summary="summary" @open="onSummary" />
@@ -66,7 +66,7 @@ function onCommand(command: Command, row: MovementRow) {
             <template #label><el-space :size="6"><Boxes :size="16" />Stok</el-space></template>
           </el-tab-pane>
         </el-tabs>
-      </PageStack>
+      </VerticalStack>
     </el-main>
   </el-scrollbar>
   <MovementDrawer v-model:open="movementOpen" :initial="initial" />

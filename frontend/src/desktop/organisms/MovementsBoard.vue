@@ -12,7 +12,7 @@ import MovementChips from '@/desktop/molecules/MovementChips.vue'
 import MovementsEmpty from '@/desktop/molecules/MovementsEmpty.vue'
 import MovementToolbar from '@/desktop/molecules/MovementToolbar.vue'
 import MovementTable from '@/desktop/organisms/MovementTable.vue'
-import PageStack from '@/desktop/templates/PageStack.vue'
+import VerticalStack from '@/desktop/atoms/VerticalStack.vue'
 
 type Command = 'open' | 'deliver' | 'takeReturn' | 'cancel'
 
@@ -37,7 +37,7 @@ const tags = computed(() =>
 </script>
 
 <template>
-  <PageStack>
+  <VerticalStack>
     <MovementChips v-model="type" :count-of="countOf" />
     <MovementToolbar :filters="filters" :locations="options.locations.value" :materials="options.materials.value"
       :parties="options.parties.value" @update="update" @dates="setDates" />
@@ -62,5 +62,5 @@ const tags = computed(() =>
       <el-pagination background layout="prev, pager, next" :total="total" :page-size="PAGE_SIZE"
         :current-page="filters.page + 1" @current-change="(page: number) => setPage(page - 1)" />
     </el-row>
-  </PageStack>
+  </VerticalStack>
 </template>
