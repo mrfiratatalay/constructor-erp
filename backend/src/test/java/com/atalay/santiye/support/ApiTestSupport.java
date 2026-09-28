@@ -70,9 +70,17 @@ public abstract class ApiTestSupport {
         return read(contentOf(result), "$.id");
     }
 
-    /** Firmanın bağlantısıyla katılmış, oturumu açık bir şef: "o kişinin telefonu". Her şantiyeyi görür. */
+    /**
+     * Firmanın bağlantısıyla katılıp (çalışan olarak gelir) patronun şef yaptığı, oturumu açık biri: "şefin
+     * telefonu". Her şantiyeyi görür.
+     */
     protected Cookie signedInLead(Cookie owner, String fullName) {
-        return sessionCookieOf(join(joinToken(owner), null, fullName, uniquePhone()));
+        String phone = uniquePhone();
+        Cookie lead = sessionCookieOf(join(joinToken(owner), null, fullName, phone));
+        String promotion = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"active\": true}"
+            .formatted(fullName, phone);
+        assertThat(patchJson("/api/team/members/" + userIdOf(lead), owner, promotion)).hasStatus(200);
+        return lead;
     }
 
     /** Telefonun yaptığı gibi: gönderi kimliği istemcide üretilir, dosyalar aynı istekte gider. */

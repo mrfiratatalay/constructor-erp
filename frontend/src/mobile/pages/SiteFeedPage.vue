@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { showFailToast } from 'vant'
 import { EllipsisVertical } from 'lucide-vue-next'
-import { errorMessage } from '@/core/api/errors'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
-import { useSendRollCall } from '@/core/rollcall/useSendRollCall'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
@@ -43,7 +40,6 @@ const fieldComposer = useComposer(target, { fieldUpdate: true })
 const infoOpen = ref(false)
 const searchOpen = ref(false)
 const moreOpen = ref(false)
-const rollCall = useSendRollCall(siteId)
 
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
 const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
@@ -56,15 +52,6 @@ function onMore(action: { key: string }) {
 
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
-
-/** Bugün zaten atıldıysa yenisi atılmaz: sohbet o mesaja gider, şef orada görür. */
-async function sendRollCall() {
-  try {
-    openTab('chat', await rollCall.send())
-  } catch (error) {
-    showFailToast(errorMessage(error))
-  }
-}
 </script>
 
 <template>
@@ -85,8 +72,7 @@ async function sendRollCall() {
       @reply="composer.replyTo.value = $event" />
     <FieldList v-else-if="site" :site="site" />
     <template v-if="site" #footer>
-      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
-        @roll-call="sendRollCall" />
+      <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
       <FieldComposer v-else :composer="fieldComposer" />
     </template>
     <SiteInfoSheet v-if="site" v-model:show="infoOpen" :site="site" />

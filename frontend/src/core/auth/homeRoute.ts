@@ -2,12 +2,13 @@ import type { CurrentUserResponseRole } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
 
 /**
- * Kullanıcının uygulamayı açınca ilk gördüğü sayfa. İki rolde de şantiye listesi (WhatsApp'ın sohbet
- * listesi gibi); tek şantiyesi olan şef de önce listeyi görür.
+ * Kullanıcının uygulamayı açınca ilk gördüğü sayfa. Her rolde şantiye listesi (WhatsApp'ın sohbet listesi
+ * gibi); şef yoklamaya menüden geçer.
  */
 const HOME_BY_ROLE: Record<CurrentUserResponseRole, RouteName> = {
   OWNER: 'sites',
   SITE_LEAD: 'sites',
+  WORKER: 'sites',
 }
 
 export function homeRouteFor(role: CurrentUserResponseRole): RouteName {

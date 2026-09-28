@@ -34,17 +34,6 @@
   --field-issue-bg: #fff8e1;
   --field-quiet: #cbd5e4;
 
-  /* Yoklama takvimi (istek: geldi yeşil, gelmedi kırmızı, izinli sarı; katılmadı gri). Zemin açık, yazı koyu:
-     gün numarası üstünde okunur (en düşüğü 6.9:1; WCAG AA 4.5:1 ister). */
-  --roll-present-bg: #bbf7d0;
-  --roll-present: #14532d;
-  --roll-absent-bg: #fecaca;
-  --roll-absent: #7f1d1d;
-  --roll-excused-bg: #fde68a;
-  --roll-excused: #713f12;
-  --roll-missed-bg: #e5e7eb;
-  --roll-missed: #374151;
-
   /* Metin ve yüzeyler: soğuk beton grisi ailesi */
   --text-strong: #141a2e;
   --text-muted: #5b6577;

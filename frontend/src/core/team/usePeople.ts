@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useIssueLoginLink, useUpdateMember } from '@/core/api/generated/team/team'
-import type { UpdateMemberRequest } from '@/core/api/generated/model'
+import type { MemberViewRole, UpdateMemberRequest } from '@/core/api/generated/model'
 import type { Participant } from '@/core/sites/participants'
 import type { IssuedLink } from '@/core/team/loginLink'
 import type { MemberForm } from '@/core/team/memberForm'
 
 /**
- * Patronun kişilerle işleri (şantiye bilgisindeki Katılımcılar): düzelt, patron yap, firmadan çıkar, giriş linki
+ * Patronun kişilerle işleri (şantiye bilgisindeki Katılımcılar): düzelt, rolünü değiştir, firmadan çıkar, giriş linki
  * gönder. Yeni kişi buradan eklenmez, firmanın bağlantısıyla kendisi gelir. Kişi değişince her ekran yenilenir:
  * adı mesajlarda, listede ve başlıkta görünür; herkes her şantiyede olduğu için her şantiyede aynıdır.
  */
@@ -31,7 +31,7 @@ export function usePeople() {
   return {
     issued,
     edit: (person: Participant, form: MemberForm) => save(person, form),
-    toggleRole: (person: Participant) => save(person, { role: person.role === 'OWNER' ? 'SITE_LEAD' : 'OWNER' }),
+    setRole: (person: Participant, role: MemberViewRole) => save(person, { role }),
     remove: (person: Participant) => save(person, { active: false }),
     sendLoginLink,
     isSaving: computed(() => update.isPending.value || issue.isPending.value),

@@ -1,7 +1,7 @@
 # Kızılkan Şantiye — Ekran Tasarımı Kararları
 
 22 Eylül 2026'da kararlaştırıldı, aynı gün dördüncü turda sadeleştirildi; 23 Eylül'de Şantiyeler modülü
-ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24-25 Eylül'de kişiler, 27 Eylül'de yoklama. Ekran düzeniyle
+ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24-25 Eylül'de kişiler, 28 Eylül'de yoklama ve roller. Ekran düzeniyle
 ilgili bir tercih yapılacağı zaman önce buraya bakılır. Kurallar değil, kararlardır; gerekçesiyle birlikte değişir.
 
 ## Tek ölçüt: tek cümle testi
@@ -93,10 +93,10 @@ Herkes aynı listeyi görür; tek şantiyesi olan şef de. Sekmenin adı herkes 
 | Başlık | Şantiye fotoğrafı, ad, altında katılımcıların ilk adları ve "Sen". Başlığa dokununca bilgi açılır; sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Altında Sohbet · Saha sekmeleri. |
 | 📞 | 25 Eylül'de kararlaştırıldı. Aranabilecekler: patron ve katılımcılar, numarası olanlar, kişinin kendisi hariç (şef patronu da buradan arar). Tek kişi varsa doğrudan onu arar (dayının en sık işi tek dokunuş); birden fazlaysa alttan liste açılır: ad, rol, numara. Önceden "telefonu olan ilk katılımcı" aranıyordu: ikinci şef buradan hiç aranamıyordu. |
 | Sistem satırları | "Patron şantiyeyi kurdu", "Mahmut davet bağlantısıyla katıldı", "Patron, Mahmut'u çıkardı" (WhatsApp gibi). Katılma ve çıkarma firmanın her şantiyesine düşer: herkes her şantiyededir. Şantiye başına üyelik varken yazılmış eski satırlar ("Patron, Musa'yı ekledi", "Musa eklendi") olduğu gibi durur. |
-| Gönderme çubuğu | `[＋] [yazı] 📷 🎤` (iPhone WhatsApp). ＋: Fotoğraf ve video · Belge (PDF) · Yoklama (günün yoklama mesajı, bkz. Yoklama). 📷 doğrudan kamera. Yazı varken 📷 ve 🎤 yerine ➤. Masaüstünde `[＋] [yazı 😊] 🎤`. |
+| Gönderme çubuğu | `[＋] [yazı] 📷 🎤` (iPhone WhatsApp). ＋: Fotoğraf ve video · Belge (PDF). 📷 doğrudan kamera. Yazı varken 📷 ve 🎤 yerine ➤. Masaüstünde `[＋] [yazı 😊] 🎤`. |
 | Sesli not | Basılı tut, bırak → gider. Basılıyken yukarı kaydırınca kilitlenir: 🗑 ya da ➤. Dinlerken 1× / 1,5× / 2×. |
 | Fotoğraflar | Baloncuk boyunda (ekranın ~3/4'ü, en çok 320px). Çok fotoğraf 2×2 albüm; dörtten fazlasında "+N". Dokununca tam ekran. |
-| Mesaj menüsü | Uzun bas (masaüstünde ⋯): Yanıtla, Kopyala, İlet, Sabitle, Sahaya ekle (bkz. Saha sekmesi), Bilgi (yalnızca kendi mesajında), Düzelt, Sil. Yoklama mesajında yalnızca Sabitle, Bilgi, Sil (bkz. Yoklama). |
+| Mesaj menüsü | Uzun bas (masaüstünde ⋯): Yanıtla, Kopyala, İlet, Sabitle, Sahaya ekle (bkz. Saha sekmesi), Bilgi (yalnızca kendi mesajında), Düzelt, Sil. |
 | Yanıtla | Çubuğun üstünde alıntı (✕ ile vazgeç); baloncukta alıntı şeridi, dokununca o mesaja gidilir. |
 | İlet | Şantiye seçilir; mesaj iletenin adıyla, "İletildi" etiketiyle gider, dosyaları kopyalanır. |
 | Sabit mesaj | Herkes sabitler, şantiye başına en fazla üç, kaldırılana kadar durur; yalnızca şantiyenin içinde (listeye yansımaz). |
@@ -146,67 +146,80 @@ bir günlüktür: kutucuk, sayaç ve ayrı bölümler yoktur; tek dikey akış v
 | Sahaya ekle | Şef alışkanlıkla "Beton döküldü" + fotoğrafı sohbete atar. Mesaja uzun bas (masaüstünde ⋯) → **Sahaya ekle**: mesaj atıldığı zamandaki yerine, yazarıyla günlüğe girer. Sabitleme gibi şantiyeyi gören herkes ekler ve çıkarır (şef de patron da). Otomatik ekleme (her fotoğraflı mesaj) konuşuldu, reddedildi: günlüğe çöp girer. |
 | İki taslak | Sohbet ve Saha çubuğunun taslakları ayrıdır: yarım yazılan mesaj sekme değişince kaybolmaz. |
 
-## Yoklama (yoklamaya katıl)
+## Yoklama (firmanın puantajı)
 
-24 Eylül'de kararlaştırıldı, 27 Eylül'de baştan değişti (Musa). Patronun her sabah sorduğu soru: **"Bugün kim
-geldi, kim gelmedi, neden?"** Şef herkesi tek tek işaretlemez: sohbete günün yoklama mesajını atar, çalışan
-kendi telefonundan **Yoklamaya Katıl**'a basar ve Geldi olur. Katılmayanı patron işaretler.
+28 Eylül'de baştan kararlaştırıldı (Fırat); önceki iki denemenin (şantiye şantiye şef penceresi, sohbette
+"Yoklamaya Katıl") yerini aldı, bkz. Askıya alınanlar. Yoklamanın tek işi **ay sonunda "kime kaç gün, kaç saat
+mesai" sorusunun kavgasız cevabıdır**: o günün gerçeğini o gün, sahada olan şef yazar.
 
-**Sohbette: yoklama mesajı.** WhatsApp'ta karşılığı ＋'daki Anket: kişinin attığı, düz yazı olmayan bir mesaj
-(İlke 1).
+> **"Şef her sabah defteri dolduruyor, sen ay sonunda puantajı görüyorsun."**
+
+Tanıdık kalıp burada WhatsApp değil, şefin kâğıt **puantaj defteridir**: satırda kişi, sütunda gün. Görsel
+referanslar ve neyin neden alındığı: `docs/referanslar/yoklama/`.
+
+| Karar | Neden |
+|---|---|
+| **Firmanın, şantiyenin değil.** Menüde Şantiyeler'in yanında **Yoklama**; sohbette yoklama yoktur. | Çalışanlar her gün başka şantiyeye gider; puantaj kişinindir. |
+| **Kim görür:** patron ve şef. Çalışan yoklamada sayılır; menüsünde Yoklama yerine kendi ayı, **Puantajım** vardır. | Roller: bkz. Kişiler. |
+| **Kim sayılır:** Personel, kişi kişi (uygulamadaki çalışanlar kendiliğinden, uygulaması olmayanlar adıyla eklenir) ve Taşeron ekipler, ekip olarak ("Demirci · Hasan Usta"). Patron ve şef sayılmaz. | Dayı demircinin kaç adamla geldiğine değil, ekibin gelip gelmediğine bakar; ekip, ekip başının işidir. |
+| **Durumlar:** Geldi · Yarım gün · Gelmedi · İzinli; ekipte yalnızca Geldi · Gelmedi. **İşaretlenmedi** ayrı durumdur, "Gelmedi" değildir. | Şef henüz bakmamış olabilir; kaydı olmayan gün yazılmaz. |
+| **Mesai** bir durum değil, Geldi gününe eklenen saattir: yarım saatlik adımla, en çok 16. Ekibe mesai yazılmaz. | "Yarım gün + mesai" kendiyle çelişir. |
+| **Not** her günde isteğe bağlı (200 harf). | Ay sonunda patron nedenini görür. |
+| **Kayıt anında.** "Kaydet" ya da "Tamamla" yoktur; son satır işaretlenince yoklama kendiliğinden tamamdır. Her işaretin yanında kim, ne zaman. | Ayrı bir "tamamlandı" durumu listeyle çelişebilirdi. |
+| **Hangi gün:** şef yalnızca bugünü, patron geçmişi de düzeltir; ileri gün işaretlenmez. Sunucu da reddeder. | Şef geçmişe dönüp puantajla oynayamaz. |
+
+**Bugün sekmesi, şefin sabahı.** Menüden girince doğrudan bugün açılır.
 
 ```
-┌──────────────────────────────────────┐
-│ Ali Usta                             │
-│ 📋 Yoklama · 27 Eylül Pazar          │
-│ 3 kişi katıldı                       │
-│ [        Yoklamaya Katıl        ]    │  katılınca: ✓ Katıldın · 08:12
-│                              08:05   │
-└──────────────────────────────────────┘
+Yoklama · 28 Eylül Pazartesi                              [+ Kişi ya da ekip ekle]
+ Bugün | Puantaj
+┌ Geldi ┐ ┌ Gelmedi ┐ ┌ İzinli ┐ ┌ İşaretlenmedi ┐
+│ 8     │ │ 1       │ │ 1      │ │ 3             │
+[Geldi · 8] [Yarım gün · 1] [Gelmedi · 1] [İzinli · 1] [İşaretlenmedi · 3]     🔍 Ara
+── Personel · 12 ──────────────────────────────────────────────────────────────
+☐ (AY) Ali Usta   ✓ Geldi   ✓ Geldi   Geldi +2 s   Bugün [Geldi|Yarım gün|Gelmedi|İzinli] ⋯
+       Kalıpçı
+── Taşeron ekipler · 2 ────────────────────────────────────────────────────────
+☐ [▣] Demirci     ✓ Geldi   ✕ Gelmedi  ✓ Geldi     Bugün [Geldi|Gelmedi] ⋯
+       Ekip başı · Hasan Usta
 ```
 
 | Parça | Karar |
 |---|---|
-| Kim atar | Sohbetteki ＋ → **Yoklama** (Fotoğraf ve video · Belge (PDF) · Yoklama). Şantiyeyi gören herkes atar; pratikte sabah şef. Saha'nın ＋'sında yoktur. |
-| Günde bir | Bir şantiyede günde bir yoklama mesajı. ＋ → Yoklama ikinci kez basılırsa yenisi atılmaz, sohbet bugünkü mesaja gider (kısa süre sarı yanar). Silinen mesajın yerine yenisi atılabilir. |
-| Katılmak | Çalışan kendi telefonundan **Yoklamaya Katıl**'a basar: o gün Geldi, hangi şantiyede ve saat kaçta katıldığı yazılır. Kartta "✓ Katıldın · 08:12"; başka şantiyenin mesajından katıldıysa o şantiyenin adı da yazar. İkinci bir mesaja basmak ilk katılmanın yerini ve saatini değiştirmez. |
-| Kapanır | Yalnızca bugünün mesajına katılınır; dünkü mesajda "Yoklama kapandı" yazar (bugün basılsa yanlış güne Geldi yazılırdı). |
-| Patron işaretlediyse | Patronun İzinli ya da Gelmedi işaretlediği kişi yine katılabilir ve Geldi olur: kendi telefonundan basması geldiğinin kanıtıdır. Kartta "İzinli olarak işaretlendi" yazar. |
-| Patron | Yoklamada sayılmaz: kartında düğme yerine "N kişi katıldı" ve **Yoklamayı gör** (modüle geçer). |
-| Menüsü | Uzun bas (masaüstünde ⋯): yalnızca Sabitle, Bilgi (kendi mesajında), Sil. Yazısı yoktur: kopyalanmaz, düzeltilmez, yanıtlanmaz (alıntısı boş kalırdı); iletilmez (her şantiye kendi yoklamasını açar); Saha'ya eklenmez. Backend de reddeder. |
-| Listede | Önizleme "📋 Yoklama" (WhatsApp'taki "📊 Anket" gibi); okunmadı rozeti ve tikler düz mesaj gibi çalışır. |
+| Özet | Dört kart: Geldi (yarım gün altında yazar), Gelmedi, İzinli, İşaretlenmedi; sıfıra inen "İşaretlenmedi" "Bugünün yoklaması tamam" der. Raporda sayı kartı yoktur (İlke 4). |
+| Renk açıklaması | Çipler hem açıklama hem süzgeç: "İşaretlenmedi"ye basınca yalnızca kalanlar görünür. Yanında arama (ad, görev, ekip başı). |
+| Satır | Avatar, kalın ad, altında gri görev (ekipte "Ekip başı · Hasan Usta"). Son beş gün yalnızca okunur (şef dünü görerek işaretler); bugünün sütununda seçenekler açıktadır, **tek tıkla** işaretlenir. ⋯: Mesai ve not · İşaretlemeyi kaldır. |
+| Toplu işaretleme | Satırlar seçilince süzgecin yerine "5 satır seçildi" çubuğu gelir: Geldi · Yarım gün · Gelmedi · İzinli (seçimde ekip varsa yalnızca Geldi · Gelmedi). Notlar yerinde kalır. |
+| Telefonda | Dört renkli sayı, arama, Personel ve Taşeron ekipler. Satıra dokununca alttan seçim (tek dokunuş); ayrıca "Mesai ve not", "İşaretlemeyi kaldır", "Ayın takvimi". Sağ üstte **Seç** toplu işaretlemeyi açar (altta renkli düğmeler), **＋** kişi ya da ekip ekler. |
 
-**Yoklama modülü (yalnızca patron).** Menüde Şantiyeler'in yanında: telefonda alt sekme, masaüstünde sol menü.
-Açılınca doğrudan **bugün** gelir; önce şantiye seçilmez.
+**Puantaj sekmesi, ay sonu.** Ay seçici (gelecek ay yok; ay adreste `?ay=2026-09`, sekme `?sekme=puantaj`),
+işaretlerin açıklaması, patrona **Excel indir**. Personel cetveli: satırda kişi, sütunda ayın günleri, hücrede
+✓ ½ ✕ İ (mesaiyle "✓+2"); sağda sabit **Çalıştığı gün** (yarım gün yarım sayılır, yevmiye buna göre) ve
+**Mesai**; en altta ayın toplamı. Taşeron ekipler cetvelinde **Geldiği gün**. Telefonda cetvel yerine liste:
+"Ali Usta · 22,5 gün", altında mesai, yarım gün, gelmedi, izinli.
 
-```
-┌──────────────────────────────────────────────┐
-│ Yoklama   27 Eylül Pazar             [Excel] │
-│ 8 geldi · 1 gelmedi · 1 izinli · 2 katılmadı │  katılmayan yoksa son parça yok
-│ KATILMAYANLAR 2                              │  iş bekleyen önce
-│ Kemal Şahin                      [İşaretle]  │
-│ GELMEYENLER 2                                │
-│ Veli Kaya                  Gelmedi · Hastalık│
-│   Patron işaretledi                          │
-│ Hasan Demir                          İzinli  │
-│ GELENLER 8                                   │
-│ Ali Usta                              Geldi  │
-│   08:12 · Namık Kemal Plaza                  │  katıldığı saat ve şantiye
-└──────────────────────────────────────────────┘
-```
+**Kişinin ya da ekibin ayı.** Ada dokununca: masaüstünde sağdan panel (liste yerinde kalır), telefonda ayrı sayfa
+(`/yoklama/kisi/:entryId`). Toplamlar, takvim (her günde renkli işaret), güne dokununca ayrıntı: durum (büyük
+düğmeler), mesai, not ve "Kaydedildi · 08:17 · Patron" izi. Uygulaması olmayan kişi ya da ekip buradan düzeltilir
+ve **listeden çıkarılır** (geçmiş günleri puantajda kalır). Uygulamadaki çalışanın yalnızca görevi düzeltilir;
+listeden Katılımcılar'dan çıkar (firmadan çıkar ya da şef yap).
 
-| Parça | Karar |
-|---|---|
-| Kimler | Firmanın patron olmayan kişileri (bağlantıyla katılanlar), o gün firmada olanlar: bugün katılan biri dünün listesinde "katılmadı" görünmez. Firmadan sonradan çıkarılan birinin o güne ait kaydı varsa o da listede kalır. Ada göre, Türkçe sıralı. |
-| Bölümler | Katılmayanlar (kaydı yok), Gelmeyenler (gelmedi ya da izinli), Gelenler. Boş bölüm çizilmez (İlke 3). |
-| İşaretlemek | Katılmayanda **İşaretle**, işaretlenende durum ("Gelmedi · Hastalık"); ikisi de aynı küçük seçimi açar, tek dokunuş: Geldi · Hastalık · İzinli · Habersiz · Diğer (telefonda alttan, masaüstünde açılır menü). "Gelmedi" ayrı bir adım değil: neden seçeneğin kendisi. Kim, ne zaman işaretlediği yazılır; katılma izi silinmez. |
-| İzinli | Ayrı bir durumdur (bilinen, onaylı yokluk), "gelmedi" sayılmaz. Sayım hep "geldi · gelmedi · izinli · katılmadı". |
-| Katılmadı | Kaydı olmayan gün. Yazılmaz, hesaplanır: o gün firmada yoklama mesajı var, kişi o gün firmadaydı ama ne katıldı ne işaretlendi. Bugün henüz "katılmadı" sayılmaz (gün bitmedi). Yoklama hiç alınmayan gün (pazar) hiçbir şey değildir: o gün için "gelmedi" demek yanlış olurdu. |
-| Kişinin takvimi | Kişiye dokununca takvimi açılır (masaüstünde sağda, liste yerinde kalır; telefonda ayrı sayfa). Başlıkta "20 gün geldi · 2 gün gelmedi · 1 gün izinli", `‹ Eylül 2026 ›` ay seçici (gelecek aya gidilmez, ay adreste `?ay=2026-09`). Geldi **yeşil**, gelmedi **kırmızı**, izinli **sarı**, katılmadı **gri**; masaüstünde hücrede adı, telefonda kısa işaret (✓ ✕ İ –), altta açıklama (İlke 2). |
-| Gün detayı | Güne dokununca (telefonda alttan, masaüstünde pencere): durum, kendisi katıldıysa saati ve şantiyesi, patron işaretlediyse kim ve ne zaman. **Değiştir** aynı küçük seçimi açar: unutulan ya da yanlış gün düzeltilir. İleri günler soluk ve seçilmez. |
-| Excel | Başlıktaki **Excel**: ay seçilir, "yoklama-2026-09.xlsx" iner. "Puantaj" sayfası şantiyelerin alışık olduğu cetvel: satırda kişi, sütunda günler, hücrede G / Y / İ / K takvimdeki renklerle, sağda toplamlar. "Kayıtlar" sayfası gün gün tam liste: tarih, kişi, durum, neden, şantiye, katılma saati, işaretleyen. |
-| Renk | Takvim renkleri kendi tokenlarıdır (`--roll-*`): zemin açık, yazı koyu, en düşük kontrast 6.9:1. Listedeki etiketler durum tonlarıyla (İzinli turuncu-sarı). |
-| Adresler | `/yoklama` bugünün listesi, `/yoklama/kisi/:userId` kişinin takvimi; ikisi de yalnızca patron. Masaüstünde ikisi tek sayfadır (SplitView). |
+**Puantajım (çalışanın sekmesi, 28 Eylül).** Hikâyenin eksik halkası: kayıt yalnızca şefte ve patronda dursa
+çalışan ay sonunda yine "ben 24 gün geldim" der. Kendi ayını her gün görürse itiraz o gün, şef hatırlarken çıkar.
+Menüde Şantiyeler'in yanında (telefonda Şantiyeler · Puantajım · Ben): bugünkü kaydı, ayın toplamları (çalıştığı
+gün, mesai, gelmedi, izinli), takvim. Güne dokununca durum, mesai ve **kimin ne zaman işaretlediği**; telefonda
+**Ara** ile o kişiyi doğrudan arar, masaüstünde numarası yazar ve kopyalanır. İtiraz için ayrı bir düğme ya da
+süreç yoktur, gerçek hayattaki gibi aranır. Yalnızca kendi kaydı görünür; başkasınınki, şefin notu (not şefle
+patron arasındadır, çalışan okuyacağını bilse şef yazmazdı) ve tutar görünmez. Kayıt işaretlendiği anda görünür.
+Uygulaması olmayan kişi ve taşeron ekip görmez; patron ve şef yoklamada sayılmaz, bu sekmeleri yoktur.
+
+**Excel** (`puantaj-2026-09.xlsx`): "Personel" ve "Ekipler" cetvelleri (G / Y / X / İ, mesaiyle "G+2", ekrandaki
+renklerle, sağda toplamlar) ve gün gün tam liste "Kayıtlar" (tür, görev, durum, mesai, not, işaretleyen, saat).
+
+**Görünüş.** Masaüstü yalnızca Element Plus, telefon yalnızca Vant bileşenleriyle kurulur; bu modülde elle CSS
+yazılmaz. Renk yalnızca bileşenin kendi tonundan gelir: Geldi yeşil, Yarım gün sarı, Gelmedi kırmızı, İzinli
+mavi (marka rengi; telefonda çerçeveli), İşaretlenmedi gri. Etiketin içinde her zaman yazı ya da ayrı şekilli bir
+işaret vardır, anlam yalnızca renge kalmaz (İlke 2).
 
 ## Şantiye bilgisi (WhatsApp'taki grup bilgisi)
 
@@ -239,6 +252,12 @@ link gerekiyordu; Fırat'ı en çok yoran buydu.
 > **Firmanın tek bir bağlantısı vardır.** Patron onu WhatsApp grubuna atar. Tıklayan adını ve numarasını yazar,
 > katılır; **bütün şantiyeleri görür ve hepsine yazar**, patron çıkarana kadar.
 
+**Üç rol (28 Eylül).** Bağlantıyla gelen herkes **çalışandır**; patron Katılımcılar'dan birini **şef** yapar, şef
+her sabah yoklamayı alır (bkz. Yoklama). Rol, kişinin uygulamada ne yapabildiğini söyler: herkes her şantiyeyi
+görür ve yazar; şef ayrıca yoklama alır, patron ayrıca kişileri yönetir. Katılımcılarda yalnızca Patron ve Şef
+etiketi yazar (WhatsApp'ta yalnızca yöneticinin etiketi olduğu gibi; kişilerin çoğu çalışandır). O güne kadar
+bağlantıyla gelip şef yazılmış herkes çalışan yapıldı (V16): patron gerçek şefleri kendisi seçer.
+
 **Kimsenin durumu yazmaz.** "Henüz girmedi", "son görülme", "linki açmadı" bizim teknik derdimizdir, dayının
 değil. Biri giremezse gerçek hayattaki gibi arar, patron ona giriş linki gönderir.
 
@@ -247,7 +266,7 @@ değil. Biri giremezse gerçek hayattaki gibi arar, patron ona giriş linki gön
 | Yeni kişi | Şantiyeler listesinin başındaki **＋ → Kişi ekle** (şantiye bilgisindeki Katılımcılar'da da "＋ Kişi ekle" durur): bağlantı, "WhatsApp'ta paylaş" ve "Kopyala". WhatsApp grup ya da kişi seçtirerek açılır. Bağlantıyı açan "Şantiye ekibine katıl · Kızılkan İnşaat" görür, **adını ve numarasını kendisi yazar**, Katıl'a basar, şantiyeler listesine düşer; her şantiyenin akışına "Mahmut davet bağlantısıyla katıldı" yazılır. Patron hiç numara yazmaz. 25 Eylül'de bağlantı şantiye bilgisinin içinden listenin ＋'sına da çıkarıldı: kişi eklemek bir şantiyenin değil, firmanın işidir. |
 | Bağlantı | Firma başına tek, **süresiz**, çok kullanımlık (WhatsApp grup bağlantısı gibi). Katılan kişinin erişimi de süresizdir; oturum her açışta yenilenir. Yanlış ellere geçerse **Bağlantıyı sıfırla**: eskisi çalışmaz, katılmış olanlar içeride kalır. |
 | Zaten içerideki | Bu telefonda firmadan biri zaten içerideyse bağlantı doğrudan şantiyelere götürür. |
-| Kişiye dokununca (patron) | Ara · Giriş linki gönder (telefonunu değiştirirse ya da "giremiyorum" derse; WhatsApp doğrudan onun sohbetinde açılır) · Düzenle (ad ve numara) · **Patron yap** / **Şef yap** · **Firmadan çıkar**. Kendi satırında yalnızca "Adımı ve numaramı düzenle" (patronun numarası buradan girilir; şeflerin 📞 listesinde görünmesi için). |
+| Kişiye dokununca (patron) | Ara · Giriş linki gönder (telefonunu değiştirirse ya da "giremiyorum" derse; WhatsApp doğrudan onun sohbetinde açılır) · Düzenle (ad ve numara) · sahip olmadığı iki rol (**Patron yap** · **Şef yap** · **Çalışan yap**; onay penceresi rolün ne getirdiğini söyler) · **Firmadan çıkar**. Kendi satırında yalnızca "Adımı ve numaramı düzenle" (patronun numarası buradan girilir; şeflerin 📞 listesinde görünmesi için). |
 | Patron | Birden fazla olabilir; bir patron başkasını "Patron yap"la patron yapar. Patron şantiye kurar, kişileri düzeltir, patron yapar ve çıkarır, bağlantıyı paylaşır ve sıfırlar. Kendini çıkaramaz, kendi rolünü değiştiremez: firmada her zaman bir patron kalır. |
 | Firmadan çıkarmak | Hiçbir şantiyeyi göremez, uygulamaya giremez, her cihazda oturumu kapanır; yazdıkları yerinde kalır. Her şantiyenin akışına "Patron, Mahmut'u çıkardı" yazılır. Aynı numarayla bağlantıdan yeniden katılırsa eski kaydı açılır. |
 | Numara | Firmada tekildir; "0532…", "+90 532…" aynı numaradır. Kayıtlı bir numarayla bağlantıdan yeni hesap açılmaz (kimse başkasının numarasını yazıp onun yerine giremesin): "Bu numara zaten kayıtlı. Patronundan giriş linki iste." |
@@ -290,14 +309,15 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 
 ## Navigasyon
 
-| | Patron | Şef |
-|---|---|---|
-| 1 | Şantiyeler | Şantiyeler (tek şantiyesi olsa da liste) |
-| 2 | Yoklama | Ben |
-| 3 | Ben | |
+| | Patron | Şef | Çalışan |
+|---|---|---|---|
+| 1 | Şantiyeler | Şantiyeler | Şantiyeler |
+| 2 | Yoklama | Yoklama | Puantajım |
+| 3 | Ben | Ben | Ben |
 
-Yoklama yalnızca patronun menüsündedir (27 Eylül): şef ve çalışan yoklamaya sohbetteki mesajdan katılır, kimin
-gelip gelmediği patronun işidir; şef /yoklama adresine giderse şantiyelerine döner.
+Yoklama patronun ve şefin menüsündedir (28 Eylül): şef her sabah alır, patron ay sonunda puantajı görür. Çalışan
+yoklamada sayılır; onun menüsünde yerine kendi ayı Puantajım vardır. Kimse ötekinin adresine giremez: çalışan
+/yoklama'ya, patron ya da şef /puantajim'e giderse şantiyelerine döner.
 
 Ayrı bir Ekip ekranı yoktur: kişiler firmanın bağlantısıyla gelir, şantiye bilgisindeki Katılımcılar'dan
 yönetilir (bkz. Kişiler). Şantiye ayarları da
@@ -326,9 +346,15 @@ yerinde duruyor, veri kaybı yok.
 
 **Personel listesi ve şantiye şantiye yoklama (27 Eylül'de arayüzden kaldırıldı).** Uygulamayı kullanmayan
 işçi ve ustaların şantiyeye bağlı listesi, şefin herkesi tek tek işaretlediği yoklama penceresi ve şantiyenin
-yoklama geçmişi arayüzden çıktı. Gerekçe: yoklamada artık firmanın kişileri sayılıyor ve çalışan kendi
-telefonundan katılıyor. Backend'e dokunulmadı: `site_workers`, `attendances`, `attendance_entries` ve uçları
+yoklama geçmişi arayüzden çıktı. O günün gerekçesi: yoklamada firmanın kişileri sayılacak, çalışan kendi
+telefonundan katılacaktı. Backend'e dokunulmadı: `site_workers`, `attendances`, `attendance_entries` ve uçları
 verisiyle yerinde duruyor.
+
+**Sohbette yoklama mesajı ve "Yoklamaya Katıl" (28 Eylül'de kaldırıldı).** 27 Eylül'deki yoklama (Musa): sohbete
+günün yoklama mesajı atılıyor, çalışan kendi telefonundan katılıyor, katılmayanı patron işaretliyordu. Gerekçe:
+patron sahada değildir, kimin gelmediğini bilemez; bilen şeftir. Düğmeye evden de basılır, telefonu olmayan usta
+sayılamaz, patron ekibi "katılmadı" görünürdü. Atılmış yoklama mesajları "silindi" izine döndü (V18); ＋'daki
+Yoklama, kart, menü kuralları ve kodu kaldırıldı. `member_attendance` verisiyle yerinde duruyor.
 
 **Bildirimler.** Push'un tek tetikleyicisi sorun bildirimiydi; sorun arayüzden kalkınca bildirim de
 fiilen sessizleşti. Ana ekrandaki "bildirim al" hatırlatması kaldırıldı, anahtar "Ben"de kaldı. Neyin
@@ -340,6 +366,5 @@ bildirim göndereceği (ör. akşam 17:00'de rapor göndermemiş şefe hatırlat
 - **Görevler** (Musa): şantiye bilgisinde duruyor; WhatsApp'ta karşılığı olmayan yeni bir kavram (İlke 1),
   kalıp kalmayacağı konuşulacak.
 - İlk açılış: sıfır şantiye, sıfır kişiyken patronun ilk on dakikası.
-- **Yoklama, sonraya bırakılanlar** (Musa): telefonu olmayan usta ve işçiler (patron mu işaretlesin, liste mi
-  geri gelsin), katılırken konum (çalışan evden de basabiliyor), "en çok gelmeyenler", sabah hatırlatması
-  ("bugün yoklama mesajı atılmadı").
+- **Yoklama, sonraya bırakılanlar:** yevmiye tutarı (gün × ücret, yalnızca patrona), sabah hatırlatması
+  (işaretlenmeyen varken şefe), çalışana "Bugün Geldi olarak yazıldın" bildirimi (bildirimler HTTPS ister).

@@ -41,7 +41,7 @@ function onAction(action: { key: string }) {
       :clickable="personMenu(participant, canManage).length > 0" @click="choose(participant)">
       <template #icon><UserAvatar :name="participant.name" :size="40" class="participants__avatar" /></template>
       <template #value>
-        <span class="participants__role">{{ participant.roleLabel }}</span>
+        <span v-if="participant.roleLabel" class="participants__role">{{ participant.roleLabel }}</span>
         <van-button v-if="participant.phone && !canManage && !participant.isViewer" round size="mini" type="primary"
           plain tag="a" :href="telHref(participant.phone)" class="participants__call" @click.stop>
           <Phone :size="13" />

@@ -54,27 +54,3 @@ img {
     transition-duration: 0.01ms !important;
   }
 }
-
-/*
- * Yoklama takviminde günün rengi (core/rollcall/memberCalendar: calendarClass). Sınıf yalnızca renk değişkenini
- * verir; hücreyi her kabuk kendisi boyar (el-calendar, van-calendar): kütüphanenin kendi stiliyle yarışılmaz.
- */
-.roll-day--present {
-  --roll-bg: var(--roll-present-bg);
-  --roll-fg: var(--roll-present);
-}
-
-.roll-day--absent {
-  --roll-bg: var(--roll-absent-bg);
-  --roll-fg: var(--roll-absent);
-}
-
-.roll-day--excused {
-  --roll-bg: var(--roll-excused-bg);
-  --roll-fg: var(--roll-excused);
-}
-
-.roll-day--missed {
-  --roll-bg: var(--roll-missed-bg);
-  --roll-fg: var(--roll-missed);
-}

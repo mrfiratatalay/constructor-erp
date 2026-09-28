@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ElMessage } from 'element-plus'
 import { EllipsisVertical, Search } from 'lucide-vue-next'
-import { errorMessage } from '@/core/api/errors'
 import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
-import { useSendRollCall } from '@/core/rollcall/useSendRollCall'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
@@ -46,16 +43,6 @@ const callable = computed(() => (site.value ? callablePeople(site.value, user.va
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
-const rollCall = useSendRollCall(() => siteId)
-
-/** Bugün zaten atıldıysa yenisi atılmaz: sohbet o mesaja gider, şef orada görür. */
-async function sendRollCall() {
-  try {
-    openTab('chat', await rollCall.send())
-  } catch (error) {
-    ElMessage.error(errorMessage(error))
-  }
-}
 </script>
 
 <template>
@@ -86,8 +73,7 @@ async function sendRollCall() {
         @reply="composer.replyTo.value = $event" />
       <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
-        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
-          @roll-call="sendRollCall" />
+        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>

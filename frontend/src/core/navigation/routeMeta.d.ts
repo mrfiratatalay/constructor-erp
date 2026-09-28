@@ -6,8 +6,10 @@ declare module 'vue-router' {
     public?: boolean
     /** Oturum açıksa girilmez; kullanıcı ana sayfasına gönderilir (giriş sayfası). */
     guestOnly?: boolean
-    /** Yalnızca patron görür. */
-    ownerOnly?: boolean
+    /** Yalnızca yoklamayı alanlar görür: patron ve şef (core/team/roles: takesRollCall). */
+    rollCallOnly?: boolean
+    /** Yalnızca çalışan görür (Puantajım): yoklamada sayılan odur. */
+    workerOnly?: boolean
     /** Adres gösterilmez; kullanıcı rolüne göre kendi ana sayfasına yönlendirilir. */
     resolveHome?: boolean
     /** Bir listenin içindeki detay sayfası: mobilde alt sekmeler gizlenir (WhatsApp'ta sohbetin içi gibi). */

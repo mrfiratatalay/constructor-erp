@@ -21,8 +21,8 @@ class SiteViews {
         this.people = people;
     }
 
-    /** Katılımcılar iki gruba ayrılır: patronlar ve şefler (ekranda rol etiketi). */
-    private record Participants(List<SiteLead> owners, List<SiteLead> leads) {
+    /** Katılımcılar rollerine göre üç gruptur: patronlar, şefler, çalışanlar (ekranda rol etiketi). */
+    private record Participants(List<SiteLead> owners, List<SiteLead> leads, List<SiteLead> workers) {
     }
 
     List<SiteView> of(List<Site> sites) {
@@ -30,9 +30,8 @@ class SiteViews {
             return List.of();
         }
         List<AppUser> everyone = people.of(sites.getFirst().getCompanyId());
-        Participants participants = new Participants(
-            withRole(everyone, true).stream().map(SiteViews::personOf).toList(),
-            withRole(everyone, false).stream().map(SiteViews::personOf).toList());
+        Participants participants = new Participants(withRole(everyone, UserRole.OWNER),
+            withRole(everyone, UserRole.SITE_LEAD), withRole(everyone, UserRole.WORKER));
         return sites.stream().map(site -> toView(site, participants)).toList();
     }
 
@@ -40,8 +39,8 @@ class SiteViews {
         return of(List.of(site)).getFirst();
     }
 
-    private static List<AppUser> withRole(List<AppUser> users, boolean owners) {
-        return users.stream().filter(user -> (user.getRole() == UserRole.OWNER) == owners).toList();
+    private static List<SiteLead> withRole(List<AppUser> users, UserRole role) {
+        return users.stream().filter(user -> user.getRole() == role).map(SiteViews::personOf).toList();
     }
 
     private static SiteLead personOf(AppUser user) {
@@ -51,6 +50,6 @@ class SiteViews {
     private static SiteView toView(Site site, Participants participants) {
         String photoUrl = site.getPhotoMediaId() == null ? null : "/api/media/" + site.getPhotoMediaId();
         return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), participants.leads(),
-            participants.owners(), photoUrl, photoUrl == null ? null : photoUrl + "/thumbnail");
+            participants.owners(), participants.workers(), photoUrl, photoUrl == null ? null : photoUrl + "/thumbnail");
     }
 }

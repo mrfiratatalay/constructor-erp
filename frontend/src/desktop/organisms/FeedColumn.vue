@@ -14,7 +14,6 @@ import PostMenu from '@/desktop/molecules/PostMenu.vue'
 import ForwardDialog from '@/desktop/organisms/ForwardDialog.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
 import PostInfoDialog from '@/desktop/organisms/PostInfoDialog.vue'
-import RollCallCard from '@/desktop/organisms/RollCallCard.vue'
 import { usePostMenuActions } from '@/desktop/postActions'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
 import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
@@ -61,9 +60,6 @@ const loadOlder = () => keepPosition(scroller(), () => loadMore())
           <el-divider v-if="item.post.id === dividerBefore" class="feed-column__new">Buradan aşağısı yeni</el-divider>
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id"
             @open-photos="(urls, index) => (viewer = { urls, index })" @open-quote="jump">
-            <template v-if="item.post.rollCallDay && !item.post.deletion" #card>
-              <RollCallCard :post="item.post" />
-            </template>
             <template v-if="!item.post.deletion" #menu>
               <PostMenu :items="postMenu(item.post, user)" @select="(action) => run(action, item.post)" />
             </template>

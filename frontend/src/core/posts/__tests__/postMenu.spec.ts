@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CurrentUserResponse, PostView } from '@/core/api/generated/model'
 import { postMenu } from '@/core/posts/postMenu'
-import { postSummary } from '@/core/posts/postPreview'
 
 const lead = { id: 'lead', role: 'SITE_LEAD' } as CurrentUserResponse
 
@@ -19,15 +18,8 @@ const post = (fields: Partial<PostView> = {}): PostView => ({
   ...fields,
 })
 
-describe('yoklama mesajı', () => {
-  it('menüsünde yalnızca sabitle, bilgi ve sil: yazısı yok, iletilmez, sahaya girmez', () => {
-    const actions = postMenu(post({ body: null, rollCallDay: '2026-09-27' }), lead).map(
-      (item) => item.action,
-    )
-    expect(actions).toEqual(['pin', 'info', 'delete'])
-  })
-
-  it('düz mesajın menüsü değişmez', () => {
+describe('mesaj menüsü', () => {
+  it('kendi mesajında WhatsApp sırasıyla bütün işler', () => {
     const actions = postMenu(post(), lead).map((item) => item.action)
     expect(actions).toEqual([
       'reply',
@@ -39,9 +31,5 @@ describe('yoklama mesajı', () => {
       'correct',
       'delete',
     ])
-  })
-
-  it('listede ve sabit şeritte adıyla görünür', () => {
-    expect(postSummary(post({ body: null, rollCallDay: '2026-09-27' }))).toBe('📋 Yoklama')
   })
 })

@@ -29,9 +29,6 @@ public class PostFieldMarks {
         if (post.isDeleted()) {
             throw ApiException.conflict("Silinmiş mesaj Saha'ya eklenemez.");
         }
-        if (post.isRollCall()) {
-            throw ApiException.conflict("Yoklama mesajı Saha'ya eklenemez.");
-        }
         post.markFieldUpdate(true);
         return views.of(post);
     }

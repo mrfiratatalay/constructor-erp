@@ -17,7 +17,6 @@ export interface PostMenuItem<Action extends string = PostAction> {
  */
 export function postMenu(post: PostView, user: CurrentUserResponse | undefined): PostMenuItem[] {
   if (post.deletion) return []
-  if (post.rollCallDay) return rollCallMenu(post, user)
   const mine = post.author.id === user?.id
   const items: Array<PostMenuItem | false> = [
     { action: 'reply', label: 'Yanıtla' },
@@ -27,19 +26,6 @@ export function postMenu(post: PostView, user: CurrentUserResponse | undefined):
     { action: 'field', label: post.fieldUpdate ? 'Sahadan çıkar' : 'Sahaya ekle' },
     mine && { action: 'info', label: 'Bilgi' },
     canCorrect(post, user) && { action: 'correct', label: 'Düzelt' },
-    canDelete(post, user) && { action: 'delete', label: 'Sil', danger: true },
-  ]
-  return items.filter((item): item is PostMenuItem => item !== false)
-}
-
-/**
- * Yoklama mesajının yazısı yoktur: kopyalanmaz, düzeltilmez, yanıtlanmaz (alıntısı boş kalırdı). İletilmez, her
- * şantiye kendi yoklamasını açar; Saha'ya eklenmez. Sabitlenir (günün yoklaması üstte dursun) ve silinir.
- */
-function rollCallMenu(post: PostView, user: CurrentUserResponse | undefined): PostMenuItem[] {
-  const items: Array<PostMenuItem | false> = [
-    { action: 'pin', label: post.pin ? 'Sabitlemeyi kaldır' : 'Sabitle' },
-    post.author.id === user?.id && { action: 'info', label: 'Bilgi' },
     canDelete(post, user) && { action: 'delete', label: 'Sil', danger: true },
   ]
   return items.filter((item): item is PostMenuItem => item !== false)
