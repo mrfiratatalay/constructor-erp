@@ -1,50 +1,53 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { CalendarOff, CircleCheck, CircleDashed, CircleX } from 'lucide-vue-next'
-import type { DayCounts } from '@/core/puantaj/puantajBook'
+import { dayProgress, type DayCounts } from '@/core/puantaj/puantajBook'
+import { STATUS_LOOKS, type DayStatus } from '@/core/puantaj/puantajLabels'
+import MarkDot from '@/desktop/atoms/MarkDot.vue'
 
 /**
- * Bugünün özeti, dört kart. "İşaretlenmedi" eyleme dönüşen sayıdır: sıfıra inince yoklama kendiliğinden tamamdır.
- * Yarım gün "Geldi" kartında yazar. Sayıya ekipler de girer (ekip tek kalemdir).
+ * Bugünün özeti, yalnızca gösterge (tıklanmaz; süzgeç listenin üstünde, kendi kontrolüyle durur). Solda geniş
+ * "Bugünün yoklaması" kartı: halka kaçının işaretlendiğini gösterir ("2/6"), yanında kaçının beklediği yazar, bitince
+ * yeşerir. Yanında dört durum kartı: sayı ve listedeki payı (kendi renginde çubuk). Izgara 8 + 4×4 = 24: kartlar eşit
+ * genişlikte, eşit boyda.
  */
-const { counts, complete } = defineProps<{ counts: DayCounts; complete: boolean }>()
-
-const cards = computed(() => [
-  {
-    key: 'present',
-    title: 'Geldi',
-    value: counts.PRESENT,
-    icon: CircleCheck,
-    color: 'var(--el-color-success)',
-    note: counts.HALF_DAY ? `Ayrıca ${counts.HALF_DAY} yarım gün` : 'Tam gün',
-  },
-  { key: 'absent', title: 'Gelmedi', value: counts.ABSENT, icon: CircleX, color: 'var(--el-color-danger)',
-    note: 'Bugün sahada yok' },
-  { key: 'leave', title: 'İzinli', value: counts.LEAVE, icon: CalendarOff, color: 'var(--el-color-primary)',
-    note: 'Bilinen, onaylı yokluk' },
-  {
-    key: 'unmarked',
-    title: 'İşaretlenmedi',
-    value: counts.unmarked,
-    icon: CircleDashed,
-    color: 'var(--el-color-info)',
-    note: complete ? 'Bugünün yoklaması tamam' : 'Şefin işaretlemesi bekleniyor',
-  },
-])
+const { counts } = defineProps<{ counts: DayCounts }>()
+const STATUSES = Object.keys(STATUS_LOOKS) as DayStatus[]
+const FULL_HEIGHT = { height: '100%' }
+const progress = computed(() => dayProgress(counts))
+const complete = computed(() => progress.value.total > 0 && counts.unmarked === 0)
+const shareOf = (value: number) => (progress.value.total ? Math.round((value / progress.value.total) * 100) : 0)
 </script>
 
 <template>
   <el-row :gutter="16">
-    <el-col v-for="card in cards" :key="card.key" :span="6">
-      <el-card shadow="never">
-        <el-statistic :value="card.value">
-          <template #title>
-            <el-space :size="6">
-              <el-icon :color="card.color" :size="16"><component :is="card.icon" /></el-icon>{{ card.title }}
-            </el-space>
-          </template>
-        </el-statistic>
-        <el-text :type="card.key === 'unmarked' && complete ? 'success' : 'info'" size="small">{{ card.note }}</el-text>
+    <el-col :span="8">
+      <el-card shadow="never" :style="FULL_HEIGHT">
+        <el-space :size="20">
+          <!-- Renk açıkça verilir: verilmezse Element Plus kendi sabit mavisini (#20a0ff) çizer, temayı değil. -->
+          <el-progress type="circle" :width="84" :stroke-width="8" :percentage="progress.percent"
+            :color="complete ? 'var(--el-color-success)' : 'var(--el-color-primary)'">
+            <el-text tag="b" size="large">{{ progress.marked }}/{{ progress.total }}</el-text>
+          </el-progress>
+          <el-space direction="vertical" alignment="flex-start" :size="4">
+            <el-text tag="b" size="large">{{ complete ? 'Yoklama tamam' : 'Bugünün yoklaması' }}</el-text>
+            <el-text :type="complete ? 'success' : 'info'">
+              {{ complete ? 'Herkes işaretlendi' : `${counts.unmarked} kişi bekliyor` }}
+            </el-text>
+          </el-space>
+        </el-space>
+      </el-card>
+    </el-col>
+    <el-col v-for="status in STATUSES" :key="status" :span="4">
+      <el-card shadow="never" :style="FULL_HEIGHT">
+        <el-space direction="vertical" alignment="stretch" :size="12" style="width: 100%">
+          <el-statistic :value="counts[status]">
+            <template #title>
+              <el-space :size="8"><MarkDot :mark="{ status }" />{{ STATUS_LOOKS[status].label }}</el-space>
+            </template>
+          </el-statistic>
+          <el-progress :percentage="shareOf(counts[status])" :color="`var(--el-color-${STATUS_LOOKS[status].tone})`"
+            :show-text="false" :stroke-width="6" />
+        </el-space>
       </el-card>
     </el-col>
   </el-row>

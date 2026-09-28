@@ -6,22 +6,22 @@ import { errorMessage } from '@/core/api/errors'
 import { entrySubtitle, entryTitle } from '@/core/puantaj/puantajLabels'
 import { useEntryMonth } from '@/core/puantaj/useEntryMonth'
 import { useRoster } from '@/core/puantaj/useRoster'
-import EntryTotalsGrid from '@/mobile/molecules/EntryTotalsGrid.vue'
-import MarkLegend from '@/mobile/molecules/MarkLegend.vue'
-import MonthGridCalendar from '@/mobile/molecules/MonthGridCalendar.vue'
-import MonthStepper from '@/mobile/molecules/MonthStepper.vue'
+import EntryTotalsList from '@/mobile/molecules/EntryTotalsList.vue'
+import MarkCalendar from '@/mobile/molecules/MarkCalendar.vue'
 import DaySheet from '@/mobile/organisms/DaySheet.vue'
 import RosterEntrySheet from '@/mobile/organisms/RosterEntrySheet.vue'
 import MobilePage from '@/mobile/templates/MobilePage.vue'
 
 /**
- * Bir kişinin ya da ekibin ayı: ay seçici, toplamlar, takvim (her günde işareti). Güne dokununca ayrıntısı alttan
- * açılır; patron geçmiş günü de düzeltir. Uygulaması olmayan kişi ya da ekip buradan düzeltilir, listeden çıkarılır.
+ * Bir kişinin ya da ekibin ayı: takvim (her günde işareti, ‹ › ile ay değişir), altında ayın özeti. Güne dokununca
+ * ayrıntısı alttan açılır; patron geçmiş günü de düzeltir.
+ * Takvim yüklenirken de yerinde kalır, ay değişirken ekran zıplamaz. Uygulaması olmayan kişi ya da ekip buradan
+ * düzeltilir, listeden çıkarılır.
  */
 const route = useRoute()
 const router = useRouter()
 const entryId = computed(() => String(route.params.entryId))
-const { month, setMonth, isCurrentMonth, today, row, totals, canMark, isPending } = useEntryMonth(entryId)
+const { month, setMonth, today, row, totals, canMark, isPending } = useEntryMonth(entryId)
 const roster = useRoster()
 const pickedDay = ref(today)
 const dayOpen = ref(false)
@@ -45,15 +45,14 @@ async function archive() {
 <template>
   <MobilePage :title="row ? entryTitle(row.entry) : 'Yoklama'" :subtitle="row ? entrySubtitle(row.entry) : ''" back
     :tabbar="false">
-    <MonthStepper :month="month" :is-current-month="isCurrentMonth" @change="setMonth" />
-    <van-skeleton v-if="isPending" :row="6" />
+    <MarkCalendar :month="month" :marks="row?.marks ?? {}" :today="today" @pick="pickDay" @change="setMonth" />
+    <van-skeleton v-if="isPending" :row="4" />
     <template v-else-if="row && totals">
-      <EntryTotalsGrid :totals="totals" :kind="row.entry.kind" />
-      <MonthGridCalendar :month="month" :marks="row.marks" :today="today" @pick="pickDay" />
-      <MarkLegend />
+      <EntryTotalsList :totals="totals" :kind="row.entry.kind" />
       <van-cell-group v-if="!row.entry.archived" inset>
-        <van-cell :title="row.entry.linked ? 'Görevini düzenle' : 'Düzenle'" is-link @click="formOpen = true" />
-        <van-cell v-if="!row.entry.linked" title="Listeden çıkar" is-link @click="archive" />
+        <van-cell :title="row.entry.linked ? 'Görevini düzenle' : 'Düzenle'" icon="edit" is-link
+          @click="formOpen = true" />
+        <van-cell v-if="!row.entry.linked" title="Listeden çıkar" icon="delete-o" is-link @click="archive" />
       </van-cell-group>
       <DaySheet v-model:show="dayOpen" :entry="row.entry" :day="pickedDay" :mark="row.marks[pickedDay]"
         :can-edit="canMark(pickedDay) && !row.entry.archived" />

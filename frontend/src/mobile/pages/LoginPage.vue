@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
 const email = ref('')
 const password = ref('')
 const { login, isPending, errorText } = usePasswordLogin()
+const devAccount = devLogin()
+
+function fillDevAccount() {
+  if (!devAccount) return
+  email.value = devAccount.email
+  password.value = devAccount.password
+}
 </script>
 
 <template>
@@ -21,6 +29,10 @@ const { login, isPending, errorText } = usePasswordLogin()
       <van-notice-bar v-if="errorText" type="danger" :text="errorText" wrapable />
       <van-button type="primary" native-type="submit" block round size="large" :loading="isPending">
         Giriş yap
+      </van-button>
+      <!-- Yalnızca hesap derlemede ortamdan verildiyse: yerel geliştirme ve yerel Docker (core/auth/devLogin). -->
+      <van-button v-if="devAccount" block round plain type="primary" @click="fillDevAccount">
+        Patron olarak doldur
       </van-button>
     </van-form>
     <p class="login-page__hint">

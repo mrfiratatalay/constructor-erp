@@ -10,6 +10,9 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend/ ./
+# "Patron olarak doldur" düğmesinin hesabı docker-compose.yml'den gelir; verilmezse boş kalır, düğme çıkmaz.
+ARG VITE_DEV_LOGIN_EMAIL=""
+ARG VITE_DEV_LOGIN_PASSWORD=""
 RUN npm run build-only
 
 FROM nginx:alpine AS runtime

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
+import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
 const form = reactive({ email: '', password: '' })
 const { login, isPending, errorText } = usePasswordLogin()
+const devAccount = devLogin()
+const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
 </script>
 
 <template>
@@ -24,6 +27,8 @@ const { login, isPending, errorText } = usePasswordLogin()
         <el-button type="primary" size="large" native-type="submit" :loading="isPending" class="login-page__submit">
           Giriş yap
         </el-button>
+        <!-- Yalnızca hesap derlemede ortamdan verildiyse: yerel geliştirme ve yerel Docker (core/auth/devLogin). -->
+        <el-button v-if="devAccount" text type="primary" @click="fillDevAccount">Patron olarak doldur</el-button>
       </el-form>
       <p class="login-page__hint">
         Şefler şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linkle girer.

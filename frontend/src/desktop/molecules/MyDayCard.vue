@@ -25,8 +25,7 @@ async function copy(phone: string) {
     <template #header><b>{{ dayTitle(day) }}</b></template>
     <el-descriptions :column="1" border>
       <el-descriptions-item label="Durum">
-        <MarkTag v-if="mark" :mark="mark" />
-        <el-text v-else type="info">İşaretlenmedi</el-text>
+        <MarkTag :mark="mark" />
       </el-descriptions-item>
       <el-descriptions-item v-if="mark?.overtimeHours" label="Mesai">
         {{ hoursText(mark.overtimeHours) }} saat

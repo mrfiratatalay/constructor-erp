@@ -28,7 +28,11 @@ time,
   font-variant-numeric: tabular-nums;
 }
 
-button {
+/* Tarayıcı form öğelerine kendi yazı tipini (Arial) verir; kütüphanelerin kutuları da bu yüzden farklı görünüyordu. */
+button,
+input,
+textarea,
+select {
   font-family: inherit;
 }
 

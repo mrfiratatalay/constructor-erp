@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { lookOf, markText, shortText, type MarkLike } from '@/core/puantaj/puantajLabels'
+import { lookOf, markLabel, type MarkLike } from '@/core/puantaj/puantajLabels'
 
 /**
- * Bir günün işareti: açık zeminli, yazılı etiket (Geldi, Yarım gün, Gelmedi, İzinli). compact: ayın cetvelinin
- * dar hücresi için kısa işaret ("✓", "✓+2"); anlamı yine şekil taşır, yalnızca renk değil.
+ * İşaretin uzun boyu, tek günün gösterildiği yerlerde: açık zeminli, koyu yazılı etiket ("✓ Geldi · +2 s"). Anlamı
+ * şekil ve yazı taşır, renk destekler. Kaydı yoksa gri "○ İşaretlenmedi". Kısa boy: MarkDot.
  */
-const { mark, compact = false } = defineProps<{ mark: MarkLike; compact?: boolean }>()
+const { mark = null } = defineProps<{ mark?: MarkLike | null }>()
 </script>
 
 <template>
-  <el-tag :type="lookOf(mark).tone" :size="compact ? 'small' : 'default'" effect="light" round disable-transitions>
-    {{ compact ? shortText(mark) : markText(mark) }}
-  </el-tag>
+  <el-tag :type="lookOf(mark).tone" effect="light" round disable-transitions>{{ markLabel(mark) }}</el-tag>
 </template>

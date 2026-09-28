@@ -70,6 +70,11 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      # Giriş ekranındaki "Patron olarak doldur" düğmesi: backend'in ilk yöneticisiyle aynı hesap (yukarıdaki api).
+      # Bu değerler verilmeden derlenen arayüzde düğme hiç çıkmaz.
+      args:
+        VITE_DEV_LOGIN_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
+        VITE_DEV_LOGIN_PASSWORD: ${OWNER_PASSWORD:-patron123}
     ports:
       - "${WEB_PORT:-5173}:80"
     depends_on:

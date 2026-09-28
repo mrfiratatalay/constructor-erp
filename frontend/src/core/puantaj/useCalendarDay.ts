@@ -21,5 +21,7 @@ export function useCalendarDay(month: Ref<string>, setMonth: (next: string) => u
       if (monthKey(day) !== month.value) void setMonth(monthKey(day))
     },
   })
-  return { selectedDay, calendarDate, reset: () => (selectedDay.value = firstShown()) }
+  /** Belirli bir günü seçmek (cetvelde tıklanan hücre, kayıtlardaki satır): ayı gerekirse onunla değişir. */
+  const select = (day: string) => (calendarDate.value = new Date(`${day}T00:00:00`))
+  return { selectedDay, calendarDate, select, reset: () => (selectedDay.value = firstShown()) }
 }

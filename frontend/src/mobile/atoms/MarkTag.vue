@@ -1,24 +1,14 @@
 <script setup lang="ts">
-import { lookOf, markText, shortText, type MarkLike, type Tone } from '@/core/puantaj/puantajLabels'
+import { lookOf, markLabel, type MarkLike } from '@/core/puantaj/puantajLabels'
+import { vanType } from '@/mobile/markTones'
 
 /**
- * Bir günün işareti, Vant etiketiyle: yumuşak renkler mobile/styles/theme.css'te. İzinli (mavi) çerçeveli çizilir:
- * dolu lacivert öbür yumuşak etiketlerin yanında bağırırdı. compact: takvimin dar hücresi ("✓", "✓+2").
+ * İşaretin uzun boyu, tek günün gösterildiği yerlerde: açık zeminli, koyu yazılı etiket ("✓ Geldi · +2 s"). Anlamı
+ * şekil ve yazı taşır, renk destekler. Kaydı yoksa gri "○ İşaretlenmedi". Kısa boy: MarkDot.
  */
-const VAN_TYPE: Record<Tone, 'success' | 'warning' | 'danger' | 'primary' | 'default'> = {
-  success: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  primary: 'primary',
-  info: 'default',
-}
-
-const { mark, compact = false } = defineProps<{ mark: MarkLike; compact?: boolean }>()
+const { mark = null } = defineProps<{ mark?: MarkLike | null }>()
 </script>
 
 <template>
-  <van-tag :type="VAN_TYPE[lookOf(mark).tone]" :plain="lookOf(mark).tone === 'primary'" round
-    :size="compact ? undefined : 'medium'">
-    {{ compact ? shortText(mark) : markText(mark) }}
-  </van-tag>
+  <van-tag :type="vanType(lookOf(mark).tone)" round size="medium">{{ markLabel(mark) }}</van-tag>
 </template>
