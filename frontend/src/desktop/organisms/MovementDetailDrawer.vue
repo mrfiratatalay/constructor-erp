@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { MapPin } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
-import { documentError } from '@/core/materials/documentRules'
+import { DOCUMENT_ACCEPT, documentError } from '@/core/materials/documentRules'
 import { deliverLabel, movementActions } from '@/core/materials/movementActions'
 import { movementNumber } from '@/core/materials/quantity'
 import { useMaterialPermissions } from '@/core/materials/useMaterialPermissions'
@@ -63,7 +63,7 @@ async function attach(files: FileList | null) {
         <DocumentList :documents="detail.documents" />
         <template v-if="can('CREATE_MATERIAL_MOVEMENT')" #footer>
           <el-button text type="primary" tag="label">Belge ekle
-            <input type="file" hidden multiple accept=".pdf,.jpg,.jpeg,.png" @change="attach(($event.target as HTMLInputElement).files)" />
+            <input type="file" hidden multiple :accept="DOCUMENT_ACCEPT" @change="attach(($event.target as HTMLInputElement).files)" />
           </el-button>
         </template>
       </el-card>
