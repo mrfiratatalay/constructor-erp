@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { DayMarkView } from '@/core/api/generated/model'
-import { lookOf, markText, shortText } from '@/core/puantaj/puantajLabels'
+import { lookOf, markText, shortText, type MarkLike } from '@/core/puantaj/puantajLabels'
 
 /**
  * Bir günün işareti: açık zeminli, yazılı etiket (Geldi, Yarım gün, Gelmedi, İzinli). compact: ayın cetvelinin
  * dar hücresi için kısa işaret ("✓", "✓+2"); anlamı yine şekil taşır, yalnızca renk değil.
  */
-const { mark, compact = false } = defineProps<{ mark: DayMarkView; compact?: boolean }>()
+const { mark, compact = false } = defineProps<{ mark: MarkLike; compact?: boolean }>()
 </script>
 
 <template>

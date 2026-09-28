@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import { ClipboardCheck, HardHat, UserRound } from 'lucide-vue-next'
+import { CalendarCheck, ClipboardCheck, HardHat, UserRound } from 'lucide-vue-next'
 import type { CurrentUserResponseRole } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
 import { takesRollCall } from '@/core/team/roles'
@@ -13,15 +13,16 @@ export interface NavItem {
 /**
  * Günlük iş tek yerdedir: şantiyeler (herkes aynı listeyi görür, WhatsApp'ın "Sohbetler"i gibi). Gönderme ayrı
  * bir sekme değildir, şantiyenin içindedir. Ayrı bir Ekip ekranı da yoktur: kişiler şantiyenin içinde eklenir ve
- * yönetilir (WhatsApp'ta grubun katılımcıları gibi). Yoklama firmanın puantajıdır: patron ve şef görür, çalışan
- * yoklamada sayılır ama menüsünde Yoklama yoktur (TASARIM.md "Yoklama"). Masaüstünde "Ben" sol menünün altındaki
- * kullanıcı düğmesidir, o yüzden menüde yer almaz.
+ * yönetilir (WhatsApp'ta grubun katılımcıları gibi). Yoklama firmanın puantajıdır: patron ve şef alır ve görür;
+ * çalışan yoklamada sayılır, onun menüsünde yerine Puantajım (kendi ayı) vardır (TASARIM.md "Yoklama").
+ * Masaüstünde "Ben" sol menünün altındaki kullanıcı düğmesidir, o yüzden menüde yer almaz.
  */
 export function mainNavItems(role: CurrentUserResponseRole, platform: 'mobile' | 'desktop'): NavItem[] {
   const sites: NavItem = { route: 'sites', label: 'Şantiyeler', icon: HardHat }
   const profile: NavItem = { route: 'profile', label: 'Ben', icon: UserRound }
   const attendance: NavItem = { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck }
-  const items = takesRollCall(role) ? [sites, attendance] : [sites]
+  const myPuantaj: NavItem = { route: 'myPuantaj', label: 'Puantajım', icon: CalendarCheck }
+  const items = [sites, takesRollCall(role) ? attendance : myPuantaj]
   return platform === 'mobile' ? [...items, profile] : items
 }
 

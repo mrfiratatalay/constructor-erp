@@ -13,5 +13,6 @@ export const routes = buildRoutes({
   siteTasks: () => import('./pages/SiteTasksPage.vue'),
   attendance: () => import('./pages/AttendancePage.vue'),
   memberAttendance: () => import('./pages/MemberAttendancePage.vue'),
+  myPuantaj: () => import('./pages/MyPuantajPage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

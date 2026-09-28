@@ -13,6 +13,8 @@ interface RosterEntryRepository extends JpaRepository<RosterEntry, UUID> {
 
     Optional<RosterEntry> findByIdAndCompanyId(UUID id, UUID companyId);
 
+    Optional<RosterEntry> findByUserId(UUID userId);
+
     /**
      * Uygulamadaki çalışanlar listeye kendiliğinden girer: firmaya katılan ya da çalışan yapılan herkesin kalemi
      * puantaj okunurken açılır. Katılma ve rol değişikliği puantajı bilmek zorunda kalmaz. Aynı anda iki okuma

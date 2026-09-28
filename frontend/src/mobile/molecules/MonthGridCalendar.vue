@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { DayMarkView } from '@/core/api/generated/model'
 import { monthGrid, WEEKDAY_HEADERS } from '@/core/puantaj/monthGrid'
 import { dayOfMonth } from '@/core/puantaj/puantajDays'
+import type { MarkLike } from '@/core/puantaj/puantajLabels'
 import MarkTag from '@/mobile/atoms/MarkTag.vue'
 
 /**
  * Ayın takvimi, yedi sütunlu ızgara (Pazartesi başta): her günde numarası ve işareti. Güne dokununca ayrıntısı
  * açılır; ileri günler seçilmez.
  */
-const { month, marks, today } = defineProps<{ month: string; marks: Record<string, DayMarkView>; today: string }>()
+const { month, marks, today } = defineProps<{ month: string; marks: Record<string, MarkLike>; today: string }>()
 const emit = defineEmits<{ pick: [day: string] }>()
 const cells = computed(() => monthGrid(month))
 </script>

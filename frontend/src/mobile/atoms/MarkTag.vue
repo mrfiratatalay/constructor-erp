@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { DayMarkView } from '@/core/api/generated/model'
-import { lookOf, markText, shortText, type Tone } from '@/core/puantaj/puantajLabels'
+import { lookOf, markText, shortText, type MarkLike, type Tone } from '@/core/puantaj/puantajLabels'
 
 /**
  * Bir günün işareti, Vant etiketiyle: yumuşak renkler mobile/styles/theme.css'te. İzinli (mavi) çerçeveli çizilir:
@@ -14,7 +13,7 @@ const VAN_TYPE: Record<Tone, 'success' | 'warning' | 'danger' | 'primary' | 'def
   info: 'default',
 }
 
-const { mark, compact = false } = defineProps<{ mark: DayMarkView; compact?: boolean }>()
+const { mark, compact = false } = defineProps<{ mark: MarkLike; compact?: boolean }>()
 </script>
 
 <template>

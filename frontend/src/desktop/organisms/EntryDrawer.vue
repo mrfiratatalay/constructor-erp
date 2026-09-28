@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
 import type { RosterEntryView } from '@/core/api/generated/model'
-import { isoDayOf, monthKey } from '@/core/format/dates'
-import { monthRange } from '@/core/puantaj/puantajDays'
+import { useCalendarDay } from '@/core/puantaj/useCalendarDay'
 import { useEntryMonth } from '@/core/puantaj/useEntryMonth'
 import { useRoster } from '@/core/puantaj/useRoster'
 import EntryCalendar from '@/desktop/molecules/EntryCalendar.vue'
@@ -21,22 +20,10 @@ const { entryId } = defineProps<{ entryId: string | null }>()
 const emit = defineEmits<{ close: []; edit: [entry: RosterEntryView] }>()
 const { month, setMonth, today, row, totals, canMark } = useEntryMonth(() => entryId)
 const roster = useRoster()
-const selectedDay = ref(today)
+const { selectedDay, calendarDate, reset } = useCalendarDay(month, setMonth, today)
 
 /** Açılınca gösterilen ayın bugünü (geçmiş ayda ilk günü) seçilir. */
-watch(() => entryId, () => {
-  selectedDay.value = month.value === monthKey(today) ? today : monthRange(month.value).from
-})
-
-const calendarDate = computed({
-  get: () => new Date(`${selectedDay.value}T00:00:00`),
-  set: (date: Date) => {
-    const day = isoDayOf(date)
-    if (monthKey(day) > monthKey(today)) return
-    selectedDay.value = day
-    if (monthKey(day) !== month.value) void setMonth(monthKey(day))
-  },
-})
+watch(() => entryId, reset)
 
 async function archive(entry: RosterEntryView) {
   const message = 'Bugünden sonra listede görünmez; geçmiş günleri puantajda kalır.'

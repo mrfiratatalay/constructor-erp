@@ -3,10 +3,11 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showConfirmDialog, showFailToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
-import { entrySubtitle, entryTitle, STATUS_LOOKS, type Tone } from '@/core/puantaj/puantajLabels'
+import { entrySubtitle, entryTitle } from '@/core/puantaj/puantajLabels'
 import { useEntryMonth } from '@/core/puantaj/useEntryMonth'
 import { useRoster } from '@/core/puantaj/useRoster'
 import EntryTotalsGrid from '@/mobile/molecules/EntryTotalsGrid.vue'
+import MarkLegend from '@/mobile/molecules/MarkLegend.vue'
 import MonthGridCalendar from '@/mobile/molecules/MonthGridCalendar.vue'
 import MonthStepper from '@/mobile/molecules/MonthStepper.vue'
 import DaySheet from '@/mobile/organisms/DaySheet.vue'
@@ -25,9 +26,6 @@ const roster = useRoster()
 const pickedDay = ref(today)
 const dayOpen = ref(false)
 const formOpen = ref(false)
-const LEGEND = Object.values(STATUS_LOOKS)
-/** Açıklama takvimdeki etiketlerle aynı renkte (mobile/atoms/MarkTag); izinli çerçeveli. */
-const legendType = (tone: Tone) => (tone === 'info' ? 'default' : tone)
 
 function pickDay(day: string) {
   pickedDay.value = day
@@ -52,12 +50,7 @@ async function archive() {
     <template v-else-if="row && totals">
       <EntryTotalsGrid :totals="totals" :kind="row.entry.kind" />
       <MonthGridCalendar :month="month" :marks="row.marks" :today="today" @pick="pickDay" />
-      <van-space wrap :size="6">
-        <van-tag v-for="look in LEGEND" :key="look.label" :type="legendType(look.tone)"
-          :plain="look.tone === 'primary'" round>
-          {{ look.short }} {{ look.label }}
-        </van-tag>
-      </van-space>
+      <MarkLegend />
       <van-cell-group v-if="!row.entry.archived" inset>
         <van-cell :title="row.entry.linked ? 'Görevini düzenle' : 'Düzenle'" is-link @click="formOpen = true" />
         <van-cell v-if="!row.entry.linked" title="Listeden çıkar" is-link @click="archive" />

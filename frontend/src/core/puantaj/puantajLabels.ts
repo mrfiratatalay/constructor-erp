@@ -2,6 +2,9 @@ import type { DayMarkView, DayMarkViewStatus, RosterEntryView } from '@/core/api
 
 export type DayStatus = DayMarkViewStatus
 
+/** Bir günün durumu ve mesaisi: puantajdaki işaret de, çalışanın Puantajım'daki günü de bu biçimdedir. */
+export type MarkLike = Pick<DayMarkView, 'status' | 'overtimeHours'>
+
 /**
  * Etiketin tonu; iki kütüphanenin ortak adları (el-tag ve van-tag "type"). Renk yalnızca durum içindir: geldi
  * yeşil, yarım gün sarı, gelmedi kırmızı, izinli mavi, işaretlenmedi gri. Etiketin içinde her zaman yazı da vardır.
@@ -25,7 +28,7 @@ export const STATUS_LOOKS: Record<DayStatus, StatusLook> = {
 /** Kaydı olmayan gün: "Gelmedi" değildir, şef henüz bakmamıştır. */
 export const UNMARKED: StatusLook = { label: 'İşaretlenmedi', tone: 'info', short: '–' }
 
-export const lookOf = (mark?: DayMarkView | null): StatusLook => (mark ? STATUS_LOOKS[mark.status] : UNMARKED)
+export const lookOf = (mark?: MarkLike | null): StatusLook => (mark ? STATUS_LOOKS[mark.status] : UNMARKED)
 
 /** Ekip yalnızca geldi ya da gelmedi olur; ekipte kaç kişi olduğu tutulmaz. */
 export function statusChoices(kind: RosterEntryView['kind']): DayStatus[] {
@@ -36,13 +39,13 @@ export function statusChoices(kind: RosterEntryView['kind']): DayStatus[] {
 export const hoursText = (hours: number): string => String(hours).replace('.', ',')
 
 /** Etiketin yazısı: "Geldi"; mesai varsa "Geldi +2 s". */
-export function markText(mark?: DayMarkView | null): string {
+export function markText(mark?: MarkLike | null): string {
   const look = lookOf(mark)
   return mark?.overtimeHours ? `${look.label} +${hoursText(mark.overtimeHours)} s` : look.label
 }
 
 /** Ayın cetvelindeki dar hücre: "✓", mesai varsa "✓+2". */
-export function shortText(mark: DayMarkView): string {
+export function shortText(mark: MarkLike): string {
   const short = STATUS_LOOKS[mark.status].short
   return mark.overtimeHours ? `${short}+${hoursText(mark.overtimeHours)}` : short
 }

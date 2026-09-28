@@ -24,8 +24,10 @@ import type {
   BulkMarkRequest,
   DayMarkView,
   ExportPuantajParams,
+  GetMyPuantajParams,
   GetPuantajParams,
   MarkRequest,
+  MyPuantajView,
   PuantajView,
   RosterEntryRequest,
   RosterEntryView,
@@ -561,6 +563,69 @@ export function useGetPuantaj<TData = Awaited<ReturnType<typeof getPuantaj>>, TE
   queryClient?: QueryClient,
 ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetPuantajQueryOptions(params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
+export const getMyPuantaj = (
+  params: MaybeRefOrGetter<GetMyPuantajParams>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  params = toValue(params)
+
+  return apiRequest<MyPuantajView>(
+    { url: `/api/puantaj/me`, method: 'GET', params, signal },
+    options,
+  )
+}
+
+export const getGetMyPuantajQueryKey = (params?: MaybeRefOrGetter<GetMyPuantajParams>) => {
+  return ['api', 'puantaj', 'me', ...(params ? [params] : [])] as const
+}
+
+export const getGetMyPuantajQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMyPuantaj>>,
+  TError = unknown,
+>(
+  params: MaybeRefOrGetter<GetMyPuantajParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPuantaj>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getGetMyPuantajQueryKey(params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyPuantaj>>> = ({ signal }) =>
+    getMyPuantaj(params, requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMyPuantaj>>,
+    TError,
+    TData
+  >
+}
+
+export type GetMyPuantajQueryResult = NonNullable<Awaited<ReturnType<typeof getMyPuantaj>>>
+export type GetMyPuantajQueryError = unknown
+
+export function useGetMyPuantaj<TData = Awaited<ReturnType<typeof getMyPuantaj>>, TError = unknown>(
+  params: MaybeRefOrGetter<GetMyPuantajParams>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyPuantaj>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetMyPuantajQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>

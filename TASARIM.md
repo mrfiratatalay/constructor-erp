@@ -160,7 +160,7 @@ referanslar ve neyin neden alındığı: `docs/referanslar/yoklama/`.
 | Karar | Neden |
 |---|---|
 | **Firmanın, şantiyenin değil.** Menüde Şantiyeler'in yanında **Yoklama**; sohbette yoklama yoktur. | Çalışanlar her gün başka şantiyeye gider; puantaj kişinindir. |
-| **Kim görür:** patron ve şef. Çalışan yoklamada sayılır, menüsünde Yoklama yoktur. | Roller: bkz. Kişiler. |
+| **Kim görür:** patron ve şef. Çalışan yoklamada sayılır; menüsünde Yoklama yerine kendi ayı, **Puantajım** vardır. | Roller: bkz. Kişiler. |
 | **Kim sayılır:** Personel, kişi kişi (uygulamadaki çalışanlar kendiliğinden, uygulaması olmayanlar adıyla eklenir) ve Taşeron ekipler, ekip olarak ("Demirci · Hasan Usta"). Patron ve şef sayılmaz. | Dayı demircinin kaç adamla geldiğine değil, ekibin gelip gelmediğine bakar; ekip, ekip başının işidir. |
 | **Durumlar:** Geldi · Yarım gün · Gelmedi · İzinli; ekipte yalnızca Geldi · Gelmedi. **İşaretlenmedi** ayrı durumdur, "Gelmedi" değildir. | Şef henüz bakmamış olabilir; kaydı olmayan gün yazılmaz. |
 | **Mesai** bir durum değil, Geldi gününe eklenen saattir: yarım saatlik adımla, en çok 16. Ekibe mesai yazılmaz. | "Yarım gün + mesai" kendiyle çelişir. |
@@ -203,6 +203,15 @@ işaretlerin açıklaması, patrona **Excel indir**. Personel cetveli: satırda 
 düğmeler), mesai, not ve "Kaydedildi · 08:17 · Patron" izi. Uygulaması olmayan kişi ya da ekip buradan düzeltilir
 ve **listeden çıkarılır** (geçmiş günleri puantajda kalır). Uygulamadaki çalışanın yalnızca görevi düzeltilir;
 listeden Katılımcılar'dan çıkar (firmadan çıkar ya da şef yap).
+
+**Puantajım (çalışanın sekmesi, 28 Eylül).** Hikâyenin eksik halkası: kayıt yalnızca şefte ve patronda dursa
+çalışan ay sonunda yine "ben 24 gün geldim" der. Kendi ayını her gün görürse itiraz o gün, şef hatırlarken çıkar.
+Menüde Şantiyeler'in yanında (telefonda Şantiyeler · Puantajım · Ben): bugünkü kaydı, ayın toplamları (çalıştığı
+gün, mesai, gelmedi, izinli), takvim. Güne dokununca durum, mesai ve **kimin ne zaman işaretlediği**; telefonda
+**Ara** ile o kişiyi doğrudan arar, masaüstünde numarası yazar ve kopyalanır. İtiraz için ayrı bir düğme ya da
+süreç yoktur, gerçek hayattaki gibi aranır. Yalnızca kendi kaydı görünür; başkasınınki, şefin notu (not şefle
+patron arasındadır, çalışan okuyacağını bilse şef yazmazdı) ve tutar görünmez. Kayıt işaretlendiği anda görünür.
+Uygulaması olmayan kişi ve taşeron ekip görmez; patron ve şef yoklamada sayılmaz, bu sekmeleri yoktur.
 
 **Excel** (`puantaj-2026-09.xlsx`): "Personel" ve "Ekipler" cetvelleri (G / Y / X / İ, mesaiyle "G+2", ekrandaki
 renklerle, sağda toplamlar) ve gün gün tam liste "Kayıtlar" (tür, görev, durum, mesai, not, işaretleyen, saat).
@@ -303,11 +312,12 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 | | Patron | Şef | Çalışan |
 |---|---|---|---|
 | 1 | Şantiyeler | Şantiyeler | Şantiyeler |
-| 2 | Yoklama | Yoklama | Ben |
-| 3 | Ben | Ben | |
+| 2 | Yoklama | Yoklama | Puantajım |
+| 3 | Ben | Ben | Ben |
 
 Yoklama patronun ve şefin menüsündedir (28 Eylül): şef her sabah alır, patron ay sonunda puantajı görür. Çalışan
-yoklamada sayılır ama menüsünde Yoklama yoktur; /yoklama adresine giderse şantiyelerine döner.
+yoklamada sayılır; onun menüsünde yerine kendi ayı Puantajım vardır. Kimse ötekinin adresine giremez: çalışan
+/yoklama'ya, patron ya da şef /puantajim'e giderse şantiyelerine döner.
 
 Ayrı bir Ekip ekranı yoktur: kişiler firmanın bağlantısıyla gelir, şantiye bilgisindeki Katılımcılar'dan
 yönetilir (bkz. Kişiler). Şantiye ayarları da
@@ -356,5 +366,5 @@ bildirim göndereceği (ör. akşam 17:00'de rapor göndermemiş şefe hatırlat
 - **Görevler** (Musa): şantiye bilgisinde duruyor; WhatsApp'ta karşılığı olmayan yeni bir kavram (İlke 1),
   kalıp kalmayacağı konuşulacak.
 - İlk açılış: sıfır şantiye, sıfır kişiyken patronun ilk on dakikası.
-- **Yoklama, sonraya bırakılanlar:** çalışanın kendi puantajını görmesi (itiraz ay sonunda değil o gün çıksın),
-  yevmiye tutarı (gün × ücret, yalnızca patrona), sabah hatırlatması (işaretlenmeyen varken şefe).
+- **Yoklama, sonraya bırakılanlar:** yevmiye tutarı (gün × ücret, yalnızca patrona), sabah hatırlatması
+  (işaretlenmeyen varken şefe), çalışana "Bugün Geldi olarak yazıldın" bildirimi (bildirimler HTTPS ister).

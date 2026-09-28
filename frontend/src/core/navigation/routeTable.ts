@@ -28,6 +28,8 @@ export const ROUTES = {
     path: '/yoklama/kisi/:entryId',
     meta: { rollCallOnly: true, detail: true, title: 'Yoklama' },
   },
+  // Çalışanın kendi ayı: kaydını o gün görür, yanlışsa işaretleyeni arar. Patron ve şef yoklamada sayılmaz.
+  myPuantaj: { path: '/puantajim', meta: { workerOnly: true, title: 'Puantajım' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>
 

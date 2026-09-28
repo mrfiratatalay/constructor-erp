@@ -1,5 +1,5 @@
 import type { DayMarkView, PuantajView, RosterEntryView } from '@/core/api/generated/model'
-import type { DayStatus } from '@/core/puantaj/puantajLabels'
+import type { DayStatus, MarkLike } from '@/core/puantaj/puantajLabels'
 
 /** Bir kalem ve istenen günlerdeki işaretleri (güne göre). İşaretsiz gün kayıtta yoktur: "İşaretlenmedi". */
 export interface PuantajRow {
@@ -48,8 +48,10 @@ export interface RowTotals {
   overtime: number
 }
 
-export function rowTotals(row: PuantajRow): RowTotals {
-  const marks = Object.values(row.marks)
+export const rowTotals = (row: PuantajRow): RowTotals => totalsOf(Object.values(row.marks))
+
+/** Bir ayın günlerinden toplamlar: puantajın satırı da, çalışanın kendi ayı da. */
+export function totalsOf(marks: MarkLike[]): RowTotals {
   const count = (status: DayStatus) => marks.filter((mark) => mark.status === status).length
   const half = count('HALF_DAY')
   return {

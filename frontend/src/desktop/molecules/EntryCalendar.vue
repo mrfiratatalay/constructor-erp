@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DayMarkView } from '@/core/api/generated/model'
 import { dayOfMonth } from '@/core/puantaj/puantajDays'
+import type { MarkLike } from '@/core/puantaj/puantajLabels'
 import MarkTag from '@/desktop/atoms/MarkTag.vue'
 
 /**
@@ -8,7 +8,7 @@ import MarkTag from '@/desktop/atoms/MarkTag.vue'
  * düğmeleriyle önceki ya da sonraki aya geçilir. Yalnızca gösterilen ayın işaretleri bilinir.
  */
 const date = defineModel<Date>({ required: true })
-const { marks } = defineProps<{ marks: Record<string, DayMarkView> }>()
+const { marks } = defineProps<{ marks: Record<string, MarkLike> }>()
 </script>
 
 <template>
