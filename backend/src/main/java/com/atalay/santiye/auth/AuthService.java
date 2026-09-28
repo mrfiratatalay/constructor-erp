@@ -35,7 +35,8 @@ public class AuthService {
     @Transactional(readOnly = true)
     public CurrentUserResponse describe(AppUser user) {
         String companyName = companies.findById(user.getCompanyId()).map(Company::getName).orElse("");
-        return new CurrentUserResponse(user.getId(), user.getFullName(), user.getRole(), companyName);
+        return new CurrentUserResponse(user.getId(), user.getFullName(), user.getRole(), companyName,
+            Permission.grantedTo(user.getRole()));
     }
 
     @Transactional(readOnly = true)
