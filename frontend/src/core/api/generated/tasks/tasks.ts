@@ -26,6 +26,67 @@ import { apiRequest } from '../../http'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
+export const getTask = (
+  taskId: MaybeRefOrGetter<string>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  taskId = toValue(taskId)
+
+  return apiRequest<TaskView>({ url: `/api/tasks/${taskId}`, method: 'GET', signal }, options)
+}
+
+export const getGetTaskQueryKey = (taskId: MaybeRefOrGetter<string>) => {
+  return ['api', 'tasks', taskId] as const
+}
+
+export const getGetTaskQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTask>>,
+  TError = unknown,
+>(
+  taskId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = getGetTaskQueryKey(taskId)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTask>>> = ({ signal }) =>
+    getTask(taskId, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => toValue(taskId) !== null && toValue(taskId) !== undefined),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData>
+}
+
+export type GetTaskQueryResult = NonNullable<Awaited<ReturnType<typeof getTask>>>
+export type GetTaskQueryError = unknown
+
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>, TError = unknown>(
+  taskId: MaybeRefOrGetter<string>,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData>>
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetTaskQueryOptions(taskId, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>
+
+  return query
+}
+
 export const updateTask = (
   taskId: MaybeRefOrGetter<string>,
   updateTaskRequest: MaybeRefOrGetter<UpdateTaskRequest>,

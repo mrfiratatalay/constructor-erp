@@ -32,4 +32,6 @@ export interface PostView {
   fieldUpdate: boolean
   /** @nullable */
   deliveryId?: string | null
+  /** @nullable */
+  taskId?: string | null
 }
