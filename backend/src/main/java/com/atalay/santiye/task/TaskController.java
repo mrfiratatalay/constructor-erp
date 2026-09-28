@@ -35,6 +35,12 @@ public class TaskController {
         return tasks.listTasks(user, siteId);
     }
 
+    /** Sohbetteki görev kartı: kime, ne zaman, durumu. */
+    @GetMapping("/tasks/{taskId}")
+    public TaskView getTask(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID taskId) {
+        return tasks.getTask(user, taskId);
+    }
+
     @PostMapping("/sites/{siteId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskView createTask(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID siteId,

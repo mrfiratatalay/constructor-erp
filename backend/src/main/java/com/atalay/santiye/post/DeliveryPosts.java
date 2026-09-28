@@ -51,6 +51,6 @@ public class DeliveryPosts {
     private Post save(CurrentUser author, DeliveryMessage message) {
         var draft = new NewPost(UUID.randomUUID(), author.companyId(), message.siteId(), author.userId(), message.body(),
             false, message.replyToId(), false, false);
-        return posts.save(Post.forDelivery(draft, message.deliveryId(), clock.instant()));
+        return posts.save(Post.linked(draft, PostLink.delivery(message.deliveryId()), clock.instant()));
     }
 }

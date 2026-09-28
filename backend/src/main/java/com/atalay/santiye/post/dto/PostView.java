@@ -11,6 +11,7 @@ import java.util.UUID;
  * replyTo: yanıtlanan mesajın alıntısı. forwarded: başka şantiyeden iletildi. pin: sabitlendiyse.
  * seenByAll: yazar dışındaki bütün katılımcılar gördü (WhatsApp'taki mavi ✓✓). fieldUpdate: Saha sekmesinden
  * yazılan saha güncellemesi. deliveryId: iş teslimi ya da şefin cevabıysa bağlı olduğu teslim (baloncukta kartı).
+ * taskId: görev kartıysa görevi (baloncukta kime, ne zaman, durumu ve sorumlusunda "İşi Teslim Et").
  */
 public record PostView(
     UUID id,
@@ -28,5 +29,6 @@ public record PostView(
     @Nullable PostPin pin,
     boolean seenByAll,
     boolean fieldUpdate,
-    @Nullable UUID deliveryId) {
+    @Nullable UUID deliveryId,
+    @Nullable UUID taskId) {
 }

@@ -3,6 +3,8 @@ package com.atalay.santiye.task;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.post.PostFeed;
+import com.atalay.santiye.post.TaskCardMessage;
+import com.atalay.santiye.post.TaskCards;
 import com.atalay.santiye.post.dto.PostView;
 import com.atalay.santiye.site.Site;
 import com.atalay.santiye.site.SiteAccess;
@@ -18,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Şantiyenin görevleri. Şantiyeyi gören herkes görevleri görür, açar ve günceller (gönderi gibi);
- * silmek yalnızca açanın ve patronun işidir. Görünmeyen şantiyenin görevi "bulunamadı" döner.
+ * silmek yalnızca açanın ve patronun işidir. Görünmeyen şantiyenin görevi "bulunamadı" döner. Görev nereden
+ * açılırsa açılsın (sohbetin ＋'sı ya da Görevler sayfası) sohbete görev kartı düşer (TaskCards).
  */
 @Service
 public class TaskService {
@@ -28,15 +31,17 @@ public class TaskService {
     private final TaskAssignees assignees;
     private final TaskViews views;
     private final PostFeed posts;
+    private final TaskCards cards;
     private final Clock clock;
 
     TaskService(TaskRepository tasks, SiteAccess siteAccess, TaskAssignees assignees, TaskViews views,
-        PostFeed posts, Clock clock) {
+        PostFeed posts, TaskCards cards, Clock clock) {
         this.tasks = tasks;
         this.siteAccess = siteAccess;
         this.assignees = assignees;
         this.views = views;
         this.posts = posts;
+        this.cards = cards;
         this.clock = clock;
     }
 
@@ -51,7 +56,18 @@ public class TaskService {
         Site site = siteAccess.requireVisible(user, siteId);
         Task task = new Task(site, user.userId(), linkedPost(user, site, request.postId()), clock.instant());
         task.describe(content(site, request));
-        return views.of(tasks.save(task));
+        Task saved = tasks.save(task);
+        cards.postCard(user, new TaskCardMessage(site.getId(), saved.getId(), "📋 Görev: " + saved.getTitle(),
+            saved.getPostId()));
+        return views.of(saved);
+    }
+
+    /** Sohbetteki görev kartı görevi buradan okur. */
+    @Transactional(readOnly = true)
+    public TaskView getTask(CurrentUser user, UUID taskId) {
+        Task task = findTask(user, taskId);
+        siteAccess.requireVisible(user, task.getSiteId());
+        return views.of(task);
     }
 
     @Transactional

@@ -5,6 +5,7 @@ import com.atalay.santiye.common.persistence.SiteMoment;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,6 +64,9 @@ interface PostRepository extends JpaRepository<Post, UUID> {
         + "where p.siteId in :siteIds and p.issue = true and p.resolvedAt is null and p.deletedAt is null "
         + "group by p.siteId")
     List<SiteMoment> findOldestOpenIssueAt(Collection<UUID> siteIds);
+
+    /** Görevin sohbetteki kartı (silinmemiş olan): teslim mesajı ona yanıt olarak düşer. */
+    Optional<Post> findFirstByLinkTaskIdAndDeletedAtIsNullOrderByCreatedAtAsc(UUID taskId);
 
     /** Şantiyenin sabit mesajları, en son sabitlenen önde (akışın üstündeki şerit). */
     @Query("select p from Post p where p.siteId = :siteId and p.pinnedAt is not null order by p.pinnedAt desc")

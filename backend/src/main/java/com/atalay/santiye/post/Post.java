@@ -1,6 +1,7 @@
 package com.atalay.santiye.post;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -32,7 +33,8 @@ public class Post {
     private UUID pinnedBy;
     @Column(name = "is_field_update")
     private boolean fieldUpdate;
-    private UUID deliveryId;
+    @Embedded
+    private PostLink link;
 
     protected Post() {
     }
@@ -50,16 +52,21 @@ public class Post {
         this.createdAt = createdAt;
     }
 
-    /** İş teslimi ya da şefin cevabı: mesaj bir teslime bağlıdır, baloncukta kartı çizilir (DeliveryPosts). */
-    static Post forDelivery(NewPost post, UUID deliveryId, Instant createdAt) {
+    /** Bir işe bağlı mesaj (görev kartı, iş teslimi, şefin cevabı): yazısını sunucu koyar, kartı çizilir. */
+    static Post linked(NewPost post, PostLink link, Instant createdAt) {
         Post message = new Post(post, createdAt);
-        message.deliveryId = deliveryId;
+        message.link = link;
         return message;
     }
 
-    /** Teslim ve cevabı işin kanıtıdır: silinmez, düzeltilmez, iletilmez. */
+    /** Yazısı işten gelir: düzeltilmez, iletilmez. */
+    boolean isGenerated() {
+        return link != null;
+    }
+
+    /** Teslim ve şefin cevabı işin kanıtıdır: silinmez. */
     boolean isDeliveryRecord() {
-        return deliveryId != null;
+        return link != null && link.deliveryId() != null;
     }
 
     public boolean isOpenIssue() {
@@ -184,7 +191,7 @@ public class Post {
         return fieldUpdate;
     }
 
-    public UUID getDeliveryId() {
-        return deliveryId;
+    public PostLink getLink() {
+        return link;
     }
 }

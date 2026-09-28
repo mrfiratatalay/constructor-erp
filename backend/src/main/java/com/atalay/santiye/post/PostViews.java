@@ -85,7 +85,8 @@ class PostViews {
             pinOf(post, lookups.people()),
             seenByAll(post, lookups.participants().getOrDefault(post.getSiteId(), List.of())),
             post.isFieldUpdate(),
-            post.getDeliveryId());
+            post.getLink() == null ? null : post.getLink().deliveryId(),
+            post.getLink() == null ? null : post.getLink().taskId());
     }
 
     private static PostAuthorRef authorOf(AppUser author) {

@@ -43,8 +43,8 @@ public class PostForwarding {
         if (source.isDeleted()) {
             throw ApiException.conflict("Silinmiş mesaj iletilemez.");
         }
-        if (source.isDeliveryRecord()) {
-            throw ApiException.conflict("İş teslimi iletilemez: teslim görevin şantiyesine aittir.");
+        if (source.isGenerated()) {
+            throw ApiException.conflict("Görev ve iş teslimi iletilemez: görevin şantiyesine aittir.");
         }
         Site target = siteAccess.requireVisible(user, targetSiteId);
         var draft = new NewPost(UUID.randomUUID(), user.companyId(), target.getId(), user.userId(), source.getBody(),

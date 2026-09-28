@@ -57,8 +57,8 @@ public class PostCorrections {
         if (post.isDeleted()) {
             throw ApiException.conflict("Silinmiş gönderi düzeltilemez.");
         }
-        if (post.isDeliveryRecord()) {
-            throw ApiException.conflict("İş teslimi düzeltilemez: işin kanıtıdır.");
+        if (post.isGenerated()) {
+            throw ApiException.conflict("Bu mesajın yazısı görevden gelir, düzeltilemez; görevi düzenle.");
         }
     }
 

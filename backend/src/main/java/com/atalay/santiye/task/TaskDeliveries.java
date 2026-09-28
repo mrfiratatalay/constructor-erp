@@ -4,6 +4,7 @@ import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.post.DeliveryMessage;
 import com.atalay.santiye.post.DeliveryPosts;
+import com.atalay.santiye.post.TaskCards;
 import com.atalay.santiye.site.Site;
 import com.atalay.santiye.site.SiteAccess;
 import com.atalay.santiye.task.dto.TaskDeliveryView;
@@ -16,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * İş teslimi (TASARIM.md "İş teslimi"): çalışan kendisine verilen görevi 1-4 fotoğrafla teslim eder; iş "Kontrolde"
- * olur ve sohbete fotoğraflı teslim mesajı düşer. Yeni bir iş sistemi değildir, mevcut görevin bir adımıdır.
+ * olur ve sohbete fotoğraflı teslim mesajı düşer (görevin kartına yanıt olarak). Yeni bir iş sistemi değildir,
+ * mevcut görevin bir adımıdır.
  */
 @Service
 public class TaskDeliveries {
@@ -27,15 +29,17 @@ public class TaskDeliveries {
     private final TaskDeliveryRepository deliveries;
     private final SiteAccess siteAccess;
     private final DeliveryPosts messages;
+    private final TaskCards cards;
     private final TaskDeliveryViews views;
     private final Clock clock;
 
     TaskDeliveries(TaskRepository tasks, TaskDeliveryRepository deliveries, SiteAccess siteAccess,
-        DeliveryPosts messages, TaskDeliveryViews views, Clock clock) {
+        DeliveryPosts messages, TaskCards cards, TaskDeliveryViews views, Clock clock) {
         this.tasks = tasks;
         this.deliveries = deliveries;
         this.siteAccess = siteAccess;
         this.messages = messages;
+        this.cards = cards;
         this.views = views;
         this.clock = clock;
     }
@@ -49,7 +53,8 @@ public class TaskDeliveries {
         requirePhotos(photos);
         UUID deliveryId = UUID.randomUUID();
         String body = "✅ İş teslim edildi: " + task.getTitle();
-        UUID postId = messages.postDelivery(user, new DeliveryMessage(site.getId(), deliveryId, body, null), photos);
+        UUID card = cards.cardOf(task.getId()).orElse(null);
+        UUID postId = messages.postDelivery(user, new DeliveryMessage(site.getId(), deliveryId, body, card), photos);
         TaskDelivery delivery = deliveries.save(
             new TaskDelivery(deliveryId, task, postId, user.userId(), clock.instant()));
         task.moveTo(TaskStatus.SUBMITTED, clock.instant());
