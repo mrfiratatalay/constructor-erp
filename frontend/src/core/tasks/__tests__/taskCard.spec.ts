@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 import type { CurrentUserResponse, TaskView } from '@/core/api/generated/model'
-import { dueDateOf } from '@/core/tasks/dueChoice'
+import { dueDateOf, isPastDay } from '@/core/tasks/dueChoice'
 import { taskCard } from '@/core/tasks/taskCard'
 import { canAssignTasks } from '@/core/tasks/taskPermissions'
 
@@ -64,6 +64,8 @@ describe('görev penceresi', () => {
     expect(dueDateOf('tomorrow', null, today)).toBe('2026-09-29')
     expect(dueDateOf('date', '2026-10-05', today)).toBe('2026-10-05')
     expect(dueDateOf('date', null, today)).toBeNull()
+    expect(isPastDay(new Date(2026, 8, 27), today)).toBe(true)
+    expect(isPastDay(new Date(2026, 8, 28), today)).toBe(false)
   })
 
   it('＋ menüsündeki Görev patronda ve şefte, çalışanda değil', () => {

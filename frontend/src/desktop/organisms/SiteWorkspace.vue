@@ -6,8 +6,10 @@ import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
 import { useSiteTab } from '@/core/sites/useSiteTab'
+import { canAssignTasks } from '@/core/tasks/taskPermissions'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallPopover from '@/desktop/molecules/CallPopover.vue'
+import AssignTaskDialog from '@/desktop/organisms/AssignTaskDialog.vue'
 import DeliverTaskDialog from '@/desktop/organisms/DeliverTaskDialog.vue'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import SiteTabs from '@/desktop/molecules/SiteTabs.vue'
@@ -26,7 +28,8 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
  * Bu şantiyede ara). Bilgi ve arama akışın sağında panel olarak açılır.
  * Başlığın altında iki sekme: Sohbet ve Saha (günlük). İki sekmenin taslağı ayrıdır: sohbete yazılan yarım mesaj
  * Saha'ya geçince kaybolmaz. Açılınca şantiye okunmuş sayılır; önceki bakıştan sonra gelenler çizgiyle ayrılır.
- * Sohbetin ＋ menüsündeki "İş Teslim Et" teslim penceresini açar; teslim edilince sohbet teslim mesajına gider.
+ * Sohbetin ＋ menüsündeki "📋 Görev" görev penceresini (patron, şef), "İş Teslim Et" teslim penceresini açar;
+ * teslim edilince sohbet teslim mesajına gider.
  */
 type Panel = 'info' | 'search'
 
@@ -44,10 +47,12 @@ const callable = computed(() => (site.value ? callablePeople(site.value, user.va
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */
 const openFound = (postId: string) => openTab('chat', postId)
+const canAssign = computed(() => canAssignTasks(user.value))
+const assigning = ref(false)
 const delivering = ref(false)
 const deliveringTaskId = ref<string | null>(null)
 
-/** ＋ → İş Teslim Et (iş seçilecek) ya da eksik dönen işin kartından (iş seçili gelir). */
+/** ＋ → İş Teslim Et (iş seçilecek) ya da görev kartından, eksik dönen işin kartından (iş seçili gelir). */
 function openDelivery(taskId: string | null = null) {
   deliveringTaskId.value = taskId
   delivering.value = true
@@ -79,16 +84,17 @@ function openDelivery(taskId: string | null = null) {
       <template #tabs><SiteTabs :active="tab" @change="openTab" /></template>
       <UploadQueueList />
       <FeedColumn v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
-        @reply="composer.replyTo.value = $event" @redeliver="openDelivery" />
+        @reply="composer.replyTo.value = $event" @deliver="openDelivery" />
       <FieldColumn v-else-if="site" :site="site" />
       <template v-if="site" #footer>
-        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name"
-          @deliver="openDelivery()" />
+        <SiteComposerBar v-if="tab === 'chat'" :composer="composer" :site-name="site.name" :can-assign="canAssign"
+          @assign="assigning = true" @deliver="openDelivery()" />
         <FieldComposerBar v-else :composer="fieldComposer" />
       </template>
     </DetailPane>
     <SiteInfoPanel v-if="site && panel === 'info'" :site="site" @close="panel = null" />
     <SiteSearchPanel v-else-if="panel === 'search'" :site-id="siteId" @open="openFound" @close="panel = null" />
+    <AssignTaskDialog v-if="site && canAssign" v-model:show="assigning" :site="site" />
     <DeliverTaskDialog v-model:show="delivering" :site-id="siteId" :task-id="deliveringTaskId" @delivered="openFound" />
   </div>
 </template>

@@ -19,3 +19,8 @@ export function dueDateOf(
   if (choice === 'tomorrow') return today.add(1, 'day').format('YYYY-MM-DD')
   return picked
 }
+
+/** "Tarih seç"te geçmiş günler kapalı: dünün işi verilmez. */
+export function isPastDay(date: Date, today = dayjs()): boolean {
+  return dayjs(date).isBefore(today, 'day')
+}

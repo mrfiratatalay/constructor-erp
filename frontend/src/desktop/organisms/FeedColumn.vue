@@ -15,6 +15,7 @@ import DeliveryCard from '@/desktop/organisms/DeliveryCard.vue'
 import ForwardDialog from '@/desktop/organisms/ForwardDialog.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
 import PostInfoDialog from '@/desktop/organisms/PostInfoDialog.vue'
+import TaskCard from '@/desktop/organisms/TaskCard.vue'
 import { usePostMenuActions } from '@/desktop/postActions'
 import FeedDayTitle from '@/shared/molecules/FeedDayTitle.vue'
 import FeedSystemLine from '@/shared/molecules/FeedSystemLine.vue'
@@ -26,10 +27,11 @@ import QueuedBubble from '@/shared/organisms/QueuedBubble.vue'
  * Şantiyenin akışı, WhatsApp Masaüstü gibi: üstte sabit mesaj şeridi, en eski üstte, en yenisi altta,
  * aralarda sistem satırları, en dipte henüz gitmemiş mesajlar (🕓). "Daha eski mesajlar" yukarıdadır ve
  * basınca ekran zıplamaz. Mesajın köşesindeki ⋯ menüsünden Yanıtla, İlet, Sabitle, Bilgi, Düzelt, Sil.
- * Yoklama mesajının baloncuğunda kartı durur ("Yoklamaya Katıl").
+ * Görev ve iş teslimi mesajlarının baloncuğunda kartları durur; ikisinin "İş Teslim Et"i de teslim penceresini
+ * iş seçili açtırır (deliver).
  */
 const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string | null }>()
-const emit = defineEmits<{ reply: [post: PostView]; redeliver: [taskId: string] }>()
+const emit = defineEmits<{ reply: [post: PostView]; deliver: [taskId: string] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
 const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
@@ -62,7 +64,10 @@ const loadOlder = () => keepPosition(scroller(), () => loadMore())
           <PostBubble :post="item.post" :mine="item.post.author.id === user?.id"
             @open-photos="(urls, index) => (viewer = { urls, index })" @open-quote="jump">
             <template v-if="item.post.deliveryId && !item.post.deletion" #card>
-              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('redeliver', taskId)" />
+              <DeliveryCard :post="item.post" @redeliver="(taskId) => emit('deliver', taskId)" />
+            </template>
+            <template v-else-if="item.post.taskId && !item.post.deletion" #card>
+              <TaskCard :post="item.post" @deliver="(taskId) => emit('deliver', taskId)" />
             </template>
             <template v-if="!item.post.deletion" #menu>
               <PostMenu :items="postMenu(item.post, user)" @select="(action) => run(action, item.post)" />

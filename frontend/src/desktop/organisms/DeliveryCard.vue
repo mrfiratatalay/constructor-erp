@@ -9,10 +9,11 @@ import DeliveryReviewDialog from '@/desktop/organisms/DeliveryReviewDialog.vue'
 import MarkablePhoto from '@/shared/molecules/MarkablePhoto.vue'
 
 /**
- * Sohbetteki iş teslimi kartı (fotoğraflar baloncukta üstte). Teslim mesajında: iş, şantiye, kim, kaç fotoğraf,
- * durum; şef ya da patronda "İNCELE". Şefin cevabında: "Tamamlandı" ya da "İş tamamlanmadı" + eksik notu ve
- * noktalı fotoğraf; işin sorumlusunda "✅ İş Teslim Et" (eksiğini tamamlayıp yeniden teslim eder). Teslimin
- * ayrıntısı gelene kadar (internet yavaş ya da istek düştü) mesajın kendi yazısı görünür: baloncuk boş kalmaz.
+ * Sohbetteki iş teslimi kartı (fotoğraflar baloncukta üstte), görev kartına yanıt olarak düşer. Teslim mesajında:
+ * iş, kim, kaç fotoğraf, durum; şef ya da patronda "İNCELE". Şefin cevabında: "✅ TAMAMLANDI" ya da "❌ İŞ
+ * TAMAMLANMADI" + eksik notu ve noktalı fotoğraf; işin sorumlusunda "✅ İŞİ TESLİM ET" (eksiğini tamamlayıp
+ * yeniden teslim eder). Teslimin ayrıntısı gelene kadar (internet yavaş ya da istek düştü) mesajın kendi yazısı
+ * görünür: baloncuk boş kalmaz.
  */
 const { post } = defineProps<{ post: PostView }>()
 const emit = defineEmits<{ redeliver: [taskId: string] }>()
@@ -42,8 +43,9 @@ const onSendBack = (request: ReturnDeliveryRequest) => review(() => returnWith(r
       :mark="view.mark ? { x: view.mark.x, y: view.mark.y } : null" class="delivery-card__mark" />
     <StatusTag v-if="card.status" :tone="card.status.tone">{{ card.status.label }}</StatusTag>
     <el-button v-if="card.action === 'review'" type="primary" @click="reviewing = true">İNCELE</el-button>
-    <el-button v-else-if="card.action === 'redeliver'" type="success" @click="emit('redeliver', view.taskId)">
-      ✅ İş Teslim Et
+    <el-button v-else-if="card.action === 'redeliver'" type="success" size="large"
+      @click="emit('redeliver', view.taskId)">
+      ✅ İŞİ TESLİM ET
     </el-button>
     <DeliveryReviewDialog v-if="card.action === 'review'" v-model:show="reviewing" :delivery="view"
       :busy="isReviewing" @approve="onApprove" @send-back="onSendBack" />
