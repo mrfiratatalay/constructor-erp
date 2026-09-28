@@ -26,12 +26,14 @@ const participantOf = (person: SiteLead, role: MemberViewRole, viewerId: string 
 
 /**
  * Şantiyenin katılımcıları: firmanın bütün kişileri (herkes her şantiyededir), bakan kişi en üstte "Sen" olarak,
- * sonra patronlar, şefler ve çalışanlar. Rol etiketi firmadaki rolüdür (Patron / Şef).
+ * sonra patronlar, şefler, depo sorumluları ve çalışanlar. Rol etiketi firmadaki rolüdür (Patron / Şef / Depo
+ * sorumlusu).
  */
 export function siteParticipants(site: SiteView, viewer: CurrentUserResponse | undefined): Participant[] {
   const people = [
     ...site.owners.map((owner) => participantOf(owner, 'OWNER', viewer?.id)),
     ...site.leads.map((lead) => participantOf(lead, 'SITE_LEAD', viewer?.id)),
+    ...site.storekeepers.map((keeper) => participantOf(keeper, 'STOREKEEPER', viewer?.id)),
     ...site.workers.map((worker) => participantOf(worker, 'WORKER', viewer?.id)),
   ]
   return [...people.filter((person) => person.isViewer), ...people.filter((person) => !person.isViewer)]

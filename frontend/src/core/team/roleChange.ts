@@ -1,6 +1,6 @@
 import type { MemberViewRole } from '@/core/api/generated/model'
 
-export type RoleAction = 'makeOwner' | 'makeLead' | 'makeWorker'
+export type RoleAction = 'makeOwner' | 'makeLead' | 'makeStorekeeper' | 'makeWorker'
 
 /** Onay penceresinin yazıları: rolün ne getirdiğini kişinin adıyla söyler. */
 export interface RoleChangeCopy {
@@ -13,6 +13,7 @@ export interface RoleChangeCopy {
 export const ROLE_OF_ACTION: Record<RoleAction, MemberViewRole> = {
   makeOwner: 'OWNER',
   makeLead: 'SITE_LEAD',
+  makeStorekeeper: 'STOREKEEPER',
   makeWorker: 'WORKER',
 }
 
@@ -29,6 +30,12 @@ const COPY: Record<MemberViewRole, Omit<RoleChangeCopy, 'title'> & { noun: strin
     confirm: 'Şef yap',
     done: 'Şef yapıldı',
   },
+  STOREKEEPER: {
+    noun: 'depo sorumlusu',
+    message: 'Şantiyelerin imalatını görür (girmez); çalışan gibi yoklamada sayılır. Kişileri yönetemez.',
+    confirm: 'Depo sorumlusu yap',
+    done: 'Depo sorumlusu yapıldı',
+  },
   WORKER: {
     noun: 'çalışan',
     message: 'Görmeye ve yazmaya devam eder; yoklamada sayılır, yoklama alamaz.',
@@ -42,7 +49,10 @@ export function roleChangeCopy(fullName: string, role: MemberViewRole): RoleChan
   return { title: `${fullName} ${noun} olsun mu?`, ...copy }
 }
 
-/** Kişinin menüsünde sahip olmadığı iki rol: "Patron yap", "Şef yap", "Çalışan yap" (bu sırayla). */
+/**
+ * Kişinin menüsünde sahip olmadığı üç rol: "Patron yap", "Şef yap", "Depo sorumlusu yap", "Çalışan yap" (bu
+ * sırayla).
+ */
 export function roleActions(current: MemberViewRole): { action: RoleAction; label: string }[] {
   return (Object.keys(ROLE_OF_ACTION) as RoleAction[])
     .filter((action) => ROLE_OF_ACTION[action] !== current)

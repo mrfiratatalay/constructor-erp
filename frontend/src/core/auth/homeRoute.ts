@@ -9,6 +9,7 @@ const HOME_BY_ROLE: Record<CurrentUserResponseRole, RouteName> = {
   OWNER: 'sites',
   SITE_LEAD: 'sites',
   WORKER: 'sites',
+  STOREKEEPER: 'sites',
 }
 
 export function homeRouteFor(role: CurrentUserResponseRole): RouteName {

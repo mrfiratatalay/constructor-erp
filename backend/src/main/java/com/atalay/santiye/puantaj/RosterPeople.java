@@ -1,7 +1,6 @@
 package com.atalay.santiye.puantaj;
 
 import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRole;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,14 +26,14 @@ record RosterPeople(Map<UUID, AppUser> byId) {
     }
 
     /**
-     * Bugünün listesinde mi? Çıkarılan kalem değil; bağlı kalemse kişi hâlâ firmada ve çalışan olmalı (şef ya da
-     * patron yapılan kişi yoklamada sayılmaz, firmadan çıkarılan da).
+     * Bugünün listesinde mi? Çıkarılan kalem değil; bağlı kalemse kişi hâlâ firmada ve yoklamada sayılan biri
+     * olmalı: çalışan ya da depo sorumlusu (şef ya da patron yapılan kişi sayılmaz, firmadan çıkarılan da).
      */
     boolean isOnList(RosterEntry entry) {
         if (entry.isArchived()) {
             return false;
         }
         AppUser user = entry.isLinked() ? byId.get(entry.getUserId()) : null;
-        return !entry.isLinked() || (user != null && user.isActive() && user.getRole() == UserRole.WORKER);
+        return !entry.isLinked() || (user != null && user.isActive() && user.getRole().isCountedInPuantaj());
     }
 }

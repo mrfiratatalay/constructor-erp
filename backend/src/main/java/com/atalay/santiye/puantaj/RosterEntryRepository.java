@@ -16,14 +16,15 @@ interface RosterEntryRepository extends JpaRepository<RosterEntry, UUID> {
     Optional<RosterEntry> findByUserId(UUID userId);
 
     /**
-     * Uygulamadaki çalışanlar listeye kendiliğinden girer: firmaya katılan ya da çalışan yapılan herkesin kalemi
-     * puantaj okunurken açılır. Katılma ve rol değişikliği puantajı bilmek zorunda kalmaz. Aynı anda iki okuma
-     * olursa ikinci ekleme sessizce atlanır (user_id tekildir).
+     * Uygulamadaki çalışanlar listeye kendiliğinden girer: firmaya katılan ya da çalışan (depo sorumlusu) yapılan
+     * herkesin kalemi puantaj okunurken açılır. Katılma ve rol değişikliği puantajı bilmek zorunda kalmaz. Aynı anda
+     * iki okuma olursa ikinci ekleme sessizce atlanır (user_id tekildir). Sayılan roller UserRole'ün
+     * isCountedInPuantaj kuralıyla aynıdır.
      */
     @Modifying
     @Query(value = "insert into roster_entries (id, company_id, kind, user_id, name, created_at) "
         + "select gen_random_uuid(), u.company_id, 'PERSON', u.id, u.full_name, now() from users u "
-        + "where u.company_id = :companyId and u.active and u.role = 'WORKER' "
+        + "where u.company_id = :companyId and u.active and u.role in ('WORKER', 'STOREKEEPER') "
         + "on conflict (user_id) do nothing", nativeQuery = true)
     int addMissingWorkers(UUID companyId);
 }

@@ -75,12 +75,21 @@ public abstract class ApiTestSupport {
      * telefonu". Her şantiyeyi görür.
      */
     protected Cookie signedInLead(Cookie owner, String fullName) {
+        return signedInAs(owner, fullName, "SITE_LEAD");
+    }
+
+    /** Aynı yoldan gelip patronun depo sorumlusu yaptığı biri: "depocunun telefonu". İmalatı görür, girmez. */
+    protected Cookie signedInStorekeeper(Cookie owner, String fullName) {
+        return signedInAs(owner, fullName, "STOREKEEPER");
+    }
+
+    private Cookie signedInAs(Cookie owner, String fullName, String role) {
         String phone = uniquePhone();
-        Cookie lead = sessionCookieOf(join(joinToken(owner), null, fullName, phone));
-        String promotion = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"active\": true}"
-            .formatted(fullName, phone);
-        assertThat(patchJson("/api/team/members/" + userIdOf(lead), owner, promotion)).hasStatus(200);
-        return lead;
+        Cookie member = sessionCookieOf(join(joinToken(owner), null, fullName, phone));
+        String promotion = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"%s\", \"active\": true}"
+            .formatted(fullName, phone, role);
+        assertThat(patchJson("/api/team/members/" + userIdOf(member), owner, promotion)).hasStatus(200);
+        return member;
     }
 
     /** Telefonun yaptığı gibi: gönderi kimliği istemcide üretilir, dosyalar aynı istekte gider. */

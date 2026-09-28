@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * Katılımcılar (ekranda "Katılımcılar") firmanın bütün aktif kişileridir, her şantiyede aynı: owners patronlar,
- * leads şefler, workers çalışanlar. photoUrl ve photoThumbnailUrl: patronun koyduğu şantiye fotoğrafı; yoksa boş.
+ * leads şefler, workers çalışanlar, storekeepers depo sorumluları. photoUrl ve photoThumbnailUrl: patronun koyduğu şantiye fotoğrafı; yoksa boş.
  * Fotoğraf yeni yüklendiyse işlenene kadar birkaç saniye açılmayabilir.
  */
 public record SiteView(
@@ -18,6 +18,7 @@ public record SiteView(
     List<SiteLead> leads,
     List<SiteLead> owners,
     List<SiteLead> workers,
+    List<SiteLead> storekeepers,
     @Nullable String photoUrl,
     @Nullable String photoThumbnailUrl) {
 }

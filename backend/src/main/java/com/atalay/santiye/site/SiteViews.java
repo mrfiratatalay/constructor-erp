@@ -21,8 +21,9 @@ class SiteViews {
         this.people = people;
     }
 
-    /** Katılımcılar rollerine göre üç gruptur: patronlar, şefler, çalışanlar (ekranda rol etiketi). */
-    private record Participants(List<SiteLead> owners, List<SiteLead> leads, List<SiteLead> workers) {
+    /** Katılımcılar rollerine göre dört gruptur: patronlar, şefler, çalışanlar, depo sorumluları (rol etiketi). */
+    private record Participants(List<SiteLead> owners, List<SiteLead> leads, List<SiteLead> workers,
+        List<SiteLead> storekeepers) {
     }
 
     List<SiteView> of(List<Site> sites) {
@@ -31,7 +32,8 @@ class SiteViews {
         }
         List<AppUser> everyone = people.of(sites.getFirst().getCompanyId());
         Participants participants = new Participants(withRole(everyone, UserRole.OWNER),
-            withRole(everyone, UserRole.SITE_LEAD), withRole(everyone, UserRole.WORKER));
+            withRole(everyone, UserRole.SITE_LEAD), withRole(everyone, UserRole.WORKER),
+            withRole(everyone, UserRole.STOREKEEPER));
         return sites.stream().map(site -> toView(site, participants)).toList();
     }
 
@@ -50,6 +52,7 @@ class SiteViews {
     private static SiteView toView(Site site, Participants participants) {
         String photoUrl = site.getPhotoMediaId() == null ? null : "/api/media/" + site.getPhotoMediaId();
         return new SiteView(site.getId(), site.getName(), site.getAddress(), site.getStatus(), participants.leads(),
-            participants.owners(), participants.workers(), photoUrl, photoUrl == null ? null : photoUrl + "/thumbnail");
+            participants.owners(), participants.workers(), participants.storekeepers(), photoUrl,
+            photoUrl == null ? null : photoUrl + "/thumbnail");
     }
 }

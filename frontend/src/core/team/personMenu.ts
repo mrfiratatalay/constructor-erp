@@ -6,8 +6,8 @@ export type PersonAction = 'loginLink' | 'edit' | RoleAction | 'remove'
 
 /**
  * Katılımcıya dokununca (masaüstünde ⌄) patronun menüsü. Kendi satırında yalnızca kendi adı ve numarası: patron
- * kendini çıkaramaz, kendi rolünü değiştiremez (firmada her zaman bir patron kalır). Kişinin sahip olmadığı iki
- * rol seçilebilir (Patron, Şef, Çalışan). Şef ve çalışan bu menüyü görmez; arar.
+ * kendini çıkaramaz, kendi rolünü değiştiremez (firmada her zaman bir patron kalır). Kişinin sahip olmadığı üç
+ * rol seçilebilir (Patron, Şef, Depo sorumlusu, Çalışan). Şef, depo sorumlusu ve çalışan bu menüyü görmez; arar.
  */
 export function personMenu(person: Participant, canManage: boolean): PostMenuItem<PersonAction>[] {
   if (!canManage) return []

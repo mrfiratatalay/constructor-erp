@@ -16,6 +16,7 @@ export interface SiteView {
   leads: SiteLead[]
   owners: SiteLead[]
   workers: SiteLead[]
+  storekeepers: SiteLead[]
   /** @nullable */
   photoUrl?: string | null
   /** @nullable */

@@ -11,4 +11,5 @@ export const MemberViewRole = {
   OWNER: 'OWNER',
   SITE_LEAD: 'SITE_LEAD',
   WORKER: 'WORKER',
+  STOREKEEPER: 'STOREKEEPER',
 } as const
