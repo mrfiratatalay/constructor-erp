@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import {
-  getListSiteTasksQueryKey,
   useCreateTask,
   useDeleteTask,
   useListSiteTasks,
   useUpdateTask,
 } from '@/core/api/generated/tasks/tasks'
 import type { TaskView, TaskViewPriority, TaskViewStatus } from '@/core/api/generated/model'
+import { refreshTaskViews } from '@/core/tasks/deliveryQueries'
 import { doneTasks, openTasks } from '@/core/tasks/taskOrder'
 
 /** Görev formunun alanları; açarken ve düzenlerken aynıdır. dueDate "YYYY-MM-DD". */
@@ -24,10 +24,13 @@ export function formOf(task: TaskView): TaskForm {
   return { title, note, assigneeId: assignee?.id ?? null, dueDate, priority }
 }
 
-/** Bir şantiyenin görevleri ve bütün işleri; kabuklar yalnızca görüntüler. Her değişiklikten sonra liste yenilenir. */
+/**
+ * Bir şantiyenin görevleri ve bütün işleri; kabuklar yalnızca görüntüler. Her değişiklikten sonra liste, sohbetteki
+ * görev kartları ve sohbet tazelenir: görev açılınca sohbete kartı düşer (Görevler sayfasından da ＋'dan da).
+ */
 export function useSiteTasks(siteId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
-  const refresh = () => queryClient.invalidateQueries({ queryKey: getListSiteTasksQueryKey(toValue(siteId)) })
+  const refresh = () => refreshTaskViews(queryClient, toValue(siteId))
   const list = useListSiteTasks(siteId)
   const create = useCreateTask({ mutation: { onSuccess: refresh } })
   const update = useUpdateTask({ mutation: { onSuccess: refresh } })

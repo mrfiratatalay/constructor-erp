@@ -9,8 +9,6 @@ export type DeliveryAction = 'review' | 'redeliver' | null
 /** showMark: şefin eksik cevabında noktalı fotoğraf gösterilir (çalışan eksik olan yeri görsün). */
 export interface DeliveryCard {
   title: string
-  task: string
-  place: string
   lines: string[]
   status: { label: string; tone: StatusTone } | null
   action: DeliveryAction
@@ -25,25 +23,25 @@ const DELIVERY_STATUS: Record<TaskDeliveryView['status'], { label: string; tone:
 
 /**
  * Sohbetteki iş teslimi kartı. Aynı teslime iki mesaj bağlıdır: çalışanın fotoğraflı teslimi ve şefin cevabı.
- * postId hangisinin baloncuğunda olduğunu söyler. Teslim kartı: kim, kaç fotoğraf, durum ve şefte "İNCELE".
- * Cevap kartı: onaylandıysa "Tamamlandı" ve onaylayan; eksik varsa not ve çalışanda "İş Teslim Et".
+ * postId hangisinin baloncuğunda olduğunu söyler. Teslim: "✅ İŞ TESLİM EDİLDİ", iş, 👤 kim, 📷 kaç fotoğraf,
+ * durum ve şefte "İNCELE". Cevap: "✅ TAMAMLANDI" ve onaylayan ya da "❌ İŞ TAMAMLANMADI", eksik notu, yeri ve
+ * noktalı fotoğraf; işin sorumlusunda "İşi Teslim Et".
  */
 export function deliveryCard(view: TaskDeliveryView, postId: string): DeliveryCard {
-  const base = { task: taskName(view.taskTitle), place: `📍 ${view.siteName}`, showMark: false }
+  const task = taskName(view.taskTitle)
   if (postId === view.postId) {
     return {
-      ...base,
-      title: '✅ İş teslim edildi',
-      lines: [`👤 ${view.deliveredBy.fullName}`, `📷 ${view.photos.length} fotoğraf`],
+      title: '✅ İŞ TESLİM EDİLDİ',
+      lines: [task, `👤 ${view.deliveredBy.fullName}`, `📷 ${view.photos.length} fotoğraf`],
       status: DELIVERY_STATUS[view.status],
       action: view.canReview ? 'review' : null,
+      showMark: false,
     }
   }
   if (view.status === 'RETURNED') {
     return {
-      ...base,
-      title: '❌ İş tamamlanmadı',
-      lines: [`Eksik: ${view.missingNote ?? ''}`],
+      title: '❌ İŞ TAMAMLANMADI',
+      lines: [`Eksik: ${view.missingNote ?? ''}`, `📍 ${view.siteName} · ${task}`],
       status: null,
       action: view.canRedeliver ? 'redeliver' : null,
       showMark: !!view.mark,
@@ -51,7 +49,7 @@ export function deliveryCard(view: TaskDeliveryView, postId: string): DeliveryCa
   }
   const reviewer = view.reviewedBy ? `Onaylayan: ${view.reviewedBy.fullName}` : ''
   const at = view.reviewedAt ? ` · ${dateTime(view.reviewedAt)}` : ''
-  return { ...base, title: '✅ Tamamlandı', lines: [reviewer + at], status: null, action: null }
+  return { title: '✅ TAMAMLANDI', lines: [task, reviewer + at], status: null, action: null, showMark: false }
 }
 
 /** Eksik gösterilen fotoğraf: şefin noktayı koyduğu fotoğraf; nokta yoksa gösterilmez. */

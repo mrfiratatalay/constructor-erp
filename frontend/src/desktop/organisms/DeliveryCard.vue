@@ -37,7 +37,6 @@ const onSendBack = (request: ReturnDeliveryRequest) => review(() => returnWith(r
   <el-space v-if="card && view" direction="vertical" alignment="flex-start" :size="4" class="delivery-card"
     data-testid="delivery-card">
     <el-text tag="b" size="large">{{ card.title }}</el-text>
-    <el-text>{{ card.place }} · {{ card.task }}</el-text>
     <el-text v-for="line in card.lines" :key="line" type="info">{{ line }}</el-text>
     <MarkablePhoto v-if="card.showMark && marked?.url" :src="marked.thumbnailUrl ?? marked.url"
       :mark="view.mark ? { x: view.mark.x, y: view.mark.y } : null" class="delivery-card__mark" />

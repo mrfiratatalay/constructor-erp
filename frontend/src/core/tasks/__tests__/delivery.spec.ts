@@ -62,10 +62,8 @@ describe('teslim edilebilir işler', () => {
 describe('sohbetteki teslim kartı', () => {
   it('teslim mesajında: kim, kaç fotoğraf, durum; şefte İNCELE', () => {
     expect(deliveryCard(delivery({ canReview: true }), 'teslim')).toEqual({
-      title: '✅ İş teslim edildi',
-      task: '⚡ 3. Kat Elektrik',
-      place: '📍 B Blok',
-      lines: ['👤 Ali Usta', '📷 2 fotoğraf'],
+      title: '✅ İŞ TESLİM EDİLDİ',
+      lines: ['⚡ 3. Kat Elektrik', '👤 Ali Usta', '📷 2 fotoğraf'],
       status: { label: 'Kontrol bekliyor', tone: 'warning' },
       action: 'review',
       showMark: false,
@@ -80,8 +78,8 @@ describe('sohbetteki teslim kartı', () => {
       mark: { mediaId: 'p1', x: 0.5, y: 0.5 },
     })
     expect(deliveryCard(returned, 'cevap')).toMatchObject({
-      title: '❌ İş tamamlanmadı',
-      lines: ['Eksik: Kablo bağlantısı'],
+      title: '❌ İŞ TAMAMLANMADI',
+      lines: ['Eksik: Kablo bağlantısı', '📍 B Blok · ⚡ 3. Kat Elektrik'],
       action: 'redeliver',
       showMark: true,
     })
@@ -94,8 +92,8 @@ describe('sohbetteki teslim kartı', () => {
       reviewedAt: '2026-09-28T14:20:00',
     })
     expect(deliveryCard(approved, 'cevap')).toMatchObject({
-      title: '✅ Tamamlandı',
-      lines: ['Onaylayan: Mehmet Şef · 28 Eylül 14:20'],
+      title: '✅ TAMAMLANDI',
+      lines: ['⚡ 3. Kat Elektrik', 'Onaylayan: Mehmet Şef · 28 Eylül 14:20'],
       action: null,
     })
   })

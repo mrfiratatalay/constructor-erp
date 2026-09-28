@@ -36,7 +36,6 @@ const onSendBack = (request: ReturnDeliveryRequest) => review(() => returnWith(r
 <template>
   <van-space v-if="card && view" direction="vertical" :size="4" class="delivery-card" data-testid="delivery-card">
     <strong>{{ card.title }}</strong>
-    <span>{{ card.place }} · {{ card.task }}</span>
     <span v-for="line in card.lines" :key="line" class="delivery-card__line">{{ line }}</span>
     <MarkablePhoto v-if="card.showMark && marked?.url" :src="marked.thumbnailUrl ?? marked.url"
       :mark="view.mark ? { x: view.mark.x, y: view.mark.y } : null" />
