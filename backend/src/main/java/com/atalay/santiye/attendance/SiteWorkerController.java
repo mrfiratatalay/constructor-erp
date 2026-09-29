@@ -1,5 +1,7 @@
 package com.atalay.santiye.attendance;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.attendance.dto.CreateWorkerRequest;
 import com.atalay.santiye.attendance.dto.WorkerView;
 import com.atalay.santiye.auth.CurrentUser;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Personel şantiyeye aittir: şantiyenin altında listelenir ve eklenir. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @Tag(name = "Attendance")
 public class SiteWorkerController {

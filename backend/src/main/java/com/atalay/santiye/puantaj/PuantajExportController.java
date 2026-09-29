@@ -1,5 +1,7 @@
 package com.atalay.santiye.puantaj;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Ayın puantajı Excel olarak; tarayıcı doğrudan indirir ("puantaj-2026-09.xlsx"). Yalnızca patron: ay sonu hesabı
  * onun işidir. Oturum çerezle gider: arayüz bu adrese düz bir bağlantıyla gider, ayrıca istemci kodu gerekmez.
  */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @PreAuthorize("hasRole('OWNER')")
 @Tag(name = "Puantaj")

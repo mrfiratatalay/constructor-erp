@@ -1,5 +1,7 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.billing.WorkspaceAccess;
+import com.atalay.santiye.billing.WorkspaceStatus;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,13 +22,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 class SessionAuthenticationFilter extends OncePerRequestFilter {
 
     static final String WORKSPACE = "WORKSPACE";
+    private static final String FEATURE = "FEATURE_";
 
     private final SessionService sessions;
     private final SessionCookies cookies;
+    private final WorkspaceAccess access;
 
-    SessionAuthenticationFilter(SessionService sessions, SessionCookies cookies) {
+    SessionAuthenticationFilter(SessionService sessions, SessionCookies cookies, WorkspaceAccess access) {
         this.sessions = sessions;
         this.cookies = cookies;
+        this.access = access;
     }
 
     @Override
@@ -37,8 +42,9 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Yetkiler: firmadaki rol (hasRole), rolün açtığı işler (hasAuthority, bkz. Permission), firma çalışma alanına
-     * giriş (WORKSPACE) ve platform rolü (ROLE_SUPER_ADMIN). Firma uçları WORKSPACE ister (SecurityConfig).
+     * Yetkiler: firmadaki rol (hasRole), rolün açtığı işler (hasAuthority, bkz. Permission), platform rolü
+     * (ROLE_SUPER_ADMIN). Firmanın çalışma alanı açıksa (firma aktif, abonelik geçerli) WORKSPACE ve paketin açtığı
+     * modüller (FEATURE_…) de eklenir; firma uçları WORKSPACE ister (SecurityConfig).
      */
     private void signIn(CurrentUser user) {
         List<SimpleGrantedAuthority> authorities = authoritiesOf(user).map(SimpleGrantedAuthority::new).toList();
@@ -48,13 +54,16 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
     }
 
-    private static Stream<String> authoritiesOf(CurrentUser user) {
+    private Stream<String> authoritiesOf(CurrentUser user) {
         Stream<String> platform = user.platformAdmin() ? Stream.of("ROLE_SUPER_ADMIN") : Stream.empty();
         if (!user.hasWorkspace()) {
             return platform;
         }
-        Stream<String> workspace = Stream.concat(Stream.of(WORKSPACE, "ROLE_" + user.role().name()),
+        Stream<String> role = Stream.concat(Stream.of("ROLE_" + user.role().name()),
             Permission.grantedTo(user.role()).stream().map(Permission::name));
-        return Stream.concat(platform, workspace);
+        WorkspaceStatus status = access.statusOf(user.companyId());
+        Stream<String> open = status.open()
+            ? Stream.concat(Stream.of(WORKSPACE), status.features().stream().map(FEATURE::concat)) : Stream.empty();
+        return Stream.concat(platform, Stream.concat(role, open));
     }
 }

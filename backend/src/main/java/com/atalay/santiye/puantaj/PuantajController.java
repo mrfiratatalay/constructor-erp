@@ -1,5 +1,7 @@
 package com.atalay.santiye.puantaj;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.puantaj.dto.BulkMarkRequest;
 import com.atalay.santiye.puantaj.dto.DayMarkView;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Yoklama (TASARIM.md "Yoklama"): firmanın puantajı. Yalnızca patron ve şef; çalışan bu menüyü görmez. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @RequestMapping("/puantaj")
 @PreAuthorize("hasAnyRole('OWNER', 'SITE_LEAD')")

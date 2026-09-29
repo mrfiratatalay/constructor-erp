@@ -1,5 +1,7 @@
 package com.atalay.santiye.material;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.annotation.Nullable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * gider (puantaj dökümü gibi), bu yüzden üretilen istemcide yer almaz.
  */
 @Hidden
+@RequiresFeature(Features.MATERIALS)
 @RestController
 class MaterialReportController {
 

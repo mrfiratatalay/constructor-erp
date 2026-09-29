@@ -1,5 +1,7 @@
 package com.atalay.santiye.production;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.production.dto.ProductionEntryForm;
 import com.atalay.santiye.production.dto.ProductionEntryView;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** İmalata veriyi yalnızca şantiye şefi girer: imalat açar, düzeltir, siler ve günlük girişleri yapar. */
+@RequiresFeature(Features.PRODUCTION)
 @RestController
 @PreAuthorize("hasAuthority('MANAGE_PRODUCTION')")
 @Tag(name = "Production")

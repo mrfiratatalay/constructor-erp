@@ -4,6 +4,7 @@ import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.auth.InviteLink;
 import com.atalay.santiye.auth.InviteService;
 import com.atalay.santiye.auth.SessionService;
+import com.atalay.santiye.billing.PlanLimits;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.site.SiteEventKind;
 import com.atalay.santiye.site.SiteEvents;
@@ -36,16 +37,18 @@ public class TeamService {
     private final InviteService invites;
     private final SessionService sessions;
     private final SiteEvents events;
+    private final PlanLimits limits;
     private final Clock clock;
 
     TeamService(UserRepository users, MembershipRepository memberships, Members members, InviteService invites,
-        SessionService sessions, SiteEvents events, Clock clock) {
+        SessionService sessions, SiteEvents events, PlanLimits limits, Clock clock) {
         this.users = users;
         this.memberships = memberships;
         this.members = members;
         this.invites = invites;
         this.sessions = sessions;
         this.events = events;
+        this.limits = limits;
         this.clock = clock;
     }
 
@@ -64,6 +67,7 @@ public class TeamService {
         if (holder.filter(Member::isActive).isPresent()) {
             throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
         }
+        limits.requireSeat(companyId);
         AppUser person = holder.map(Member::user).orElseGet(() -> new AppUser("", clock.instant()));
         person.updateProfile(PersonNames.tidy(fullName), checked);
         users.save(person);
@@ -83,13 +87,7 @@ public class TeamService {
     @Transactional
     public MemberView updateMember(CurrentUser owner, UUID memberId, UpdateMemberRequest request) {
         Member member = findMember(owner, memberId);
-        if (member.getId().equals(owner.userId()) && (!request.active() || request.role() != member.getRole())) {
-            throw ApiException.badRequest("Kendini firmadan çıkaramaz ya da kendi rolünü değiştiremezsin.");
-        }
-        String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
-        if (phone != null) {
-            holderOf(owner.companyId(), phone, memberId).ifPresent(TeamService::rejectTaken);
-        }
+        String phone = checkedChange(owner, member, request);
         boolean leaving = member.isActive() && !request.active();
         member.user().updateProfile(PersonNames.tidy(request.fullName()), phone);
         member.membership().changeRole(request.role());
@@ -100,6 +98,23 @@ public class TeamService {
         }
         return new MemberView(member.getId(), member.getFullName(), member.getPhone(), member.getRole(),
             member.isActive());
+    }
+
+    /**
+     * Değişiklik geçerli mi; geçerliyse yazılacak numarayı döner. Geri alınan kişi paketin kullanıcı sınırına sayılır.
+     */
+    private String checkedChange(CurrentUser owner, Member member, UpdateMemberRequest request) {
+        if (member.getId().equals(owner.userId()) && (!request.active() || request.role() != member.getRole())) {
+            throw ApiException.badRequest("Kendini firmadan çıkaramaz ya da kendi rolünü değiştiremezsin.");
+        }
+        String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
+        if (phone != null) {
+            holderOf(owner.companyId(), phone, member.getId()).ifPresent(TeamService::rejectTaken);
+        }
+        if (!member.isActive() && request.active()) {
+            limits.requireSeat(owner.companyId());
+        }
+        return phone;
     }
 
     @Transactional

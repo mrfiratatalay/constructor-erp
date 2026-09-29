@@ -1,5 +1,7 @@
 package com.atalay.santiye.puantaj;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.puantaj.dto.MyPuantajView;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Puantajım: oturumu açık kişinin kendi ayı. Herkes yalnızca kendini görür; başkasının kaydı buradan gelmez. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @Tag(name = "Puantaj")
 public class MyPuantajController {

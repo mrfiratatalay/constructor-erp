@@ -1,5 +1,7 @@
 package com.atalay.santiye.attendance;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.attendance.dto.SiteAttendanceMonth;
 import com.atalay.santiye.attendance.dto.SiteAttendanceOverview;
 import com.atalay.santiye.attendance.dto.WorkerAttendanceMonth;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Yoklama geçmişi: ana sayfa, şantiyenin ayı, personelin ayı. Ay "2026-09" biçimindedir. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @Tag(name = "Attendance")
 public class AttendanceHistoryController {

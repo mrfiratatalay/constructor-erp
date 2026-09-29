@@ -1,5 +1,7 @@
 package com.atalay.santiye.material;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.material.dto.MaterialRequest;
 import com.atalay.santiye.material.dto.MaterialView;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Malzeme kartları: listelemek herkese (malzemeyi gören), eklemek ve düzeltmek katalog yetkisine. */
+@RequiresFeature(Features.MATERIALS)
 @RestController
 @RequestMapping("/materials")
 @Tag(name = "Materials")

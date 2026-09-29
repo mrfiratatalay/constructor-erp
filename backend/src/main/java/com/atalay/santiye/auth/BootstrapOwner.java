@@ -1,5 +1,6 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.billing.SubscriptionService;
 import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
 import com.atalay.santiye.company.CompanySlugs;
@@ -17,27 +18,32 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Boş bir veritabanında ilk firmayı ve patronu oluşturur; veri varsa hiçbir şeye dokunmaz. */
+/** Boş bir veritabanında ilk firmayı, patronunu ve aboneliğini oluşturur; veri varsa hiçbir şeye dokunmaz. */
 @Component
 class BootstrapOwner implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(BootstrapOwner.class);
+    /** Kendi sunucusuna kuran (ya da geliştiren) kişi ilk yıl kilitle uğraşmasın. */
+    private static final int BOOTSTRAP_MONTHS = 12;
 
     private final BootstrapProperties properties;
     private final CompanyRepository companies;
     private final CompanySlugs slugs;
     private final UserRepository users;
     private final MembershipRepository memberships;
+    private final SubscriptionService subscriptions;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
 
     BootstrapOwner(BootstrapProperties properties, CompanyRepository companies, CompanySlugs slugs,
-        UserRepository users, MembershipRepository memberships, PasswordEncoder passwordEncoder, Clock clock) {
+        UserRepository users, MembershipRepository memberships, SubscriptionService subscriptions,
+        PasswordEncoder passwordEncoder, Clock clock) {
         this.properties = properties;
         this.companies = companies;
         this.slugs = slugs;
         this.users = users;
         this.memberships = memberships;
+        this.subscriptions = subscriptions;
         this.passwordEncoder = passwordEncoder;
         this.clock = clock;
     }
@@ -54,6 +60,7 @@ class BootstrapOwner implements ApplicationRunner {
         owner.setPasswordLogin(properties.ownerEmail(), passwordEncoder.encode(properties.ownerPassword()));
         users.save(owner);
         memberships.save(new Membership(company.getId(), owner.getId(), UserRole.OWNER, clock.instant()));
+        subscriptions.startOnDefaultPlan(company.getId(), BOOTSTRAP_MONTHS, "İlk kurulum");
         log.info("İlk yönetici oluşturuldu: {}", properties.ownerEmail());
     }
 }

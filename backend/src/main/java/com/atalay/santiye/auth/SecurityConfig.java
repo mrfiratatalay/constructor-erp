@@ -1,5 +1,6 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.billing.WorkspaceAccess;
 import com.atalay.santiye.tenant.TenantContextFilter;
 import jakarta.servlet.DispatcherType;
 import java.util.UUID;
@@ -27,8 +28,8 @@ public class SecurityConfig {
     };
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, SessionService sessions, SessionCookies cookies)
-        throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, SessionService sessions, SessionCookies cookies,
+        WorkspaceAccess access) throws Exception {
         return http
             // CSRF token'ı yerine SameSite=Strict çerez kullanıyoruz (bkz. SessionCookies).
             .csrf(AbstractHttpConfigurer::disable)
@@ -37,7 +38,9 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
-            .exceptionHandling(errors -> errors.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .exceptionHandling(errors -> errors
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .accessDeniedHandler(new WorkspaceDeniedHandler(access)))
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(PUBLIC_PATHS).permitAll()
@@ -49,7 +52,7 @@ public class SecurityConfig {
                 // gelir (MIMARI-SAAS.md Bölüm 6).
                 .requestMatchers("/api/**").hasAuthority(SessionAuthenticationFilter.WORKSPACE)
                 .anyRequest().denyAll())
-            .addFilterBefore(new SessionAuthenticationFilter(sessions, cookies), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new SessionAuthenticationFilter(sessions, cookies, access), UsernamePasswordAuthenticationFilter.class)
             // Firma bağlamı (RLS) kimlik doğrulandıktan sonra, yalnızca oturumdan kurulur.
             .addFilterAfter(new TenantContextFilter(SecurityConfig::companyOf), SessionAuthenticationFilter.class)
             .build();
