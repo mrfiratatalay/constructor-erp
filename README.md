@@ -13,6 +13,7 @@ katman kuralları oradadır ve otomatik denetlenir.
 | `frontend/` | Vue 3, TypeScript, Vite. Mobil: Vant, masaüstü: Element Plus |
 | `backend/` | Java 25, Spring Boot 4, PostgreSQL 18, Flyway |
 | `docker/`, `docker-compose.yml`, `scripts/` | Kurulum: veritabanı, backend, arayüz |
+| `marketing/video/` | Reklam videoları: uygulamanın gerçek ekranları, Remotion ile ([plan](marketing/video/PLAN.md)) |
 
 ## Çalıştırma — her şey Docker'da
 

@@ -1,0 +1,61 @@
+# Reklam videoları
+
+Uygulamanın gerçek ekranlarından, tamamen kodla üretilen reklam videoları. Neyin neden böyle yapıldığı:
+**[PLAN.md](PLAN.md)**.
+
+| Klasör | Ne |
+|---|---|
+| `demo-data/` | Boş bir veritabanına hayali firmayı ("Toprak Yapı") API'den kuran betikler |
+| `capture/` | Playwright: uygulamayı senaryodaki gibi kullanır, her adımın ekranını çeker |
+| `public/captures/` | Çekilen ekranlar (telefon 3x, masaüstü 2x) |
+| `src/captures/` | Çekimin defteri: hangi resim, nereye dokunuldu, neresi kaydırıldı |
+| `src/kit/` | Parça seti: telefon, laptop, parmak, imleç, kamera, sözler, kapanış. Bütün videolar ortak kullanır. |
+| `src/yoklama/` | Yoklama videosu; `timeline.ts` bütün zamanlamayı tutar |
+
+Bu klasör ürün kodu değildir: frontend'in ESLint'i ve backend'in Checkstyle'ı buraya bakmaz. ANAYASA'nın boyut ve
+isim kurallarına yine de uyulur.
+
+## Yalnızca videoyu yeniden üretmek
+
+Çekimler repoda durur; uygulamayı çalıştırmak gerekmez.
+
+```bash
+cd marketing/video
+npm install
+npm run studio          # tarayıcıda önizleme: zaman çizelgesi, kare kare ileri geri
+npm run render:yoklama  # out/yoklama.mp4 (1920×1080, 30 kare/sn)
+```
+
+Metni ya da zamanlamayı değiştirmek için `src/yoklama/timeline.ts`, kamerayı değiştirmek için `camera.ts`.
+
+## Ekranları yeniden çekmek (uygulama değiştiyse)
+
+Uygulama ayrı bir veritabanıyla (`santiye_demo`) çalışır: geliştirme verine dokunulmaz.
+
+```bash
+docker compose up -d                          # repo kökünde: yalnızca PostgreSQL
+marketing/video/demo-data/backend.sh          # backend, demo veritabanıyla (8080)
+cd frontend && npm run dev                    # arayüz (5173), ayrı bir terminalde
+cd marketing/video
+npm run seed                                  # firma, kişiler, şantiyeler, ayın puantajı
+npm run capture:yoklama                       # ekranlar ve defter yenilenir
+```
+
+- Puantaj ayın başından düne kadar doldurulur: çekim ayın sonuna doğru yapılırsa cetvel dolu görünür.
+- Çekim her seferinde bugünün işaretlerini siler ve aynı sabahtan başlar; tekrar tekrar çalıştırılabilir.
+- Demo dünyasını baştan kurmak: backend'i durdur, `demo-data/reset.sh`, sonra yeniden `backend.sh` ve `npm run seed`.
+- Kişilerin ve şantiyelerin adları `demo-data/world.mjs`'tedir.
+
+## Bulut ortamında
+
+Tarayıcılar önceden kurulu olduğunda indirme yerine onlar kullanılır:
+
+```bash
+PLAYWRIGHT_CHROMIUM=/opt/pw-browsers/chromium npm run capture:yoklama
+npm run render:yoklama -- --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+```
+
+## Lisans
+
+Remotion bireylere ve en çok 3 çalışanı olan şirketlere ücretsizdir; daha büyük şirket ücretli lisans alır.
+Yayından önce güncel koşullar: https://www.remotion.dev/license

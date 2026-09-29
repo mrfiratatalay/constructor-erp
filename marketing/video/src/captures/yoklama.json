@@ -1,0 +1,303 @@
+{
+  "phone-start": {
+    "src": "captures/yoklama/phone-start.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-header": {
+    "box": {
+      "x": 0,
+      "y": 46,
+      "width": 393,
+      "height": 44
+    }
+  },
+  "phone-tabbar": {
+    "box": {
+      "x": 0,
+      "y": 714,
+      "width": 393,
+      "height": 50
+    }
+  },
+  "phone-tap-row": {
+    "box": {
+      "x": 16,
+      "y": 534,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-sheet": {
+    "src": "captures/yoklama/phone-sheet.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-sheet-layer": {
+    "src": "captures/yoklama/phone-sheet-layer.png",
+    "box": {
+      "x": 0,
+      "y": 406,
+      "width": 393,
+      "height": 358
+    }
+  },
+  "phone-tap-absent": {
+    "box": {
+      "x": 16,
+      "y": 592,
+      "width": 175.5,
+      "height": 54
+    }
+  },
+  "phone-one-marked": {
+    "src": "captures/yoklama/phone-one-marked.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-select": {
+    "box": {
+      "x": 292.7,
+      "y": 7,
+      "width": 40.3,
+      "height": 32
+    }
+  },
+  "phone-select-mode": {
+    "src": "captures/yoklama/phone-select-mode.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-bulkbar": {
+    "box": {
+      "x": 0,
+      "y": 676,
+      "width": 393,
+      "height": 88
+    }
+  },
+  "phone-select-list": {
+    "src": "captures/yoklama/phone-select-list.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-strip-select": {
+    "src": "captures/yoklama/phone-strip-select.png",
+    "width": 393,
+    "height": 1968
+  },
+  "phone-tap-pick-1": {
+    "box": {
+      "x": 16,
+      "y": 128,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-1": {
+    "src": "captures/yoklama/phone-picked-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-tap-pick-2": {
+    "box": {
+      "x": 16,
+      "y": 276,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-2": {
+    "src": "captures/yoklama/phone-picked-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-tap-pick-3": {
+    "box": {
+      "x": 16,
+      "y": 350,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-3": {
+    "src": "captures/yoklama/phone-picked-3.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-tap-pick-4": {
+    "box": {
+      "x": 16,
+      "y": 424,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-4": {
+    "src": "captures/yoklama/phone-picked-4.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-tap-pick-5": {
+    "box": {
+      "x": 16,
+      "y": 498,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-5": {
+    "src": "captures/yoklama/phone-picked-5.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-tap-pick-6": {
+    "box": {
+      "x": 16,
+      "y": 572,
+      "width": 361,
+      "height": 74
+    }
+  },
+  "phone-picked-6": {
+    "src": "captures/yoklama/phone-picked-6.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 332
+  },
+  "phone-picked-all": {
+    "src": "captures/yoklama/phone-picked-all.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 1204
+  },
+  "phone-strip-picked": {
+    "src": "captures/yoklama/phone-strip-picked.png",
+    "width": 393,
+    "height": 1968
+  },
+  "phone-tap-present": {
+    "box": {
+      "x": 16,
+      "y": 718,
+      "width": 175.5,
+      "height": 32
+    }
+  },
+  "phone-marked-bottom": {
+    "src": "captures/yoklama/phone-marked-bottom.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 1203
+  },
+  "phone-done": {
+    "src": "captures/yoklama/phone-done.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-ring": {
+    "box": {
+      "x": 301,
+      "y": 120,
+      "width": 60,
+      "height": 60
+    }
+  },
+  "phone-strip-done": {
+    "src": "captures/yoklama/phone-strip-done.png",
+    "width": 393,
+    "height": 1968
+  },
+  "desk-today": {
+    "src": "captures/yoklama/desk-today.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-summary": {
+    "box": {
+      "x": 276,
+      "y": 159.2,
+      "width": 380.7,
+      "height": 133.3
+    }
+  },
+  "desk-tap-puantaj": {
+    "box": {
+      "x": 342.4,
+      "y": 105.2,
+      "width": 73.7,
+      "height": 40
+    }
+  },
+  "desk-month": {
+    "src": "captures/yoklama/desk-month.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-days": {
+    "box": {
+      "x": 517,
+      "y": 356.1875,
+      "width": 912,
+      "height": 882
+    }
+  },
+  "desk-tap-cell": {
+    "box": {
+      "x": 823,
+      "y": 608.2,
+      "width": 46,
+      "height": 63
+    }
+  },
+  "desk-drawer": {
+    "src": "captures/yoklama/desk-drawer.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-drawer-layer": {
+    "src": "captures/yoklama/desk-drawer-layer.png",
+    "box": {
+      "x": 570,
+      "y": 0,
+      "width": 900,
+      "height": 920
+    }
+  },
+  "desk-day-header": {
+    "box": {
+      "x": 1247.7,
+      "y": 269.1,
+      "width": 181.3,
+      "height": 18
+    }
+  },
+  "desk-tap-excel": {
+    "box": {
+      "x": 1325.9,
+      "y": 159.2,
+      "width": 124.1,
+      "height": 32
+    }
+  },
+  "desk-excel": {
+    "src": "captures/yoklama/desk-excel.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  }
+}

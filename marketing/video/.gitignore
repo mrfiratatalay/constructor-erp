@@ -1,0 +1,4 @@
+node_modules/
+out/
+demo-data/.ids.json
+demo-data/.media/
