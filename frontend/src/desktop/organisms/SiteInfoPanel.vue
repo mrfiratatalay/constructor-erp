@@ -26,7 +26,7 @@ const router = useRouter()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
 const library = useSiteLibrary(() => site.id)
-const { open: openTasks } = useSiteTasks(() => site.id)
+const { open: openTasks, available: hasTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const showingLibrary = ref(false)
 const participants = computed(() => siteParticipants(site, user.value))
@@ -67,7 +67,8 @@ const save = (form: SiteForm) =>
           <img v-for="item in library.strip.value.slice(0, 4)" :key="item.id" :src="item.thumbnailUrl ?? ''" alt=""
             @click="showingLibrary = true" />
         </div>
-        <button type="button" class="info-panel__row" @click="router.push({ name: 'siteTasks', params: { siteId: site.id } })">
+        <button v-if="hasTasks" type="button" class="info-panel__row"
+          @click="router.push({ name: 'siteTasks', params: { siteId: site.id } })">
           <span>Görevler</span><small>{{ openTasks.length ? `${openTasks.length} açık` : '' }} ›</small>
         </button>
         <el-divider content-position="left">Katılımcılar · {{ participants.length }}</el-divider>

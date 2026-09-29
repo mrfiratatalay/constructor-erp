@@ -5,6 +5,7 @@ import { Menu } from 'lucide-vue-next'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import type { RouteName } from '@/core/navigation/routeTable'
 import { useNavMenu } from '@/core/navigation/useNavMenu'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 import { ROLE_LABELS } from '@/core/team/roles'
 import UserPanel from '@/desktop/organisms/UserPanel.vue'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
@@ -20,7 +21,8 @@ const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { open, floating, toggle, closeFloating } = useNavMenu()
-const items = computed<NavItem[]>(() => (user.value ? mainNavItems(user.value, 'desktop') : []))
+const { viewer } = useWorkspace()
+const items = computed<NavItem[]>(() => (viewer.value ? mainNavItems(viewer.value, 'desktop') : []))
 /** Seçili öğe adresten gelir: şantiye sayfası da "Şantiyeler"i yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 

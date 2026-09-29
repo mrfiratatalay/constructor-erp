@@ -7,6 +7,19 @@ const sitesPage = () => import('./pages/SitesPage.vue')
 const attendancePage = () => import('./pages/AttendancePage.vue')
 
 export const routes = buildRoutes({
+  // Aşağıdaki geçici yönlendirmeler sayfaları yazıldıkça gerçek sayfalarla değişir.
+  landing: { redirectTo: 'login' },
+  pricing: { redirectTo: 'login' },
+  apply: { redirectTo: 'login' },
+  setup: { redirectTo: 'login' },
+  company: { redirectTo: 'sites' },
+  workspaceLocked: { redirectTo: 'login' },
+  platformDashboard: { redirectTo: 'login' },
+  platformTenants: { redirectTo: 'login' },
+  platformTenant: { redirectTo: 'login' },
+  platformLeads: { redirectTo: 'login' },
+  platformPlans: { redirectTo: 'login' },
+  platformAudit: { redirectTo: 'login' },
   login: () => import('./pages/LoginPage.vue'),
   invite: () => import('./pages/InviteAcceptPage.vue'),
   join: () => import('./pages/JoinPage.vue'),

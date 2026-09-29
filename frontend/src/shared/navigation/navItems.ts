@@ -1,44 +1,68 @@
 import type { Component } from 'vue'
-import { Boxes, CalendarCheck, ClipboardCheck, HardHat, UserRound } from 'lucide-vue-next'
-import type { CurrentUserResponse } from '@/core/api/generated/model'
-import type { RouteName } from '@/core/navigation/routeTable'
-import { takesRollCall } from '@/core/team/roles'
+import {
+  Boxes,
+  Building2,
+  CalendarCheck,
+  ClipboardCheck,
+  FileClock,
+  HardHat,
+  Inbox,
+  LayoutDashboard,
+  Package,
+  UserRound,
+} from 'lucide-vue-next'
+import { ROUTES, type RouteName } from '@/core/navigation/routeTable'
+import { routeAllows, type WorkspaceViewer } from '@/core/team/roles'
 
 export interface NavItem {
   route: RouteName
   label: string
   icon: Component
+  /** Yalnızca bu kabukta görünür (masaüstünde Hesabım paneldir, telefonda Firma Hesabım'ın içindedir). */
+  only?: 'mobile' | 'desktop'
 }
 
 /**
- * Günlük iş tek yerdedir: şantiyeler (herkes aynı listeyi görür, WhatsApp'ın "Sohbetler"i gibi). Gönderme ayrı
- * bir sekme değildir, şantiyenin içindedir. Ayrı bir Ekip ekranı da yoktur: kişiler şantiyenin içinde eklenir ve
- * yönetilir (WhatsApp'ta grubun katılımcıları gibi). Yoklama firmanın puantajıdır: patron ve şef alır ve görür;
- * çalışan yoklamada sayılır, onun menüsünde yerine Puantajım (kendi ayı) vardır (TASARIM.md "Yoklama"). Malzemeler
- * firmanın stoğudur; menüde rol adına göre değil, malzemeyi görme iznine göre durur.
- * Masaüstünde "Ben" sol menünün altındaki kullanıcı düğmesidir, o yüzden menüde yer almaz.
+ * Firmanın menüsü, tek yerde. Görünürlük öğenin adresinden okunur (rol, izin, paketteki modül; routeTable): menü
+ * ile adres kuralı ayrışamaz, yeni modül yalnızca buraya bir satır ekler. Günlük iş şantiyelerdedir (WhatsApp'ın
+ * "Sohbetler"i gibi); Yoklama patron ve şefin, Puantajım çalışanın, Malzemeler malzemeyi görenin, Firma patronun.
  */
-export function mainNavItems(
-  user: Pick<CurrentUserResponse, 'role' | 'permissions'>,
-  platform: 'mobile' | 'desktop',
-): NavItem[] {
-  const items: NavItem[] = [{ route: 'sites', label: 'Şantiyeler', icon: HardHat }]
-  if (takesRollCall(user.role))
-    items.push({ route: 'attendance', label: 'Yoklama', icon: ClipboardCheck })
-  if (user.role === 'WORKER')
-    items.push({ route: 'myPuantaj', label: 'Puantajım', icon: CalendarCheck })
-  if (user.permissions.includes('VIEW_MATERIALS'))
-    items.push({ route: 'materials', label: 'Malzemeler', icon: Boxes })
-  if (platform === 'mobile') items.push({ route: 'profile', label: 'Ben', icon: UserRound })
-  return items
+const WORKSPACE_ITEMS: readonly NavItem[] = [
+  { route: 'sites', label: 'Şantiyeler', icon: HardHat },
+  { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck },
+  { route: 'myPuantaj', label: 'Puantajım', icon: CalendarCheck },
+  { route: 'materials', label: 'Malzemeler', icon: Boxes },
+  { route: 'company', label: 'Firma', icon: Building2, only: 'desktop' },
+  { route: 'profile', label: 'Ben', icon: UserRound, only: 'mobile' },
+]
+
+export function mainNavItems(user: WorkspaceViewer, platform: 'mobile' | 'desktop'): NavItem[] {
+  return WORKSPACE_ITEMS.filter((item) => !item.only || item.only === platform).filter((item) =>
+    routeAllows(ROUTES[item.route].meta, user),
+  )
+}
+
+/** Platform yönetiminin menüsü (yalnızca süper yönetici). */
+export const PLATFORM_ITEMS: readonly NavItem[] = [
+  { route: 'platformDashboard', label: 'Özet', icon: LayoutDashboard },
+  { route: 'platformTenants', label: 'Firmalar', icon: Building2 },
+  { route: 'platformLeads', label: 'Başvurular', icon: Inbox },
+  { route: 'platformPlans', label: 'Paketler', icon: Package, only: 'desktop' },
+  { route: 'platformAudit', label: 'İşlem geçmişi', icon: FileClock, only: 'desktop' },
+]
+
+export function platformNavItems(platform: 'mobile' | 'desktop'): NavItem[] {
+  return PLATFORM_ITEMS.filter((item) => !item.only || item.only === platform)
 }
 
 /** Alt sayfalar kendi sekmesini yakar: şantiye sayfasındayken "Şantiyeler" seçili görünür. */
 const PARENT_ROUTE: Partial<Record<RouteName, RouteName>> = {
   siteFeed: 'sites',
   siteField: 'sites',
+  siteProduction: 'sites',
   siteTasks: 'sites',
   memberAttendance: 'attendance',
+  platformTenant: 'platformTenants',
 }
 
 export function navRouteOf(route: RouteName): RouteName {

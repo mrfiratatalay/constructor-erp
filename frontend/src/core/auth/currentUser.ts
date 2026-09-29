@@ -1,26 +1,30 @@
-import { useQuery, type QueryClient } from '@tanstack/vue-query'
-import { isUnauthorized } from '@/core/api/errors'
-import { getCurrentUser, getGetCurrentUserQueryKey } from '@/core/api/generated/auth/auth'
-import type { CurrentUserResponse } from '@/core/api/generated/model'
+import { computed } from 'vue'
+import type { QueryClient } from '@tanstack/vue-query'
+import type { CurrentUserResponse, SessionContextView } from '@/core/api/generated/model'
+import { loadSessionContext, useSessionContext } from '@/core/auth/sessionContext'
 
-/** Tek tanım: route guard (bileşen dışı) ve bileşenler aynı sorguyu, aynı önbelleği kullanır. */
-const currentUserQuery = {
-  queryKey: getGetCurrentUserQueryKey(),
-  queryFn: ({ signal }: { signal: AbortSignal }) => getCurrentUser(undefined, signal),
-  staleTime: 60_000,
-}
-
-/** Oturum yoksa null döner. Route guard her sayfa geçişinde çağırır; bir dakika önbellekten gelir. */
-export async function loadCurrentUser(queryClient: QueryClient): Promise<CurrentUserResponse | null> {
-  try {
-    return await queryClient.fetchQuery(currentUserQuery)
-  } catch (error) {
-    if (isUnauthorized(error)) return null
-    throw error
+/**
+ * Çalışma alanındaki kişi, oturum bağlamından: rolü, izinleri (paketin açtığı modüllerle kesişmiş) ve firmanın adı.
+ * Firmasız hesapta (platform yöneticisi) boştur. Ekranlar rol ve izni hep buradan okur.
+ */
+export function workspaceUserOf(context: SessionContextView | null | undefined): CurrentUserResponse | undefined {
+  const workspace = context?.workspace
+  if (!context || !workspace) return undefined
+  return {
+    id: context.user.id,
+    fullName: context.user.fullName,
+    role: workspace.role,
+    companyName: workspace.name,
+    permissions: workspace.permissions,
   }
 }
 
-/** Bileşenler için: guard zaten yüklediği için çoğunlukla önbellekten anında gelir. */
+export async function loadCurrentUser(queryClient: QueryClient): Promise<CurrentUserResponse | null> {
+  return workspaceUserOf(await loadSessionContext(queryClient)) ?? null
+}
+
+/** Bileşenler için: guard bağlamı zaten yüklediği için çoğunlukla önbellekten anında gelir. */
 export function useCurrentUser() {
-  return useQuery(currentUserQuery)
+  const { data } = useSessionContext()
+  return { data: computed(() => workspaceUserOf(data.value)) }
 }

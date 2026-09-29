@@ -9,6 +9,7 @@ import {
 } from '@/core/api/generated/tasks/tasks'
 import type { TaskView, TaskViewPriority, TaskViewStatus } from '@/core/api/generated/model'
 import { doneTasks, openTasks } from '@/core/tasks/taskOrder'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 
 /** Görev formunun alanları; açarken ve düzenlerken aynıdır. dueDate "YYYY-MM-DD". */
 export interface TaskForm {
@@ -24,11 +25,16 @@ export function formOf(task: TaskView): TaskForm {
   return { title, note, assigneeId: assignee?.id ?? null, dueDate, priority }
 }
 
-/** Bir şantiyenin görevleri ve bütün işleri; kabuklar yalnızca görüntüler. Her değişiklikten sonra liste yenilenir. */
+/**
+ * Bir şantiyenin görevleri ve bütün işleri; kabuklar yalnızca görüntüler. Her değişiklikten sonra liste yenilenir.
+ * Görevler modülü firmanın paketinde yoksa liste hiç istenmez (available: false; ekranlar girişini gizler).
+ */
 export function useSiteTasks(siteId: MaybeRefOrGetter<string>) {
   const queryClient = useQueryClient()
+  const { hasFeature } = useWorkspace()
+  const available = computed(() => hasFeature('tasks'))
   const refresh = () => queryClient.invalidateQueries({ queryKey: getListSiteTasksQueryKey(toValue(siteId)) })
-  const list = useListSiteTasks(siteId)
+  const list = useListSiteTasks(siteId, { query: { enabled: available } })
   const create = useCreateTask({ mutation: { onSuccess: refresh } })
   const update = useUpdateTask({ mutation: { onSuccess: refresh } })
   const remove = useDeleteTask({ mutation: { onSuccess: refresh } })
@@ -43,6 +49,7 @@ export function useSiteTasks(siteId: MaybeRefOrGetter<string>) {
   const deleteTask = (task: TaskView) => remove.mutateAsync({ taskId: task.id })
 
   return {
+    available,
     open: computed(() => openTasks(list.data.value ?? [])),
     done: computed(() => doneTasks(list.data.value ?? [])),
     isLoading: list.isPending,

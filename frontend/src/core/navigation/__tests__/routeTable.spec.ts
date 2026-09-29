@@ -4,7 +4,11 @@ import { buildRoutes, ROUTES, type PageSet } from '@/core/navigation/routeTable'
 const page = () => Promise.resolve({ render: () => null })
 // Açık liste: yeni bir adres eklenince derleyici bu testi de güncellemeye zorlar.
 const PAGES: PageSet = {
+  landing: page,
+  pricing: page,
+  apply: page,
   login: page,
+  setup: page,
   invite: page,
   join: page,
   sites: page,
@@ -16,7 +20,15 @@ const PAGES: PageSet = {
   memberAttendance: page,
   myPuantaj: page,
   materials: page,
+  company: page,
   profile: page,
+  workspaceLocked: page,
+  platformDashboard: page,
+  platformTenants: page,
+  platformTenant: page,
+  platformLeads: page,
+  platformPlans: page,
+  platformAudit: page,
 }
 
 describe('buildRoutes', () => {
