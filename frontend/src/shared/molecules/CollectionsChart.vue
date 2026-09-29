@@ -47,6 +47,8 @@ const heightOf = (amount: number) => `${(amount / ceiling.value) * 100}%`
 <style scoped>
 .chart {
   margin: 0;
+  /* Son ayın tepesindeki tutar etiketi en yüksek sütunda çizim alanının üstüne taşar. */
+  padding-top: var(--space-5);
 }
 
 .chart__plot {
