@@ -49,7 +49,7 @@ export const ROUTES = {
     meta: { permission: 'VIEW_MATERIALS', feature: 'materials', title: 'Malzemeler' },
   },
   // Firmanın kimliği (ad, logo, iletişim) ve aboneliği: patronun.
-  company: { path: '/firma', meta: { ownerOnly: true, title: 'Firma' } },
+  company: { path: '/firma', meta: { ownerOnly: true, detail: true, title: 'Firma' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
   workspaceLocked: { path: '/erisim', meta: { lockedOnly: true, title: 'Erişim kapalı' } },
   // Constructor ERP platform yönetimi (süper yönetici): firmalar, abonelikler, ödemeler, başvurular.
