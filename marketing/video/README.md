@@ -26,10 +26,13 @@ cd marketing/video
 npm install
 npm run studio          # sesleri üretir, tarayıcıda önizleme: zaman çizelgesi, kare kare ileri geri
 npm run render:yoklama  # sesleri üretir, out/yoklama.mp4 (1920×1080, 30 kare/sn, sesli)
+npm run render:malzeme  # out/malzeme.mp4
+npm run render:ekip     # out/ekip.mp4
 ```
 
-Metni ya da zamanlamayı değiştirmek için `src/yoklama/timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve
-yüksekliğini `sounds.ts`, müziği `audio/music.mjs`. Müzik 120 BPM'dir: timeline'daki büyük anlar (120, 480, 840.
+Her video kendi klasöründedir (`src/yoklama/`, `src/malzeme/`, `src/ekip/`). Metni ya da zamanlamayı değiştirmek
+için `timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve yüksekliğini `sounds.ts`; müziğin akorları ve
+melodisi `audio/scores.mjs`'te, sesin kendisi `audio/music.mjs`'tedir. Müzik 120 BPM'dir: timeline'daki büyük anlar (120, 480, 840.
 kare) müziğin düşüşleridir; biri değişirse öteki de değişir.
 
 ## Ekranları yeniden çekmek (uygulama değiştiyse)
@@ -43,10 +46,14 @@ cd frontend && npm run dev                    # arayüz (5173), ayrı bir termin
 cd marketing/video
 npm run seed                                  # firma, kişiler, şantiyeler, ayın puantajı
 npm run capture:yoklama                       # ekranlar ve defter yenilenir
+npm run capture:malzeme
+npm run capture:ekip
 ```
 
 - Puantaj ayın başından düne kadar doldurulur: çekim ayın sonuna doğru yapılırsa cetvel dolu görünür.
-- Çekim her seferinde bugünün işaretlerini siler ve aynı sabahtan başlar; tekrar tekrar çalıştırılabilir.
+- Çekim her seferinde bugün girdiğini siler (yoklamada işaretler, malzemede sevkiyatlar, ekipte yeni usta) ve aynı
+  sabahtan başlar; tekrar tekrar çalıştırılabilir. Gün değiştiyse dünkü çekimden kalanlar silinmez: çekimlerden
+  önce demo dünyası baştan kurulur.
 - Demo dünyasını baştan kurmak: backend'i durdur, `demo-data/reset.sh`, sonra yeniden `backend.sh` ve `npm run seed`.
 - Kişilerin ve şantiyelerin adları `demo-data/world.mjs`'tedir.
 

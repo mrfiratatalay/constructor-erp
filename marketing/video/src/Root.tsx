@@ -1,4 +1,6 @@
 import { Composition } from 'remotion'
+import { Ekip } from './ekip/Ekip'
+import { DURATION as EKIP } from './ekip/timeline'
 import { Malzeme } from './malzeme/Malzeme'
 import { DURATION as MALZEME } from './malzeme/timeline'
 import { STAGE } from './theme'
@@ -12,5 +14,6 @@ export const Root: React.FC = () => (
   <>
     <Composition id="Yoklama" component={Yoklama} durationInFrames={YOKLAMA} {...FORMAT} />
     <Composition id="Malzeme" component={Malzeme} durationInFrames={MALZEME} {...FORMAT} />
+    <Composition id="Ekip" component={Ekip} durationInFrames={EKIP} {...FORMAT} />
   </>
 )

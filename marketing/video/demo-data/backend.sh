@@ -13,8 +13,10 @@ if ! docker compose -f "$repo/docker-compose.yml" exec -T postgres \
 fi
 
 cd "$repo/backend"
-# Firma ve patron world.mjs'teki OWNER ile aynıdır.
+# Firma ve patron world.mjs'teki OWNER ile aynıdır. Katılma bağlantısı videoda ekranda yazar: "localhost" yerine
+# yer tutucu bir adres (.example hiçbir zaman gerçek bir siteye ait olamaz). Uygulamanın gerçek adresi gelince o yazılır.
 DB_URL=jdbc:postgresql://localhost:5432/santiye_demo \
+APP_BASE_URL="${DEMO_BASE_URL:-https://kizilkan.example}" \
 MEDIA_ROOT="$repo/marketing/video/demo-data/.media" \
 APP_BOOTSTRAP_COMPANY_NAME='Kızılkan Yapı' \
 APP_BOOTSTRAP_OWNER_NAME='Patron' \

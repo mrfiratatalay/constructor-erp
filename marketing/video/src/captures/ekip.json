@@ -1,0 +1,234 @@
+{
+  "_day": {
+    "day": "2026-09-30"
+  },
+  "_link": {
+    "link": "https://kizilkan.example/katil/-zVly2430GJYPOkiCLj2hsgT8M7kYCFFZ6T94qsYL9o"
+  },
+  "boss-start": {
+    "src": "captures/ekip/boss-start.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "boss-tap-add": {
+    "box": {
+      "x": 345,
+      "y": 7,
+      "width": 32,
+      "height": 32
+    }
+  },
+  "boss-menu-layer": {
+    "src": "captures/ekip/boss-menu-layer.png",
+    "box": {
+      "x": 0,
+      "y": 578,
+      "width": 393,
+      "height": 186
+    }
+  },
+  "boss-tap-people": {
+    "box": {
+      "x": 166.6,
+      "y": 642,
+      "width": 59.8,
+      "height": 22
+    }
+  },
+  "boss-link-layer": {
+    "src": "captures/ekip/boss-link-layer.png",
+    "box": {
+      "x": 0,
+      "y": 415,
+      "width": 393,
+      "height": 349
+    }
+  },
+  "boss-link-url": {
+    "box": {
+      "x": 16,
+      "y": 529,
+      "width": 361,
+      "height": 63
+    }
+  },
+  "boss-tap-copy": {
+    "box": {
+      "x": 16,
+      "y": 660,
+      "width": 361,
+      "height": 44
+    }
+  },
+  "worker-join": {
+    "src": "captures/ekip/worker-join.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-tap-name": {
+    "box": {
+      "x": 137,
+      "y": 259.5,
+      "width": 224,
+      "height": 24
+    }
+  },
+  "worker-name-1": {
+    "src": "captures/ekip/worker-name-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-2": {
+    "src": "captures/ekip/worker-name-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-3": {
+    "src": "captures/ekip/worker-name-3.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-4": {
+    "src": "captures/ekip/worker-name-4.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-5": {
+    "src": "captures/ekip/worker-name-5.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-6": {
+    "src": "captures/ekip/worker-name-6.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-7": {
+    "src": "captures/ekip/worker-name-7.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-8": {
+    "src": "captures/ekip/worker-name-8.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-9": {
+    "src": "captures/ekip/worker-name-9.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-name-10": {
+    "src": "captures/ekip/worker-name-10.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-tap-phone": {
+    "box": {
+      "x": 137,
+      "y": 311.5,
+      "width": 224,
+      "height": 24
+    }
+  },
+  "worker-phone-1": {
+    "src": "captures/ekip/worker-phone-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-phone-2": {
+    "src": "captures/ekip/worker-phone-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-phone-3": {
+    "src": "captures/ekip/worker-phone-3.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-phone-4": {
+    "src": "captures/ekip/worker-phone-4.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-tap-join": {
+    "box": {
+      "x": 16,
+      "y": 369.5,
+      "width": 361,
+      "height": 44
+    }
+  },
+  "worker-sites": {
+    "src": "captures/ekip/worker-sites.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "worker-tap-site": {
+    "box": {
+      "x": 16,
+      "y": 190,
+      "width": 361,
+      "height": 78
+    }
+  },
+  "worker-feed": {
+    "src": "captures/ekip/worker-feed.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 584
+  },
+  "desk-feed": {
+    "src": "captures/ekip/desk-feed.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-joined-line": {
+    "box": {
+      "x": 937.6,
+      "y": 803.5,
+      "width": 210.8,
+      "height": 28
+    }
+  },
+  "desk-tap-roll": {
+    "box": {
+      "x": 59,
+      "y": 142.8,
+      "width": 61.4,
+      "height": 22.5
+    }
+  },
+  "desk-roll": {
+    "src": "captures/ekip/desk-roll.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-new-row": {
+    "box": {
+      "x": 297,
+      "y": 495.5,
+      "width": 1132,
+      "height": 53
+    }
+  }
+}

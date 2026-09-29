@@ -21,6 +21,7 @@ const marks = await markMonth(owner, entries, today)
 const shipments = await seedDepot(await signInAs(owner, people.mehmet), today, sites)
 runSql('retime.sql', { ahmet: people.ahmet, serkan: people.serkan })
 runSql('depot-retime.sql')
+runSql('sites-retime.sql')
 
 writeFileSync(new URL('.ids.json', import.meta.url), JSON.stringify({ today, sites, people }, null, 2))
 console.log(`Hazır: ${SITES.length} şantiye, ${entries.length} yoklama kalemi, ${marks} geçmiş işaret, ${shipments} sevkiyat (${today}).`)

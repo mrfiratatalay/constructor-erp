@@ -51,6 +51,9 @@ export const CREWS = [
   { key: 'alcipan', name: 'Kadir Usta', trade: 'Alçıpan', phone: phone(34) },
 ]
 
+/** Ekip videosunda firmanın bağlantısından katılan yeni usta (seed eklemez, çekim ekrandan katılır). */
+export const NEW_WORKER = { name: 'Ali Yıldız', phone: phone(40) }
+
 export const SITES = [
   { key: 'kartal', name: 'Kartal Konutları B Blok', address: 'Yakacık Mah. Kartal / İstanbul' },
   { key: 'atasehir', name: 'Ataşehir Ofis Binası', address: 'Barbaros Mah. Ataşehir / İstanbul' },

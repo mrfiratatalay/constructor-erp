@@ -36,4 +36,14 @@ export const SCORES = {
       F: [72, null, 77, 76, 74, null, 72, null],
     },
   },
+  /** Do – Sol – Lam – Fa: pop'un en sıcak dizisi, "hoş geldin"; ikinci düşüş Do'da, son Sol'den Do'ya. */
+  ekip: {
+    progression: ['C', 'G', 'Am', 'F'],
+    tune: {
+      C: [76, null, 79, 76, 72, null, 74, 76],
+      G: [74, null, 79, 74, 71, null, 74, null],
+      Am: [72, null, 76, 72, 69, null, 71, 72],
+      F: [69, null, 72, 77, 76, null, 74, null],
+    },
+  },
 }

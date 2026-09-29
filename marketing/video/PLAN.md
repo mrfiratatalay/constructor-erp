@@ -34,14 +34,15 @@ Ana cümle (TASARIM.md'deki tek cümle testinden, izleyene dönük):
 Üretim modül modüldür; her video kendi temposunda parlar, tek tek onaylanır. En sonda ana video bu
 parçalardan kurgulanır.
 
-| # | Video | Tek cümle | Telefonda (saha) | Masaüstünde (patron) |
-|---|---|---|---|---|
-| 1 | **Yoklama ve puantaj** (deneme) | Şef her sabah yazıyor, ay sonunda puantaj hazır. | Şef sabah yoklamayı alır | Puantaj cetveli, Excel |
-| 2 | Şantiye sohbeti | Her şantiyenin kendi sohbeti. | Fotoğraf, sesli not | Bütün şantiyeler solda, sohbet sağda |
-| 3 | Saha günlüğü | Şantiyede bugün ne oldu, tek akışta. | "Sorun bildir" | Sarı sorun satırı, günlük |
-| 4 | Malzeme sevkiyatı | Ne çıktı, nereye gitti, geri gelecek mi. | Depocu sevkiyat çıkarır, irsaliye çeker | Sevkiyat defteri, "dışarıda" şeridi |
-| 5 | Ekibi eklemek | Tek bağlantı, herkes içeride. | İşçi bağlantıdan katılır | Katılımcılar listesi |
-| 6 | **Ana video** (60-75 sn) | Hepsi | 1-5'in en iyi anları | |
+| # | Video | Tek cümle | Telefonda (saha) | Masaüstünde (patron) | Durum |
+|---|---|---|---|---|---|
+| 1 | **Yoklama ve puantaj** | Şef her sabah yazıyor, ay sonunda puantaj hazır. | Şef sabah yoklamayı alır | Puantaj cetveli, Excel | Hazır |
+| 2 | Şantiye sohbeti | Her şantiyenin kendi sohbeti. | Fotoğraf, sesli not | Bütün şantiyeler solda, sohbet sağda | Fotoğraf bekliyor |
+| 3 | Saha günlüğü | Şantiyede bugün ne oldu, tek akışta. | "Sorun bildir" | Sarı sorun satırı, günlük | Fotoğraf bekliyor |
+| 4 | **Malzeme sevkiyatı** | Ne çıktı, nereye gitti, geri gelecek mi. | Depocu sevkiyat çıkarır, irsaliye çeker | Sevkiyat defteri, "dışarıda" şeridi | Hazır |
+| 5 | **Ekibi eklemek** | Tek bağlantı, herkes içeride. | Usta bağlantıdan katılır | Akışta "katıldı", yoklamada yeni satır | Hazır |
+| 6 | İş ilerlemesi | Şef miktarı yazar, yüzde kendiliğinden. | Şef "Demir İşleri → 3,5 ton" girer | Kalemler, yüzde, kalan | Sırada |
+| 7 | **Ana video** (60-75 sn) | Hepsi | 1-6'nın en iyi anları | | En son |
 
 Görevler videoya girmez: TASARIM.md'de ürün kararı henüz konuşuluyor. Bildirim, 3. videonun parçasıdır.
 
@@ -115,6 +116,7 @@ bölümleri gibi durur. Yoklamada gördüğün şef, saha günlüğünde sorun b
 | Personel | 14 kişi: uygulamayı kullananlar ve uygulaması olmayanlar karışık, her birinin görevi (Kalıpçı, Duvarcı…) |
 | Taşeron ekipler | Demirci · Hasan Usta, Elektrik · Volkan Usta, Tesisat · Erdal Usta, Alçıpan · Kadir Usta |
 | Şantiyeler | Kartal Konutları B Blok, Ataşehir Ofis Binası, Beylikdüzü Villaları, Çekmeköy Okulu; tamamlanan: Maltepe Rezidans |
+| Geçmiş | Firma uygulamaya geçen ay başlamış gibi: şantiyeler ağustosta beşer gün arayla açılmış, ekip ertesi sabah katılmış (`sites-retime.sql`). |
 | Puantaj | Ayın başından dünkü güne kadar dolu: çoğu gün Geldi, arada gerçekçi Gelmedi / İzinli / Yarım gün, bazı günlerde mesai ve not. Pazar boş. Aynı betik her çalıştığında aynı veriyi üretir. |
 
 ## Deneme videosu: Yoklama ve puantaj (32 sn) — ikinci taslak: Kızılkan Yapı, müzikli
@@ -141,12 +143,36 @@ bölümleri gibi durur. Yoklamada gördüğün şef, saha günlüğünde sorun b
 - Uzun kaydırmada iki ekran görüntüsü arasında görülmemiş satırlar kalır: kaydırma, sayfanın tam boy şeridinden oynatılır.
 - Tıklamadan sonra fare çekimde de videoda da kenara çekilir; yoksa açılan pencerede üzerine gelinmiş gibi görünür.
 
+## Ekip videosu: tek bağlantı (32 sn)
+
+`npm run render:ekip` → `out/ekip.mp4`. Üç cihaz: patronun telefonu, yeni ustanın telefonu, patronun laptopu.
+
+| Zaman | Sahne | Ses | Ekranda yazan |
+|---|---|---|---|
+| 0-4 sn | Izgara çizilir. | Yumuşak akorlar | "Kızılkan Yapı'ya yeni usta." → "Uygulamaya nasıl girecek?" |
+| 4-8 sn | Patronun telefonu **ilk düşüşte**: ＋ → Kişi ekle → firmanın bağlantısı → Kopyala. | Dokunuş, pencere kayışı | "Patron tek bağlantıyı paylaşır." |
+| 8-10 sn | İki telefon yan yana; bağlantı bir baloncuk olarak uçar, ustanın kilit ekranına bildirim düşer. | Vınlama, "ding" | |
+| 10-15 sn | Usta bildirime dokunur: "Şantiye ekibine katıl · Kızılkan Yapı". Adını harf harf, numarasını yazar, **Katıl**. | Tuş sesleri, çan arpeji | "Şifre yok, indirme yok." · "Adını yazar, katılır." |
+| 15-20 sn | Laptop **ikinci düşüşte**; Kartal'ın akışında "Bugün · Ali Yıldız davet bağlantısıyla katıldı" parlar. | Vızıltı, "ding" | "Patron akışta hemen görür." |
+| 20-23 sn | İmleç Yoklama'ya tıklar: Ali listenin başında, bugünkü yoklamayı bekliyor. | Tık, çan | "Yoklamaya kendiliğinden girer." |
+| 23-32 sn | Üç cihaz birlikte, sonra kapanış. | Çözülüş, parıltı | "Herkes her şantiyede, tek bağlantıyla." · "Tek bağlantı, herkes içeride." |
+
+Bağlantının adresi çekimde yer tutucudur (`kizilkan.example`); gerçek adres verilince `backend.sh`'taki
+`DEMO_BASE_URL` ile yeniden çekilir.
+
 ## Uygulamada fark edilenler
 
 Çekim sırasında görüldü, videoyu etkilemedi (o kare kullanılmadı), ürün tarafında düzeltilecek:
 
 - Telefonda toplu işaretlemeden sonra çıkan "17 satır işaretlendi" bildiriminde kutu dar: kelime ortadan bölünüyor
   ("işaretl / endi").
+- Masaüstünde şantiye akışı açılışta dibe iner ama yalnızca mesajlara bakarak; sistem satırları ("… katıldı") ayrı
+  istekle sonradan gelince ekran onları takip etmez. Yeni katılan birinin satırı patron kaydırana kadar altta
+  gizli kalır (`useFeedBottom`, `useSiteTimeline`). Çekimde akış elle dibe kaydırıldı.
+- Malzeme listesi Türkçe alfabeye göre sıralanmıyor: "Çelik kalıp" ve "Çimento" en sonda, "Tuğla"dan sonra
+  (`MaterialCatalog`, `lower(name)`; veritabanının dili `en_US`).
+- Masaüstünde "N malzeme dışarıda" şeridi aramaya göre süzülüyor: arama yapınca, aranmayan ama dışarıda olan
+  malzemeler şeritten düşüyor (`useShipments`).
 
 ## Kalite kontrol
 
@@ -158,7 +184,8 @@ bölümleri gibi durur. Yoklamada gördüğün şef, saha günlüğünde sorun b
 
 1. **Sesli taslağa geri bildirim:** müzik, efektlerin yüksekliği, hız. Ses kodla üretildiği için her şey bir sayıdır.
 2. **Kapanış:** Kızılkan Yapı'ya sunumda kapanışta ne yazsın (ör. uygulamanın adresi)?
-3. **Gerçek adlar (isteğe bağlı):** Kızılkan Yapı'nın şantiye ve usta adları verilirse demo dünyası onlarla kurulur;
+3. **Uygulamanın gerçek adresi:** ekip videosundaki davet bağlantısında görünür (şimdilik `kizilkan.example`).
+4. **Gerçek adlar (isteğe bağlı):** Kızılkan Yapı'nın şantiye ve usta adları verilirse demo dünyası onlarla kurulur;
    izleyen kendi insanlarını ekranda görür.
 
 ## Dikkat

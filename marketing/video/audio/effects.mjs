@@ -136,6 +136,7 @@ export const SOUNDS = {
   cascade: () => arpeggio([84, 88, 91, 96, 100], 0.05, 0.35, 1.6),
   chime: () => arpeggio([84, 88, 91, 96, 103], 0.07, 1.1, 2.6),
   shine: () => arpeggio([96, 100, 103, 108], 0.05, 0.8, 2.2),
+  ding: () => arpeggio([91, 96], 0.09, 0.5, 1.4),
   zip: () => both(zip()),
   fill: () => both(fill()),
   pop,

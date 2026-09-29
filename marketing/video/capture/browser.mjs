@@ -25,7 +25,10 @@ export async function launch() {
   return chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM })
 }
 
-/** kind: 'phone' ya da 'desktop'. who: 'owner' ya da .ids.json'daki kişi anahtarı ('ahmet'). */
+/**
+ * kind: 'phone' ya da 'desktop'. who: 'owner', .ids.json'daki kişi anahtarı ('ahmet') ya da null: hiç girmemiş bir
+ * telefon (firmanın bağlantısını ilk kez açan yeni usta gibi).
+ */
 export async function openAs(browser, kind, who) {
   const device = kind === 'phone' ? PHONE : DESKTOP
   const context = await browser.newContext({
@@ -35,7 +38,9 @@ export async function openAs(browser, kind, who) {
     timezoneId: 'Europe/Istanbul',
     reducedMotion: 'no-preference',
   })
-  await signIn(context, who)
+  if (who !== null) await signIn(context, who)
+  // Bağlantı "Kopyala" düğmesi panoya yazar; tarayıcı izin vermezse sessizce başarısız olur.
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: APP })
   const page = await context.newPage()
   return { context, page }
 }

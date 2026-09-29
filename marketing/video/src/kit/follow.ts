@@ -16,11 +16,14 @@ export function followPhone(place: Place, appY: number, scale: number): Place {
 }
 
 /**
- * Laptop ekranında bir noktaya yaklaşmak. Ekranın kenarına yaslı yerlerde (sağdan açılan panel, sağ üstteki düğme)
- * kamera ekranın kenarını aşmaz: yoksa ekranın dışındaki çerçeve ve zemin görünür.
+ * Laptop ekranında bir noktaya yaklaşmak. Ekranın kenarına yaslı yerlerde (sağdan açılan panel, sağ üstteki düğme,
+ * akışın en altındaki satır) kamera ekranın kenarını aşmaz: yoksa ekranın dışındaki çerçeve ve zemin görünür.
+ * Yalnızca yan kenarlar ve alt kenar sınırlanır; üstte başlığı biraz aşmak sorun değildir.
  */
 export function focusLaptop(place: Place, point: { x: number; y: number }, scale: number): Place {
   const halfWidth = STAGE.width / (2 * scale * place.scale)
+  const halfHeight = STAGE.height / (2 * scale * place.scale)
   const x = Math.min(Math.max(point.x, halfWidth), LAPTOP.app.width - halfWidth)
-  return { ...laptopPoint(place, { x, y: point.y }), scale }
+  const y = Math.min(point.y, LAPTOP.app.height - halfHeight)
+  return { ...laptopPoint(place, { x, y }), scale }
 }

@@ -70,6 +70,11 @@ export class Recorder {
     this.screens._day = { day }
   }
 
+  /** Firmanın katılma bağlantısı: videoda uçan baloncuk ve ustanın bildirimi bunu yazar. */
+  setLink(link) {
+    this.screens._link = { link }
+  }
+
   /** Hesaplanmış bir alan (ör. cetvelin gün hücreleri): tek bir öğe değil, birkaçının birleşimi. */
   region(name, box) {
     this.screens[name] = { box }

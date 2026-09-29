@@ -1,38 +1,34 @@
-import { AbsoluteFill } from 'remotion'
-import { Blueprint } from '../kit/Blueprint'
-import { Camera } from '../kit/Camera'
-import { Captions } from '../kit/Captions'
-import { EndCard } from '../kit/EndCard'
 import { FileMoment } from '../kit/FileMoment'
+import { Film } from '../kit/Film'
 import { laptopPoint } from '../kit/Laptop'
 import { LightStreak } from '../kit/LightStreak'
 import { Pulse } from '../kit/Pulse'
-import { Soundtrack } from '../kit/Soundtrack'
-import { Title } from '../kit/Title'
-import { useBrandFont } from '../kit/useBrandFont'
-import { COLOR, FONT } from '../theme'
+import { COLOR } from '../theme'
 import { CAMERA, EXCEL_BUTTON, RING } from './camera'
-import { TODAY_MONTH } from './shots'
 import { DeskAct } from './DeskAct'
 import { PhoneAct } from './PhoneAct'
+import { TODAY_MONTH } from './shots'
 import { CUES, MUSIC } from './sounds'
 import { CAPTIONS, CLOSING, DESK_CLICKS, END_CARD, INTRO, LAPTOP_ON, RING_PULSE, STREAK } from './timeline'
 
 /**
  * Yoklama videosu: sabah şef telefonda yoklamayı alır, patron ofiste bugünü ve ayın puantajını görür, Excel'i indirir.
- * Cihazlar ve efektler kameranın içinde (dünyada), sözler ve uçan dosya ekranın üstündedir; ses en alttadır.
  */
-export const Yoklama: React.FC = () => {
-  useBrandFont()
-  return (
-    <AbsoluteFill style={{ fontFamily: FONT, background: COLOR.deep, overflow: 'hidden' }}>
-      <Blueprint />
-      <Camera poses={CAMERA}>
+const SCRIPT = { intro: INTRO, captions: CAPTIONS, closing: { start: END_CARD, ...CLOSING }, music: MUSIC, cues: CUES }
+
+export const Yoklama: React.FC = () => (
+  <Film
+    camera={CAMERA}
+    script={SCRIPT}
+    world={
+      <>
         <DeskAct />
         <PhoneAct />
         <LightStreak from={{ x: 1700, y: 780 }} to={laptopPoint(LAPTOP_ON, { x: 735, y: 460 })} frames={STREAK} />
         <Pulse at={RING} radius={30} color={COLOR.successBright} from={RING_PULSE} />
-      </Camera>
+      </>
+    }
+    overlay={
       <FileMoment
         start={DESK_CLICKS.excel + 2}
         button={EXCEL_BUTTON}
@@ -40,12 +36,6 @@ export const Yoklama: React.FC = () => {
         name={`puantaj-${TODAY_MONTH}.xlsx`}
         sheets={['Personel', 'Ekipler', 'Kayıtlar']}
       />
-      <Captions lines={CAPTIONS} />
-      {INTRO.map((title) => (
-        <Title key={title.from} {...title} />
-      ))}
-      <EndCard start={END_CARD} line={CLOSING.line} note={CLOSING.note} />
-      <Soundtrack music={MUSIC.name} musicVolume={MUSIC.volume} cues={CUES} />
-    </AbsoluteFill>
-  )
-}
+    }
+  />
+)
