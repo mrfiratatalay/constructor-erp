@@ -2,16 +2,20 @@
 import type { PaymentForm } from '@/core/admin/paymentForm'
 import { PAYMENT_METHODS } from '@/core/billing/billingLabels'
 
-/** Alınan ödeme: "Ödeme alındı" açıksa tutar, yöntem, tarih ve not. POS yok; para elden ya da havaleyle alınır. */
+/**
+ * Alınan ödeme: "Ödeme alındı" açıksa tutar, yöntem, tarih ve not. POS yok; para elden ya da havaleyle alınır.
+ * optional: kapalıysa anahtar görünmez (tek başına ödeme kaydında ödeme zaten alınmıştır).
+ */
+const { optional = true } = defineProps<{ optional?: boolean }>()
 const payment = defineModel<PaymentForm>({ required: true })
 </script>
 
 <template>
   <div class="payment-fields">
-    <el-form-item label="Ödeme">
+    <el-form-item v-if="optional" label="Ödeme">
       <el-switch v-model="payment.paid" active-text="Ödeme alındı, şimdi kaydet" inactive-text="Ödeme sonra" />
     </el-form-item>
-    <template v-if="payment.paid">
+    <template v-if="payment.paid || !optional">
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="Tutar (₺)">

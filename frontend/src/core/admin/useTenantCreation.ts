@@ -1,9 +1,10 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
-import { useCreateTenant, useListPlans } from '@/core/api/generated/platform/platform'
+import { useCreateTenant } from '@/core/api/generated/platform/platform'
 import type { OnboardingLink } from '@/core/api/generated/model'
 import { refreshAdminLists } from '@/core/admin/adminCache'
 import { tenantRequestOf, type TenantForm } from '@/core/admin/tenantForm'
+import { useActivePlans } from '@/core/admin/useActivePlans'
 
 export interface CreatedTenant {
   companyId: string
@@ -18,7 +19,7 @@ export interface CreatedTenant {
  */
 export function useTenantCreation() {
   const queryClient = useQueryClient()
-  const { data: plans } = useListPlans()
+  const plans = useActivePlans()
   const created = ref<CreatedTenant | null>(null)
   const mutation = useCreateTenant({ mutation: { onSuccess: () => refreshAdminLists(queryClient) } })
 
@@ -29,7 +30,7 @@ export function useTenantCreation() {
   }
 
   return {
-    plans: computed(() => (plans.value ?? []).filter((plan) => plan.status === 'ACTIVE')),
+    plans,
     create,
     created,
     isCreating: mutation.isPending,
