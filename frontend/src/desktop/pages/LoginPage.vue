@@ -2,7 +2,7 @@
 import { reactive } from 'vue'
 import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
-import BrandLogo from '@/shared/atoms/BrandLogo.vue'
+import AuthLayout from '@/desktop/templates/AuthLayout.vue'
 
 const form = reactive({ email: '', password: '' })
 const { login, isPending, errorText } = usePasswordLogin()
@@ -11,9 +11,10 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
 </script>
 
 <template>
-  <main class="login-page">
+  <AuthLayout>
     <el-card class="login-page__card" shadow="never">
-      <BrandLogo class="login-page__logo" />
+      <h2 class="login-page__title">Giriş yap</h2>
+      <p class="login-page__lead">Firmanızın çalışma alanına ya da platform yönetimine girin.</p>
       <el-form label-position="top" class="login-page__form" @submit.prevent="login(form.email, form.password)">
         <el-form-item label="E-posta">
           <el-input v-model="form.email" type="email" size="large" autocomplete="username"
@@ -31,29 +32,34 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
         <el-button v-if="devAccount" text type="primary" @click="fillDevAccount">Patron olarak doldur</el-button>
       </el-form>
       <p class="login-page__hint">
-        Şefler şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linkle girer.
+        Saha ekibi şifre kullanmaz: firmasının WhatsApp'tan gönderdiği bağlantıyla girer.
+      </p>
+      <el-divider />
+      <p class="login-page__hint">
+        Firmanız henüz Constructor ERP kullanmıyor mu?
+        <RouterLink :to="{ name: 'pricing' }">Paketleri inceleyin</RouterLink>
       </p>
     </el-card>
-  </main>
+  </AuthLayout>
 </template>
 
 <style scoped>
-.login-page {
-  display: grid;
-  place-items: center;
-  min-height: var(--layout-app-height);
-  padding: var(--space-6);
-  background: var(--canvas);
-}
-
 .login-page__card {
-  width: min(100%, 420px);
+  width: min(100%, 440px);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
 }
 
-.login-page__logo {
-  justify-content: center;
-  width: 100%;
-  margin-bottom: var(--space-6);
+.login-page__title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  letter-spacing: -0.02em;
+}
+
+.login-page__lead {
+  margin: var(--space-2) 0 var(--space-6);
+  color: var(--text-muted);
 }
 
 .login-page__form {
@@ -67,10 +73,19 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
 }
 
 .login-page__hint {
-  margin: var(--space-5) 0 0;
+  margin: var(--space-4) 0 0;
   color: var(--text-muted);
   font-size: var(--text-sm);
   line-height: 1.5;
   text-align: center;
+}
+
+.login-page__hint a {
+  color: var(--brand-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.login-page__card :deep(.el-divider) {
+  margin: var(--space-4) 0 0;
 }
 </style>

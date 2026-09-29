@@ -44,7 +44,7 @@ async function showLatestNotification() {
   } catch {
     // Ağ yoksa bile bir bildirim gösterilmeli (iOS her dürtmede bildirim bekler).
   }
-  await self.registration.showNotification('Kızılkan Şantiye', { body: 'Yeni bir bildirimin var.', icon: ICON, badge: BADGE, data: { url: '/' } })
+  await self.registration.showNotification('Constructor ERP', { body: 'Yeni bir bildirimin var.', icon: ICON, badge: BADGE, data: { url: '/' } })
 }
 
 /** Uygulama açıksa o pencere öne gelir ve ilgili sayfaya gider; kapalıysa açılır. */

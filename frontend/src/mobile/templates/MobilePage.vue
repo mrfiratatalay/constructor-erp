@@ -3,10 +3,11 @@ import { useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { ChevronLeft } from 'lucide-vue-next'
 import PageTitle from '@/mobile/molecules/PageTitle.vue'
+import CompanyLogo from '@/shared/atoms/CompanyLogo.vue'
 
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
- * brand: ana ekranın lacivert, ızgaralı başlığı (ad solda, action sağda).
+ * brand: ana ekranın lacivert, ızgaralı başlığı (firmanın logosu ve adı solda, action sağda); logoUrl firmanın logosu.
  * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi).
  * subbar: başlığın hemen altında, sayfa kayarken ona yapışık duran çubuk (şantiyede Sohbet / Saha).
  * footer: ekranın altında sabit duran alan (şantiye sayfasındaki gönderme çubuğu).
@@ -21,6 +22,7 @@ const {
   brand = false,
   tabbar = true,
   bottom = false,
+  logoUrl = null,
 } = defineProps<{
   title: string
   subtitle?: string
@@ -28,6 +30,7 @@ const {
   brand?: boolean
   tabbar?: boolean
   bottom?: boolean
+  logoUrl?: string | null
 }>()
 const slots = useSlots()
 const router = useRouter()
@@ -42,7 +45,10 @@ function goBack() {
   <van-nav-bar :title="brand || subtitle || slots.heading ? undefined : title" :left-arrow="back && !slots.heading"
     :border="!brand" :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed
     placeholder @click-left="!slots.heading && goBack()">
-    <template v-if="brand" #left><span class="mobile-page__brand">{{ title }}</span></template>
+    <template v-if="brand" #left>
+      <span class="mobile-page__brand"><CompanyLogo :name="title" :logo-url="logoUrl" :size="30" surface="dark" />
+        {{ title }}</span>
+    </template>
     <template v-else-if="slots.heading" #left>
       <span class="mobile-page__heading">
         <button v-if="back" type="button" class="mobile-page__back" aria-label="Geri" @click.stop="goBack">
@@ -161,6 +167,9 @@ function goBack() {
 }
 
 .mobile-page__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--brand-on-deep);
   font-size: var(--text-md);
   font-weight: var(--weight-black);

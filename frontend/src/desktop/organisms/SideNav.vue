@@ -9,19 +9,20 @@ import { useWorkspace } from '@/core/tenant/useWorkspace'
 import { ROLE_LABELS } from '@/core/team/roles'
 import UserPanel from '@/desktop/organisms/UserPanel.vue'
 import UserAvatar from '@/shared/atoms/UserAvatar.vue'
-import BrandMark from '@/shared/molecules/BrandMark.vue'
+import WorkspaceBrand from '@/shared/molecules/WorkspaceBrand.vue'
 import { mainNavItems, navRouteOf, type NavItem } from '@/shared/navigation/navItems'
 
 /**
  * Sol menü, Gmail'deki gibi ☰ ile açılır ve kapanır (ne zaman yana kaydığı, ne zaman üstüne kaydığı:
  * useNavMenu). Açıkken ikonların yanında adları yazar (TASARIM.md İlke 2); kapalıyken ince şerittir, ad
- * üstüne gelince ipucu olarak çıkar. Seçili öğe baret sarısında. En altta kişinin kendisi: Hesabım panelini açar.
+ * üstüne gelince ipucu olarak çıkar. Seçili öğe baret sarısında. Üstte firmanın kimliği (logosu, adı), en altta kişinin
+ * kendisi: Hesabım panelini açar.
  */
 const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
 const { open, floating, toggle, closeFloating } = useNavMenu()
-const { viewer } = useWorkspace()
+const { viewer, workspace } = useWorkspace()
 const items = computed<NavItem[]>(() => (viewer.value ? mainNavItems(viewer.value, 'desktop') : []))
 /** Seçili öğe adresten gelir: şantiye sayfası da "Şantiyeler"i yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
@@ -41,7 +42,7 @@ function go(item: NavItem) {
           :aria-expanded="open" @click="toggle">
           <Menu :size="22" />
         </button>
-        <BrandMark :compact="!open" />
+        <WorkspaceBrand v-if="workspace" :name="workspace.name" :logo-url="workspace.logoUrl" :compact="!open" />
       </header>
       <nav class="side-nav__items" aria-label="Ana menü">
         <el-tooltip v-for="item in items" :key="item.route" :content="item.label" placement="right" :disabled="open">

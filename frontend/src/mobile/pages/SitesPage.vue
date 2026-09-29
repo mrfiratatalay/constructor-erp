@@ -12,6 +12,7 @@ import { useSiteCreation, type NewSiteForm } from '@/core/sites/useSiteCreation'
 import { useSites } from '@/core/sites/useSites'
 import { sitesInListOrder } from '@/core/today/siteRow'
 import { useToday } from '@/core/today/useToday'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 import JoinLinkSheet from '@/mobile/organisms/JoinLinkSheet.vue'
 import NewSitePopup from '@/mobile/organisms/NewSitePopup.vue'
 import SearchResults from '@/mobile/organisms/SearchResults.vue'
@@ -26,6 +27,7 @@ import MobilePage from '@/mobile/templates/MobilePage.vue'
  */
 const router = useRouter()
 const { data: user } = useCurrentUser()
+const { workspace } = useWorkspace()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
 const { createSite, isSaving } = useSiteCreation()
@@ -71,7 +73,7 @@ async function pin() {
 </script>
 
 <template>
-  <MobilePage :title="user?.companyName ?? 'Şantiyeler'" brand>
+  <MobilePage :title="workspace?.name ?? 'Şantiyeler'" :logo-url="workspace?.logoUrl" brand>
     <template #action>
       <van-button round size="small" class="sites__add" aria-label="Ekle" @click="choosing = true">
         <Plus :size="18" />

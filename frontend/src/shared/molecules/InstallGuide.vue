@@ -5,7 +5,7 @@ import { Share, SquarePlus } from 'lucide-vue-next'
 const STEPS = [
   { icon: Share, text: "Safari'nin altındaki Paylaş düğmesine dokun." },
   { icon: SquarePlus, text: 'Listeden "Ana Ekrana Ekle"yi seç.' },
-  { icon: null, text: 'Ana ekrandaki Kızılkan ikonundan aç, bildirimleri buradan aç.' },
+  { icon: null, text: 'Ana ekrandaki Constructor ERP ikonundan aç, bildirimleri buradan aç.' },
 ]
 </script>
 

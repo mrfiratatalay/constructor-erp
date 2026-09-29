@@ -1,13 +1,19 @@
 <script setup lang="ts">
-/** Hiçbir şantiye seçili değilken sağ taraf, WhatsApp Masaüstü'ndeki gibi sade bir karşılama. */
-const { companyName } = defineProps<{ companyName?: string }>()
+import CompanyLogo from '@/shared/atoms/CompanyLogo.vue'
+
+/**
+ * Hiçbir şantiye seçili değilken sağ taraf, WhatsApp Masaüstü'ndeki gibi sade bir karşılama: firmanın kendi logosu ve
+ * adı. Ürün (Constructor ERP) yalnızca alt satırda imza gibi durur.
+ */
+const { companyName = '', logoUrl = null } = defineProps<{ companyName?: string; logoUrl?: string | null }>()
 </script>
 
 <template>
   <section class="welcome">
-    <span class="welcome__badge" aria-hidden="true">KŞ</span>
-    <h2>Kızılkan Şantiye</h2>
-    <p>{{ companyName ? `${companyName} şantiyeleri tek yerde.` : 'Şantiyeler tek yerde.' }} Soldan bir şantiye seç.</p>
+    <CompanyLogo :name="companyName" :logo-url="logoUrl" :size="88" />
+    <h2>{{ companyName }}</h2>
+    <p>Şantiyeleriniz tek yerde. Soldan bir şantiye seçin.</p>
+    <small>Constructor ERP</small>
   </section>
 </template>
 
@@ -24,21 +30,9 @@ const { companyName } = defineProps<{ companyName?: string }>()
   text-align: center;
 }
 
-.welcome__badge {
-  display: grid;
-  place-items: center;
-  width: 88px;
-  height: 88px;
-  border-radius: 26px;
-  background: var(--brand-deep);
-  color: var(--brand-signature);
-  font-size: 32px;
-  font-weight: var(--weight-black);
-}
-
 .welcome h2 {
   margin: 0;
-  color: var(--text-primary, inherit);
+  color: var(--text-strong);
   font-size: var(--text-xl);
   font-weight: var(--weight-black);
 }
@@ -46,5 +40,13 @@ const { companyName } = defineProps<{ companyName?: string }>()
 .welcome p {
   margin: 0;
   font-size: var(--text-sm);
+}
+
+.welcome small {
+  color: var(--text-subtle);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 </style>
