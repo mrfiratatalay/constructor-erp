@@ -6,7 +6,7 @@ import { useGetSite } from '@/core/api/generated/sites/sites'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { useComposer } from '@/core/posts/useComposer'
 import { callablePeople, participantLine } from '@/core/sites/participants'
-import { useSiteTab } from '@/core/sites/useSiteTab'
+import { siteTabsFor, useSiteTab } from '@/core/sites/useSiteTab'
 import { useSiteVisit } from '@/core/visits/useSiteVisit'
 import CallButton from '@/mobile/molecules/CallButton.vue'
 import SiteTabs from '@/mobile/molecules/SiteTabs.vue'
@@ -14,6 +14,7 @@ import StatusNotice from '@/mobile/molecules/StatusNotice.vue'
 import FeedList from '@/mobile/organisms/FeedList.vue'
 import FieldComposer from '@/mobile/organisms/FieldComposer.vue'
 import FieldList from '@/mobile/organisms/FieldList.vue'
+import ProductionTab from '@/mobile/organisms/ProductionTab.vue'
 import SiteComposer from '@/mobile/organisms/SiteComposer.vue'
 import SiteInfoSheet from '@/mobile/organisms/SiteInfoSheet.vue'
 import SiteSearchSheet from '@/mobile/organisms/SiteSearchSheet.vue'
@@ -23,8 +24,8 @@ import SiteHeading from '@/shared/molecules/SiteHeading.vue'
 /**
  * Şantiyenin içi, WhatsApp'ta bir grubun içi gibi: solda geri, fotoğraf, ad ve "Musa, Sen" (dokununca bilgi);
  * sağda 📞 (tek kişiyi doğrudan arar, çok kişide liste) ve ⋮ (Şantiye bilgisi, Bu şantiyede ara; telefonda yer
- * dar, 🔍 dışarı çıkmaz). Başlığın altında iki sekme: Sohbet ve Saha (günlük);
- * /santiyeler/:id ve /santiyeler/:id/saha bu sayfadır. İki sekmenin taslağı ayrıdır. Sayfa açılınca şantiye
+ * dar, 🔍 dışarı çıkmaz). Başlığın altında sekmeler: Sohbet, Saha (günlük) ve patron, şef, depo sorumlusunda
+ * İmalat (yazma çubuğu yok); /santiyeler/:id, /saha ve /imalat bu sayfadır. Sohbet ve Saha'nın taslağı ayrıdır. Sayfa açılınca şantiye
  * okunmuş sayılır; alt sekmeler gizlenir. Sohbetin ＋ menüsündeki Yoklama günün yoklama mesajını atar ve sohbette
  * ona gider: çalışan mesajdan katılır.
  */
@@ -42,6 +43,7 @@ const searchOpen = ref(false)
 const moreOpen = ref(false)
 
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
+const tabs = computed(() => siteTabsFor(user.value))
 const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
 
 function onMore(action: { key: string }) {
@@ -66,12 +68,13 @@ const openFound = (postId: string) => openTab('chat', postId)
         <EllipsisVertical :size="18" />
       </van-button>
     </template>
-    <template #subbar><SiteTabs :active="tab" @change="openTab" /></template>
+    <template #subbar><SiteTabs :active="tab" :tabs="tabs" @change="openTab" /></template>
     <StatusNotice v-if="site?.status === 'COMPLETED'" tone="neutral" text="Bu şantiye tamamlandı." />
     <FeedList v-if="tab === 'chat'" :site-id="siteId" :seen-at="previousSeenAt"
       @reply="composer.replyTo.value = $event" />
+    <ProductionTab v-else-if="tab === 'production'" :site-id="siteId" />
     <FieldList v-else-if="site" :site="site" />
-    <template v-if="site" #footer>
+    <template v-if="site && tab !== 'production'" #footer>
       <SiteComposer v-if="tab === 'chat'" :composer="composer" :site-name="site.name" />
       <FieldComposer v-else :composer="fieldComposer" />
     </template>

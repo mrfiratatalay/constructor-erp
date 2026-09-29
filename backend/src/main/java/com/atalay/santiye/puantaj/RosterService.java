@@ -7,6 +7,7 @@ import com.atalay.santiye.puantaj.dto.RosterEntryView;
 import com.atalay.santiye.team.PersonNames;
 import com.atalay.santiye.team.PhoneNumbers;
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,19 @@ public class RosterService {
                 "Uygulamadaki çalışan buradan çıkarılmaz: Katılımcılar'dan firmadan çıkar ya da şef yap.");
         }
         entry.archive(clock.instant());
+    }
+
+    /**
+     * Firmanın taşeron ekipleri: imalatın taşeronu buradan seçilir (firmada tek taşeron listesi). Listeden çıkmış
+     * ekip de gelir (archived): eski imalatın taşeronu adıyla görünmeye devam eder.
+     */
+    @Transactional(readOnly = true)
+    public List<RosterEntryView> crews(UUID companyId) {
+        RosterPeople people = ledger.peopleOf(companyId);
+        return entries.findByCompanyId(companyId).stream()
+            .filter(entry -> entry.getKind() == RosterKind.CREW)
+            .map(entry -> PuantajViews.entryOf(entry, people))
+            .toList();
     }
 
     /** İşaretlenecek kalem: firmanın ve bugün listede. Listeden çıkmış kalemin geçmiş günleri değişmez. */

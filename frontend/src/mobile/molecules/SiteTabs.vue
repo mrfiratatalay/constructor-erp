@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { MapPin, MessageCircle } from 'lucide-vue-next'
-import { SITE_TABS, type SiteTab } from '@/core/sites/useSiteTab'
+import { Layers, MapPin, MessageCircle } from 'lucide-vue-next'
+import type { SiteTab, SiteTabItem } from '@/core/sites/useSiteTab'
 
-/** Şantiye başlığının altındaki iki sekme: Sohbet ve Saha. İçerik sekmelerin altında değil, sayfanın kendisinde. */
-const { active } = defineProps<{ active: SiteTab }>()
+/** Şantiye başlığının altındaki sekmeler: Sohbet, Saha ve (görene) İmalat. İçerik sekmelerin altında değil, sayfanın kendisinde. */
+const { active, tabs } = defineProps<{ active: SiteTab; tabs: SiteTabItem[] }>()
 const emit = defineEmits<{ change: [tab: SiteTab] }>()
 
-const ICONS: Record<SiteTab, Component> = { chat: MessageCircle, field: MapPin }
+const ICONS: Record<SiteTab, Component> = { chat: MessageCircle, field: MapPin, production: Layers }
 </script>
 
 <template>
   <van-tabs :active="active" class="site-tabs" @change="(name: string | number) => emit('change', name as SiteTab)">
-    <van-tab v-for="item in SITE_TABS" :key="item.tab" :name="item.tab">
+    <van-tab v-for="item in tabs" :key="item.tab" :name="item.tab">
       <template #title>
         <span class="site-tabs__label"><component :is="ICONS[item.tab]" :size="16" />{{ item.label }}</span>
       </template>

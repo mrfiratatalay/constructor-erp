@@ -39,6 +39,17 @@ public class MediaIntake {
         }
     }
 
+    /** İmalat girişi yalnızca fotoğraf ve belge (PDF) alır: sahadan kanıt, video ya da ses değil. */
+    public void acceptPhotosAndDocuments(MediaOwner owner, List<MultipartFile> files) {
+        for (MultipartFile file : files) {
+            MediaKind kind = kindOf(file);
+            if (kind != MediaKind.PHOTO && kind != MediaKind.DOCUMENT) {
+                throw ApiException.badRequest("Yalnızca fotoğraf ve PDF eklenebilir.");
+            }
+        }
+        accept(owner, files);
+    }
+
     /** Şantiyenin fotoğrafı (grup fotoğrafı): gönderiye bağlı değildir ve yalnızca fotoğraf olabilir. */
     UUID acceptSitePhoto(UUID siteId, UUID companyId, MultipartFile file) {
         if (kindOf(file) != MediaKind.PHOTO) {

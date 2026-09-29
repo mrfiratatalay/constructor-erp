@@ -10,8 +10,8 @@ const SITE: SiteView = {
     { id: 'ahmet', fullName: 'Ahmet Usta' },
     { id: 'mehmet', fullName: 'Mehmet Kalfa' },
   ],
-  storekeepers: [],
   workers: [],
+  storekeepers: [{ id: 'riza', fullName: 'Depocu Rıza' }],
   owners: [{ id: 'patron', fullName: 'Patron' }],
 }
 const OWNER: CurrentUserResponse = {
@@ -31,13 +31,19 @@ const AHMET: CurrentUserResponse = {
 
 describe('assigneeChoices', () => {
   it('patron görevi kendine ya da şantiyenin sorumlularına verebilir', () => {
-    expect(assigneeChoices(SITE, OWNER).map((c) => c.label)).toEqual(['Ben', 'Ahmet Usta', 'Mehmet Kalfa'])
+    expect(assigneeChoices(SITE, OWNER).map((c) => c.label)).toEqual([
+      'Ben',
+      'Ahmet Usta',
+      'Mehmet Kalfa',
+      'Depocu Rıza',
+    ])
   })
 
   it('sorumlu kendini bir kez "Ben" olarak görür, öteki sorumlular adıyla gelir', () => {
     expect(assigneeChoices(SITE, AHMET)).toEqual([
       { id: 'ahmet', label: 'Ben' },
       { id: 'mehmet', label: 'Mehmet Kalfa' },
+      { id: 'riza', label: 'Depocu Rıza' },
     ])
   })
 })

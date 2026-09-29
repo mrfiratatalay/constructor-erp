@@ -3,7 +3,8 @@
 
   // Override to include only test files and clear exclusions.
   // Application code imported in tests is automatically included via module resolution.
-  "include": ["src/**/__tests__/*", "env.d.ts"],
+  // routeMeta.d.ts: adreslerin meta tipi (vue-router eklentisi); roles.ts gibi onu kullanan kod testte de derlenir.
+  "include": ["src/**/__tests__/*", "env.d.ts", "src/core/navigation/routeMeta.d.ts"],
   "exclude": [],
 
   "compilerOptions": {
