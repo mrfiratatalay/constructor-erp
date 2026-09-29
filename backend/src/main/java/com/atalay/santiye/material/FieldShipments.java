@@ -1,6 +1,7 @@
 package com.atalay.santiye.material;
 
 import com.atalay.santiye.auth.CurrentUser;
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.material.dto.FieldShipmentRef;
 import java.util.List;
 import java.util.UUID;
@@ -24,10 +25,10 @@ class FieldShipments {
                                || ' kalem'
                           else '' end
                 from material_shipment_lines sl join materials m on m.id = sl.material_id
-                where sl.shipment_id = s.id order by m.name limit 1) as summary
+                where sl.shipment_id = s.id order by m.name %s limit 1) as summary
         from material_field_posts f join material_shipments s on s.id = f.shipment_id
         where f.site_id = :site and s.company_id = :company
-        """;
+        """.formatted(TurkishOrder.SQL_COLLATION);
 
     private final JdbcClient jdbc;
 

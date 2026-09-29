@@ -2,6 +2,7 @@ package com.atalay.santiye.production;
 
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.production.dto.CrewRef;
 import com.atalay.santiye.production.dto.ProductionBoardView;
 import com.atalay.santiye.production.dto.ProductionDetailView;
@@ -70,7 +71,7 @@ public class ProductionReads {
     public List<CrewRef> crews(CurrentUser user) {
         return lookups.crews(user.companyId()).values().stream()
             .filter(crew -> !crew.archived())
-            .sorted(Comparator.comparing(CrewRef::name, String.CASE_INSENSITIVE_ORDER))
+            .sorted(Comparator.comparing(CrewRef::name, TurkishOrder.COLLATOR))
             .toList();
     }
 

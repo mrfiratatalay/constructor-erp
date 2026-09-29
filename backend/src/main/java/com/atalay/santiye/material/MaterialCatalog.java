@@ -4,6 +4,7 @@ import static com.atalay.santiye.material.MaterialTexts.tidy;
 
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.material.dto.MaterialRequest;
 import com.atalay.santiye.material.dto.MaterialView;
 import java.time.Clock;
@@ -35,7 +36,7 @@ public class MaterialCatalog {
     /** Önce aktif kartlar, sonra pasifler; her grup adına göre. */
     @Transactional(readOnly = true)
     public List<MaterialView> list(CurrentUser user) {
-        return jdbc.sql(SELECT + "where company_id = :company order by active desc, lower(name)")
+        return jdbc.sql(SELECT + "where company_id = :company order by active desc, name " + TurkishOrder.SQL_COLLATION)
             .param("company", user.companyId())
             .query(MaterialView.class)
             .list();

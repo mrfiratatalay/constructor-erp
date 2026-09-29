@@ -4,6 +4,7 @@ import static com.atalay.santiye.material.MaterialTexts.tidy;
 
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.material.dto.DepotRequest;
 import com.atalay.santiye.material.dto.LocationView;
 import java.time.Clock;
@@ -28,8 +29,8 @@ public class StockLocations {
         select l.id, l.kind, coalesce(l.name, s.name) as name, l.site_id, (s.id is null or s.status = 'ACTIVE') as active
         from stock_locations l left join sites s on s.id = l.site_id
         where l.company_id = :company
-        order by active desc, l.kind, lower(coalesce(l.name, s.name))
-        """;
+        order by active desc, l.kind, coalesce(l.name, s.name) %s
+        """.formatted(TurkishOrder.SQL_COLLATION);
 
     private final StockLocationRepository locations;
     private final JdbcClient jdbc;
