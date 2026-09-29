@@ -6,8 +6,8 @@ import { shots } from './shots'
 import { DESK_CLICKS, DRAWER, END_CARD, LAPTOP_ON, PHONE_ON, SENT_PULSE, STREAK } from './timeline'
 
 /**
- * Kameranın yolu. Telefonda dokunulan yerin yüksekliğini izler (form yukarıdan aşağı dolar, seçici en alttaki
- * Çimento'ya iner, en sonda Gönder); masaüstünde sırayla yeni satıra, aramaya, açılan panele ve Excel'e bakar.
+ * Kameranın yolu. Telefonda dokunulan yerin yüksekliğini izler (form yukarıdan aşağı dolar, en sonda Gönder);
+ * masaüstünde sırayla yeni satıra, aramaya, açılan panele ve Excel'e bakar.
  */
 const WIDE = { x: 960, y: 540, scale: 1 }
 const phone = (appY: number, scale = 1.45) => followPhone(PHONE_ON, appY, scale)
@@ -34,8 +34,6 @@ export const CAMERA: Pose[] = [
   { at: 118, ...WIDE },
   { at: 140, ...phone(300) },
   { at: 186, ...phone(300) },
-  { at: 200, ...phone(480) },
-  { at: 214, ...phone(480) },
   { at: 226, ...phone(330) },
   { at: 250, ...phone(330) },
   { at: 262, ...phone(370) },

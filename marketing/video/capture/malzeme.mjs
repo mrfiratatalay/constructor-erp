@@ -41,6 +41,7 @@ async function filmPhone(page) {
   for (const [index, line] of LINES.entries()) await fillLine(page, form, index, line)
   await filmPhoto(page, form)
   await film.tap(form.getByRole('button', { name: 'Gönder' }), 'phone-tap-send')
+  runSql(new URL('malzeme-morning.sql', import.meta.url))
   // "Sevkiyat kaydedildi" bildirimi kaybolana kadar beklenir: dar kutuda kelimeyi ortadan bölüyor.
   await film.shot(page, 'phone-saved', 2600)
   const detail = page.locator('.van-popup:visible').filter({ hasText: 'Geçmiş' })

@@ -37,12 +37,11 @@ parçalardan kurgulanır.
 | # | Video | Tek cümle | Telefonda (saha) | Masaüstünde (patron) | Durum |
 |---|---|---|---|---|---|
 | 1 | **Yoklama ve puantaj** | Şef her sabah yazıyor, ay sonunda puantaj hazır. | Şef sabah yoklamayı alır | Puantaj cetveli, Excel | Hazır |
-| 2 | Şantiye sohbeti | Her şantiyenin kendi sohbeti. | Fotoğraf, sesli not | Bütün şantiyeler solda, sohbet sağda | Fotoğraf bekliyor |
-| 3 | Saha günlüğü | Şantiyede bugün ne oldu, tek akışta. | "Sorun bildir" | Sarı sorun satırı, günlük | Fotoğraf bekliyor |
+| 2-3 | **Saha ve sohbet** | Sahada ne olursa, ofiste o an bilinir. | Şef "Sorun bildir": sarı satır | Listede öne çıkan şantiye, Saha, Sohbet'te cevap | Hazır (fotoğrafsız) |
 | 4 | **Malzeme sevkiyatı** | Ne çıktı, nereye gitti, geri gelecek mi. | Depocu sevkiyat çıkarır, irsaliye çeker | Sevkiyat defteri, "dışarıda" şeridi | Hazır |
 | 5 | **Ekibi eklemek** | Tek bağlantı, herkes içeride. | Usta bağlantıdan katılır | Akışta "katıldı", yoklamada yeni satır | Hazır |
 | 6 | **İş ilerlemesi** | Şef miktarı yazar, yüzde kendiliğinden. | Şef "Demir İşleri → 3,5 ton" girer | Pano, geciken iş, şefin notu | Hazır |
-| 7 | **Ana video** (60-75 sn) | Hepsi | 1-6'nın en iyi anları | | En son |
+| 7 | **Ana video** (72 sn) | Hepsi | Beş videodan birer parça, bir şantiye günü | | Hazır |
 
 Görevler videoya girmez: TASARIM.md'de ürün kararı henüz konuşuluyor. Bildirim, 3. videonun parçasıdır.
 
@@ -180,6 +179,21 @@ kez görünür (Tamamlandı, Devam ediyor, Bitmeye yakın, Gecikiyor). Yağmur v
 Sunucunun saati değiştirilemediği için çekim, şefin girişini kaydettikten hemen sonra akşama (17:38) taşır
 (`capture/ilerleme-evening.sql`): gece çekilse de akşam görünür.
 
+## Saha ve sohbet videosu (32 sn)
+
+`npm run render:saha` → `out/saha.mp4`. 14:20'de şef Kartal'ın Saha sekmesinden sorun bildirir ("Beton pompası
+arızalandı…"): çubuk sararır, akışta sarı satır olur. Patron masaüstünde listede Kartal'ı öne çıkmış (14:20, rozet 2),
+Saha'da sarı satırı görür, Sohbet'e geçip cevap yazar (14:26); kapanışta cevap şefin telefonundadır. Fotoğraf yoktur:
+bu ortamdan stok fotoğraf sitelerine erişilemedi; Kızılkan Yapı'nın fotoğrafları gelince bir fotoğraf eklenir.
+
+## Ana video: tanıtım (72 sn)
+
+`npm run render:tanitim` → `out/tanitim.mp4`. Açılış ("Kızılkan Yapı'nın şantiyeleri." → "WhatsApp'ta değil, tek
+yerde."), sonra bir şantiye günü sırasıyla beş bölüm, her biri modül videosundan 12 saniye (`src/tanitim/timeline.ts`):
+Yoklama (sabah), Malzeme (09:32), Saha (14:20), İlerleme (17:38), Ekip. Parçalar kendi sözleri ve efektleriyle oynar,
+müzikleri susar; altında tek müzik çalar ("tanitim" biçimi: her bölüm bir düşüşle açılır). Sonda "Yoklama, malzeme,
+saha, ilerleme, ekip: tek uygulama." ve kapanış: "Sahada telefon, ofiste tek ekran."
+
 ## Uygulamada fark edilenler
 
 Çekim sırasında görüldü, videoyu etkilemedi (o kare kullanılmadı), ürün tarafında düzeltilecek:
@@ -189,8 +203,8 @@ Sunucunun saati değiştirilemediği için çekim, şefin girişini kaydettikten
 - Masaüstünde şantiye akışı açılışta dibe iner ama yalnızca mesajlara bakarak; sistem satırları ("… katıldı") ayrı
   istekle sonradan gelince ekran onları takip etmez. Yeni katılan birinin satırı patron kaydırana kadar altta
   gizli kalır (`useFeedBottom`, `useSiteTimeline`). **Düzeltildi** (ayrı commit): dip, en alttaki öğe ve öğe sayısıyla izlenir.
-- Malzeme listesi Türkçe alfabeye göre sıralanmıyor: "Çelik kalıp" ve "Çimento" en sonda, "Tuğla"dan sonra
-  (`MaterialCatalog`, `lower(name)`; veritabanının dili `en_US`).
+- Malzeme listesi Türkçe alfabeye göre sıralanmıyordu: "Çelik kalıp" ve "Çimento" en sondaydı. **Düzeltildi** (ayrı
+  commit): malzeme, depo ve taşeron adları Türkçe sıralanır (`common/text/TurkishOrder`, `MaterialOrderTest`).
 - Telefonda "İlerleme kaydedildi" bildirimi stilsizdi (zeminsiz, başlığın üstüne binen düz yazı): `showNotify`'ın
   stili yüklenmiyordu. **Düzeltildi** (`frontend/src/mobile/index.ts`, ayrı commit), videoda düzgün hâli var.
 - Masaüstünde "N malzeme dışarıda" şeridi aramaya göre süzülüyor: arama yapınca, aranmayan ama dışarıda olan
@@ -207,7 +221,9 @@ Sunucunun saati değiştirilemediği için çekim, şefin girişini kaydettikten
 1. **Sesli taslağa geri bildirim:** müzik, efektlerin yüksekliği, hız. Ses kodla üretildiği için her şey bir sayıdır.
 2. **Kapanış:** Kızılkan Yapı'ya sunumda kapanışta ne yazsın (ör. uygulamanın adresi)?
 3. **Uygulamanın gerçek adresi:** ekip videosundaki davet bağlantısında görünür (şimdilik `kizilkan.example`).
-4. **Gerçek adlar (isteğe bağlı):** Kızılkan Yapı'nın şantiye ve usta adları verilirse demo dünyası onlarla kurulur;
+4. **Fotoğraflar:** Saha videosuna Kızılkan Yapı'nın bir şantiye fotoğrafı (ya da ortamın ağ ayarında
+   images.pexels.com / images.unsplash.com açılırsa ücretsiz lisanslı stok fotoğraf).
+5. **Gerçek adlar (isteğe bağlı):** Kızılkan Yapı'nın şantiye ve usta adları verilirse demo dünyası onlarla kurulur;
    izleyen kendi insanlarını ekranda görür.
 
 ## Dikkat

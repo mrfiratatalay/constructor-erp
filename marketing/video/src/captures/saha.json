@@ -1,0 +1,206 @@
+{
+  "_day": {
+    "day": "2026-09-30"
+  },
+  "phone-saha": {
+    "src": "captures/saha/phone-saha.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-plus": {
+    "box": {
+      "x": 12,
+      "y": 712,
+      "width": 46,
+      "height": 44
+    }
+  },
+  "phone-menu-layer": {
+    "src": "captures/saha/phone-menu-layer.png",
+    "box": {
+      "x": 0,
+      "y": 578,
+      "width": 393,
+      "height": 186
+    }
+  },
+  "phone-tap-issue": {
+    "box": {
+      "x": 154.5,
+      "y": 642,
+      "width": 84.1,
+      "height": 22
+    }
+  },
+  "phone-issue": {
+    "src": "captures/saha/phone-issue.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-text": {
+    "box": {
+      "x": 90,
+      "y": 688,
+      "width": 159,
+      "height": 48
+    }
+  },
+  "phone-typed-1": {
+    "src": "captures/saha/phone-typed-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-typed-2": {
+    "src": "captures/saha/phone-typed-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-typed-3": {
+    "src": "captures/saha/phone-typed-3.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-typed-4": {
+    "src": "captures/saha/phone-typed-4.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-typed-5": {
+    "src": "captures/saha/phone-typed-5.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-send": {
+    "box": {
+      "x": 327,
+      "y": 704,
+      "width": 46,
+      "height": 44
+    }
+  },
+  "phone-sent": {
+    "src": "captures/saha/phone-sent.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-issue-row": {
+    "box": {
+      "x": 16,
+      "y": 309.5,
+      "width": 361,
+      "height": 111.5
+    }
+  },
+  "desk-start": {
+    "src": "captures/saha/desk-start.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-site-row": {
+    "box": {
+      "x": 256,
+      "y": 113,
+      "width": 359,
+      "height": 75.3
+    }
+  },
+  "desk-tap-saha": {
+    "box": {
+      "x": 735.6,
+      "y": 73,
+      "width": 97.7,
+      "height": 40
+    }
+  },
+  "desk-saha": {
+    "src": "captures/saha/desk-saha.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-issue-row": {
+    "box": {
+      "x": 687,
+      "y": 368.5,
+      "width": 712,
+      "height": 69.5
+    }
+  },
+  "desk-tap-chat": {
+    "box": {
+      "x": 640,
+      "y": 73,
+      "width": 95.6,
+      "height": 40
+    }
+  },
+  "desk-chat": {
+    "src": "captures/saha/desk-chat.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-tap-text": {
+    "box": {
+      "x": 711,
+      "y": 865,
+      "width": 664,
+      "height": 43
+    }
+  },
+  "desk-typed-1": {
+    "src": "captures/saha/desk-typed-1.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-typed-2": {
+    "src": "captures/saha/desk-typed-2.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-typed-3": {
+    "src": "captures/saha/desk-typed-3.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-replied": {
+    "src": "captures/saha/desk-replied.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-reply": {
+    "box": {
+      "x": 1054.3,
+      "y": 806.8,
+      "width": 334.7,
+      "height": 21.8
+    }
+  },
+  "phone-chat": {
+    "src": "captures/saha/phone-chat.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 1058
+  },
+  "phone-reply": {
+    "box": {
+      "x": 26,
+      "y": 596.5,
+      "width": 261.6,
+      "height": 43.5
+    }
+  }
+}

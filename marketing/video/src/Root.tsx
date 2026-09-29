@@ -5,6 +5,10 @@ import { Ilerleme } from './ilerleme/Ilerleme'
 import { DURATION as ILERLEME } from './ilerleme/timeline'
 import { Malzeme } from './malzeme/Malzeme'
 import { DURATION as MALZEME } from './malzeme/timeline'
+import { Tanitim } from './tanitim/Tanitim'
+import { DURATION as TANITIM } from './tanitim/timeline'
+import { Saha } from './saha/Saha'
+import { DURATION as SAHA } from './saha/timeline'
 import { STAGE } from './theme'
 import { Yoklama } from './yoklama/Yoklama'
 import { DURATION as YOKLAMA } from './yoklama/timeline'
@@ -18,5 +22,7 @@ export const Root: React.FC = () => (
     <Composition id="Malzeme" component={Malzeme} durationInFrames={MALZEME} {...FORMAT} />
     <Composition id="Ekip" component={Ekip} durationInFrames={EKIP} {...FORMAT} />
     <Composition id="Ilerleme" component={Ilerleme} durationInFrames={ILERLEME} {...FORMAT} />
+    <Composition id="Saha" component={Saha} durationInFrames={SAHA} {...FORMAT} />
+    <Composition id="Tanitim" component={Tanitim} durationInFrames={TANITIM} {...FORMAT} />
   </>
 )

@@ -1,16 +1,16 @@
 import { master, mixInto, place, RATE, samples, stereo } from './dsp.mjs'
+import { FORMS } from './forms.mjs'
 import { bass, clap, hat, impact, kick, pad, pluck, riser } from './instruments.mjs'
 import { CHORDS } from './scores.mjs'
 import { pingPong, reverb } from './space.mjs'
 
 /**
- * Serinin müziği: 120 BPM, 16 ölçü, tam 32 saniye. Bir vuruş yarım saniye = videoda 15 kare, bir ölçü 60 kare.
- * İskelet her videoda aynıdır ve videoların zamanlamasıyla (src/<video>/timeline.ts) örtüşür: 2. ölçüde (kare 120)
- * ilk düşüş, 7. ölçüde nefes, 8. ölçüde (kare 480) ikinci düşüş, 14. ölçüde (kare 840) kapanış. Akorlar ve melodi
- * partisyondan (scores.mjs) gelir.
+ * Serinin müziği: 120 BPM. Bir vuruş yarım saniye = videoda 15 kare, bir ölçü 60 kare. İskelet biçimden (forms.mjs)
+ * gelir ve videoların zamanlamasıyla (src/<video>/timeline.ts) örtüşür: modül videolarında 2. ölçüde (kare 120) ilk
+ * düşüş, 7. ölçüde nefes, 8. ölçüde (kare 480) ikinci düşüş, 14. ölçüde (kare 840) kapanış. Akorlar ve melodi
+ * partisyondan (scores.mjs) gelir; partisyon biçim söylemezse modül biçimidir.
  */
 const BAR = 2
-const LENGTH = 32
 
 /**
  * Karışımın dengesi: ölçülerek ayarlandı (her bandın toplama oranı). Davul ve alt bas telefonda duyulmaz ama
@@ -19,22 +19,24 @@ const LENGTH = 32
 const LEVEL = { kick: 0.5, clap: 0.4, hat: 0.2, ghost: 0.07, bass: 0.26, pad: 0.6, introPad: 0.55, arp: 0.3, introArp: 0.34, tune: 0.5, impact: 0.42, riser: 0.4 }
 const ARP = [0, 1, 2, 3, 2, 1, 2, 3, 0, 1, 2, 3, 2, 1, 0, 1]
 
-/** Ölçünün bölümü: giriş, ilk akış, nefes, dolu akış, kapanış. */
-function sectionOf(bar) {
-  if (bar < 2) return 'intro'
-  if (bar < 7) return 'groove'
-  if (bar < 8) return 'breath'
-  if (bar < 14) return 'full'
+/** Ölçünün bölümü: giriş, ilk akış, nefes, dolu akış; biçimdeki sıraya göre. */
+function sectionOf(bar, form) {
+  let end = 0
+  for (const [section, bars] of form.sections) {
+    end += bars
+    if (bar < end) return section
+  }
   return 'outro'
 }
 
-/** Bir partisyonu (scores.mjs) çalar: stereo, 32 saniye, sesi dengelenmiş. */
+/** Bir partisyonu (scores.mjs) kendi biçimiyle çalar: stereo, sesi dengelenmiş. */
 export function compose(score) {
-  const length = samples(LENGTH)
+  const form = FORMS[score.form ?? 'modul']
+  const length = samples(form.length)
   const bus = { drums: stereo(length), low: stereo(length), pads: stereo(length), keys: stereo(length), fx: stereo(length) }
   const kicks = []
-  for (let bar = 0; bar < 14; bar++) {
-    const section = sectionOf(bar)
+  for (let bar = 0; bar < form.resolve / BAR; bar++) {
+    const section = sectionOf(bar, form)
     const name = score.progression[bar % score.progression.length]
     const chord = { ...CHORDS[name], tune: score.tune[name] }
     const start = bar * BAR
@@ -42,10 +44,10 @@ export function compose(score) {
     writeKeys(bus, chord, start, section)
     if (section === 'groove' || section === 'full') writeGroove(bus, chord, start, section, kicks)
   }
-  writeMoments(bus)
+  writeMoments(bus, form)
   duck(bus.low, kicks, 0.45)
   duck(bus.pads, kicks, 0.55)
-  return mixDown(bus, length)
+  return mixDown(bus, length, form)
 }
 
 function writePad(bus, chord, start, section, bar) {
@@ -88,13 +90,13 @@ function writeGroove(bus, chord, start, section, kicks) {
 }
 
 /** Bölüm geçişleri: düşüşlerden önce gerilim, düşüşte gümbürtü; sonda Do akoruna çözülüş. */
-function writeMoments(bus) {
-  place(bus.fx, riser(1.5, 5), 2.5, LEVEL.riser)
-  place(bus.fx, riser(1.6, 6), 14.4, LEVEL.riser)
-  for (const at of [4, 16, 28]) place(bus.fx, impact(9 + at), at, LEVEL.impact)
-  place(bus.pads, pad([48, 55, 60, 64, 67, 72], 3.2, { attack: 0.05, release: 2.6, brightness: 2600 }), 28, LEVEL.pad)
-  place(bus.low, bass(36, 2.6), 28, LEVEL.bass)
-  ;[60, 64, 67, 72, 76, 79, 84].forEach((note, index) => place(bus.keys, pluck(note, { decay: 0.5 }), 28 + index * 0.125, LEVEL.arp))
+function writeMoments(bus, form) {
+  form.risers.forEach(([at, length], index) => place(bus.fx, riser(length, 5 + index), at, LEVEL.riser))
+  for (const at of [...form.impacts, form.resolve]) place(bus.fx, impact(9 + at), at, LEVEL.impact)
+  const end = form.resolve
+  place(bus.pads, pad([48, 55, 60, 64, 67, 72], 3.2, { attack: 0.05, release: 2.6, brightness: 2600 }), end, LEVEL.pad)
+  place(bus.low, bass(36, 2.6), end, LEVEL.bass)
+  ;[60, 64, 67, 72, 76, 79, 84].forEach((note, index) => place(bus.keys, pluck(note, { decay: 0.5 }), end + index * 0.125, LEVEL.arp))
 }
 
 /** Yan zincir sıkıştırma: davul vurunca bas ve akorlar bir an çekilir, müzik "nefes alır" gibi atar. */
@@ -110,7 +112,7 @@ function duck(buffer, kicks, depth) {
   }
 }
 
-function mixDown(bus, length) {
+function mixDown(bus, length, form) {
   const mix = stereo(length)
   mixInto(mix, bus.drums, 1)
   mixInto(mix, bus.low, 1)
@@ -119,7 +121,7 @@ function mixDown(bus, length) {
   mixInto(mix, bus.fx, 1)
   mixInto(mix, pingPong(bus.keys, { time: 0.375, feedback: 0.3 }), 0.28)
   mixInto(mix, reverb(sum(bus.pads, bus.keys, bus.fx, bus.drums, 0.25)), 0.55)
-  fadeOut(mix, 30.6, LENGTH)
+  fadeOut(mix, form.fade, form.length)
   return master(mix)
 }
 

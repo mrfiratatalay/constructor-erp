@@ -56,4 +56,25 @@ export const SCORES = {
       G: [74, null, 76, 79, 77, null, 74, 71],
     },
   },
+  /** Ana video (72 sn, biçim "tanitim"): ekibin sıcak dizisi, melodisi daha geniş; beş bölüm, beş düşüş. */
+  tanitim: {
+    form: 'tanitim',
+    progression: ['C', 'G', 'Am', 'F'],
+    tune: {
+      C: [72, null, 76, 79, 76, null, 74, 72],
+      G: [74, null, 79, 83, 81, null, 79, null],
+      Am: [76, null, 81, 79, 76, null, 72, 74],
+      F: [77, null, 76, 72, 69, null, 72, null],
+    },
+  },
+  /** Lam – Do – Fa – Sol: önce kaygı (bir sorun var), sonra ferahlık (cevap geldi); son Sol'den Do'ya. */
+  saha: {
+    progression: ['Am', 'C', 'F', 'G'],
+    tune: {
+      Am: [69, null, 72, 76, 74, null, 72, 69],
+      C: [72, null, 76, 79, 76, null, 74, 72],
+      F: [72, null, 77, 76, 72, null, 69, null],
+      G: [74, null, 79, 77, 74, null, 71, null],
+    },
+  },
 }

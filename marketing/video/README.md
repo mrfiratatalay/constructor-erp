@@ -29,12 +29,15 @@ npm run render:yoklama  # sesleri üretir, out/yoklama.mp4 (1920×1080, 30 kare/
 npm run render:malzeme  # out/malzeme.mp4
 npm run render:ekip     # out/ekip.mp4
 npm run render:ilerleme # out/ilerleme.mp4
+npm run render:saha     # out/saha.mp4
+npm run render:tanitim  # ana video, 72 sn: beş videodan birer parça
 ```
 
-Her video kendi klasöründedir (`src/yoklama/`, `src/malzeme/`, `src/ekip/`, `src/ilerleme/`). Metni ya da
-zamanlamayı değiştirmek için `timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve yüksekliğini `sounds.ts`;
-müziğin akorları ve melodisi `audio/scores.mjs`'te, sesin kendisi `audio/music.mjs`'tedir. Müzik 120 BPM'dir:
-timeline'daki büyük anlar (120, 480, 840. kare) müziğin düşüşleridir; biri değişirse öteki de değişir.
+Her video kendi klasöründedir (`src/yoklama/`, `src/malzeme/`, `src/ekip/`, `src/ilerleme/`, `src/saha/`; ana video
+`src/tanitim/`). Metni ya da zamanlamayı değiştirmek için `timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve
+yüksekliğini `sounds.ts`; müziğin akorları ve melodisi `audio/scores.mjs`'te, sesin kendisi `audio/music.mjs`'tedir.
+Müzik 120 BPM'dir: timeline'daki büyük anlar (120, 480, 840. kare) müziğin düşüşleridir; biri değişirse öteki de
+değişir.
 
 ## Ekranları yeniden çekmek (uygulama değiştiyse)
 
@@ -50,11 +53,12 @@ npm run capture:yoklama                       # ekranlar ve defter yenilenir
 npm run capture:malzeme
 npm run capture:ekip
 npm run capture:ilerleme
+npm run capture:saha
 ```
 
 - Puantaj ayın başından düne kadar doldurulur: çekim ayın sonuna doğru yapılırsa cetvel dolu görünür.
 - Çekim her seferinde bugün girdiğini siler (yoklamada işaretler, malzemede sevkiyatlar, ekipte yeni usta, ilerlemede
-  bugünün girişi) ve aynı
+  bugünün girişi, sahada sorun ve cevap) ve aynı
   sabahtan başlar; tekrar tekrar çalıştırılabilir. Gün değiştiyse dünkü çekimden kalanlar silinmez: çekimlerden
   önce demo dünyası baştan kurulur.
 - Demo dünyasını baştan kurmak: backend'i durdur, `demo-data/reset.sh`, sonra yeniden `backend.sh` ve `npm run seed`.

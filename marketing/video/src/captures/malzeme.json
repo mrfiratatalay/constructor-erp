@@ -1,6 +1,6 @@
 {
   "_day": {
-    "day": "2026-09-29"
+    "day": "2026-09-30"
   },
   "phone-start": {
     "src": "captures/malzeme/phone-start.png",
@@ -36,7 +36,7 @@
   "phone-tap-site": {
     "box": {
       "x": 16,
-      "y": 222,
+      "y": 274,
       "width": 153.3,
       "height": 19
     }
@@ -67,7 +67,7 @@
   "phone-line-1-tap-material": {
     "box": {
       "x": 0,
-      "y": 616,
+      "y": 200,
       "width": 393,
       "height": 52
     }
@@ -123,7 +123,7 @@
   "phone-line-2-tap-material": {
     "box": {
       "x": 0,
-      "y": 200,
+      "y": 304,
       "width": 393,
       "height": 52
     }
