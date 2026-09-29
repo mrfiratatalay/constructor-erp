@@ -8,13 +8,6 @@
 export interface MaterialView {
   id: string
   name: string
-  /** @nullable */
-  code?: string | null
-  category: string
   unit: string
-  /** @nullable */
-  minStock?: number | null
-  /** @nullable */
-  description?: string | null
   active: boolean
 }

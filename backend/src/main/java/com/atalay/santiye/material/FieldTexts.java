@@ -1,27 +1,22 @@
 package com.atalay.santiye.material;
 
+import java.util.List;
+
 /**
- * Saha gönderisinin yazısı. Saha simgesi yazıdan okunur ("geldi" teslimattır, 📦): gelen malzeme "geldi" der,
- * yoldaki "yolda", çıkan "gönderildi", kullanım "kullanıldı". Tarih ve saat gönderinin kendisindedir.
+ * Saha gönderisinin yazısı. Saha simgesi yazıdan okunur ("geldi" teslimattır, 📦): şantiyeye gelen sevkiyat
+ * "geldi", şantiyeden çıkan "gönderildi" der. Tarih ve saat gönderinin kendisindedir.
  */
-record FieldTexts(MaterialMovement movement, Material material, String from, String to) {
+record FieldTexts(Shipment shipment, List<String> items, String from, String to) {
 
     String body(boolean arriving) {
-        String what = material.getName() + ", " + Quantities.withUnit(movement.getQuantity(), material.getUnit());
-        return headline(arriving) + ": " + what + route();
+        return headline(arriving) + ": " + String.join(", ", items) + route();
     }
 
     private String headline(boolean arriving) {
-        return switch (movement.getType()) {
-            case USED -> "Malzeme kullanıldı";
-            case OUTBOUND -> "Malzeme dışarı verildi";
-            case RETURN -> "İade geldi";
-            default -> arriving ? arrivingHeadline() : "Malzeme gönderildi";
-        };
-    }
-
-    private String arrivingHeadline() {
-        return movement.getStatus() == MovementStatus.IN_TRANSIT ? "Malzeme yolda" : "Malzeme geldi";
+        if (shipment.getType() == ShipmentType.OUTBOUND) {
+            return "Malzeme dışarı verildi";
+        }
+        return arriving ? "Malzeme geldi" : "Malzeme gönderildi";
     }
 
     private String route() {

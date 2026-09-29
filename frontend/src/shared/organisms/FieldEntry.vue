@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { FieldMaterialRef, PostView } from '@/core/api/generated/model'
+import type { FieldShipmentRef, PostView } from '@/core/api/generated/model'
 import { fieldKind } from '@/core/field/fieldKind'
 import FieldMedia from '@/shared/molecules/FieldMedia.vue'
 import FieldRow from '@/shared/molecules/FieldRow.vue'
@@ -11,8 +11,8 @@ import MaterialFieldCard from '@/shared/molecules/MaterialFieldCard.vue'
  * Silinen güncellemenin yerinde iz kalır (İlke 6). ⋯ menüsü kabuktan yuvayla gelir. Malzeme hareketinden gelen
  * gönderinin altında hareketin kartı durur (güncel durumuyla; dokununca hareketin ayrıntısı).
  */
-const { post, material = undefined } = defineProps<{ post: PostView; material?: FieldMaterialRef }>()
-const emit = defineEmits<{ openPhotos: [urls: string[], index: number]; openMaterial: [movementId: string] }>()
+const { post, material = undefined } = defineProps<{ post: PostView; material?: FieldShipmentRef }>()
+const emit = defineEmits<{ openPhotos: [urls: string[], index: number]; openMaterial: [shipmentId: string] }>()
 
 const kind = computed(() => (post.deletion ? 'note' : fieldKind(post)))
 </script>

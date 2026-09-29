@@ -7,7 +7,7 @@ import type { PostView, SiteView } from '@/core/api/generated/model'
 import { dayDividerText } from '@/core/field/fieldDays'
 import { fieldSummary } from '@/core/field/fieldSummary'
 import { useFieldUpdates } from '@/core/field/useFieldUpdates'
-import { useFieldMaterialRefs } from '@/core/materials/useFieldMaterialRefs'
+import { useFieldShipmentRefs } from '@/core/shipments/useFieldShipmentRefs'
 import FieldActionSheet from '@/mobile/organisms/FieldActionSheet.vue'
 import FieldDayTitle from '@/shared/molecules/FieldDayTitle.vue'
 import FieldHero from '@/shared/molecules/FieldHero.vue'
@@ -22,7 +22,7 @@ const { site } = defineProps<{ site: SiteView }>()
 const { days, isEmpty, isLoading, hasMore, isLoadingMore, loadMore } = useFieldUpdates(() => site.id)
 const summary = computed(() => fieldSummary(days.value, site.photoUrl ?? null))
 const acting = ref<PostView | null>(null)
-const materials = useFieldMaterialRefs(() => site.id)
+const materials = useFieldShipmentRefs(() => site.id)
 const router = useRouter()
 const openMaterial = (movementId: string) => router.push({ name: 'materials', query: { hareket: movementId } })
 

@@ -1,85 +1,75 @@
 package com.atalay.santiye.material;
 
 import com.atalay.santiye.auth.CurrentUser;
-import com.atalay.santiye.material.dto.MovementFilter;
-import com.atalay.santiye.material.dto.ReturnRow;
-import com.atalay.santiye.material.dto.StockCell;
-import com.atalay.santiye.material.dto.StockRow;
+import com.atalay.santiye.material.dto.ShipmentLineView;
+import com.atalay.santiye.material.dto.ShipmentRow;
+import jakarta.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.dhatim.fastexcel.Workbook;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Malzeme raporu, tek çalışma kitabı; sunucuda oluşturulur (büyük döküm tarayıcıyı yormaz). Sayfalar seçilir:
- * Hareketler (ekrandaki süzgeçlerle), Stok Özeti (bugünün durumu, lokasyon sütunlarıyla) ve Beklenen İadeler.
+ * Sevkiyat dökümü: ekrandaki listenin Excel hali, her kalem bir satır. Tek sayfadır; stok özeti yoktur, çünkü
+ * modül stok tutmaz.
  */
 @Service
-public class MaterialReport {
+class MaterialReport {
 
-    private final MovementSearch search;
-    private final StockView stock;
-    private final MaterialInsights insights;
+    private static final List<TableSheet.Column> COLUMNS = List.of(
+        new TableSheet.Column("Tarih", 12),
+        new TableSheet.Column("Sevkiyat", 14),
+        new TableSheet.Column("Ne oldu", 22),
+        new TableSheet.Column("Nereden", 26),
+        new TableSheet.Column("Nereye", 26),
+        new TableSheet.Column("Malzeme", 28),
+        new TableSheet.Column("Miktar", 12),
+        new TableSheet.Column("Birim", 10),
+        new TableSheet.Column("Durum", 16));
+
+    private final ShipmentRows rows;
     private final Clock clock;
 
-    MaterialReport(MovementSearch search, StockView stock, MaterialInsights insights, Clock clock) {
-        this.search = search;
-        this.stock = stock;
-        this.insights = insights;
+    MaterialReport(ShipmentRows rows, Clock clock) {
+        this.rows = rows;
         this.clock = clock;
     }
 
-    @Transactional
-    public byte[] workbook(CurrentUser user, MovementFilter filter, Set<ReportSheet> sheets) {
-        ByteArrayOutputStream file = new ByteArrayOutputStream();
-        try (Workbook workbook = new Workbook(file, "Kizilkan Santiye", "1.0")) {
-            if (sheets.contains(ReportSheet.MOVEMENTS)) {
-                TableSheet.write(workbook.newWorksheet("Hareketler"), ReportRows.MOVEMENT_COLUMNS,
-                    search.all(user, filter).stream().map(ReportRows::movement).toList(), clock.getZone());
-            }
-            if (sheets.contains(ReportSheet.STOCK)) {
-                writeStock(workbook, user, filter);
-            }
-            if (sheets.contains(ReportSheet.RETURNS)) {
-                writeReturns(workbook, user, filter);
-            }
+    byte[] workbook(CurrentUser user, @Nullable String search) {
+        var out = new ByteArrayOutputStream();
+        try (Workbook workbook = new Workbook(out, "Kızılkan Şantiye", "1.0")) {
+            TableSheet.write(workbook.newWorksheet("Sevkiyatlar"), COLUMNS, linesOf(rows.list(user, search)),
+                clock.getZone());
         } catch (IOException problem) {
             throw new UncheckedIOException(problem);
         }
-        return file.toByteArray();
+        return out.toByteArray();
     }
 
-    /** Dosya adı dönemi söyler: malzeme_raporu_2026-09-01_2026-09-30.xlsx; dönem yoksa bugünün tarihi. */
-    public String fileName(MovementFilter filter) {
-        LocalDate today = LocalDate.now(clock);
-        if (filter.from() == null && filter.to() == null) {
-            return "malzeme_raporu_" + today + ".xlsx";
-        }
-        return "malzeme_raporu_" + (filter.from() == null ? "baslangic" : filter.from()) + "_"
-            + (filter.to() == null ? today : filter.to()) + ".xlsx";
+    String fileName() {
+        return "sevkiyatlar_" + LocalDate.now(clock) + ".xlsx";
     }
 
-    private void writeStock(Workbook workbook, CurrentUser user, MovementFilter filter) {
-        List<StockRow> rows = stock.rows(user).stream().filter(row -> ReportRows.stockMatches(row,
-            filter.materialId(), MaterialTexts.tidy(filter.category()), filter.locationId())).toList();
-        List<String> places = rows.stream().flatMap(row -> row.locations().stream()).map(StockCell::name)
-            .distinct().toList();
-        TableSheet.write(workbook.newWorksheet("Stok Özeti"), ReportRows.stockColumns(places),
-            rows.stream().map(row -> ReportRows.stock(row, places)).toList(), clock.getZone());
+    /** Bir sevkiyatın her kalemi ayrı satır olur: Excel'de süzülsün ve toplansın diye. */
+    private static List<List<Object>> linesOf(List<ShipmentRow> shipments) {
+        List<List<Object>> lines = new ArrayList<>();
+        shipments.forEach(shipment -> shipment.lines()
+            .forEach(line -> lines.add(rowOf(shipment, line))));
+        return lines;
     }
 
-    private void writeReturns(Workbook workbook, CurrentUser user, MovementFilter filter) {
-        LocalDate today = LocalDate.now(clock);
-        List<ReturnRow> rows = insights.awaitingReturns(user).stream()
-            .filter(row -> filter.materialId() == null || row.materialId().equals(filter.materialId()))
-            .toList();
-        TableSheet.write(workbook.newWorksheet("Beklenen İadeler"), ReportRows.RETURN_COLUMNS,
-            rows.stream().map(row -> ReportRows.awaitingReturn(row, today)).toList(), clock.getZone());
+    private static List<Object> rowOf(ShipmentRow shipment, ShipmentLineView line) {
+        return List.of(shipment.day(), Quantities.number(shipment.number()),
+            ShipmentLabels.typeOf(shipment.type()), text(shipment.fromName()), text(shipment.toName()),
+            line.materialName(), line.quantity(), line.unit(), ShipmentLabels.statusOf(shipment.status()));
+    }
+
+    private static String text(@Nullable String value) {
+        return value == null ? "—" : value;
     }
 }

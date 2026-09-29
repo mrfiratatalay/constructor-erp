@@ -22,6 +22,6 @@ final class Quantities {
     }
 
     static String number(long number) {
-        return "MH-%06d".formatted(number);
+        return "SV-%06d".formatted(number);
     }
 }

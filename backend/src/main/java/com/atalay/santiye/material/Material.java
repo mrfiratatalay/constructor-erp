@@ -4,13 +4,12 @@ import com.atalay.santiye.material.dto.MaterialRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Malzeme kartı: sabit ürün tanımı ("Çimento · Torba · Yapı"). Stok burada tutulmaz, hareketlerden hesaplanır.
- * Tek ana birimle izlenir: aynı malzeme farklı birimle girilemez. Eski malzeme silinmez, pasifleşir.
+ * Malzeme kartı: ad ve ana birim ("Çimento · Torba"). Kategori ve kritik eşik kalktı; kategori sahada birim gibi
+ * dolduruluyordu, kritik eşik ise stok sayılmadan anlamsızdı. Eski malzeme silinmez, pasifleşir.
  */
 @Entity
 @Table(name = "materials")
@@ -20,11 +19,7 @@ class Material {
     private UUID id;
     private UUID companyId;
     private String name;
-    private String code;
-    private String category;
     private String unit;
-    private BigDecimal minStock;
-    private String description;
     private boolean active;
     private Instant createdAt;
 
@@ -40,11 +35,7 @@ class Material {
 
     void describe(MaterialRequest request) {
         this.name = request.name();
-        this.code = request.code();
-        this.category = request.category();
         this.unit = request.unit();
-        this.minStock = request.minStock();
-        this.description = request.description();
         this.active = request.active();
     }
 
@@ -58,9 +49,5 @@ class Material {
 
     String getUnit() {
         return unit;
-    }
-
-    boolean isActive() {
-        return active;
     }
 }

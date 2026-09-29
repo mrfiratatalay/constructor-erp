@@ -16,18 +16,18 @@ public enum Permission {
     UPDATE_MATERIAL_MOVEMENT,
     CANCEL_MATERIAL_MOVEMENT,
     MANAGE_MATERIAL_CATALOG,
-    CONFIRM_DELIVERY,
     EXPORT_MATERIALS,
-    STOCK_ADJUSTMENT,
     VIEW_PRODUCTION,
     MANAGE_PRODUCTION;
 
     /**
-     * Şef sahadaki hareketi kaydeder ve teslim alır; kartları, iptali ve sayımı depo ile patron yönetir. İlerlemeyi
-     * (iş kalemleri ve günlük girişler) yalnızca şef girer; patron ve depo sorumlusu görür (Musa'nın kararı).
+     * Şef sevkiyatı görür, kendi şantiyesinden çıkarır ve döküm alır. Malzeme kartını da açabilir: sevkiyat
+     * girebilen biri listede olmayan malzemede tıkanmamalı, yoksa kayıt hiç girilmez. İptal depo ve patronundur.
+     * İlerlemeyi (iş kalemleri ve günlük girişler) yalnızca şef girer; patron ve depo sorumlusu görür (Musa'nın
+     * kararı).
      */
     private static final Set<Permission> SITE_LEAD = EnumSet.of(VIEW_MATERIALS, CREATE_MATERIAL_MOVEMENT,
-        CONFIRM_DELIVERY, EXPORT_MATERIALS, VIEW_PRODUCTION, MANAGE_PRODUCTION);
+        MANAGE_MATERIAL_CATALOG, EXPORT_MATERIALS, VIEW_PRODUCTION, MANAGE_PRODUCTION);
 
     public static List<Permission> grantedTo(UserRole role) {
         Set<Permission> granted = switch (role) {
