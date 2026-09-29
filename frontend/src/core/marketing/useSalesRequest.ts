@@ -11,7 +11,7 @@ export interface SalesRequestForm {
   email: string
   city: string
   siteCount: number | null
-  planId: string | null
+  planId: string | undefined
   message: string
   /** Bal küpü: insan görmez, bot doldurur. Dolu gelen başvuruyu sunucu sessizce yutar. */
   website: string
@@ -32,11 +32,11 @@ function problemOf(form: SalesRequestForm): string | null {
 export function useSalesRequest(plans: () => PublicPlanView[]) {
   const route = useRoute()
   const form = reactive<SalesRequestForm>({
-    companyName: '', contactName: '', phone: '', email: '', city: '', siteCount: null, planId: null, message: '', website: '',
+    companyName: '', contactName: '', phone: '', email: '', city: '', siteCount: null, planId: undefined, message: '', website: '',
   })
   watch(plans, (list) => {
     if (form.planId) return
-    form.planId = list.find((plan) => plan.code === route.query.paket)?.id ?? null
+    form.planId = list.find((plan) => plan.code === route.query.paket)?.id
   }, { immediate: true })
 
   const problem = ref<string | null>(null)

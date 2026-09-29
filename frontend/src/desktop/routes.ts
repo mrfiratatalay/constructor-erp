@@ -7,10 +7,9 @@ const sitesPage = () => import('./pages/SitesPage.vue')
 const attendancePage = () => import('./pages/AttendancePage.vue')
 
 export const routes = buildRoutes({
-  // Aşağıdaki geçici yönlendirmeler sayfaları yazıldıkça gerçek sayfalarla değişir.
   landing: () => import('./pages/LandingPage.vue'),
-  pricing: { redirectTo: 'login' },
-  apply: { redirectTo: 'login' },
+  pricing: () => import('./pages/PricingPage.vue'),
+  apply: () => import('./pages/ApplyPage.vue'),
   setup: () => import('./pages/SetupPage.vue'),
   platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
   platformTenants: () => import('./pages/PlatformTenantsPage.vue'),
