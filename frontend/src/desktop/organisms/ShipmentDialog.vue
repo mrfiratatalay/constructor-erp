@@ -99,7 +99,7 @@ async function submit() {
           <el-button link type="danger" :disabled="draft.lines.length === 1" @click="draft.lines.splice(index, 1)">
             Sil
           </el-button>
-          <el-text v-if="line.materialId" size="small" type="info" class="dialog__stock">
+          <el-text v-if="stock.quantityOf(line.materialId) > 0" size="small" type="info" class="dialog__stock">
             Depoda: {{ withUnit(stock.quantityOf(line.materialId), unitOf(line.materialId)) }}
           </el-text>
         </div>

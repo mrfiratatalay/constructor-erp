@@ -12,7 +12,13 @@ const quantity = defineModel<number | null>('quantity', { required: true })
 const { material, available } = defineProps<{ material: MaterialView | null; available: number }>()
 const emit = defineEmits<{ pick: []; remove: [] }>()
 
-const stockText = computed(() => (material ? `Depoda: ${withUnit(available, material.unit)}` : ''))
+/**
+ * "Depoda: 300 Torba" yalnızca gerçekten bir şey varken yazılır. Yeni açılmış ya da girişi hiç yazılmamış
+ * malzemenin sayısı sıfırdır; "Depoda: 0" depo boş demek değil, kayıt yok demektir ve okuyanı yanıltır.
+ */
+const stockText = computed(() =>
+  material && available > 0 ? `Depoda: ${withUnit(available, material.unit)}` : '',
+)
 
 function onQuantity(value: string) {
   quantity.value = value === '' ? null : Number(value)
