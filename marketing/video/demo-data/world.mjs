@@ -1,15 +1,16 @@
 /**
- * Reklam videolarının hayali dünyası: bütün videolarda aynı firma, aynı kişiler, aynı şantiyeler. Adlar gerçek
- * birine ait değildir. Numaralar 0500 ile başlar: hiçbir operatöre verilmemiş bir önektir, videoda görünen numara
- * kimsenin telefonunu çaldırmaz.
+ * Reklam videolarının dünyası: bütün videolarda aynı firma, aynı kişiler, aynı şantiyeler. Firma Kızılkan Yapı'dır
+ * (video ilk olarak ona sunulur); patronun adı uygulamanın kendi varsayılanıdır ("Patron"). Çalışanlar ve şantiyeler
+ * hayalidir, gerçek birine ait değildir. Numaralar 0500 ile başlar: hiçbir operatöre verilmemiş bir önektir, videoda
+ * görünen numara kimsenin telefonunu çaldırmaz.
  */
 const phone = (index) => `0500 000 10 ${String(index).padStart(2, '0')}`
 
-/** Backend bu hesapla açılır (APP_BOOTSTRAP_*): firma ve patron boş veritabanında bir kez oluşur. */
+/** Backend bu hesapla açılır (APP_BOOTSTRAP_*, backend.sh): firma ve patron boş veritabanında bir kez oluşur. */
 export const OWNER = {
-  company: 'Toprak Yapı',
-  name: 'Murat Toprak',
-  email: 'patron@toprakyapi.local',
+  company: 'Kızılkan Yapı',
+  name: 'Patron',
+  email: 'patron@kizilkanyapi.local',
   password: 'demo1234',
 }
 

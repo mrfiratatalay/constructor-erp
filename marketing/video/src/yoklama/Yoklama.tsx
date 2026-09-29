@@ -8,17 +8,19 @@ import { laptopPoint } from '../kit/Laptop'
 import { LightStreak } from '../kit/LightStreak'
 import { placeAt, progress } from '../kit/motion'
 import { Pulse } from '../kit/Pulse'
+import { Soundtrack } from '../kit/Soundtrack'
 import { Title } from '../kit/Title'
 import { useBrandFont } from '../kit/useBrandFont'
 import { COLOR, FONT } from '../theme'
 import { CAMERA, EXCEL_BUTTON, RING } from './camera'
 import { DeskAct } from './DeskAct'
 import { PhoneAct } from './PhoneAct'
+import { CUES, MUSIC } from './sounds'
 import { CAPTIONS, CLOSING, DESK_CLICKS, END_CARD, INTRO, LAPTOP_ON, RING_PULSE, STREAK } from './timeline'
 
 /**
  * Yoklama videosu: sabah şef telefonda yoklamayı alır, patron ofiste bugünü ve ayın puantajını görür, Excel'i indirir.
- * Cihazlar ve efektler kameranın içinde (dünyada), sözler ve uçan dosya ekranın üstündedir.
+ * Cihazlar ve efektler kameranın içinde (dünyada), sözler ve uçan dosya ekranın üstündedir; ses en alttadır.
  */
 export const Yoklama: React.FC = () => {
   useBrandFont()
@@ -37,6 +39,7 @@ export const Yoklama: React.FC = () => {
         <Title key={title.from} {...title} />
       ))}
       <EndCard start={END_CARD} line={CLOSING.line} note={CLOSING.note} />
+      <Soundtrack music={MUSIC.name} musicVolume={MUSIC.volume} cues={CUES} />
     </AbsoluteFill>
   )
 }

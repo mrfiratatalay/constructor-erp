@@ -8,7 +8,7 @@ import { RevealWipe } from '../kit/RevealWipe'
 import { ScreenTrack, type Shot } from '../kit/ScreenTrack'
 import { SlideLayer } from '../kit/SlideLayer'
 import { shots, tapOf } from './shots'
-import { CURSOR_REST, DESK_CLICKS, DRAWER, GRID_FILL, LAPTOP_POSES } from './timeline'
+import { CURSOR_REST, DESK_CLICKS, DRAWER, GRID_FILL, LAPTOP_POSES, LAPTOP_TAG } from './timeline'
 
 const SHOTS: Shot[] = [
   { at: 0, screen: shots.screen('desk-today') },
@@ -38,7 +38,7 @@ export const DeskAct: React.FC = () => {
         <SlideLayer layer={shots.layer('desk-drawer-layer')} from="right" frames={DRAWER} app={LAPTOP.app} dim={0.5} />
         <Cursor clicks={CLICKS} />
       </Laptop>
-      <DeviceTag at={top} text="Patron · ofiste" frames={{ from: 490, to: 610 }} />
+      <DeviceTag at={top} text="Patron · ofiste" frames={LAPTOP_TAG} />
     </>
   )
 }

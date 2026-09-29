@@ -6,7 +6,7 @@ import { PHONE, Phone, PHONE_SIZE } from '../kit/Phone'
 import { ScreenTrack, type Shot } from '../kit/ScreenTrack'
 import { SlideLayer } from '../kit/SlideLayer'
 import { PHONE_CONTENT, shots, tapOf } from './shots'
-import { PHONE_POSES, PHONE_SCROLLS, PHONE_TAPS, SHEET } from './timeline'
+import { PHONE_POSES, PHONE_SCROLLS, PHONE_TAG, PHONE_TAPS, SHEET } from './timeline'
 
 const screen = shots.screen
 const { picks } = PHONE_TAPS
@@ -57,7 +57,7 @@ export const PhoneAct: React.FC = () => {
         <SlideLayer layer={shots.layer('phone-sheet-layer')} from="bottom" frames={SHEET} app={PHONE.app} dim={0.7} />
         <Finger taps={TAPS} />
       </Phone>
-      <DeviceTag at={top} text="Şef · sahada" frames={{ from: 104, to: 440 }} />
+      <DeviceTag at={top} text="Şef · sahada" frames={PHONE_TAG} />
     </>
   )
 }

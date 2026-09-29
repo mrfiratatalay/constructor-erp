@@ -3,7 +3,17 @@ import { centerOf, type Pose } from '../kit/motion'
 import { phonePoint } from '../kit/Phone'
 import { STAGE } from '../theme'
 import { shots } from './shots'
-import { LAPTOP_ON, PHONE_ON } from './timeline'
+import {
+  DESK_CLICKS,
+  DRAWER,
+  END_CARD,
+  LAPTOP_ON,
+  PHONE_ON,
+  PHONE_SCROLLS,
+  PHONE_TAPS,
+  RING_PULSE,
+  STREAK,
+} from './timeline'
 
 /**
  * Kameranın yolu. Odaklar çekimin kaydettiği yerlerden hesaplanır: uygulama değişip çekim yenilenince kamera yine
@@ -43,28 +53,37 @@ const excel = laptopPoint(LAPTOP_ON, centerOf(shots.box('desk-tap-excel')))
 
 export const EXCEL_BUTTON = excel
 
+const ringFocus = followPhone(ring.y + 60, 1.7)
+const summaryFocus = { ...summaryRow, scale: 1.5 }
+const gridFocus = { ...grid, scale: 1.3 }
+const detailFocus = { ...detail, scale: DETAIL_ZOOM }
+const excelFocus = { x: excel.x - 180, y: excel.y + 150, scale: 1.5 }
+const taps = PHONE_TAPS
+const clicks = DESK_CLICKS
+
+/** Kamera anlara bağlıdır (timeline.ts): zamanlama değişince kamera da kendiliğinden kayar. */
 export const CAMERA: Pose[] = [
   { at: 0, ...WIDE },
-  { at: 110, ...WIDE },
-  { at: 134, ...followPhone(500, 1.45) },
-  { at: 160, ...followPhone(500, 1.45) },
-  { at: 172, ...followPhone(300, 1.45) },
-  { at: 186, ...followPhone(300, 1.45) },
-  { at: 206, ...followPhone(380, 1.55) },
-  { at: 282, ...followPhone(380, 1.55) },
-  { at: 298, ...followPhone(470, 1.55) },
-  { at: 342, ...followPhone(470, 1.55) },
-  { at: 384, ...followPhone(360, 1.25) },
-  { at: 402, ...followPhone(ring.y + 60, 1.7) },
-  { at: 426, ...followPhone(ring.y + 60, 1.7) },
-  { at: 458, ...WIDE },
-  { at: 500, ...WIDE },
-  { at: 532, ...summaryRow, scale: 1.5 },
-  { at: 598, ...summaryRow, scale: 1.5 },
-  { at: 632, ...grid, scale: 1.3 },
-  { at: 704, ...grid, scale: 1.3 },
-  { at: 728, ...detail, scale: DETAIL_ZOOM },
-  { at: 772, ...detail, scale: DETAIL_ZOOM },
-  { at: 798, x: excel.x - 180, y: excel.y + 150, scale: 1.5 },
-  { at: 850, x: excel.x - 180, y: excel.y + 150, scale: 1.5 },
+  { at: taps.row - 17, ...WIDE },
+  { at: taps.row + 5, ...followPhone(500, 1.45) },
+  { at: taps.absent + 7, ...followPhone(500, 1.45) },
+  { at: taps.select - 9, ...followPhone(300, 1.45) },
+  { at: taps.select + 5, ...followPhone(300, 1.45) },
+  { at: PHONE_SCROLLS.toList + 14, ...followPhone(380, 1.55) },
+  { at: PHONE_SCROLLS.toEnd - 6, ...followPhone(380, 1.55) },
+  { at: PHONE_SCROLLS.toEnd + 8, ...followPhone(470, 1.55) },
+  { at: PHONE_SCROLLS.toTop - 10, ...followPhone(470, 1.55) },
+  { at: PHONE_SCROLLS.toTop + 22, ...followPhone(360, 1.25) },
+  { at: RING_PULSE + 4, ...ringFocus },
+  { at: RING_PULSE + 28, ...ringFocus },
+  { at: STREAK.start - 8, ...WIDE },
+  { at: STREAK.end + 6, ...WIDE },
+  { at: STREAK.end + 34, ...summaryFocus },
+  { at: clicks.puantaj - 12, ...summaryFocus },
+  { at: clicks.puantaj + 22, ...gridFocus },
+  { at: clicks.cell - 2, ...gridFocus },
+  { at: clicks.cell + 22, ...detailFocus },
+  { at: DRAWER.close + 2, ...detailFocus },
+  { at: clicks.excel - 4, ...excelFocus },
+  { at: END_CARD, ...excelFocus },
 ]

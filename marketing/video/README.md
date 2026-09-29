@@ -5,9 +5,11 @@ Uygulamanın gerçek ekranlarından, tamamen kodla üretilen reklam videoları. 
 
 | Klasör | Ne |
 |---|---|
-| `demo-data/` | Boş bir veritabanına hayali firmayı ("Toprak Yapı") API'den kuran betikler |
+| `demo-data/` | Boş bir veritabanına demo dünyasını (Kızılkan Yapı, hayali çalışanlar) API'den kuran betikler |
+| `audio/` | Müzik ve ses efektleri, kodla: osilatör, filtre, yankı; kütüphane yok |
 | `capture/` | Playwright: uygulamayı senaryodaki gibi kullanır, her adımın ekranını çeker |
 | `public/captures/` | Çekilen ekranlar (telefon 3x, masaüstü 2x) |
+| `public/audio/` | Üretilen sesler (`npm run audio`; repoda durmaz, her seferinde aynı çıkar) |
 | `src/captures/` | Çekimin defteri: hangi resim, nereye dokunuldu, neresi kaydırıldı |
 | `src/kit/` | Parça seti: telefon, laptop, parmak, imleç, kamera, sözler, kapanış. Bütün videolar ortak kullanır. |
 | `src/yoklama/` | Yoklama videosu; `timeline.ts` bütün zamanlamayı tutar |
@@ -22,11 +24,13 @@ isim kurallarına yine de uyulur.
 ```bash
 cd marketing/video
 npm install
-npm run studio          # tarayıcıda önizleme: zaman çizelgesi, kare kare ileri geri
-npm run render:yoklama  # out/yoklama.mp4 (1920×1080, 30 kare/sn)
+npm run studio          # sesleri üretir, tarayıcıda önizleme: zaman çizelgesi, kare kare ileri geri
+npm run render:yoklama  # sesleri üretir, out/yoklama.mp4 (1920×1080, 30 kare/sn, sesli)
 ```
 
-Metni ya da zamanlamayı değiştirmek için `src/yoklama/timeline.ts`, kamerayı değiştirmek için `camera.ts`.
+Metni ya da zamanlamayı değiştirmek için `src/yoklama/timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve
+yüksekliğini `sounds.ts`, müziği `audio/music.mjs`. Müzik 120 BPM'dir: timeline'daki büyük anlar (120, 480, 840.
+kare) müziğin düşüşleridir; biri değişirse öteki de değişir.
 
 ## Ekranları yeniden çekmek (uygulama değiştiyse)
 
@@ -52,7 +56,9 @@ Tarayıcılar önceden kurulu olduğunda indirme yerine onlar kullanılır:
 
 ```bash
 PLAYWRIGHT_CHROMIUM=/opt/pw-browsers/chromium npm run capture:yoklama
-npm run render:yoklama -- --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+npm run audio
+npx remotion render src/index.ts Yoklama out/yoklama.mp4 --jpeg-quality=95 --crf=18 \
+  --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
 ```
 
 ## Lisans
