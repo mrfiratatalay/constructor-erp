@@ -1,4 +1,4 @@
-# Kızılkan Şantiye — Proje Anayasası
+# Constructor ERP — Proje Anayasası
 
 Bu dosya projenin temel kurallarıdır. Kod yazan herkes (insan ya da yapay zekâ) buna uyar.
 Kurallar yalnızca proje sahibinin kararıyla değişir ve değişiklik bu dosyada yapılır.
@@ -86,3 +86,18 @@ Kodu tekrar eden yorum yazılmaz.
 ## Madde 8 — Bağımlılıklar
 
 Yeni bir kütüphane yalnızca ihtiyaç duyulduğu anda eklenir, "belki lazım olur" diye eklenmez.
+
+## Madde 9 — Çok firmalı yapı (multi-tenant)
+
+Constructor ERP birden fazla firmaya hizmet verir; bir firmanın verisi başka bir firmaya hiçbir yoldan görünmez.
+Ayrıntı ve yeni modül listesi [MIMARI-SAAS.md](MIMARI-SAAS.md)'dedir.
+
+- Firmaya ait her tabloda `company_id` vardır ve tabloya satır seviyesinde güvenlik (RLS) açılır. Açılmamış tablo
+  uygulamanın açılışında hata verir.
+- Firma kimliği istemciden alınmaz: oturumdan gelir. İstekteki bir `companyId`'ye güvenilmez.
+- Benzersizlikler firma içindedir (`unique (company_id, …)`); numaralar (irsaliye, SV-000001) firmaya göre sayılır.
+- Dosya, dışa aktarım, önbellek anahtarı ve bildirim de firmaya göre ayrılır.
+- Platform yönetimi (süper yönetici) firma rollerinden ayrıdır; firma verisini firma ekranlarından değil, platform
+  uçlarından ve yalnızca gerektiği kadar okur. Kritik işlemler işlem geçmişine yazılır.
+- Paketle açılıp kapanan modül backend'de `@RequiresFeature`, arayüzde `meta.feature` ile korunur.
+
