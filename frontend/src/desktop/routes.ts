@@ -13,7 +13,6 @@ export const routes = buildRoutes({
   apply: { redirectTo: 'login' },
   setup: { redirectTo: 'login' },
   company: { redirectTo: 'sites' },
-  workspaceLocked: { redirectTo: 'login' },
   platformDashboard: { redirectTo: 'login' },
   platformTenants: { redirectTo: 'login' },
   platformTenant: { redirectTo: 'login' },
@@ -33,5 +32,6 @@ export const routes = buildRoutes({
   myPuantaj: () => import('./pages/MyPuantajPage.vue'),
   materials: () => import('./pages/MaterialsPage.vue'),
   // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
+  workspaceLocked: () => import('./pages/WorkspaceLockedPage.vue'),
   profile: { redirectTo: 'sites' },
 })

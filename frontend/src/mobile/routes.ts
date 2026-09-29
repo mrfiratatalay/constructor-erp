@@ -10,7 +10,6 @@ export const routes = buildRoutes({
   apply: { redirectTo: 'login' },
   setup: { redirectTo: 'login' },
   company: { redirectTo: 'sites' },
-  workspaceLocked: { redirectTo: 'login' },
   platformDashboard: { redirectTo: 'login' },
   platformTenants: { redirectTo: 'login' },
   platformTenant: { redirectTo: 'login' },
@@ -29,5 +28,6 @@ export const routes = buildRoutes({
   memberAttendance: () => import('./pages/MemberAttendancePage.vue'),
   myPuantaj: () => import('./pages/MyPuantajPage.vue'),
   materials: () => import('./pages/MaterialsPage.vue'),
+  workspaceLocked: () => import('./pages/WorkspaceLockedPage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

@@ -15,6 +15,7 @@ import { useToday } from '@/core/today/useToday'
 import { useWorkspace } from '@/core/tenant/useWorkspace'
 import JoinLinkSheet from '@/mobile/organisms/JoinLinkSheet.vue'
 import NewSitePopup from '@/mobile/organisms/NewSitePopup.vue'
+import RenewalNoticeBar from '@/mobile/organisms/RenewalNoticeBar.vue'
 import SearchResults from '@/mobile/organisms/SearchResults.vue'
 import SiteRowCell from '@/mobile/organisms/SiteRowCell.vue'
 import UploadQueueCells from '@/mobile/organisms/UploadQueueCells.vue'
@@ -79,6 +80,7 @@ async function pin() {
         <Plus :size="18" />
       </van-button>
     </template>
+    <RenewalNoticeBar />
     <van-search v-model="search.text.value" shape="round" placeholder="Ara" class="sites__search" />
     <SearchResults v-if="search.isActive.value" :sites="search.matchingSites.value" :posts="search.posts.value"
       :searching="search.isSearching.value" @open-site="open" @open-post="openPost" />
