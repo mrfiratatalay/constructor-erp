@@ -8,3 +8,7 @@ app:
     owner-name: Patron
     owner-email: patron@kizilkan.local
     owner-password: patron123
+  platform:
+    admin-name: Constructor Destek
+    admin-email: admin@constructor-erp.local
+    admin-password: admin123

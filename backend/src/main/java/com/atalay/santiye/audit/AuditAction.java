@@ -1,0 +1,17 @@
+package com.atalay.santiye.audit;
+
+/** Platform yönetiminde iz bırakan işlemler. */
+public enum AuditAction {
+    TENANT_CREATED,
+    TENANT_UPDATED,
+    TENANT_STATUS_CHANGED,
+    SUBSCRIPTION_EXTENDED,
+    SUBSCRIPTION_PLAN_CHANGED,
+    SUBSCRIPTION_STATUS_CHANGED,
+    PAYMENT_RECORDED,
+    INVITE_CREATED,
+    INVITE_REVOKED,
+    SETUP_COMPLETED,
+    PLAN_UPDATED,
+    SALES_REQUEST_UPDATED
+}

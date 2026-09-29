@@ -43,6 +43,9 @@ app:
   invite:
     lifetime: 7d
     base-url: ${APP_BASE_URL:http://localhost:5173}
+  # Satın alan firmaya gönderilen kurulum linki (/kurulum/…).
+  onboarding:
+    lifetime: 14d
   media:
     # Fotoğraf, video ve seslerin durduğu klasör. Production'da kalıcı bir diske (ya da ileride buluta) bağlanır.
     root: ${MEDIA_ROOT:./.data/media}
@@ -53,8 +56,13 @@ app:
     max-audio-seconds: 180
   push:
     # Web Push servisleri (Apple, Google) sorun olursa bu adrese ulaşır.
-    subject: ${PUSH_SUBJECT:mailto:destek@kizilkan.local}
-  # İlk yönetici; yalnızca veritabanında hiç kullanıcı yokken oluşturulur.
+    subject: ${PUSH_SUBJECT:mailto:destek@constructor-erp.local}
+  # Constructor ERP ekibinin ilk süper yöneticisi (platform yönetimi); yalnızca hiç süper yönetici yokken açılır.
+  platform:
+    admin-name: ${PLATFORM_ADMIN_NAME:}
+    admin-email: ${PLATFORM_ADMIN_EMAIL:}
+    admin-password: ${PLATFORM_ADMIN_PASSWORD:}
+  # İlk firma ve patronu; yalnızca veritabanında hiç kullanıcı yokken oluşturulur.
   bootstrap:
     company-name: ${BOOTSTRAP_COMPANY_NAME:}
     owner-name: ${BOOTSTRAP_OWNER_NAME:}
