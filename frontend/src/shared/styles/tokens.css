@@ -53,6 +53,10 @@
   --move-count: #475569;
   --move-count-bg: #eef1f5;
 
+  /* Grafik: tek serili değer grafiği (dataviz doğrulayıcısından geçti: açıklık bandı, doygunluk, zemine karşıtlık). */
+  --chart-series: #2563eb;
+  --chart-grid: #e8edf5;
+
   /* Metin ve yüzeyler: soğuk beton grisi ailesi */
   --text-strong: #141a2e;
   --text-muted: #5b6577;
