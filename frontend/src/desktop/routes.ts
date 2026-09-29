@@ -8,7 +8,7 @@ const attendancePage = () => import('./pages/AttendancePage.vue')
 
 export const routes = buildRoutes({
   // Aşağıdaki geçici yönlendirmeler sayfaları yazıldıkça gerçek sayfalarla değişir.
-  landing: { redirectTo: 'login' },
+  landing: () => import('./pages/LandingPage.vue'),
   pricing: { redirectTo: 'login' },
   apply: { redirectTo: 'login' },
   setup: () => import('./pages/SetupPage.vue'),
