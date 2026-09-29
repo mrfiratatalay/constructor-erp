@@ -1,6 +1,8 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.tenant.TenantContextFilter;
 import jakarta.servlet.DispatcherType;
+import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -48,7 +50,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasAuthority(SessionAuthenticationFilter.WORKSPACE)
                 .anyRequest().denyAll())
             .addFilterBefore(new SessionAuthenticationFilter(sessions, cookies), UsernamePasswordAuthenticationFilter.class)
+            // Firma bağlamı (RLS) kimlik doğrulandıktan sonra, yalnızca oturumdan kurulur.
+            .addFilterAfter(new TenantContextFilter(SecurityConfig::companyOf), SessionAuthenticationFilter.class)
             .build();
+    }
+
+    private static UUID companyOf(Object principal) {
+        return principal instanceof CurrentUser user ? user.companyId() : null;
     }
 
     @Bean
