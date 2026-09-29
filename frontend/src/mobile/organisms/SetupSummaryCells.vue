@@ -28,6 +28,6 @@ const { forms, invite } = defineProps<{ forms: SetupForms; invite: SetupInviteVi
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin: var(--space-3) var(--space-4) 0;
+  margin: var(--space-3) 0 0;
 }
 </style>

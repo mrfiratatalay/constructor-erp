@@ -4,10 +4,9 @@ import { buildRoutes } from '@/core/navigation/routeTable'
 const siteFeedPage = () => import('./pages/SiteFeedPage.vue')
 
 export const routes = buildRoutes({
-  // Aşağıdaki geçici yönlendirmeler sayfaları yazıldıkça gerçek sayfalarla değişir.
-  landing: { redirectTo: 'login' },
-  pricing: { redirectTo: 'login' },
-  apply: { redirectTo: 'login' },
+  landing: () => import('./pages/LandingPage.vue'),
+  pricing: () => import('./pages/PricingPage.vue'),
+  apply: () => import('./pages/ApplyPage.vue'),
   setup: () => import('./pages/SetupPage.vue'),
   platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
   platformTenants: () => import('./pages/PlatformTenantsPage.vue'),

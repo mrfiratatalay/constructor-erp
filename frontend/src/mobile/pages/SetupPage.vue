@@ -68,7 +68,7 @@ async function onUpload(file: File) {
   max-width: var(--layout-phone-column);
   min-height: var(--layout-app-height);
   margin-inline: auto;
-  padding-bottom: var(--space-8);
+  padding: 0 var(--space-4) var(--space-8);
 }
 
 .setup-page__head {
@@ -82,7 +82,7 @@ async function onUpload(file: File) {
 }
 
 .setup-page__intro {
-  padding: var(--space-4) var(--space-4) 0;
+  padding: var(--space-4) 0 0;
 }
 
 .setup-page__intro small {
@@ -101,18 +101,21 @@ async function onUpload(file: File) {
 }
 
 .setup-page__problem {
-  margin: var(--space-3) var(--space-4) 0;
+  margin-top: var(--space-3);
   border-radius: var(--radius-md);
 }
 
 .setup-page__actions {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-5) var(--space-4) 0;
+  padding-top: var(--space-5);
 }
 
 .setup-page__actions .van-button:not(.van-button--block) {
   flex: none;
   min-width: 88px;
+}
+.setup-page :deep(.van-steps) {
+  border-radius: var(--radius-md);
 }
 </style>

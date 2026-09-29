@@ -18,7 +18,7 @@ const owner = defineModel<SetupForms['owner']>({ required: true })
 
 <style scoped>
 .setup-note {
-  margin: var(--space-3) var(--space-4) 0;
+  margin: var(--space-3) 0 0;
   color: var(--text-muted);
   font-size: var(--text-sm);
   line-height: 1.5;
