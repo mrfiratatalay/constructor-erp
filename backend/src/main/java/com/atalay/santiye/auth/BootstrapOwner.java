@@ -2,6 +2,9 @@ package com.atalay.santiye.auth;
 
 import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
+import com.atalay.santiye.company.CompanySlugs;
+import com.atalay.santiye.tenant.Membership;
+import com.atalay.santiye.tenant.MembershipRepository;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
@@ -22,15 +25,19 @@ class BootstrapOwner implements ApplicationRunner {
 
     private final BootstrapProperties properties;
     private final CompanyRepository companies;
+    private final CompanySlugs slugs;
     private final UserRepository users;
+    private final MembershipRepository memberships;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
 
-    BootstrapOwner(BootstrapProperties properties, CompanyRepository companies, UserRepository users,
-        PasswordEncoder passwordEncoder, Clock clock) {
+    BootstrapOwner(BootstrapProperties properties, CompanyRepository companies, CompanySlugs slugs,
+        UserRepository users, MembershipRepository memberships, PasswordEncoder passwordEncoder, Clock clock) {
         this.properties = properties;
         this.companies = companies;
+        this.slugs = slugs;
         this.users = users;
+        this.memberships = memberships;
         this.passwordEncoder = passwordEncoder;
         this.clock = clock;
     }
@@ -41,10 +48,12 @@ class BootstrapOwner implements ApplicationRunner {
         if (!properties.isComplete() || users.count() > 0) {
             return;
         }
-        Company company = companies.save(new Company(properties.companyName(), clock.instant()));
+        String name = properties.companyName();
+        Company company = companies.save(new Company(name, slugs.uniqueFor(name), clock.instant()));
         AppUser owner = new AppUser(company.getId(), properties.ownerName(), UserRole.OWNER, clock.instant());
         owner.setPasswordLogin(properties.ownerEmail(), passwordEncoder.encode(properties.ownerPassword()));
         users.save(owner);
+        memberships.save(new Membership(company.getId(), owner.getId(), UserRole.OWNER, clock.instant()));
         log.info("İlk yönetici oluşturuldu: {}", properties.ownerEmail());
     }
 }
