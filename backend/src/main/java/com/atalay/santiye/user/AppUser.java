@@ -8,65 +8,66 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** "User" adı Spring Security'nin sınıfıyla çakıştığı için AppUser. */
+/**
+ * Kişinin kimliği: adı, telefonu, girişi. Hangi firmada hangi rolde olduğu kişinin değil üyeliğinin bilgisidir
+ * (tenant.Membership). "User" adı Spring Security'nin sınıfıyla çakıştığı için AppUser.
+ */
 @Entity
 @Table(name = "users")
 public class AppUser {
 
     @Id
     private UUID id;
-    private UUID companyId;
     private String fullName;
     private String email;
     private String phone;
     private String passwordHash;
     @Enumerated(EnumType.STRING)
-    private UserRole role;
-    private boolean active;
+    private PlatformRole platformRole;
     private Instant createdAt;
 
     protected AppUser() {
     }
 
-    public AppUser(UUID companyId, String fullName, UserRole role, Instant createdAt) {
+    public AppUser(String fullName, Instant createdAt) {
         this.id = UUID.randomUUID();
-        this.companyId = companyId;
         this.fullName = fullName;
-        this.role = role;
-        this.active = true;
         this.createdAt = createdAt;
     }
 
-    /** Yalnızca şifreyle giren hesaplar için (ilk yönetici). Saha ekibi davet linkiyle girer. */
+    /** Yalnızca şifreyle giren hesaplar için (patron, platform yöneticisi). Saha ekibi bağlantıyla girer. */
     public void setPasswordLogin(String email, String passwordHash) {
         this.email = email;
         this.passwordHash = passwordHash;
     }
 
-    public void updateProfile(String fullName, String phone, UserRole role) {
+    public void updateProfile(String fullName, String phone) {
         this.fullName = fullName;
         this.phone = phone;
-        this.role = role;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void grantPlatformRole(PlatformRole role) {
+        this.platformRole = role;
     }
 
     public boolean canLoginWithPassword() {
-        return active && passwordHash != null;
+        return passwordHash != null;
+    }
+
+    public boolean isPlatformAdmin() {
+        return platformRole == PlatformRole.SUPER_ADMIN;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public UUID getCompanyId() {
-        return companyId;
-    }
-
     public String getFullName() {
         return fullName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getPhone() {
@@ -77,15 +78,11 @@ public class AppUser {
         return passwordHash;
     }
 
-    public UserRole getRole() {
-        return role;
+    public PlatformRole getPlatformRole() {
+        return platformRole;
     }
 
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public boolean isActive() {
-        return active;
     }
 }

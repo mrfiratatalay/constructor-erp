@@ -3,6 +3,7 @@ package com.atalay.santiye.join;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.auth.SessionCookies;
 import com.atalay.santiye.auth.SessionService;
+import com.atalay.santiye.auth.SignIn;
 import com.atalay.santiye.join.dto.JoinInvite;
 import com.atalay.santiye.join.dto.JoinLink;
 import com.atalay.santiye.join.dto.JoinRequest;
@@ -62,8 +63,11 @@ public class CompanyJoinController {
         Joined joined = joins.accept(token, viewer, request);
         ResponseEntity.BodyBuilder response = ResponseEntity.ok();
         if (joined.newcomer() != null) {
-            String session = sessions.open(joined.newcomer(), http.getHeader(HttpHeaders.USER_AGENT));
+            String session = sessions.open(new SignIn(joined.newcomer(), joined.companyId()),
+                http.getHeader(HttpHeaders.USER_AGENT));
             response.header(HttpHeaders.SET_COOKIE, cookies.issue(session).toString());
+        } else {
+            cookies.read(http).ifPresent(session -> sessions.switchWorkspace(session, viewer.userId(), joined.companyId()));
         }
         return response.build();
     }

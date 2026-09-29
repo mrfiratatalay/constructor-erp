@@ -3,7 +3,7 @@ package com.atalay.santiye.puantaj;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.puantaj.dto.MyDayView;
 import com.atalay.santiye.puantaj.dto.MyPuantajView;
-import com.atalay.santiye.user.AppUser;
+import com.atalay.santiye.tenant.Member;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -37,7 +37,7 @@ public class MyPuantaj {
         LocalDate to = month.atEndOfMonth();
         entries.addMissingWorkers(user.companyId());
         RosterPeople people = ledger.peopleOf(user.companyId());
-        Optional<RosterEntry> mine = entries.findByUserId(user.userId());
+        Optional<RosterEntry> mine = entries.findByCompanyIdAndUserId(user.companyId(), user.userId());
         List<MyDayView> own = mine.map(entry -> marksOf(entry, from, to)).orElse(List.of()).stream()
             .map(mark -> dayOf(mark, people))
             .toList();
@@ -50,7 +50,7 @@ public class MyPuantaj {
     }
 
     private static MyDayView dayOf(DayMark mark, RosterPeople people) {
-        AppUser marker = people.byId().get(mark.getMarkedBy());
+        Member marker = people.byId().get(mark.getMarkedBy());
         return new MyDayView(mark.getDay(), mark.getStatus(), mark.getOvertimeHours(),
             people.nameOfUser(mark.getMarkedBy()), marker == null ? null : marker.getPhone(), mark.getMarkedAt());
     }

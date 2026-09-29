@@ -19,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 class SessionAuthenticationFilter extends OncePerRequestFilter {
 
+    static final String WORKSPACE = "WORKSPACE";
+
     private final SessionService sessions;
     private final SessionCookies cookies;
 
@@ -34,13 +36,25 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    /** Yetkiler: rol (hasRole) ve rolün açtığı işler (hasAuthority, bkz. Permission). */
+    /**
+     * Yetkiler: firmadaki rol (hasRole), rolün açtığı işler (hasAuthority, bkz. Permission), firma çalışma alanına
+     * giriş (WORKSPACE) ve platform rolü (ROLE_SUPER_ADMIN). Firma uçları WORKSPACE ister (SecurityConfig).
+     */
     private void signIn(CurrentUser user) {
-        List<SimpleGrantedAuthority> authorities = Stream.concat(Stream.of("ROLE_" + user.role().name()),
-            Permission.grantedTo(user.role()).stream().map(Permission::name)).map(SimpleGrantedAuthority::new).toList();
+        List<SimpleGrantedAuthority> authorities = authoritiesOf(user).map(SimpleGrantedAuthority::new).toList();
         var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    private static Stream<String> authoritiesOf(CurrentUser user) {
+        Stream<String> platform = user.platformAdmin() ? Stream.of("ROLE_SUPER_ADMIN") : Stream.empty();
+        if (!user.hasWorkspace()) {
+            return platform;
+        }
+        Stream<String> workspace = Stream.concat(Stream.of(WORKSPACE, "ROLE_" + user.role().name()),
+            Permission.grantedTo(user.role()).stream().map(Permission::name));
+        return Stream.concat(platform, workspace);
     }
 }

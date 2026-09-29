@@ -2,12 +2,12 @@ package com.atalay.santiye.notification;
 
 import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
+import com.atalay.santiye.company.CompanyStatus;
 import com.atalay.santiye.post.PostStats;
 import com.atalay.santiye.site.Site;
 import com.atalay.santiye.site.SiteRepository;
 import com.atalay.santiye.site.SiteStatus;
-import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.tenant.Members;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
 import java.time.Instant;
@@ -30,16 +30,16 @@ class DailyReminders {
     private final CompanyRepository companies;
     private final SiteRepository sites;
     private final PostStats postStats;
-    private final UserRepository users;
+    private final Members members;
     private final Notifier notifier;
     private final Clock clock;
 
-    DailyReminders(CompanyRepository companies, SiteRepository sites, PostStats postStats, UserRepository users,
+    DailyReminders(CompanyRepository companies, SiteRepository sites, PostStats postStats, Members members,
         Notifier notifier, Clock clock) {
         this.companies = companies;
         this.sites = sites;
         this.postStats = postStats;
-        this.users = users;
+        this.members = members;
         this.notifier = notifier;
         this.clock = clock;
     }
@@ -47,12 +47,14 @@ class DailyReminders {
     @Scheduled(cron = "0 0 18 * * *", zone = "${app.timezone}")
     void summarizeForOwners() {
         for (Company company : companies.findAll()) {
+            if (company.getStatus() != CompanyStatus.ACTIVE) {
+                continue;
+            }
             List<Site> silent = silentSitesOf(company);
             if (silent.isEmpty()) {
                 continue;
             }
-            List<UUID> owners = users.findByCompanyIdAndRoleAndActiveTrue(company.getId(), UserRole.OWNER).stream()
-                .map(AppUser::getId).toList();
+            List<UUID> owners = members.activeIdsWithRole(company.getId(), UserRole.OWNER);
             String names = silent.stream().map(Site::getName).collect(Collectors.joining(", "));
             notifier.deliver(owners, new NotificationContent("Bugün haber gelmeyen şantiyeler", names, "/santiyeler"));
         }

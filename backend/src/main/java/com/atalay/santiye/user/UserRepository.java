@@ -1,20 +1,16 @@
 package com.atalay.santiye.user;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+/**
+ * Kimlik deposu. Firmaya göre kişi aramak burada değil üyelikte yapılır (tenant.Members): kişi listesinin firma
+ * filtresi tek yerde durur.
+ */
 public interface UserRepository extends JpaRepository<AppUser, UUID> {
 
     Optional<AppUser> findByEmailIgnoreCase(String email);
 
-    /** Firma filtresi her sorguda: başka firmanın kullanıcısı hiçbir yoldan dönmez. */
-    Optional<AppUser> findByIdAndCompanyId(UUID id, UUID companyId);
-
-    List<AppUser> findByCompanyIdOrderByFullName(UUID companyId);
-
-    List<AppUser> findByCompanyIdAndRoleAndActiveTrue(UUID companyId, UserRole role);
-
-    List<AppUser> findByCompanyIdAndActiveTrueOrderByFullName(UUID companyId);
+    boolean existsByPlatformRole(PlatformRole platformRole);
 }

@@ -1,7 +1,7 @@
 package com.atalay.santiye.puantaj;
 
-import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.tenant.Member;
+import com.atalay.santiye.tenant.Members;
 import java.text.Collator;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -25,12 +25,12 @@ class LedgerReader {
 
     private final RosterEntryRepository entries;
     private final DayMarkRepository marks;
-    private final UserRepository users;
+    private final Members members;
 
-    LedgerReader(RosterEntryRepository entries, DayMarkRepository marks, UserRepository users) {
+    LedgerReader(RosterEntryRepository entries, DayMarkRepository marks, Members members) {
         this.entries = entries;
         this.marks = marks;
-        this.users = users;
+        this.members = members;
     }
 
     /** Yazar da: uygulamaya yeni katılan çalışanların kalemini açar (RosterEntryRepository.addMissingWorkers). */
@@ -47,8 +47,8 @@ class LedgerReader {
     }
 
     RosterPeople peopleOf(UUID companyId) {
-        Map<UUID, AppUser> byId = users.findByCompanyIdOrderByFullName(companyId).stream()
-            .collect(Collectors.toMap(AppUser::getId, Function.identity()));
+        Map<UUID, Member> byId = members.of(companyId).stream()
+            .collect(Collectors.toMap(Member::getId, Function.identity()));
         return new RosterPeople(byId);
     }
 

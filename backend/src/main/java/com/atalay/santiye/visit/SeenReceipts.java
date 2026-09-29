@@ -1,7 +1,7 @@
 package com.atalay.santiye.visit;
 
 import com.atalay.santiye.site.SitePeople;
-import com.atalay.santiye.user.AppUser;
+import com.atalay.santiye.tenant.Member;
 import com.atalay.santiye.visit.dto.SeenBy;
 import java.time.Instant;
 import java.util.Collection;
@@ -31,7 +31,7 @@ public class SeenReceipts {
     /** Şantiye başına katılımcılar ve son bakışları; sayfa başına sabit sayıda sorgu. */
     @Transactional(readOnly = true)
     public Map<UUID, List<SeenBy>> participantsBySite(UUID companyId, Collection<UUID> siteIds) {
-        List<AppUser> everyone = people.of(companyId);
+        List<Member> everyone = people.of(companyId);
         Map<SiteVisitId, Instant> seen = visits.findBySiteIds(siteIds).stream()
             .collect(Collectors.toMap(SiteVisit::getId, SiteVisit::getSeenAt));
         return siteIds.stream().distinct().collect(Collectors.toMap(Function.identity(), siteId -> everyone.stream()

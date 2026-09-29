@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+/** Bir cihazdaki oturum; hangi firmada çalışıldığını da taşır (birden çok firmada üyeliği olan kişi için). */
 @Entity
 @Table(name = "user_sessions")
 class UserSession {
@@ -18,6 +19,7 @@ class UserSession {
     @Id
     private UUID id;
     private UUID userId;
+    private UUID companyId;
     private String tokenHash;
     private Instant createdAt;
     private Instant lastSeenAt;
@@ -50,7 +52,15 @@ class UserSession {
         expiresAt = now.plus(lifetime);
     }
 
+    void switchTo(UUID companyId) {
+        this.companyId = companyId;
+    }
+
     UUID getUserId() {
         return userId;
+    }
+
+    UUID getCompanyId() {
+        return companyId;
     }
 }

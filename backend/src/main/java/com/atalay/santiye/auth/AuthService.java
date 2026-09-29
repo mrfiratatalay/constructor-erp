@@ -4,8 +4,12 @@ import com.atalay.santiye.auth.dto.CurrentUserResponse;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
+import com.atalay.santiye.tenant.Membership;
+import com.atalay.santiye.tenant.Workspaces;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,34 +19,52 @@ public class AuthService {
 
     private final UserRepository users;
     private final CompanyRepository companies;
+    private final Workspaces workspaces;
     private final PasswordEncoder passwordEncoder;
 
-    AuthService(UserRepository users, CompanyRepository companies, PasswordEncoder passwordEncoder) {
+    AuthService(UserRepository users, CompanyRepository companies, Workspaces workspaces,
+        PasswordEncoder passwordEncoder) {
         this.users = users;
         this.companies = companies;
+        this.workspaces = workspaces;
         this.passwordEncoder = passwordEncoder;
     }
 
-    /** Hata mesajı bilerek aynı: hangi e-postanın kayıtlı olduğunu dışarıya belli etmeyiz. */
+    /**
+     * Hata mesajı bilerek aynı: hangi e-postanın kayıtlı olduğunu dışarıya belli etmeyiz. Oturum kişinin en eski
+     * aktif üyeliğinin firmasında açılır; platform yöneticisi firmasız da girer.
+     */
     @Transactional(readOnly = true)
-    public AppUser login(String email, String password) {
-        return users.findByEmailIgnoreCase(email.trim())
+    public SignIn login(String email, String password) {
+        AppUser user = users.findByEmailIgnoreCase(email.trim())
             .filter(AppUser::canLoginWithPassword)
-            .filter(user -> passwordEncoder.matches(password, user.getPasswordHash()))
+            .filter(candidate -> passwordEncoder.matches(password, candidate.getPasswordHash()))
             .orElseThrow(() -> ApiException.unauthorized("E-posta ya da şifre hatalı."));
+        UUID companyId = workspaces.resolve(user.getId(), null).map(Membership::getCompanyId).orElse(null);
+        if (companyId == null && !user.isPlatformAdmin()) {
+            throw ApiException.unauthorized("Hesabın hiçbir firmada etkin değil. Firmanın yöneticisine başvur.");
+        }
+        return new SignIn(user, companyId);
     }
 
-    @Transactional(readOnly = true)
-    public CurrentUserResponse describe(AppUser user) {
-        String companyName = companies.findById(user.getCompanyId()).map(Company::getName).orElse("");
-        return new CurrentUserResponse(user.getId(), user.getFullName(), user.getRole(), companyName,
-            Permission.grantedTo(user.getRole()));
-    }
-
+    /** Çalışma alanındaki kişi: rolü ve rolün açtığı işler üyelikten gelir. */
     @Transactional(readOnly = true)
     public CurrentUserResponse describe(CurrentUser current) {
-        return users.findById(current.userId())
-            .map(this::describe)
-            .orElseThrow(() -> ApiException.unauthorized("Oturum geçersiz."));
+        if (!current.hasWorkspace()) {
+            throw ApiException.forbidden("Bir firmanın çalışma alanında değilsin.");
+        }
+        String companyName = companies.findById(current.companyId()).map(Company::getName).orElse("");
+        return new CurrentUserResponse(current.userId(), current.fullName(), current.role(), companyName,
+            Permission.grantedTo(current.role()));
+    }
+
+    /** Girişin cevabı: firmasız platform yöneticisinde rol ve izin yoktur. */
+    @Transactional(readOnly = true)
+    public CurrentUserResponse describe(SignIn signIn) {
+        AppUser user = signIn.user();
+        return workspaces.resolve(user.getId(), signIn.companyId())
+            .map(membership -> describe(new CurrentUser(user.getId(), membership.getCompanyId(), membership.getRole(),
+                user.getFullName(), user.isPlatformAdmin())))
+            .orElseGet(() -> new CurrentUserResponse(user.getId(), user.getFullName(), null, "", List.of()));
     }
 }

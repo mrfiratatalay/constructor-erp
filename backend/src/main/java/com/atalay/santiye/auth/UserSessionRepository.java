@@ -14,7 +14,8 @@ interface UserSessionRepository extends JpaRepository<UserSession, UUID> {
     @Query("delete from UserSession s where s.tokenHash = :tokenHash")
     void deleteByTokenHash(String tokenHash);
 
+    /** Kişi bir firmadan çıkarılınca yalnızca o firmada açık oturumları kapanır; başka firmadaki işi sürer. */
     @Modifying
-    @Query("delete from UserSession s where s.userId = :userId")
-    void deleteAllByUserId(UUID userId);
+    @Query("delete from UserSession s where s.userId = :userId and s.companyId = :companyId")
+    void deleteAllInCompany(UUID userId, UUID companyId);
 }

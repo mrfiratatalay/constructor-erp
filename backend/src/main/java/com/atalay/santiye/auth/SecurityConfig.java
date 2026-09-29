@@ -19,7 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] PUBLIC_PATHS = {
-        "/api/auth/login", "/api/auth/logout", "/api/auth/invites/accept", "/api/join/**",
+        "/api/auth/login", "/api/auth/logout", "/api/auth/invites/accept", "/api/join/**", "/api/public/**",
+        "/api/setup/**",
         "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error",
     };
 
@@ -38,7 +39,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(PUBLIC_PATHS).permitAll()
-                .requestMatchers("/api/**").authenticated()
+                // Oturum ve firma seçimi: firması kilitli olan da kim olduğunu ve neden kilitli olduğunu görebilmeli.
+                .requestMatchers("/api/auth/**").authenticated()
+                // Platform yönetimi yalnızca süper yöneticinin; firmanın patronu buraya giremez.
+                .requestMatchers("/api/platform/**").hasRole("SUPER_ADMIN")
+                // Geri kalan her uç firmanın çalışma alanıdır: yeni modül buraya eklenince firma kuralı kendiliğinden
+                // gelir (MIMARI-SAAS.md Bölüm 6).
+                .requestMatchers("/api/**").hasAuthority(SessionAuthenticationFilter.WORKSPACE)
                 .anyRequest().denyAll())
             .addFilterBefore(new SessionAuthenticationFilter(sessions, cookies), UsernamePasswordAuthenticationFilter.class)
             .build();

@@ -50,7 +50,7 @@ class BootstrapOwner implements ApplicationRunner {
         }
         String name = properties.companyName();
         Company company = companies.save(new Company(name, slugs.uniqueFor(name), clock.instant()));
-        AppUser owner = new AppUser(company.getId(), properties.ownerName(), UserRole.OWNER, clock.instant());
+        AppUser owner = new AppUser(properties.ownerName(), clock.instant());
         owner.setPasswordLogin(properties.ownerEmail(), passwordEncoder.encode(properties.ownerPassword()));
         users.save(owner);
         memberships.save(new Membership(company.getId(), owner.getId(), UserRole.OWNER, clock.instant()));

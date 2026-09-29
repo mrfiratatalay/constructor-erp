@@ -3,7 +3,6 @@ package com.atalay.santiye.auth;
 import com.atalay.santiye.auth.dto.AcceptInviteRequest;
 import com.atalay.santiye.auth.dto.CurrentUserResponse;
 import com.atalay.santiye.auth.dto.LoginRequest;
-import com.atalay.santiye.user.AppUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -55,10 +54,10 @@ public class AuthController {
         return auth.describe(user);
     }
 
-    private ResponseEntity<CurrentUserResponse> signIn(AppUser user, HttpServletRequest http) {
-        String token = sessions.open(user, http.getHeader(HttpHeaders.USER_AGENT));
+    private ResponseEntity<CurrentUserResponse> signIn(SignIn signIn, HttpServletRequest http) {
+        String token = sessions.open(signIn, http.getHeader(HttpHeaders.USER_AGENT));
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookies.issue(token).toString())
-            .body(auth.describe(user));
+            .body(auth.describe(signIn));
     }
 }
