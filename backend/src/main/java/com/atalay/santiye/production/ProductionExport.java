@@ -51,7 +51,7 @@ public class ProductionExport {
         List<ProductionItemView> items = reads.board(user, siteId).items();
         List<ProductionEntryView> entries = reads.allEntries(siteId);
         ByteArrayOutputStream file = new ByteArrayOutputStream();
-        try (Workbook workbook = new Workbook(file, "Kizilkan Santiye", "1.0")) {
+        try (Workbook workbook = new Workbook(file, "Constructor ERP", "1.0")) {
             writeItems(workbook.newWorksheet("İş kalemleri"), items);
             writeEntries(workbook.newWorksheet("Günlük girişler"), entries, items);
         } catch (IOException problem) {
