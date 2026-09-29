@@ -11,7 +11,7 @@ export const routes = buildRoutes({
   landing: { redirectTo: 'login' },
   pricing: { redirectTo: 'login' },
   apply: { redirectTo: 'login' },
-  setup: { redirectTo: 'login' },
+  setup: () => import('./pages/SetupPage.vue'),
   platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
   platformTenants: () => import('./pages/PlatformTenantsPage.vue'),
   platformTenant: () => import('./pages/PlatformTenantPage.vue'),

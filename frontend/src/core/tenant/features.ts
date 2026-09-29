@@ -10,3 +10,6 @@ export const FEATURE_LABELS: Record<FeatureKey, string> = {
   materials: 'Malzeme ve sevkiyat',
   production: 'İlerleme takibi',
 }
+
+/** Sunucudan gelen anahtarın adı; bu sürümün tanımadığı yeni bir modül anahtarıyla görünür. */
+export const featureLabel = (key: string) => FEATURE_LABELS[key as FeatureKey] ?? key
