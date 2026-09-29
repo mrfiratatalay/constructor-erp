@@ -3,6 +3,9 @@ package com.atalay.santiye.auth;
 import com.atalay.santiye.auth.dto.AcceptInviteRequest;
 import com.atalay.santiye.auth.dto.CurrentUserResponse;
 import com.atalay.santiye.auth.dto.LoginRequest;
+import com.atalay.santiye.auth.dto.SessionContextView;
+import com.atalay.santiye.auth.dto.SwitchWorkspaceRequest;
+import com.atalay.santiye.common.error.ApiException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,12 +27,15 @@ public class AuthController {
     private final InviteService invites;
     private final SessionService sessions;
     private final SessionCookies cookies;
+    private final SessionContexts contexts;
 
-    AuthController(AuthService auth, InviteService invites, SessionService sessions, SessionCookies cookies) {
+    AuthController(AuthService auth, InviteService invites, SessionService sessions, SessionCookies cookies,
+        SessionContexts contexts) {
         this.auth = auth;
         this.invites = invites;
         this.sessions = sessions;
         this.cookies = cookies;
+        this.contexts = contexts;
     }
 
     @PostMapping("/login")
@@ -52,6 +58,23 @@ public class AuthController {
     @GetMapping("/me")
     public CurrentUserResponse getCurrentUser(@AuthenticationPrincipal CurrentUser user) {
         return auth.describe(user);
+    }
+
+    /** Açılışta ilk soru: kim, hangi firmalarda, şu anki firmanın markası, modülleri ve abonelik durumu. */
+    @GetMapping("/context")
+    public SessionContextView getSessionContext(@AuthenticationPrincipal CurrentUser user) {
+        return contexts.of(user);
+    }
+
+    /** Başka bir firmanın çalışma alanına geçer; üye olmadığı firmaya geçilemez. */
+    @PostMapping("/workspace")
+    public SessionContextView switchWorkspace(@AuthenticationPrincipal CurrentUser user,
+        @Valid @RequestBody SwitchWorkspaceRequest request, HttpServletRequest http) {
+        String token = cookies.read(http).orElseThrow(() -> ApiException.unauthorized("Oturum yok."));
+        if (!sessions.switchWorkspace(token, user.userId(), request.companyId())) {
+            throw ApiException.forbidden("Bu firmada üyeliğin yok.");
+        }
+        return contexts.of(sessions.authenticate(token).orElseThrow(() -> ApiException.unauthorized("Oturum yok.")));
     }
 
     private ResponseEntity<CurrentUserResponse> signIn(SignIn signIn, HttpServletRequest http) {

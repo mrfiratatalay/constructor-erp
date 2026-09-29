@@ -1,6 +1,7 @@
 package com.atalay.santiye.audit;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.List;
@@ -27,16 +28,20 @@ public class PlatformAudit {
 
     private final JdbcClient jdbc;
     private final JsonMapper json;
+    private final EntityManager entityManager;
     private final Clock clock;
 
-    PlatformAudit(JdbcClient jdbc, JsonMapper json, Clock clock) {
+    PlatformAudit(JdbcClient jdbc, JsonMapper json, EntityManager entityManager, Clock clock) {
         this.jdbc = jdbc;
         this.json = json;
+        this.entityManager = entityManager;
         this.clock = clock;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void record(@Nullable UUID actorId, AuditEvent event) {
+        // İz, işlemin yazdıklarından sonra yazılır: yeni açılan firma henüz veritabanına gitmediyse FK kırılırdı.
+        entityManager.flush();
         jdbc.sql("""
             insert into platform_audit_logs (id, actor_id, action, company_id, summary, details, created_at)
             values (:id, :actor, :action, :company, :summary, cast(:details as jsonb), :at)""")

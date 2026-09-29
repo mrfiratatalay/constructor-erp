@@ -7,8 +7,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -60,15 +58,9 @@ public class WorkspaceAccess {
         cache.remove(companyId);
     }
 
-    /** Bugünü kapsayan dönem; yoksa en son biten (ya da başlayacak) dönem. İptal edilenler en sona düşer. */
+    /** Bugünü kapsayan dönem; yoksa en son biten (ya da başlayacak) dönem (bkz. Periods). */
     public Optional<Subscription> current(UUID companyId) {
-        LocalDate today = LocalDate.now(clock);
-        List<Subscription> all = subscriptions.findByCompanyIdOrderByStartsOnDesc(companyId);
-        return all.stream()
-            .filter(period -> period.getStatus() != SubscriptionStatus.CANCELLED && period.covers(today)).findFirst()
-            .or(() -> all.stream().filter(period -> period.getStatus() != SubscriptionStatus.CANCELLED)
-                .max(Comparator.comparing(Subscription::getEndsOn)))
-            .or(() -> all.stream().findFirst());
+        return Periods.current(subscriptions.findByCompanyIdOrderByStartsOnDesc(companyId), LocalDate.now(clock));
     }
 
     private WorkspaceStatus compute(UUID companyId) {
