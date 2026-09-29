@@ -18,7 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Boş bir veritabanında ilk firmayı, patronunu ve aboneliğini oluşturur; veri varsa hiçbir şeye dokunmaz. */
+/**
+ * Hiç firma yokken ilk firmayı, patronunu ve aboneliğini oluşturur; firma varsa hiçbir şeye dokunmaz. Koşul kişi
+ * sayısı değil firma sayısıdır: platform yöneticisi (PlatformAdminBootstrap) firmasız bir kişidir.
+ */
 @Component
 class BootstrapOwner implements ApplicationRunner {
 
@@ -51,7 +54,7 @@ class BootstrapOwner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (!properties.isComplete() || users.count() > 0) {
+        if (!properties.isComplete() || companies.count() > 0) {
             return;
         }
         String name = properties.companyName();
