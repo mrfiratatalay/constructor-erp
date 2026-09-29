@@ -1,22 +1,17 @@
 import { master, mixInto, place, RATE, samples, stereo } from './dsp.mjs'
 import { bass, clap, hat, impact, kick, pad, pluck, riser } from './instruments.mjs'
+import { CHORDS } from './scores.mjs'
 import { pingPong, reverb } from './space.mjs'
 
 /**
- * Yoklama videosunun müziği: 120 BPM, 16 ölçü, tam 32 saniye. Bir vuruş yarım saniye = videoda 15 kare, bir ölçü
- * 60 kare. Bölümler videonun zamanlamasıyla (src/yoklama/timeline.ts) aynıdır: 2. ölçüde (kare 120) telefon gelir,
- * 8. ölçüde (kare 480) laptop, 14. ölçüde (kare 840) logo. Akorlar Lam – Fa – Do – Sol; son, Fa'dan Do'ya çözülür.
+ * Serinin müziği: 120 BPM, 16 ölçü, tam 32 saniye. Bir vuruş yarım saniye = videoda 15 kare, bir ölçü 60 kare.
+ * İskelet her videoda aynıdır ve videoların zamanlamasıyla (src/<video>/timeline.ts) örtüşür: 2. ölçüde (kare 120)
+ * ilk düşüş, 7. ölçüde nefes, 8. ölçüde (kare 480) ikinci düşüş, 14. ölçüde (kare 840) kapanış. Akorlar ve melodi
+ * partisyondan (scores.mjs) gelir.
  */
 const BAR = 2
 const LENGTH = 32
 
-const CHORDS = {
-  Am: { pad: [57, 60, 64, 69], bass: 33, arp: [69, 72, 76, 81], tune: [76, null, 76, 74, 72, null, 69, null] },
-  F: { pad: [53, 57, 60, 65], bass: 29, arp: [65, 69, 72, 77], tune: [72, null, 72, 74, 76, null, 72, null] },
-  C: { pad: [55, 60, 64, 67], bass: 36, arp: [67, 72, 76, 79], tune: [79, null, 79, 76, 74, null, 72, null] },
-  G: { pad: [55, 59, 62, 67], bass: 31, arp: [67, 71, 74, 79], tune: [74, null, 74, 76, 74, 72, 71, null] },
-}
-const PROGRESSION = ['Am', 'F', 'C', 'G']
 /**
  * Karışımın dengesi: ölçülerek ayarlandı (her bandın toplama oranı). Davul ve alt bas telefonda duyulmaz ama
  * enerjiyi yutar; kısık tutulur ki akorlar ve melodi (dinleyenin asıl duyduğu) önde kalsın.
@@ -33,13 +28,15 @@ function sectionOf(bar) {
   return 'outro'
 }
 
-export function composeYoklama() {
+/** Bir partisyonu (scores.mjs) çalar: stereo, 32 saniye, sesi dengelenmiş. */
+export function compose(score) {
   const length = samples(LENGTH)
   const bus = { drums: stereo(length), low: stereo(length), pads: stereo(length), keys: stereo(length), fx: stereo(length) }
   const kicks = []
   for (let bar = 0; bar < 14; bar++) {
     const section = sectionOf(bar)
-    const chord = CHORDS[PROGRESSION[bar % 4]]
+    const name = score.progression[bar % score.progression.length]
+    const chord = { ...CHORDS[name], tune: score.tune[name] }
     const start = bar * BAR
     writePad(bus, chord, start, section, bar)
     writeKeys(bus, chord, start, section)

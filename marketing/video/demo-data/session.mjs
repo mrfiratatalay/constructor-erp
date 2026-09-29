@@ -28,6 +28,15 @@ export class Session {
     return this.request('DELETE', path)
   }
 
+  /** Dosya yükler (multipart): files = [{ name, type, data }], hepsi aynı alan adıyla. */
+  async upload(path, field, files) {
+    const form = new FormData()
+    for (const file of files) form.append(field, new Blob([file.data], { type: file.type }), file.name)
+    const response = await fetch(`${this.baseUrl}${path}`, { method: 'POST', headers: { cookie: this.cookie }, body: form })
+    if (!response.ok) throw new Error(`POST ${path} → ${response.status}: ${await response.text()}`)
+    return response.json()
+  }
+
   async request(method, path, body) {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method,
@@ -53,6 +62,14 @@ export class Session {
 export async function signIn(baseUrl, credentials) {
   const session = new Session(baseUrl)
   await session.post('/auth/login', credentials)
+  return session
+}
+
+/** Patron kişiye giriş linki üretir, kişi linki açar: uygulamadaki "Giriş linki gönder" yolunun aynısı. */
+export async function signInAs(owner, memberId) {
+  const link = await owner.post(`/team/members/${memberId}/login-link`)
+  const session = new Session(owner.baseUrl)
+  await session.post('/auth/invites/accept', { token: link.url.slice(link.url.lastIndexOf('/') + 1) })
   return session
 }
 

@@ -4,12 +4,14 @@
  */
 import { fileURLToPath } from 'node:url'
 import { finish, SOUNDS } from './effects.mjs'
-import { composeYoklama } from './music.mjs'
+import { compose } from './music.mjs'
+import { SCORES } from './scores.mjs'
 import { writeWav } from './wav.mjs'
 
 const target = (name) => fileURLToPath(new URL(`../public/audio/${name}.wav`, import.meta.url))
 
 const started = Date.now()
-writeWav(target('yoklama-muzik'), composeYoklama())
+for (const [name, score] of Object.entries(SCORES)) writeWav(target(`${name}-muzik`), compose(score))
 for (const [name, make] of Object.entries(SOUNDS)) writeWav(target(`sfx/${name}`), finish(make()))
-console.log(`Ses hazır: müzik ve ${Object.keys(SOUNDS).length} efekt (${((Date.now() - started) / 1000).toFixed(1)} sn).`)
+const count = `${Object.keys(SCORES).length} müzik, ${Object.keys(SOUNDS).length} efekt`
+console.log(`Ses hazır: ${count} (${((Date.now() - started) / 1000).toFixed(1)} sn).`)

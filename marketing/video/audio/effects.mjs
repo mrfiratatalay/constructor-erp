@@ -27,6 +27,21 @@ function click() {
   return render(0.15, (t) => (t < 0.07 ? hit(t) : hit(t - 0.07) * 0.6))
 }
 
+/** Klavye tuşu: kısa, tahta gibi bir "tık" ve altında hafif bir tok ses; harf harf yazarken. */
+function key(seed) {
+  const grain = noise(seed)
+  const band = new Filter('bandpass', 2600, 1.8)
+  return render(0.06, (t) => band.run(grain()) * Math.exp(-t / 0.004) * 2.2 + Math.sin(TAU * 420 * t) * Math.exp(-t / 0.012) * 0.3)
+}
+
+/** Kamera deklanşörü: iki hızlı mekanik vuruş (perde açılır, kapanır). */
+function shutter() {
+  const grain = noise(45)
+  const band = new Filter('bandpass', 1800, 1.2)
+  const snap = (t) => band.run(grain()) * Math.exp(-t / 0.008) * 2.4
+  return render(0.18, (t) => (t < 0.07 ? snap(t) : snap(t - 0.07) * 0.8))
+}
+
 /** Saat: "tik" biraz tiz, "tak" biraz pes; tahta blok gibi kısa. */
 function clock(freq) {
   const grain = noise(29)
@@ -109,6 +124,8 @@ const both = (mono) => [mono, Float32Array.from(mono)]
 export const SOUNDS = {
   tap: () => both(tap()),
   click: () => both(click()),
+  key: () => both(key(43)),
+  shutter: () => both(shutter()),
   tick: () => both(clock(2600)),
   tock: () => both(clock(1900)),
   whoosh: () => both(whoosh(0.5, 300, 1800, 31)),

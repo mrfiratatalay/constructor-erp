@@ -16,3 +16,6 @@ export const PHONE_CONTENT = {
   aboveBar: shots.box('phone-bulkbar').y,
   aboveTabbar: shots.box('phone-tabbar').y,
 }
+
+/** Çekimin ayı ("2026-09"): ekrandaki puantaj o aydır, indirilen Excel'in adı da. */
+export const TODAY_MONTH = shots.day().slice(0, 7)

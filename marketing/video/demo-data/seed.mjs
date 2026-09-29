@@ -4,7 +4,8 @@
  * SQL ile kaydırılır. Çekim betiklerinin ihtiyaç duyduğu kimlikler .ids.json'a yazılır.
  */
 import { writeFileSync } from 'node:fs'
-import { joinCompany, signIn } from './session.mjs'
+import { seedDepot } from './seedDepot.mjs'
+import { joinCompany, signIn, signInAs } from './session.mjs'
 import { APP_WORKERS, CREWS, LISTED_PEOPLE, OWNER, SITES, STAFF } from './world.mjs'
 import { pastWorkdays, planMonth } from './puantajPlan.mjs'
 import { runSql } from './sql.mjs'
@@ -17,10 +18,12 @@ const sites = await createSites(owner)
 const people = await joinEveryone(owner)
 const { today, entries } = await buildRoster(owner)
 const marks = await markMonth(owner, entries, today)
+const shipments = await seedDepot(await signInAs(owner, people.mehmet), today, sites)
 runSql('retime.sql', { ahmet: people.ahmet, serkan: people.serkan })
+runSql('depot-retime.sql')
 
 writeFileSync(new URL('.ids.json', import.meta.url), JSON.stringify({ today, sites, people }, null, 2))
-console.log(`Hazır: ${SITES.length} şantiye, ${entries.length} yoklama kalemi, ${marks} geçmiş işaret (${today}).`)
+console.log(`Hazır: ${SITES.length} şantiye, ${entries.length} yoklama kalemi, ${marks} geçmiş işaret, ${shipments} sevkiyat (${today}).`)
 
 async function requireEmpty(session) {
   if ((await session.get('/sites')).length > 0) {

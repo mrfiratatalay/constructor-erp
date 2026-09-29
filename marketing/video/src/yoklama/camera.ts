@@ -1,7 +1,7 @@
 import { LAPTOP, laptopPoint } from '../kit/Laptop'
 import { centerOf, type Pose } from '../kit/motion'
 import { phonePoint } from '../kit/Phone'
-import { STAGE } from '../theme'
+import { focusLaptop, followPhone as follow } from '../kit/follow'
 import { shots } from './shots'
 import {
   DESK_CLICKS,
@@ -24,16 +24,7 @@ const WIDE = { x: 960, y: 540, scale: 1 }
 const ring = centerOf(shots.box('phone-ring'))
 export const RING = phonePoint(PHONE_ON, ring)
 
-/** Soldaki sözün sağ kenarı: telefona yaklaşırken telefonun sol kenarı bunun sağında kalır. */
-const CAPTION_EDGE = 1110
-/**
- * Telefonda dokunulan yere yaklaşmak: uygulamanın appY yüksekliği ekranın ortasına gelir, telefon sağda durur.
- * 1,5 kat yakınlıkta uygulamanın yazısı 1080p'de ~23 piksele çıkar: telefondan izleyen de okur.
- */
-function followPhone(appY: number, scale: number) {
-  const left = phonePoint(PHONE_ON, { x: 0, y: appY })
-  return { x: left.x - (CAPTION_EDGE - 960) / scale, y: left.y, scale }
-}
+const followPhone = (appY: number, scale: number) => follow(PHONE_ON, appY, scale)
 
 const summary = shots.box('desk-summary')
 /** Bugünün özet kartları: ilk karttan ekranın sağ kenarına bir sıra; altındaki süzgeç de görünsün. */
@@ -45,10 +36,7 @@ const DETAIL_ZOOM = 1.85
  * Kişinin ayı: solda takvim, sağda gün ayrıntısı (durum, mesai, not, "Kaydedildi · saat · şef"). Panel ekranın sağ
  * kenarına yaslıdır; kamera o kenarı aşmaz, yoksa ekranın dışındaki çerçeve ve zemin görünür.
  */
-const detail = laptopPoint(LAPTOP_ON, {
-  x: LAPTOP.app.width - STAGE.width / (2 * DETAIL_ZOOM * LAPTOP_ON.scale),
-  y: header.y + 180,
-})
+const detailFocus = focusLaptop(LAPTOP_ON, { x: header.x, y: header.y + 180 }, DETAIL_ZOOM)
 const excel = laptopPoint(LAPTOP_ON, centerOf(shots.box('desk-tap-excel')))
 
 export const EXCEL_BUTTON = excel
@@ -56,7 +44,6 @@ export const EXCEL_BUTTON = excel
 const ringFocus = followPhone(ring.y + 60, 1.7)
 const summaryFocus = { ...summaryRow, scale: 1.5 }
 const gridFocus = { ...grid, scale: 1.3 }
-const detailFocus = { ...detail, scale: DETAIL_ZOOM }
 const excelFocus = { x: excel.x - 180, y: excel.y + 150, scale: 1.5 }
 const taps = PHONE_TAPS
 const clicks = DESK_CLICKS

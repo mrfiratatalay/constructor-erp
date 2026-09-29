@@ -3,7 +3,7 @@ export type Box = { x: number; y: number; width: number; height: number }
 export type Screen = { src: string; width: number; height: number; scrollY?: number }
 export type Layer = { src: string; box: Box }
 
-type Entry = { src?: string; width?: number; height?: number; scrollY?: number; box?: Box }
+type Entry = { src?: string; width?: number; height?: number; scrollY?: number; box?: Box; day?: string }
 
 /** Bir çekimin defterine adla erişim; olmayan adda hemen hata verir: yanlış yazılan ad sessizce boş kare olmasın. */
 export function capturesOf(manifest: Record<string, Entry>) {
@@ -15,6 +15,8 @@ export function capturesOf(manifest: Record<string, Entry>) {
   return {
     screen: (name: string) => entry(name) as Screen,
     layer: (name: string) => entry(name) as Layer,
+    /** Çekimin yapıldığı gün (YYYY-AA-GG): ekranlardaki "bugün" odur. */
+    day: () => entry('_day').day as string,
     box: (name: string) => {
       const { box } = entry(name)
       if (!box) throw new Error(`"${name}" bir yer kaydı değil.`)

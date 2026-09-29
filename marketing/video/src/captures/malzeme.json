@@ -1,0 +1,322 @@
+{
+  "_day": {
+    "day": "2026-09-29"
+  },
+  "phone-start": {
+    "src": "captures/malzeme/phone-start.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-new": {
+    "box": {
+      "x": 16,
+      "y": 62,
+      "width": 361,
+      "height": 54
+    }
+  },
+  "phone-form-layer": {
+    "src": "captures/malzeme/phone-form-layer.png",
+    "box": {
+      "x": 0,
+      "y": 0,
+      "width": 393,
+      "height": 764
+    }
+  },
+  "phone-form-bar": {
+    "box": {
+      "x": 0,
+      "y": 0,
+      "width": 393,
+      "height": 46
+    }
+  },
+  "phone-tap-site": {
+    "box": {
+      "x": 16,
+      "y": 222,
+      "width": 153.3,
+      "height": 19
+    }
+  },
+  "phone-target": {
+    "src": "captures/malzeme/phone-target.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-line-1-tap-pick": {
+    "box": {
+      "x": 16,
+      "y": 226,
+      "width": 91.8,
+      "height": 19
+    }
+  },
+  "phone-picker-layer": {
+    "src": "captures/malzeme/phone-picker-layer.png",
+    "box": {
+      "x": 0,
+      "y": 0,
+      "width": 393,
+      "height": 764
+    }
+  },
+  "phone-line-1-tap-material": {
+    "box": {
+      "x": 0,
+      "y": 616,
+      "width": 393,
+      "height": 52
+    }
+  },
+  "phone-line-1-picked": {
+    "src": "captures/malzeme/phone-line-1-picked.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-line-1-tap-quantity": {
+    "box": {
+      "x": 121,
+      "y": 298,
+      "width": 256,
+      "height": 24
+    }
+  },
+  "phone-line-1-typed-1": {
+    "src": "captures/malzeme/phone-line-1-typed-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-line-1-typed-2": {
+    "src": "captures/malzeme/phone-line-1-typed-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-add": {
+    "box": {
+      "x": 16,
+      "y": 352,
+      "width": 361,
+      "height": 32
+    }
+  },
+  "phone-added": {
+    "src": "captures/malzeme/phone-added.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-line-2-tap-pick": {
+    "box": {
+      "x": 16,
+      "y": 352,
+      "width": 91.8,
+      "height": 19
+    }
+  },
+  "phone-line-2-tap-material": {
+    "box": {
+      "x": 0,
+      "y": 200,
+      "width": 393,
+      "height": 52
+    }
+  },
+  "phone-line-2-picked": {
+    "src": "captures/malzeme/phone-line-2-picked.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-line-2-tap-quantity": {
+    "box": {
+      "x": 121,
+      "y": 424,
+      "width": 256,
+      "height": 24
+    }
+  },
+  "phone-line-2-typed-1": {
+    "src": "captures/malzeme/phone-line-2-typed-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-form-bottom": {
+    "src": "captures/malzeme/phone-form-bottom.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 118
+  },
+  "phone-tap-photo": {
+    "box": {
+      "x": 121,
+      "y": 478,
+      "width": 80,
+      "height": 80
+    }
+  },
+  "phone-photo": {
+    "src": "captures/malzeme/phone-photo.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 118
+  },
+  "phone-tap-send": {
+    "box": {
+      "x": 16,
+      "y": 672,
+      "width": 361,
+      "height": 44
+    }
+  },
+  "phone-saved": {
+    "src": "captures/malzeme/phone-saved.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-detail-layer": {
+    "src": "captures/malzeme/phone-detail-layer.png",
+    "box": {
+      "x": 0,
+      "y": 91.7,
+      "width": 393,
+      "height": 672.3
+    }
+  },
+  "phone-detail-title": {
+    "box": {
+      "x": 116.9,
+      "y": 103.7,
+      "width": 159.2,
+      "height": 22
+    }
+  },
+  "desk-start": {
+    "src": "captures/malzeme/desk-start.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-new-row": {
+    "box": {
+      "x": 280,
+      "y": 277.2,
+      "width": 1166,
+      "height": 63
+    }
+  },
+  "desk-alert": {
+    "box": {
+      "x": 280,
+      "y": 125.2,
+      "width": 1166,
+      "height": 40
+    }
+  },
+  "desk-tap-search": {
+    "box": {
+      "x": 291,
+      "y": 182.2,
+      "width": 336,
+      "height": 38
+    }
+  },
+  "desk-search-1": {
+    "src": "captures/malzeme/desk-search-1.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-search-2": {
+    "src": "captures/malzeme/desk-search-2.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-search-3": {
+    "src": "captures/malzeme/desk-search-3.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-search-4": {
+    "src": "captures/malzeme/desk-search-4.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-search-5": {
+    "src": "captures/malzeme/desk-search-5.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-tap-row": {
+    "box": {
+      "x": 280,
+      "y": 403.2,
+      "width": 1166,
+      "height": 63
+    }
+  },
+  "desk-drawer": {
+    "src": "captures/malzeme/desk-drawer.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-drawer-layer": {
+    "src": "captures/malzeme/desk-drawer-layer.png",
+    "box": {
+      "x": 1030,
+      "y": 0,
+      "width": 440,
+      "height": 920
+    }
+  },
+  "desk-tap-return": {
+    "box": {
+      "x": 1254.1,
+      "y": 868,
+      "width": 102.3,
+      "height": 32
+    }
+  },
+  "desk-returned": {
+    "src": "captures/malzeme/desk-returned.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-drawer-after-layer": {
+    "src": "captures/malzeme/desk-drawer-after-layer.png",
+    "box": {
+      "x": 1030,
+      "y": 0,
+      "width": 440,
+      "height": 920
+    }
+  },
+  "desk-after": {
+    "src": "captures/malzeme/desk-after.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-tap-excel": {
+    "box": {
+      "x": 1251.1,
+      "y": 50.6,
+      "width": 70.3,
+      "height": 32
+    }
+  }
+}

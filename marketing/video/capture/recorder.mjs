@@ -19,10 +19,13 @@ export class Recorder {
    * Ekranın tamamı. Animasyonların oturması beklenir: halka dolar, pencere açılır. Kaydırma konumu da yazılır:
    * video iki ekran arasındaki kaydırmayı bu farkla canlandırır.
    */
-  async shot(page, name, settle = 700) {
+  async shot(page, name, settle = 700, scroller = null) {
     await page.waitForTimeout(settle)
     await page.screenshot({ path: this.file(name), animations: 'disabled' })
-    const scrollY = await page.evaluate(() => Math.round(window.scrollY))
+    // Tam ekran bir pencerenin içi kendi kabında kayar (ör. sevkiyat formu): o zaman kabın kaydırması yazılır.
+    const scrollY = scroller
+      ? await page.locator(scroller).evaluate((element) => Math.round(element.scrollTop))
+      : await page.evaluate(() => Math.round(window.scrollY))
     this.screens[name] = { src: `captures/${this.name}/${name}.png`, ...page.viewportSize(), scrollY }
   }
 
@@ -60,6 +63,11 @@ export class Recorder {
     this.screens[name] = { box: await boxOf(locator) }
     await locator.click()
     await locator.page().mouse.move(1, 1)
+  }
+
+  /** Çekimin günü: ekranlardaki "bugün" odur; video dosya adlarını (Excel) buna göre yazar. */
+  setDay(day) {
+    this.screens._day = { day }
   }
 
   /** Hesaplanmış bir alan (ör. cetvelin gün hücreleri): tek bir öğe değil, birkaçının birleşimi. */

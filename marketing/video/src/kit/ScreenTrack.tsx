@@ -6,12 +6,13 @@ import { mix, progress } from './motion'
 
 /**
  * Cihazın ekranında sırayla görünen çekimler. Her çekim kendi karesinde başlar, bir öncekinden nasıl geldiğini söyler:
- * kesme, yumuşak geçiş, yukarıdan aşağı açılma (işaretlerin satır satır dolması) ya da kaydırma.
+ * kesme, yumuşak geçiş, yukarıdan aşağı açılma (işaretlerin satır satır dolması) ya da kaydırma. Kaydırma uzunsa
+ * sayfanın tam boy şeridinden (strip) oynar; kısaysa (içerik yüksekliğinden az) iki görüntü birlikte kayar.
  */
 export type Enter =
   | { kind: 'cut' }
   | { kind: 'fade' | 'wipe'; frames: number }
-  | { kind: 'scroll'; frames: number; strip: Screen; top: number; bottom: number }
+  | { kind: 'scroll'; frames: number; strip?: Screen; top: number; bottom: number }
 
 export type Shot = { at: number; screen: Screen; enter?: Enter }
 
@@ -56,6 +57,7 @@ const Scroll: React.FC<{
   amount: number
 }> = ({ from, to, enter, amount }) => {
   const scroll = mix(from.scrollY ?? 0, to.scrollY ?? 0, amount)
+  if (!enter.strip) return <Glide from={from} to={to} enter={enter} scroll={scroll} />
   const viewport: CSSProperties = {
     position: 'absolute',
     left: 0,
@@ -70,6 +72,36 @@ const Scroll: React.FC<{
       <ScreenImage screen={to} />
       <div style={viewport}>
         <ScreenImage screen={enter.strip} style={{ top: -(scroll + enter.top) }} />
+      </div>
+    </>
+  )
+}
+
+/**
+ * Kısa kaydırma, şeritsiz: iki görüntünün içerik bölümleri aynı hızla kayar, birinin bittiği yerde öteki başlar.
+ * Her görüntü kendi içerik alanına kırpılır: başlık gibi sabit parçalar kayan içeriğe karışmaz.
+ */
+const Glide: React.FC<{
+  from: Screen
+  to: Screen
+  enter: Extract<Enter, { kind: 'scroll' }>
+  scroll: number
+}> = ({ from, to, enter, scroll }) => {
+  const height = enter.bottom - enter.top
+  const band = (screen: Screen) => {
+    const shift = (screen.scrollY ?? 0) - scroll
+    return (
+      <div style={{ position: 'absolute', left: 0, top: shift, width: screen.width, height, overflow: 'hidden' }}>
+        <ScreenImage screen={screen} style={{ top: -enter.top }} />
+      </div>
+    )
+  }
+  return (
+    <>
+      <ScreenImage screen={to} />
+      <div style={{ position: 'absolute', left: 0, top: enter.top, width: to.width, height, overflow: 'hidden', background: COLOR.canvas }}>
+        {band(from)}
+        {band(to)}
       </div>
     </>
   )

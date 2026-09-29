@@ -1,4 +1,7 @@
 {
+  "_day": {
+    "day": "2026-09-29"
+  },
   "phone-start": {
     "src": "captures/yoklama/phone-start.png",
     "width": 393,
@@ -280,9 +283,9 @@
   },
   "desk-day-header": {
     "box": {
-      "x": 1244.5,
+      "x": 1244.4,
       "y": 269.1,
-      "width": 184.5,
+      "width": 184.6,
       "height": 18
     }
   },

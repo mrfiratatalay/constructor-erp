@@ -19,6 +19,7 @@ const owner = await signIn(`${APP}/api`, { email: OWNER.email, password: OWNER.p
 const today = await clearToday(owner)
 const pourDay = await lastPourDay(owner, today)
 const recorder = new Recorder('yoklama')
+recorder.setDay(today)
 const browser = await launch()
 await filmPhone(recorder, (await openAs(browser, 'phone', 'ahmet')).page)
 await filmDesktop(recorder, (await openAs(browser, 'desktop', 'owner')).page)

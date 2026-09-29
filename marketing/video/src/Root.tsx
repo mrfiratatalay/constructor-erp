@@ -1,9 +1,16 @@
 import { Composition } from 'remotion'
+import { Malzeme } from './malzeme/Malzeme'
+import { DURATION as MALZEME } from './malzeme/timeline'
 import { STAGE } from './theme'
 import { Yoklama } from './yoklama/Yoklama'
 import { DURATION as YOKLAMA } from './yoklama/timeline'
 
 /** Serinin videoları. Her modül kendi klasöründe, kendi zamanlamasıyla; parça seti (kit/) ortaktır. */
+const FORMAT = { fps: STAGE.fps, width: STAGE.width, height: STAGE.height }
+
 export const Root: React.FC = () => (
-  <Composition id="Yoklama" component={Yoklama} durationInFrames={YOKLAMA} fps={STAGE.fps} width={STAGE.width} height={STAGE.height} />
+  <>
+    <Composition id="Yoklama" component={Yoklama} durationInFrames={YOKLAMA} {...FORMAT} />
+    <Composition id="Malzeme" component={Malzeme} durationInFrames={MALZEME} {...FORMAT} />
+  </>
 )
