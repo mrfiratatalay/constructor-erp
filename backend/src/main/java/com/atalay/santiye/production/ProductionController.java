@@ -1,5 +1,7 @@
 package com.atalay.santiye.production;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.production.dto.CrewRef;
 import com.atalay.santiye.production.dto.ProductionBoardView;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** İmalatı yalnızca patron, şef ve depo sorumlusu görür; çalışan göremez (sekmesi de yoktur). */
+@RequiresFeature(Features.PRODUCTION)
 @RestController
 @PreAuthorize("hasAuthority('VIEW_PRODUCTION')")
 @Tag(name = "Production")

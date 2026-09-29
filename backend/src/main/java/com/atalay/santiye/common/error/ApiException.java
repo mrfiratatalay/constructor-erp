@@ -14,6 +14,12 @@ public class ApiException extends ErrorResponseException {
         super(status, ProblemDetail.forStatusAndDetail(status, detail), null);
     }
 
+    /** code: arayüzün mesajı değil durumu tanıdığı sabit (ör. WORKSPACE_LOCKED, FEATURE_NOT_IN_PLAN). */
+    private ApiException(HttpStatus status, String detail, String code) {
+        this(status, detail);
+        getBody().setProperty("code", code);
+    }
+
     public static ApiException badRequest(String detail) {
         return new ApiException(HttpStatus.BAD_REQUEST, detail);
     }
@@ -25,6 +31,10 @@ public class ApiException extends ErrorResponseException {
     /** Kaydı görebiliyor ama bu işi yapmaya yetkisi yok (ör. başkasının gönderisini düzeltmek). */
     public static ApiException forbidden(String detail) {
         return new ApiException(HttpStatus.FORBIDDEN, detail);
+    }
+
+    public static ApiException forbidden(String detail, String code) {
+        return new ApiException(HttpStatus.FORBIDDEN, detail, code);
     }
 
     /** Başka firmanın kaydı da "bulunamadı" döner: varlığını bile belli etmeyiz. */

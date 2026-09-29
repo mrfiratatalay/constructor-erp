@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCurrentUser } from '@/core/auth/currentUser'
 import type { RouteName } from '@/core/navigation/routeTable'
 import { useTabbarVisible } from '@/core/navigation/useTabbarVisible'
-import { mainNavItems, navRouteOf } from '@/shared/navigation/navItems'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
+import { mainNavItems, navRouteOf, platformNavItems } from '@/shared/navigation/navItems'
 
+/** Alt sekmeler: platform sayfalarında platform menüsü, firmanın çalışma alanında firmanın menüsü. */
 const route = useRoute()
-const { data: user } = useCurrentUser()
+const { viewer } = useWorkspace()
 const visible = useTabbarVisible()
-const items = computed(() => (user.value ? mainNavItems(user.value, 'mobile') : []))
+const items = computed(() => {
+  if (route.meta.platform) return platformNavItems('mobile')
+  return viewer.value ? mainNavItems(viewer.value, 'mobile') : []
+})
 /** Seçili sekme adresten gelir: şantiye sayfası "Şantiyeler" sekmesini yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 </script>

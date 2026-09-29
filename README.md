@@ -1,10 +1,20 @@
-# Kızılkan Şantiye
+# Constructor ERP
 
-Müteahhitlerin birden fazla şantiyeyi WhatsApp yerine tek yerden takip ettiği web uygulaması.
-Telefonda sade bir saha arayüzü, bilgisayarda yönetim paneli.
+Müteahhitlerin şantiyelerini WhatsApp grupları yerine tek yerden yönettiği, çok firmalı (multi-tenant) SaaS ERP.
+Telefonda sade bir saha arayüzü, bilgisayarda yönetim paneli. İlk müşterisi Kızılkan İnşaat'tır.
 
 Kod yazmadan önce **[ANAYASA.md](ANAYASA.md)** okunur: boyut sınırları, atomik tasarım ve
-katman kuralları oradadır ve otomatik denetlenir.
+katman kuralları oradadır ve otomatik denetlenir. Firma ayrımı (tenant), abonelik ve platform yönetiminin
+nasıl çalıştığı ve yeni bir modül eklerken izlenecek liste **[MIMARI-SAAS.md](MIMARI-SAAS.md)**'dedir.
+
+## Yüzeyler
+
+| Kim | Nerede | Ne yapar |
+|---|---|---|
+| Ziyaretçi | `/`, `/fiyatlar`, `/basvuru` | Ürünü tanır, paketleri karşılaştırır, başvurur (ödeme altyapısı yok, satış başvuruyla başlar) |
+| Satın alan firma | `/kurulum/:token` | Platformun gönderdiği tek kullanımlık linkle firmasını kurar: bilgiler, logo, patron hesabı, ilk şantiye |
+| Firma (patron, şef, çalışan) | `/santiyeler`, `/yoklama`, `/malzemeler`, `/firma` | Kendi çalışma alanı; yalnızca kendi verisini görür, paketi hangi modülleri açıyorsa onları |
+| Constructor ERP ekibi | `/platform-admin` | Firmalar, abonelik ve ödemeler, kurulum linkleri, başvurular, paketler, işlem geçmişi |
 
 ## Yapı
 
@@ -29,7 +39,8 @@ git clone <depo-adresi> && cd atalay-santiye
 |---|---|
 | Arayüz | http://localhost:5173 |
 | API dokümanı | http://localhost:8080/swagger-ui.html |
-| İlk giriş | `patron@kizilkan.local` / `patron123` |
+| Firma girişi (Kızılkan patronu) | `patron@kizilkan.local` / `patron123` |
+| Platform yönetimi | `admin@constructor-erp.local` / `admin123` → `/platform-admin` |
 
 | Betik | Ne yapar |
 |---|---|
@@ -38,7 +49,7 @@ git clone <depo-adresi> && cd atalay-santiye
 | `./scripts/logs.sh [servis]` | Kayıtları akıtır (`api`, `web`, `postgres`) |
 | `./scripts/reset.sh` | **Her şeyi siler** (veritabanı + medya), sıfırdan kurmak için |
 
-Ayarlar (portlar, ilk yönetici, şifreler) `.env` ile değiştirilir: `cp .env.example .env`.
+Ayarlar (portlar, ilk firma, platform yöneticisi, şifreler) `.env` ile değiştirilir: `cp .env.example .env`.
 Dosya yoksa `.env.example`'daki değerlerin aynısı varsayılan olarak geçerlidir.
 
 Windows PowerShell'de betikler yerine doğrudan:

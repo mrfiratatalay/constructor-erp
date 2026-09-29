@@ -42,7 +42,7 @@ class MaterialReport {
 
     byte[] workbook(CurrentUser user, @Nullable String search) {
         var out = new ByteArrayOutputStream();
-        try (Workbook workbook = new Workbook(out, "Kızılkan Şantiye", "1.0")) {
+        try (Workbook workbook = new Workbook(out, "Constructor ERP", "1.0")) {
             TableSheet.write(workbook.newWorksheet("Sevkiyatlar"), COLUMNS, linesOf(rows.list(user, search)),
                 clock.getZone());
         } catch (IOException problem) {

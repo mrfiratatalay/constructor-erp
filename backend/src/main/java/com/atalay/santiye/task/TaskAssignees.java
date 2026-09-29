@@ -2,8 +2,8 @@ package com.atalay.santiye.task;
 
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.site.Site;
-import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.tenant.Member;
+import com.atalay.santiye.tenant.Members;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 @Component
 class TaskAssignees {
 
-    private final UserRepository users;
+    private final Members members;
 
-    TaskAssignees(UserRepository users) {
-        this.users = users;
+    TaskAssignees(Members members) {
+        this.members = members;
     }
 
     /** Sorumlu verilmediyse görev sorumlusuz kalır; bu geçerli bir cevaptır ("sonra atarım"). */
@@ -25,9 +25,9 @@ class TaskAssignees {
         if (assigneeId == null) {
             return null;
         }
-        return users.findByIdAndCompanyId(assigneeId, site.getCompanyId())
-            .filter(AppUser::isActive)
-            .map(AppUser::getId)
+        return members.find(site.getCompanyId(), assigneeId)
+            .filter(Member::isActive)
+            .map(Member::getId)
             .orElseThrow(() -> ApiException.badRequest("Görevin sorumlusu bulunamadı."));
     }
 }

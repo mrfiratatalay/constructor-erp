@@ -1,5 +1,7 @@
 package com.atalay.santiye.task;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.task.dto.CreateTaskRequest;
 import com.atalay.santiye.task.dto.TaskView;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Görev şantiyesine aittir: şantiyenin altında listelenir ve açılır, kendi adresiyle güncellenir. */
+@RequiresFeature(Features.TASKS)
 @RestController
 @Tag(name = "Tasks")
 public class TaskController {

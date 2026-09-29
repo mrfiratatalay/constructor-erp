@@ -7,6 +7,16 @@ const sitesPage = () => import('./pages/SitesPage.vue')
 const attendancePage = () => import('./pages/AttendancePage.vue')
 
 export const routes = buildRoutes({
+  landing: () => import('./pages/LandingPage.vue'),
+  pricing: () => import('./pages/PricingPage.vue'),
+  apply: () => import('./pages/ApplyPage.vue'),
+  setup: () => import('./pages/SetupPage.vue'),
+  platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
+  platformTenants: () => import('./pages/PlatformTenantsPage.vue'),
+  platformTenant: () => import('./pages/PlatformTenantPage.vue'),
+  platformLeads: () => import('./pages/PlatformLeadsPage.vue'),
+  platformPlans: () => import('./pages/PlatformPlansPage.vue'),
+  platformAudit: () => import('./pages/PlatformAuditPage.vue'),
   login: () => import('./pages/LoginPage.vue'),
   invite: () => import('./pages/InviteAcceptPage.vue'),
   join: () => import('./pages/JoinPage.vue'),
@@ -20,5 +30,7 @@ export const routes = buildRoutes({
   myPuantaj: () => import('./pages/MyPuantajPage.vue'),
   materials: () => import('./pages/MaterialsPage.vue'),
   // Masaüstünde Hesabım ayrı sayfa değil, sol alttaki kullanıcı düğmesinin açtığı paneldir.
+  company: () => import('./pages/CompanyPage.vue'),
+  workspaceLocked: () => import('./pages/WorkspaceLockedPage.vue'),
   profile: { redirectTo: 'sites' },
 })

@@ -24,7 +24,7 @@ public class OpenApiConfig {
 
     @Bean
     OpenAPI openApi() {
-        return new OpenAPI().info(new Info().title("Kızılkan Şantiye API").version("1.0"));
+        return new OpenAPI().info(new Info().title("Constructor ERP API").version("1.0"));
     }
 
     @Bean

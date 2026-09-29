@@ -35,9 +35,9 @@ export default defineConfig({
       filename: 'sw.ts',
       injectRegister: false,
       manifest: {
-        name: 'Kızılkan Şantiye',
-        short_name: 'Kızılkan',
-        description: 'Şantiyelerden fotoğraf, video, sesli not ve sorunlar tek yerde.',
+        name: 'Constructor ERP',
+        short_name: 'Constructor',
+        description: 'Müteahhitler için şantiye, ekip, yoklama ve malzeme yönetimi tek yerde.',
         lang: 'tr',
         start_url: '/',
         display: 'standalone',

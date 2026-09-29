@@ -1,4 +1,4 @@
-# Kızılkan Şantiye — iki kip:
+# Constructor ERP — iki kip:
 #
 #   docker compose up -d                  yalnızca veritabanı (geliştirme: backend ve frontend elde çalışır)
 #   docker compose --profile app up -d    bütün sistem (veritabanı + backend + arayüz), ./scripts/start.sh
@@ -48,6 +48,10 @@ services:
       APP_BOOTSTRAP_OWNER_NAME: ${OWNER_NAME:-Patron}
       APP_BOOTSTRAP_OWNER_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
       APP_BOOTSTRAP_OWNER_PASSWORD: ${OWNER_PASSWORD:-patron123}
+      # Constructor ERP ekibinin platform yönetimi hesabı (/platform-admin); firmalardan ayrı, süper yönetici.
+      APP_PLATFORM_ADMIN_NAME: ${PLATFORM_ADMIN_NAME:-Constructor Destek}
+      APP_PLATFORM_ADMIN_EMAIL: ${PLATFORM_ADMIN_EMAIL:-admin@constructor-erp.local}
+      APP_PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-admin123}
       TZ: Europe/Istanbul
     ports:
       - "${API_PORT:-8080}:8080"
@@ -75,6 +79,8 @@ services:
       args:
         VITE_DEV_LOGIN_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
         VITE_DEV_LOGIN_PASSWORD: ${OWNER_PASSWORD:-patron123}
+        VITE_SALES_PHONE: ${SALES_PHONE:-}
+        VITE_SALES_EMAIL: ${SALES_EMAIL:-}
     ports:
       - "${WEB_PORT:-5173}:80"
     depends_on:

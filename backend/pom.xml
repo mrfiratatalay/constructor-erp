@@ -14,7 +14,7 @@
     <artifactId>santiye-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>santiye-api</name>
-    <description>Kızılkan Şantiye API</description>
+    <description>Constructor ERP API</description>
 
     <properties>
         <java.version>25</java.version>

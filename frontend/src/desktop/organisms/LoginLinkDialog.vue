@@ -3,11 +3,15 @@ import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { dateTime } from '@/core/format/dates'
 import { copyText, whatsappShareUrl, type IssuedLink } from '@/core/team/loginLink'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 
 const { issued } = defineProps<{ issued: IssuedLink | null }>()
 const emit = defineEmits<{ close: [] }>()
 
-const shareUrl = computed(() => (issued ? whatsappShareUrl(issued.member, issued.link.url) : ''))
+const { workspace } = useWorkspace()
+const shareUrl = computed(() =>
+  issued ? whatsappShareUrl(issued.member, issued.link.url, workspace.value?.name) : '',
+)
 
 async function copy() {
   if (!issued) return

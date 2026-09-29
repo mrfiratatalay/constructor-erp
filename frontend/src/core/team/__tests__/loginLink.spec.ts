@@ -5,9 +5,9 @@ const LINK = 'http://localhost:5173/davet/abc'
 
 describe('whatsappShareUrl', () => {
   it('Türkçe karakterleri ve linki bozmadan WhatsApp mesajına koyar', () => {
-    const url = new URL(whatsappShareUrl({ fullName: 'Şükrü Usta', phone: null }, LINK))
+    const url = new URL(whatsappShareUrl({ fullName: 'Şükrü Usta', phone: null }, LINK, 'Kızılkan İnşaat'))
     expect(url.searchParams.get('text')).toBe(
-      `Merhaba Şükrü Usta, Kızılkan Şantiye'ye girmek için bu linke dokun: ${LINK}`,
+      `Merhaba Şükrü Usta, Kızılkan İnşaat çalışma alanına girmek için bu linke dokun: ${LINK}`,
     )
   })
 

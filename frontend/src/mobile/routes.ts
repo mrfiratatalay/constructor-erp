@@ -4,6 +4,17 @@ import { buildRoutes } from '@/core/navigation/routeTable'
 const siteFeedPage = () => import('./pages/SiteFeedPage.vue')
 
 export const routes = buildRoutes({
+  landing: () => import('./pages/LandingPage.vue'),
+  pricing: () => import('./pages/PricingPage.vue'),
+  apply: () => import('./pages/ApplyPage.vue'),
+  setup: () => import('./pages/SetupPage.vue'),
+  platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
+  platformTenants: () => import('./pages/PlatformTenantsPage.vue'),
+  platformTenant: () => import('./pages/PlatformTenantPage.vue'),
+  platformLeads: () => import('./pages/PlatformLeadsPage.vue'),
+  // Paket düzenleme ve bütün işlem geçmişi geniş ekran işidir; telefonda özet açılır.
+  platformPlans: { redirectTo: 'platformDashboard' },
+  platformAudit: { redirectTo: 'platformDashboard' },
   login: () => import('./pages/LoginPage.vue'),
   invite: () => import('./pages/InviteAcceptPage.vue'),
   join: () => import('./pages/JoinPage.vue'),
@@ -16,5 +27,7 @@ export const routes = buildRoutes({
   memberAttendance: () => import('./pages/MemberAttendancePage.vue'),
   myPuantaj: () => import('./pages/MyPuantajPage.vue'),
   materials: () => import('./pages/MaterialsPage.vue'),
+  company: () => import('./pages/CompanyPage.vue'),
+  workspaceLocked: () => import('./pages/WorkspaceLockedPage.vue'),
   profile: () => import('./pages/ProfilePage.vue'),
 })

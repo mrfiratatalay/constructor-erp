@@ -15,6 +15,7 @@ export interface QueuedPost {
   fieldUpdate?: boolean
 }
 
+// Adı ürünün eski adını taşır ve bilerek değişmez: değişirse telefonlarda gönderilmeyi bekleyen gönderiler kaybolur.
 const store = createStore('kizilkan-santiye', 'gonderim-kuyrugu')
 
 /**

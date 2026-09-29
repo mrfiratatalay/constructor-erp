@@ -1,5 +1,7 @@
 package com.atalay.santiye.attendance;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.attendance.dto.AttendanceDayView;
 import com.atalay.santiye.attendance.dto.SaveAttendanceRequest;
 import com.atalay.santiye.auth.CurrentUser;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Bir şantiyenin bir günlük yoklaması: gün adreste ("2026-09-25"), kişi kişi liste gövdede. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @Tag(name = "Attendance")
 public class AttendanceController {

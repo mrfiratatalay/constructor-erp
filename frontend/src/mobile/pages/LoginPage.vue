@@ -18,7 +18,8 @@ function fillDevAccount() {
 
 <template>
   <main class="login-page">
-    <BrandLogo class="login-page__logo" />
+    <BrandLogo class="login-page__logo" size="lg" />
+    <p class="login-page__lead">Firmanızın çalışma alanına girin.</p>
     <van-form class="login-page__form" @submit="login(email, password)">
       <van-cell-group inset>
         <van-field v-model="email" name="email" label="E-posta" type="email" autocomplete="username"
@@ -36,7 +37,10 @@ function fillDevAccount() {
       </van-button>
     </van-form>
     <p class="login-page__hint">
-      Şefler şifre kullanmaz: yöneticinin WhatsApp'tan gönderdiği linke dokunarak girer.
+      Saha ekibi şifre kullanmaz: firmasının WhatsApp'tan gönderdiği bağlantıya dokunarak girer.
+    </p>
+    <p class="login-page__hint">
+      Firmanız henüz Constructor ERP kullanmıyor mu? <RouterLink :to="{ name: 'pricing' }">Paketleri inceleyin</RouterLink>
     </p>
   </main>
 </template>
@@ -53,6 +57,17 @@ function fillDevAccount() {
 
 .login-page__logo {
   justify-self: center;
+}
+
+.login-page__lead {
+  margin: calc(var(--space-4) * -1) 0 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.login-page__hint a {
+  color: var(--brand-primary);
+  font-weight: var(--weight-semibold);
 }
 
 .login-page__form {

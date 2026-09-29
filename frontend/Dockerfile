@@ -13,6 +13,9 @@ COPY frontend/ ./
 # "Patron olarak doldur" düğmesinin hesabı docker-compose.yml'den gelir; verilmezse boş kalır, düğme çıkmaz.
 ARG VITE_DEV_LOGIN_EMAIL=""
 ARG VITE_DEV_LOGIN_PASSWORD=""
+# Tanıtım sitesindeki satış telefonu ve e-postası; verilmezse site yalnızca başvuru formunu gösterir.
+ARG VITE_SALES_PHONE=""
+ARG VITE_SALES_EMAIL=""
 RUN npm run build-only
 
 FROM nginx:alpine AS runtime

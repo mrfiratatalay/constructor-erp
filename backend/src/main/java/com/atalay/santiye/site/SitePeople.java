@@ -1,7 +1,7 @@
 package com.atalay.santiye.site;
 
-import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.tenant.Member;
+import com.atalay.santiye.tenant.Members;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class SitePeople {
 
-    private final UserRepository users;
+    private final Members members;
 
-    SitePeople(UserRepository users) {
-        this.users = users;
+    SitePeople(Members members) {
+        this.members = members;
     }
 
     @Transactional(readOnly = true)
-    public List<AppUser> of(UUID companyId) {
-        return users.findByCompanyIdAndActiveTrueOrderByFullName(companyId);
+    public List<Member> of(UUID companyId) {
+        return members.activeOf(companyId);
     }
 }

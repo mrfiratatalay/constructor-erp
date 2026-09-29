@@ -2,7 +2,7 @@ package com.atalay.santiye.site;
 
 import com.atalay.santiye.site.dto.SiteLead;
 import com.atalay.santiye.site.dto.SiteView;
-import com.atalay.santiye.user.AppUser;
+import com.atalay.santiye.tenant.Member;
 import com.atalay.santiye.user.UserRole;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ class SiteViews {
         if (sites.isEmpty()) {
             return List.of();
         }
-        List<AppUser> everyone = people.of(sites.getFirst().getCompanyId());
+        List<Member> everyone = people.of(sites.getFirst().getCompanyId());
         Participants participants = new Participants(withRole(everyone, UserRole.OWNER),
             withRole(everyone, UserRole.SITE_LEAD), withRole(everyone, UserRole.WAREHOUSE),
             withRole(everyone, UserRole.WORKER));
@@ -41,11 +41,11 @@ class SiteViews {
         return of(List.of(site)).getFirst();
     }
 
-    private static List<SiteLead> withRole(List<AppUser> users, UserRole role) {
-        return users.stream().filter(user -> user.getRole() == role).map(SiteViews::personOf).toList();
+    private static List<SiteLead> withRole(List<Member> members, UserRole role) {
+        return members.stream().filter(member -> member.getRole() == role).map(SiteViews::personOf).toList();
     }
 
-    private static SiteLead personOf(AppUser user) {
+    private static SiteLead personOf(Member user) {
         return new SiteLead(user.getId(), user.getFullName(), user.getPhone());
     }
 

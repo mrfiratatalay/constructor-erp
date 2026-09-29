@@ -1,5 +1,7 @@
 package com.atalay.santiye.material;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.material.dto.DepotRequest;
 import com.atalay.santiye.material.dto.LocationView;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Hareket formunun seçenekleri: stok lokasyonları (depolar, şantiyeler) ve şirket dışındaki taraflar. */
+@RequiresFeature(Features.MATERIALS)
 @RestController
 @Tag(name = "Materials")
 public class StockLocationController {

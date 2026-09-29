@@ -8,7 +8,7 @@ const route = useRoute()
 <template>
   <div class="mobile-shell">
     <RouterView />
-    <MobileTabbar v-if="!route.meta.public" />
+    <MobileTabbar v-if="!route.meta.public && !route.meta.lockedOnly" />
   </div>
 </template>
 

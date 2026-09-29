@@ -38,7 +38,7 @@ public class PuantajExport {
     public byte[] month(CurrentUser user, YearMonth month) {
         Ledger book = ledger.read(user.companyId(), month.atDay(1), month.atEndOfMonth());
         ByteArrayOutputStream file = new ByteArrayOutputStream();
-        try (Workbook workbook = new Workbook(file, "Kizilkan Santiye", "1.0")) {
+        try (Workbook workbook = new Workbook(file, "Constructor ERP", "1.0")) {
             GridSheet.write(workbook.newWorksheet("Personel"), month, PEOPLE, rowsOf(book, RosterKind.PERSON));
             GridSheet.write(workbook.newWorksheet("Ekipler"), month, CREWS, rowsOf(book, RosterKind.CREW));
             RecordsSheet.write(workbook.newWorksheet("Kayıtlar"), book, clock.getZone());

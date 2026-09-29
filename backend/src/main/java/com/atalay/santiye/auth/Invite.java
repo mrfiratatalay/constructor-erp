@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+/** Tek kullanımlık giriş linki; hangi firmanın patronu ürettiyse oturum o firmada açılır. */
 @Entity
 @Table(name = "invites")
 class Invite {
@@ -13,6 +14,7 @@ class Invite {
     @Id
     private UUID id;
     private UUID userId;
+    private UUID companyId;
     private String tokenHash;
     private Instant createdAt;
     private Instant expiresAt;
@@ -21,9 +23,10 @@ class Invite {
     protected Invite() {
     }
 
-    Invite(UUID userId, String tokenHash, Instant createdAt, Instant expiresAt) {
+    Invite(UUID userId, UUID companyId, String tokenHash, Instant createdAt, Instant expiresAt) {
         this.id = UUID.randomUUID();
         this.userId = userId;
+        this.companyId = companyId;
         this.tokenHash = tokenHash;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
@@ -40,5 +43,9 @@ class Invite {
 
     UUID getUserId() {
         return userId;
+    }
+
+    UUID getCompanyId() {
+        return companyId;
     }
 }

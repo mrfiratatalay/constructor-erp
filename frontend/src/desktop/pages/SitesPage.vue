@@ -6,6 +6,7 @@ import { HardHat, Plus, Search, UserPlus } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { PostView, SiteToday } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 import { useSitePins } from '@/core/pins/useSitePins'
 import { useSearch } from '@/core/search/useSearch'
 import { useSiteCreation, type NewSiteForm } from '@/core/sites/useSiteCreation'
@@ -31,6 +32,7 @@ import SplitView from '@/desktop/templates/SplitView.vue'
 const route = useRoute()
 const router = useRouter()
 const { data: user } = useCurrentUser()
+const { workspace } = useWorkspace()
 const { today, isLoading } = useToday()
 const { sites: allSites } = useSites()
 const { createSite, isSaving } = useSiteCreation()
@@ -104,7 +106,7 @@ const openPost = (post: PostView) =>
       <SiteTasksPanel v-if="selectedId && route.name === 'siteTasks'" :key="`tasks-${selectedId}`"
         :site-id="selectedId" />
       <SiteWorkspace v-else-if="selectedId" :key="selectedId" :site-id="selectedId" />
-      <WelcomePane v-else :company-name="user?.companyName" />
+      <WelcomePane v-else :company-name="workspace?.name" :logo-url="workspace?.logoUrl" />
     </template>
   </SplitView>
   <NewSiteDialog v-model:show="adding" :saving="isSaving" @submit="add" />

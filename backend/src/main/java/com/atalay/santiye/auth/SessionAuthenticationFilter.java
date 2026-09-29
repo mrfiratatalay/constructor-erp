@@ -1,5 +1,7 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.billing.WorkspaceAccess;
+import com.atalay.santiye.billing.WorkspaceStatus;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,12 +21,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 class SessionAuthenticationFilter extends OncePerRequestFilter {
 
+    static final String WORKSPACE = "WORKSPACE";
+    private static final String FEATURE = "FEATURE_";
+
     private final SessionService sessions;
     private final SessionCookies cookies;
+    private final WorkspaceAccess access;
 
-    SessionAuthenticationFilter(SessionService sessions, SessionCookies cookies) {
+    SessionAuthenticationFilter(SessionService sessions, SessionCookies cookies, WorkspaceAccess access) {
         this.sessions = sessions;
         this.cookies = cookies;
+        this.access = access;
     }
 
     @Override
@@ -34,13 +41,29 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    /** Yetkiler: rol (hasRole) ve rolün açtığı işler (hasAuthority, bkz. Permission). */
+    /**
+     * Yetkiler: firmadaki rol (hasRole), rolün açtığı işler (hasAuthority, bkz. Permission), platform rolü
+     * (ROLE_SUPER_ADMIN). Firmanın çalışma alanı açıksa (firma aktif, abonelik geçerli) WORKSPACE ve paketin açtığı
+     * modüller (FEATURE_…) de eklenir; firma uçları WORKSPACE ister (SecurityConfig).
+     */
     private void signIn(CurrentUser user) {
-        List<SimpleGrantedAuthority> authorities = Stream.concat(Stream.of("ROLE_" + user.role().name()),
-            Permission.grantedTo(user.role()).stream().map(Permission::name)).map(SimpleGrantedAuthority::new).toList();
+        List<SimpleGrantedAuthority> authorities = authoritiesOf(user).map(SimpleGrantedAuthority::new).toList();
         var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    private Stream<String> authoritiesOf(CurrentUser user) {
+        Stream<String> platform = user.platformAdmin() ? Stream.of("ROLE_SUPER_ADMIN") : Stream.empty();
+        if (!user.hasWorkspace()) {
+            return platform;
+        }
+        WorkspaceStatus status = access.statusOf(user.companyId());
+        Stream<String> role = Stream.concat(Stream.of("ROLE_" + user.role().name()),
+            Permission.grantedTo(user.role(), status.features()).stream().map(Permission::name));
+        Stream<String> open = status.open()
+            ? Stream.concat(Stream.of(WORKSPACE), status.features().stream().map(FEATURE::concat)) : Stream.empty();
+        return Stream.concat(platform, Stream.concat(role, open));
     }
 }

@@ -1,6 +1,7 @@
 package com.atalay.santiye.material;
 
 import com.atalay.santiye.auth.CurrentUser;
+import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.material.dto.DocumentView;
 import com.atalay.santiye.material.dto.ShipmentDetail;
 import java.util.List;
@@ -9,7 +10,10 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Sevkiyatın ayrıntısı: listedeki satırı, açıklaması, irsaliyeleri ve değişmez geçmişi bir arada. */
+/**
+ * Sevkiyatın ayrıntısı: listedeki satırı, açıklaması, irsaliyeleri ve değişmez geçmişi bir arada. Başka firmanın
+ * sevkiyatı "bulunamadı"dır.
+ */
 @Service
 class ShipmentDetails {
 
@@ -40,7 +44,8 @@ class ShipmentDetails {
             .param("shipment", shipmentId)
             .param("company", user.companyId())
             .query(Head.class)
-            .single();
+            .optional()
+            .orElseThrow(() -> ApiException.notFound("Sevkiyat bulunamadı."));
         List<DocumentView> documents = jdbc.sql(DOCUMENTS).param("shipment", shipmentId)
             .query(DocumentView.class).list();
         return new ShipmentDetail(rows.one(user.companyId(), shipmentId), head.description(), head.createdByName(),

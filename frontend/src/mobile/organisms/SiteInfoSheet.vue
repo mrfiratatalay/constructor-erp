@@ -26,7 +26,7 @@ const { site } = defineProps<{ site: SiteView }>()
 const { data: user } = useCurrentUser()
 const { saveSite, isSaving } = useSites()
 const library = useSiteLibrary(() => site.id)
-const { open: openTasks } = useSiteTasks(() => site.id)
+const { open: openTasks, available: hasTasks } = useSiteTasks(() => site.id)
 const editing = ref(false)
 const libraryOpen = ref(false)
 const participants = computed(() => siteParticipants(site, user.value))
@@ -65,7 +65,7 @@ function openStripItem(index: number) {
       <SiteMediaRow :count="library.count.value" :strip="library.strip.value" @open="libraryOpen = true"
         @open-photo="openStripItem" />
       <van-cell-group inset class="site-info__tasks">
-        <van-cell title="Görevler" :value="openTasks.length ? `${openTasks.length} açık` : ''" is-link
+        <van-cell v-if="hasTasks" title="Görevler" :value="openTasks.length ? `${openTasks.length} açık` : ''" is-link
           :to="{ name: 'siteTasks', params: { siteId: site.id } }" @click="show = false" />
       </van-cell-group>
       <h3 class="site-info__heading">Katılımcılar · {{ participants.length }}</h3>

@@ -1,5 +1,7 @@
 package com.atalay.santiye.material;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.common.error.ApiException;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * API dokümanında (ve üretilen istemcide) yer almaz, medya dosyaları gibi.
  */
 @Hidden
+@RequiresFeature(Features.MATERIALS)
 @RestController
 class MaterialDocumentController {
 

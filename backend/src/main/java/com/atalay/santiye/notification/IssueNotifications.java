@@ -1,8 +1,7 @@
 package com.atalay.santiye.notification;
 
 import com.atalay.santiye.post.IssueReported;
-import com.atalay.santiye.user.AppUser;
-import com.atalay.santiye.user.UserRepository;
+import com.atalay.santiye.tenant.Members;
 import com.atalay.santiye.user.UserRole;
 import java.util.List;
 import java.util.UUID;
@@ -17,11 +16,11 @@ class IssueNotifications {
 
     private static final int EXCERPT = 120;
 
-    private final UserRepository users;
+    private final Members members;
     private final Notifier notifier;
 
-    IssueNotifications(UserRepository users, Notifier notifier) {
-        this.users = users;
+    IssueNotifications(Members members, Notifier notifier) {
+        this.members = members;
         this.notifier = notifier;
     }
 
@@ -29,8 +28,7 @@ class IssueNotifications {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void onIssueReported(IssueReported issue) {
-        List<UUID> owners = users.findByCompanyIdAndRoleAndActiveTrue(issue.companyId(), UserRole.OWNER).stream()
-            .map(AppUser::getId)
+        List<UUID> owners = members.activeIdsWithRole(issue.companyId(), UserRole.OWNER).stream()
             .filter(ownerId -> !ownerId.equals(issue.authorId()))
             .toList();
         notifier.deliver(owners, new NotificationContent(

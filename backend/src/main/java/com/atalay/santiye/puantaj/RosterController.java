@@ -1,5 +1,7 @@
 package com.atalay.santiye.puantaj;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.puantaj.dto.RosterEntryRequest;
 import com.atalay.santiye.puantaj.dto.RosterEntryView;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Yoklama listesine uygulaması olmayan bir kişiyi ya da taşeron ekibi eklemek, düzeltmek, listeden çıkarmak. */
+@RequiresFeature(Features.ATTENDANCE)
 @RestController
 @RequestMapping("/puantaj/entries")
 @PreAuthorize("hasAnyRole('OWNER', 'SITE_LEAD')")

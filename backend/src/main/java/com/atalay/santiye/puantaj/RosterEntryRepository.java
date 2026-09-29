@@ -13,17 +13,18 @@ interface RosterEntryRepository extends JpaRepository<RosterEntry, UUID> {
 
     Optional<RosterEntry> findByIdAndCompanyId(UUID id, UUID companyId);
 
-    Optional<RosterEntry> findByUserId(UUID userId);
+    Optional<RosterEntry> findByCompanyIdAndUserId(UUID companyId, UUID userId);
 
     /**
      * Uygulamadaki çalışanlar listeye kendiliğinden girer: firmaya katılan ya da çalışan yapılan herkesin kalemi
      * puantaj okunurken açılır. Katılma ve rol değişikliği puantajı bilmek zorunda kalmaz. Aynı anda iki okuma
-     * olursa ikinci ekleme sessizce atlanır (user_id tekildir).
+     * olursa ikinci ekleme sessizce atlanır (kişi firmada tekildir).
      */
     @Modifying
     @Query(value = "insert into roster_entries (id, company_id, kind, user_id, name, created_at) "
-        + "select gen_random_uuid(), u.company_id, 'PERSON', u.id, u.full_name, now() from users u "
-        + "where u.company_id = :companyId and u.active and u.role = 'WORKER' "
-        + "on conflict (user_id) do nothing", nativeQuery = true)
+        + "select gen_random_uuid(), m.company_id, 'PERSON', u.id, u.full_name, now() "
+        + "from company_memberships m join users u on u.id = m.user_id "
+        + "where m.company_id = :companyId and m.active and m.role = 'WORKER' "
+        + "on conflict (company_id, user_id) do nothing", nativeQuery = true)
     int addMissingWorkers(UUID companyId);
 }

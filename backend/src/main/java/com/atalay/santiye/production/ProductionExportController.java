@@ -1,5 +1,7 @@
 package com.atalay.santiye.production;
 
+import com.atalay.santiye.billing.Features;
+import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Clock;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Şantiyenin imalat raporu Excel olarak; tarayıcı doğrudan indirir ("imalat-2026-09-28.xlsx"). İmalatı gören herkes
  * alır (patron, şef, depo sorumlusu). Oturum çerezle gider: arayüz bu adrese düz bir bağlantıyla gider.
  */
+@RequiresFeature(Features.PRODUCTION)
 @RestController
 @PreAuthorize("hasAuthority('VIEW_PRODUCTION')")
 @Tag(name = "Production")
