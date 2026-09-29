@@ -41,7 +41,7 @@ parçalardan kurgulanır.
 | 3 | Saha günlüğü | Şantiyede bugün ne oldu, tek akışta. | "Sorun bildir" | Sarı sorun satırı, günlük | Fotoğraf bekliyor |
 | 4 | **Malzeme sevkiyatı** | Ne çıktı, nereye gitti, geri gelecek mi. | Depocu sevkiyat çıkarır, irsaliye çeker | Sevkiyat defteri, "dışarıda" şeridi | Hazır |
 | 5 | **Ekibi eklemek** | Tek bağlantı, herkes içeride. | Usta bağlantıdan katılır | Akışta "katıldı", yoklamada yeni satır | Hazır |
-| 6 | İş ilerlemesi | Şef miktarı yazar, yüzde kendiliğinden. | Şef "Demir İşleri → 3,5 ton" girer | Kalemler, yüzde, kalan | Sırada |
+| 6 | **İş ilerlemesi** | Şef miktarı yazar, yüzde kendiliğinden. | Şef "Demir İşleri → 3,5 ton" girer | Pano, geciken iş, şefin notu | Hazır |
 | 7 | **Ana video** (60-75 sn) | Hepsi | 1-6'nın en iyi anları | | En son |
 
 Görevler videoya girmez: TASARIM.md'de ürün kararı henüz konuşuluyor. Bildirim, 3. videonun parçasıdır.
@@ -116,6 +116,7 @@ bölümleri gibi durur. Yoklamada gördüğün şef, saha günlüğünde sorun b
 | Personel | 14 kişi: uygulamayı kullananlar ve uygulaması olmayanlar karışık, her birinin görevi (Kalıpçı, Duvarcı…) |
 | Taşeron ekipler | Demirci · Hasan Usta, Elektrik · Volkan Usta, Tesisat · Erdal Usta, Alçıpan · Kadir Usta |
 | Şantiyeler | Kartal Konutları B Blok, Ataşehir Ofis Binası, Beylikdüzü Villaları, Çekmeköy Okulu; tamamlanan: Maltepe Rezidans |
+| İlerleme | Kartal'da beş iş kalemi (temel demiri bitti, karkas demiri %48,8, elektrik bitmek üzere, bodrum tesisatı gecikmiş, alçı yeni) ve ağustos-eylülün günlük girişleri, şefin notlarıyla (`progress.mjs`). |
 | Geçmiş | Firma uygulamaya geçen ay başlamış gibi: şantiyeler ağustosta beşer gün arayla açılmış, ekip ertesi sabah katılmış (`sites-retime.sql`). |
 | Puantaj | Ayın başından dünkü güne kadar dolu: çoğu gün Geldi, arada gerçekçi Gelmedi / İzinli / Yarım gün, bazı günlerde mesai ve not. Pazar boş. Aynı betik her çalıştığında aynı veriyi üretir. |
 
@@ -160,6 +161,25 @@ bölümleri gibi durur. Yoklamada gördüğün şef, saha günlüğünde sorun b
 Bağlantının adresi çekimde yer tutucudur (`kizilkan.example`); gerçek adres verilince `backend.sh`'taki
 `DEMO_BASE_URL` ile yeniden çekilir.
 
+## İlerleme videosu: iş kalemleri (32 sn)
+
+`npm run render:ilerleme` → `out/ilerleme.mp4`. Kartal'ın beş iş kalemi `demo-data/progress.mjs`'tedir; her durum bir
+kez görünür (Tamamlandı, Devam ediyor, Bitmeye yakın, Gecikiyor). Yağmur ve beton dökümü günleri puantajla aynıdır.
+
+| Zaman | Sahne | Ses | Ekranda yazan |
+|---|---|---|---|
+| 0-4 sn | Izgara çizilir. | Yumuşak akorlar | "Akşam 17:30, iş bitti." → "Bugün ne kadar yapıldı?" |
+| 4-7 sn | Şefin telefonu **ilk düşüşte**: İlerleme sekmesi → Demir İşleri'nde **Güncelle** → "Günlük İlerleme" penceresi. | Dokunuş, pencere | "Demir İşleri → Güncelle." |
+| 7-10 sn | Bugün yapılan **3,5**, çalışan **12**, pencere kayar, **Güncellemeyi kaydet**. | Tuş sesleri | "Bugün yapılan: 3,5 ton." |
+| 10-15 sn | Üstte yeşil "İlerleme kaydedildi"; kart 62 / 120 ton, %51,7, "↑ Bugün +3,5 ton · 58 ton kaldı" parlar. | Çan, çan arpeji | "Yüzde, kalan, durum: kendiliğinden." |
+| 15-19 sn | Laptop **ikinci düşüşte**: panoda Demir İşleri, "Son güncelleme: Bugün 17:38". | Vızıltı, "ding" | "Patron ofisten aynı akşam görür." |
+| 19-22 sn | **Geciken** → kırmızı Bodrum Tesisatı. | Tık | "Geciken iş kırmızıyla öne çıkar." |
+| 22-25 sn | **Detay**: gün gün geçmiş, şefin notu: boru tedarikçiden üç gün geç geldi. | Tık, panel | "Neden gecikti? Şefin notu orada." |
+| 25-32 sn | Laptop ve telefon birlikte, sonra kapanış. | Çözülüş, parıltı | "Her kalem, her gün: kayıtlı." · "Şef yazar, yüzdeyi uygulama hesaplar." |
+
+Sunucunun saati değiştirilemediği için çekim, şefin girişini kaydettikten hemen sonra akşama (17:38) taşır
+(`capture/ilerleme-evening.sql`): gece çekilse de akşam görünür.
+
 ## Uygulamada fark edilenler
 
 Çekim sırasında görüldü, videoyu etkilemedi (o kare kullanılmadı), ürün tarafında düzeltilecek:
@@ -171,6 +191,8 @@ Bağlantının adresi çekimde yer tutucudur (`kizilkan.example`); gerçek adres
   gizli kalır (`useFeedBottom`, `useSiteTimeline`). Çekimde akış elle dibe kaydırıldı.
 - Malzeme listesi Türkçe alfabeye göre sıralanmıyor: "Çelik kalıp" ve "Çimento" en sonda, "Tuğla"dan sonra
   (`MaterialCatalog`, `lower(name)`; veritabanının dili `en_US`).
+- Telefonda "İlerleme kaydedildi" bildirimi stilsizdi (zeminsiz, başlığın üstüne binen düz yazı): `showNotify`'ın
+  stili yüklenmiyordu. **Düzeltildi** (`frontend/src/mobile/index.ts`, ayrı commit), videoda düzgün hâli var.
 - Masaüstünde "N malzeme dışarıda" şeridi aramaya göre süzülüyor: arama yapınca, aranmayan ama dışarıda olan
   malzemeler şeritten düşüyor (`useShipments`).
 

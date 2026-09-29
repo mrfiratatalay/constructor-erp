@@ -46,4 +46,14 @@ export const SCORES = {
       F: [69, null, 72, 77, 76, null, 74, null],
     },
   },
+  /** Do – Fa – Lam – Sol: melodi basamak basamak yükselir, "iş ilerliyor"; nefes Sol'de, son Sol'den Do'ya. */
+  ilerleme: {
+    progression: ['C', 'F', 'Am', 'G'],
+    tune: {
+      C: [72, null, 74, 76, 79, null, 76, null],
+      F: [72, null, 77, 76, 77, null, 81, null],
+      Am: [76, null, 79, 81, 79, null, 76, null],
+      G: [74, null, 76, 79, 77, null, 74, 71],
+    },
+  },
 }

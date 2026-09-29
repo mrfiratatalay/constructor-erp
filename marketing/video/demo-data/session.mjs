@@ -28,6 +28,15 @@ export class Session {
     return this.request('DELETE', path)
   }
 
+  /** Form gönderir (multipart, dosyasız): uç nokta dosyayı da aynı istekte kabul ettiği için JSON almaz. */
+  async postForm(path, fields) {
+    const form = new FormData()
+    for (const [name, value] of Object.entries(fields)) if (value != null) form.append(name, String(value))
+    const response = await fetch(`${this.baseUrl}${path}`, { method: 'POST', headers: { cookie: this.cookie }, body: form })
+    if (!response.ok) throw new Error(`POST ${path} → ${response.status}: ${await response.text()}`)
+    return response.json()
+  }
+
   /** Dosya yükler (multipart): files = [{ name, type, data }], hepsi aynı alan adıyla. */
   async upload(path, field, files) {
     const form = new FormData()

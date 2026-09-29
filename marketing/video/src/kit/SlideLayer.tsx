@@ -3,8 +3,8 @@ import type { Layer } from './captures'
 import { progress, settle } from './motion'
 
 /**
- * Ayrı çekilmiş pencere, gerçek fizikle: arkası kararır, pencere alttan (telefonda seçim penceresi) ya da sağdan
- * (masaüstünde kişinin ayı) kayarak gelir, kapanırken aynı yoldan döner. dim: arkanın ne kadar kararacağı
+ * Ayrı çekilmiş pencere, gerçek fizikle: arkası kararır, pencere alttan (telefonda seçim penceresi), sağdan
+ * (masaüstünde kişinin ayı) ya da üstten (telefonda "kaydedildi" bildirimi) kayarak gelir, kapanırken aynı yoldan döner. dim: arkanın ne kadar kararacağı
  * (Vant 0,7, Element Plus 0,5; tam ekran pencerede 0).
  *
  * frames.open: kaymaya başladığı kare (instant ise o karede açık belirir: altındaki ekranla aynıdır, yalnızca
@@ -15,7 +15,7 @@ export type SlideFrames = { open: number; close?: number; cut?: number; instant?
 
 type SlideLayerProps = {
   layer: Layer
-  from: 'bottom' | 'right'
+  from: 'bottom' | 'right' | 'top'
   frames: SlideFrames
   app: { width: number; height: number }
   dim: number
@@ -28,10 +28,11 @@ export const SlideLayer: React.FC<SlideLayerProps> = ({ layer, from, frames, app
   if (openness <= 0) return null
   const shown = swap && frame >= swap.at ? swap.layer : layer
   const { box } = shown
-  const shift =
-    from === 'bottom'
-      ? `translateY(${(1 - openness) * (app.height - box.y)}px)`
-      : `translateX(${(1 - openness) * (app.width - box.x)}px)`
+  const shift = {
+    bottom: `translateY(${(1 - openness) * (app.height - box.y)}px)`,
+    right: `translateX(${(1 - openness) * (app.width - box.x)}px)`,
+    top: `translateY(${-(1 - openness) * (box.y + box.height)}px)`,
+  }[from]
   return (
     <>
       {dim > 0 && <div style={{ position: 'absolute', inset: 0, background: `rgb(0 0 0 / ${dim * openness})` }} />}

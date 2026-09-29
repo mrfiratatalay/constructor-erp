@@ -28,12 +28,13 @@ npm run studio          # sesleri üretir, tarayıcıda önizleme: zaman çizelg
 npm run render:yoklama  # sesleri üretir, out/yoklama.mp4 (1920×1080, 30 kare/sn, sesli)
 npm run render:malzeme  # out/malzeme.mp4
 npm run render:ekip     # out/ekip.mp4
+npm run render:ilerleme # out/ilerleme.mp4
 ```
 
-Her video kendi klasöründedir (`src/yoklama/`, `src/malzeme/`, `src/ekip/`). Metni ya da zamanlamayı değiştirmek
-için `timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve yüksekliğini `sounds.ts`; müziğin akorları ve
-melodisi `audio/scores.mjs`'te, sesin kendisi `audio/music.mjs`'tedir. Müzik 120 BPM'dir: timeline'daki büyük anlar (120, 480, 840.
-kare) müziğin düşüşleridir; biri değişirse öteki de değişir.
+Her video kendi klasöründedir (`src/yoklama/`, `src/malzeme/`, `src/ekip/`, `src/ilerleme/`). Metni ya da
+zamanlamayı değiştirmek için `timeline.ts`, kamerayı `camera.ts`, efektlerin yeri ve yüksekliğini `sounds.ts`;
+müziğin akorları ve melodisi `audio/scores.mjs`'te, sesin kendisi `audio/music.mjs`'tedir. Müzik 120 BPM'dir:
+timeline'daki büyük anlar (120, 480, 840. kare) müziğin düşüşleridir; biri değişirse öteki de değişir.
 
 ## Ekranları yeniden çekmek (uygulama değiştiyse)
 
@@ -48,10 +49,12 @@ npm run seed                                  # firma, kişiler, şantiyeler, ay
 npm run capture:yoklama                       # ekranlar ve defter yenilenir
 npm run capture:malzeme
 npm run capture:ekip
+npm run capture:ilerleme
 ```
 
 - Puantaj ayın başından düne kadar doldurulur: çekim ayın sonuna doğru yapılırsa cetvel dolu görünür.
-- Çekim her seferinde bugün girdiğini siler (yoklamada işaretler, malzemede sevkiyatlar, ekipte yeni usta) ve aynı
+- Çekim her seferinde bugün girdiğini siler (yoklamada işaretler, malzemede sevkiyatlar, ekipte yeni usta, ilerlemede
+  bugünün girişi) ve aynı
   sabahtan başlar; tekrar tekrar çalıştırılabilir. Gün değiştiyse dünkü çekimden kalanlar silinmez: çekimlerden
   önce demo dünyası baştan kurulur.
 - Demo dünyasını baştan kurmak: backend'i durdur, `demo-data/reset.sh`, sonra yeniden `backend.sh` ve `npm run seed`.

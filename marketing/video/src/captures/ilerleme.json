@@ -1,0 +1,223 @@
+{
+  "_day": {
+    "day": "2026-09-30"
+  },
+  "phone-feed": {
+    "src": "captures/ilerleme/phone-feed.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 678
+  },
+  "phone-tap-tab": {
+    "box": {
+      "x": 262,
+      "y": 46,
+      "width": 131,
+      "height": 44
+    }
+  },
+  "phone-board": {
+    "src": "captures/ilerleme/phone-board.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-demir-card": {
+    "box": {
+      "x": 16,
+      "y": 494,
+      "width": 361,
+      "height": 262
+    }
+  },
+  "phone-tap-update": {
+    "box": {
+      "x": 32,
+      "y": 698,
+      "width": 329,
+      "height": 44
+    }
+  },
+  "phone-sheet-layer": {
+    "src": "captures/ilerleme/phone-sheet-layer.png",
+    "box": {
+      "x": 0,
+      "y": 152.8,
+      "width": 393,
+      "height": 611.2
+    }
+  },
+  "phone-sheet": {
+    "src": "captures/ilerleme/phone-sheet.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-sheet-content": {
+    "box": {
+      "x": 0,
+      "y": 200.8,
+      "width": 393,
+      "height": 563.2
+    }
+  },
+  "phone-tap-quantity": {
+    "box": {
+      "x": 155.5,
+      "y": 368.8,
+      "width": 197.5,
+      "height": 24
+    }
+  },
+  "phone-quantity-1": {
+    "src": "captures/ilerleme/phone-quantity-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-quantity-2": {
+    "src": "captures/ilerleme/phone-quantity-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-quantity-3": {
+    "src": "captures/ilerleme/phone-quantity-3.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-tap-workers": {
+    "box": {
+      "x": 155.5,
+      "y": 420.8,
+      "width": 221.5,
+      "height": 24
+    }
+  },
+  "phone-workers-1": {
+    "src": "captures/ilerleme/phone-workers-1.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-workers-2": {
+    "src": "captures/ilerleme/phone-workers-2.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-sheet-bottom": {
+    "src": "captures/ilerleme/phone-sheet-bottom.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 109
+  },
+  "phone-sheet-bottom-layer": {
+    "src": "captures/ilerleme/phone-sheet-bottom-layer.png",
+    "box": {
+      "x": 0,
+      "y": 152.8,
+      "width": 393,
+      "height": 611.2
+    }
+  },
+  "phone-tap-save": {
+    "box": {
+      "x": 16,
+      "y": 703.8,
+      "width": 361,
+      "height": 44
+    }
+  },
+  "phone-notify-layer": {
+    "src": "captures/ilerleme/phone-notify-layer.png",
+    "box": {
+      "x": 0,
+      "y": 0,
+      "width": 393,
+      "height": 36
+    }
+  },
+  "phone-saved": {
+    "src": "captures/ilerleme/phone-saved.png",
+    "width": 393,
+    "height": 764,
+    "scrollY": 0
+  },
+  "phone-saved-card": {
+    "box": {
+      "x": 16,
+      "y": 494,
+      "width": 361,
+      "height": 262
+    }
+  },
+  "desk-board": {
+    "src": "captures/ilerleme/desk-board.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-demir-row": {
+    "box": {
+      "x": 640,
+      "y": 478.8,
+      "width": 806,
+      "height": 162.5
+    }
+  },
+  "desk-tap-delayed": {
+    "box": {
+      "x": 958.8,
+      "y": 380.8,
+      "width": 89.1,
+      "height": 28
+    }
+  },
+  "desk-delayed": {
+    "src": "captures/ilerleme/desk-delayed.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-bodrum-row": {
+    "box": {
+      "x": 640,
+      "y": 478.8,
+      "width": 806,
+      "height": 162.5
+    }
+  },
+  "desk-tap-detail": {
+    "box": {
+      "x": 1349.9,
+      "y": 505.8,
+      "width": 75.1,
+      "height": 32
+    }
+  },
+  "desk-detail-layer": {
+    "src": "captures/ilerleme/desk-detail-layer.png",
+    "box": {
+      "x": 910,
+      "y": 0,
+      "width": 560,
+      "height": 920
+    }
+  },
+  "desk-detail": {
+    "src": "captures/ilerleme/desk-detail.png",
+    "width": 1470,
+    "height": 920,
+    "scrollY": 0
+  },
+  "desk-delay-note": {
+    "box": {
+      "x": 998,
+      "y": 341.7,
+      "width": 452,
+      "height": 45
+    }
+  }
+}

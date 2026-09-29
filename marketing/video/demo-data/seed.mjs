@@ -5,9 +5,11 @@
  */
 import { writeFileSync } from 'node:fs'
 import { seedDepot } from './seedDepot.mjs'
+import { PROGRESS_SITE } from './progress.mjs'
+import { seedProgress } from './seedProgress.mjs'
 import { joinCompany, signIn, signInAs } from './session.mjs'
 import { APP_WORKERS, CREWS, LISTED_PEOPLE, OWNER, SITES, STAFF } from './world.mjs'
-import { pastWorkdays, planMonth } from './puantajPlan.mjs'
+import { pastWorkdays, planMonth, storyDays } from './puantajPlan.mjs'
 import { runSql } from './sql.mjs'
 
 const API = process.env.DEMO_API ?? 'http://127.0.0.1:8080/api'
@@ -19,12 +21,15 @@ const people = await joinEveryone(owner)
 const { today, entries } = await buildRoster(owner)
 const marks = await markMonth(owner, entries, today)
 const shipments = await seedDepot(await signInAs(owner, people.mehmet), today, sites)
+const calendar = { today, ...storyDays(pastWorkdays(today)) }
+const progress = await seedProgress(await signInAs(owner, people.ahmet), sites[PROGRESS_SITE], calendar)
 runSql('retime.sql', { ahmet: people.ahmet, serkan: people.serkan })
 runSql('depot-retime.sql')
 runSql('sites-retime.sql')
+runSql('progress-retime.sql')
 
 writeFileSync(new URL('.ids.json', import.meta.url), JSON.stringify({ today, sites, people }, null, 2))
-console.log(`Hazır: ${SITES.length} şantiye, ${entries.length} yoklama kalemi, ${marks} geçmiş işaret, ${shipments} sevkiyat (${today}).`)
+console.log(`Hazır: ${SITES.length} şantiye, ${entries.length} yoklama kalemi, ${marks} geçmiş işaret, ${shipments} sevkiyat, ${progress} ilerleme girişi (${today}).`)
 
 async function requireEmpty(session) {
   if ((await session.get('/sites')).length > 0) {

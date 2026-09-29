@@ -23,8 +23,11 @@ export function planMonth(entries, workdays) {
   )
 }
 
-/** Hikâyenin günleri sondan sayılır: ay kısa da olsa olaylar dünden geriye doğru yerleşir. */
-function storyDays(workdays) {
+/**
+ * Hikâyenin günleri sondan sayılır: ay kısa da olsa olaylar dünden geriye doğru yerleşir. İlerlemenin girişleri de
+ * bunları okur: yağmur günü demirde yarım gün, beton dökümünden önce donatı teslimi.
+ */
+export function storyDays(workdays) {
   const back = (count) => workdays[workdays.length - count]
   return {
     rain: back(8),
