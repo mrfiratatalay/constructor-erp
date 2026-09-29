@@ -1,7 +1,7 @@
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useListSiteEvents } from '@/core/api/generated/sites/sites'
 import { useUploadQueue } from '@/core/posts/uploadQueueStore'
-import { buildTimeline } from '@/core/posts/timeline'
+import { buildTimeline, feedBottomKey } from '@/core/posts/timeline'
 import { useFeed } from '@/core/posts/useFeed'
 
 /**
@@ -19,6 +19,8 @@ export function useSiteTimeline(siteId: MaybeRefOrGetter<string>) {
   )
   /** Eskiden yeniye mesajlar: "buradan aşağısı yeni" çizgisi ve dibe inme bunlarla hesaplanır. */
   const posts = computed(() => [...feed.posts.value].reverse())
+  /** Akışın dibi: henüz gitmemiş mesaj, yoksa zaman çizgisinin imzası (feedBottomKey). */
+  const bottom = computed(() => pending.value.at(-1)?.id ?? feedBottomKey(days.value))
 
-  return { ...feed, days, pending, posts }
+  return { ...feed, days, pending, posts, bottom }
 }

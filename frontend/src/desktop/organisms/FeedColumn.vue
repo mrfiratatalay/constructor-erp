@@ -31,7 +31,7 @@ const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string 
 const emit = defineEmits<{ reply: [post: PostView] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
-const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
+const { days, pending, posts, bottom, isLoading, hasMore, isLoadingMore, loadMore } = timeline
 const { jump } = useJumpTarget(timeline)
 const { pinned } = usePinnedPosts(() => siteId)
 const { correcting, forwarding, inspecting, run } = usePostMenuActions((post) => emit('reply', post))
@@ -41,7 +41,7 @@ const root = useTemplateRef<HTMLElement>('root')
 const dividerBefore = computed(() => firstUnreadPostId(posts.value, seenAt, user.value?.id))
 /** Kayan öğe sağ panelin gövdesidir (el-scrollbar'ın sarmalayıcısı); akış onun içinde yaşar. */
 const scroller = (): Scroller => root.value?.closest<HTMLElement>('.el-scrollbar__wrap') ?? null
-useFeedBottom(scroller, () => pending.value.at(-1)?.id ?? posts.value.at(-1)?.id)
+useFeedBottom(scroller, bottom)
 const loadOlder = () => keepPosition(scroller(), () => loadMore())
 </script>
 

@@ -5,14 +5,15 @@ import { isNearBottom, scrollToBottom, type Scroller } from '@/core/posts/feedAn
  * Akış sohbet gibi açılır: sayfa dibe iner, orada en yeni gönderi durur. Sonrasında yeni gönderi geldiğinde
  * ekran ancak kullanıcı dipteyse onu takip eder; yukarıda eski günleri okuyanı yerinden oynatmaz.
  *
- * newestId: akıştaki son gönderinin kimliği. Değişmesi yeni gönderi geldi demektir.
+ * bottom: akışın dibinin imzası (feedBottomKey). Değişmesi akışa bir şey eklendi demektir: yeni mesaj, sonradan
+ * yüklenen mesaj ya da sistem satırı. Kullanıcı dipteyse dipte kalır.
  */
-export function useFeedBottom(scroller: () => Scroller, newestId: MaybeRefOrGetter<string | undefined>): void {
+export function useFeedBottom(scroller: () => Scroller, bottom: MaybeRefOrGetter<string | undefined>): void {
   let landed = false
   watch(
-    () => toValue(newestId),
-    async (id) => {
-      if (!id || (landed && !isNearBottom(scroller()))) return
+    () => toValue(bottom),
+    async (key) => {
+      if (!key || (landed && !isNearBottom(scroller()))) return
       await nextTick()
       scrollToBottom(scroller())
       landed = true

@@ -28,7 +28,7 @@ const { siteId, seenAt = null } = defineProps<{ siteId: string; seenAt?: string 
 const emit = defineEmits<{ reply: [post: PostView] }>()
 const { data: user } = useCurrentUser()
 const timeline = useSiteTimeline(() => siteId)
-const { days, pending, posts, isLoading, hasMore, isLoadingMore, loadMore } = timeline
+const { days, pending, posts, bottom, isLoading, hasMore, isLoadingMore, loadMore } = timeline
 const { jump } = useJumpTarget(timeline)
 const { pinned } = usePinnedPosts(() => siteId)
 const acting = ref<PostView | null>(null)
@@ -36,7 +36,7 @@ const longPress = useLongPress()
 
 const dividerBefore = computed(() => firstUnreadPostId(posts.value, seenAt, user.value?.id))
 // Mobilde kayan şey sayfanın kendisidir (null). Yeni gönderilen (🕓) mesaj da dibe indirir.
-useFeedBottom(() => null, () => pending.value.at(-1)?.id ?? posts.value.at(-1)?.id)
+useFeedBottom(() => null, bottom)
 const loadOlder = () => keepPosition(null, () => loadMore())
 
 /** Silinen mesajın menüsü yoktur; ötekilerde uzun basma WhatsApp'taki menüyü açar. */

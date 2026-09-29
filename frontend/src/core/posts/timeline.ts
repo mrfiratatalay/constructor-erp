@@ -32,6 +32,18 @@ function groupByDay(items: TimelineItem[]): FeedDay[] {
 }
 
 /**
+ * Akışın dibinin imzası: en alttaki öğe ve öğe sayısı. Sayfa bununla dibe iner, dipte olanı dipte tutar. Mesajlar
+ * ve sistem satırları ayrı isteklerle, herhangi bir sırayla gelir: yalnızca son mesaja bakılırsa sonradan gelen
+ * "… katıldı" satırları, yalnızca en alttakine bakılırsa sonradan üste eklenen mesajlar dibi aşağı iter.
+ */
+export function feedBottomKey(days: FeedDay[]): string | undefined {
+  const last = days.at(-1)?.items.at(-1)
+  if (!last) return undefined
+  const count = days.reduce((sum, day) => sum + day.items.length, 0)
+  return `${last.key}:${count}`
+}
+
+/**
  * Sohbet yönündeki akış: en eski üstte, en yenisi altta, günlere ayrılmış (WhatsApp gibi). posts sunucudan
  * en yeniden eskiye gelir. Sistem satırı yalnızca yüklenmiş aralıktaysa görünür; geçmişin tamamı yüklendiyse
  * (complete) hepsi: yoksa eski bir satır, henüz yüklenmemiş mesajların önüne düşerdi.
