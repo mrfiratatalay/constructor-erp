@@ -1,17 +1,7 @@
 package com.atalay.santiye.material.dto;
 
-import jakarta.annotation.Nullable;
-import java.math.BigDecimal;
 import java.util.UUID;
 
-/** Malzeme kartı; stok ayrıca hesaplanır (StockRow). */
-public record MaterialView(
-    UUID id,
-    String name,
-    @Nullable String code,
-    String category,
-    String unit,
-    @Nullable BigDecimal minStock,
-    @Nullable String description,
-    boolean active) {
+/** Malzeme kartı: ad ve birim. Kategori ve kritik eşik kalktı; stok sayısı ayrıca hesaplanır (StockLevel). */
+public record MaterialView(UUID id, String name, String unit, boolean active) {
 }

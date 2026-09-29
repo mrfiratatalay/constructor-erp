@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ChevronRight } from 'lucide-vue-next'
-import type { FieldMaterialRef } from '@/core/api/generated/model'
-import { STATUS_LOOKS } from '@/core/materials/materialLabels'
-import { movementNumber, withUnit } from '@/core/materials/quantity'
-import MovementTypeBadge from '@/shared/atoms/MovementTypeBadge.vue'
+import type { FieldShipmentRef } from '@/core/api/generated/model'
+import { shipmentNumber } from '@/core/shipments/quantity'
+import { cancelledLabel, TYPE_LABELS } from '@/core/shipments/shipmentLabels'
 
 /**
- * Saha akışındaki malzeme gönderisinin kartı: türü, hareket numarası, malzeme ve miktar, hareketin **güncel** durumu.
- * Gönderi yalnızca referanstır; hareket iptal edilirse kart "İptal" der. Dokununca hareketin ayrıntısı açılır.
+ * Saha akışındaki malzeme gönderisinin kartı: ne oldu ve neler geldi. Gönderi yalnızca referanstır; sevkiyat
+ * iptal edilirse kart onu **güncel** haliyle "İptal" der. Dokununca sevkiyat açılır.
  */
-const { reference } = defineProps<{ reference: FieldMaterialRef }>()
-const emit = defineEmits<{ open: [movementId: string] }>()
-const status = computed(() => STATUS_LOOKS[reference.status])
+const { reference } = defineProps<{ reference: FieldShipmentRef }>()
+const emit = defineEmits<{ open: [shipmentId: string] }>()
+const cancelled = computed(() => cancelledLabel(reference.status))
 </script>
 
 <template>
   <button type="button" class="material-card" :class="{ 'material-card--cancelled': reference.status === 'CANCELLED' }"
-    @click="emit('open', reference.movementId)">
-    <MovementTypeBadge :type="reference.type" size="small" />
+    @click="emit('open', reference.shipmentId)">
     <span class="material-card__what">
-      <strong>{{ reference.materialName }}, {{ withUnit(reference.quantity, reference.unit) }}</strong>
-      <small>{{ movementNumber(reference.number) }} · <span :class="`material-card__status--${status.tone}`">{{ status.label }}</span></small>
+      <strong>{{ reference.summary }}</strong>
+      <small>
+        {{ TYPE_LABELS[reference.type] }} · {{ shipmentNumber(reference.number) }}
+        <span v-if="cancelled" class="material-card__cancelled">· {{ cancelled }}</span>
+      </small>
     </span>
     <ChevronRight :size="16" class="material-card__chevron" aria-hidden="true" />
   </button>
@@ -30,7 +31,7 @@ const status = computed(() => STATUS_LOOKS[reference.status])
 <style scoped>
 .material-card {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2) var(--space-3);
   width: 100%;
@@ -75,9 +76,7 @@ const status = computed(() => STATUS_LOOKS[reference.status])
   color: var(--text-subtle);
 }
 
-.material-card__status--success { color: var(--status-success); }
-.material-card__status--warning { color: var(--status-warning); }
-.material-card__status--danger { color: var(--status-danger); }
-.material-card__status--primary { color: var(--brand-primary); }
-.material-card__status--info { color: var(--status-neutral); }
+.material-card__cancelled {
+  color: var(--status-danger);
+}
 </style>
