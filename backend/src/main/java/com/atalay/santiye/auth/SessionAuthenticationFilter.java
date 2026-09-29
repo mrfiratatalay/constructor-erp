@@ -59,9 +59,9 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
         if (!user.hasWorkspace()) {
             return platform;
         }
-        Stream<String> role = Stream.concat(Stream.of("ROLE_" + user.role().name()),
-            Permission.grantedTo(user.role()).stream().map(Permission::name));
         WorkspaceStatus status = access.statusOf(user.companyId());
+        Stream<String> role = Stream.concat(Stream.of("ROLE_" + user.role().name()),
+            Permission.grantedTo(user.role(), status.features()).stream().map(Permission::name));
         Stream<String> open = status.open()
             ? Stream.concat(Stream.of(WORKSPACE), status.features().stream().map(FEATURE::concat)) : Stream.empty();
         return Stream.concat(platform, Stream.concat(role, open));

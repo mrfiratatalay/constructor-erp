@@ -39,12 +39,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CurrentUserResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
+    public ResponseEntity<SessionContextView> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
         return signIn(auth.login(request.email(), request.password()), http);
     }
 
     @PostMapping("/invites/accept")
-    public ResponseEntity<CurrentUserResponse> acceptInvite(
+    public ResponseEntity<SessionContextView> acceptInvite(
         @Valid @RequestBody AcceptInviteRequest request, HttpServletRequest http) {
         return signIn(invites.accept(request.token()), http);
     }
@@ -77,10 +77,12 @@ public class AuthController {
         return contexts.of(sessions.authenticate(token).orElseThrow(() -> ApiException.unauthorized("Oturum yok.")));
     }
 
-    private ResponseEntity<CurrentUserResponse> signIn(SignIn signIn, HttpServletRequest http) {
+    /** Girişin cevabı oturumun bağlamıdır: arayüz ikinci bir istek atmadan kişiyi doğru ana sayfaya götürür. */
+    private ResponseEntity<SessionContextView> signIn(SignIn signIn, HttpServletRequest http) {
         String token = sessions.open(signIn, http.getHeader(HttpHeaders.USER_AGENT));
+        CurrentUser principal = sessions.authenticate(token).orElseThrow(() -> ApiException.unauthorized("Oturum yok."));
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookies.issue(token).toString())
-            .body(auth.describe(signIn));
+            .body(contexts.of(principal));
     }
 }

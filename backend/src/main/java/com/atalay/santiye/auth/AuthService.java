@@ -1,6 +1,7 @@
 package com.atalay.santiye.auth;
 
 import com.atalay.santiye.auth.dto.CurrentUserResponse;
+import com.atalay.santiye.billing.WorkspaceAccess;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.company.Company;
 import com.atalay.santiye.company.CompanyRepository;
@@ -8,7 +9,6 @@ import com.atalay.santiye.tenant.Membership;
 import com.atalay.santiye.tenant.Workspaces;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,15 @@ public class AuthService {
     private final UserRepository users;
     private final CompanyRepository companies;
     private final Workspaces workspaces;
+    private final WorkspaceAccess access;
     private final PasswordEncoder passwordEncoder;
 
-    AuthService(UserRepository users, CompanyRepository companies, Workspaces workspaces,
+    AuthService(UserRepository users, CompanyRepository companies, Workspaces workspaces, WorkspaceAccess access,
         PasswordEncoder passwordEncoder) {
         this.users = users;
         this.companies = companies;
         this.workspaces = workspaces;
+        this.access = access;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -55,16 +57,6 @@ public class AuthService {
         }
         String companyName = companies.findById(current.companyId()).map(Company::getName).orElse("");
         return new CurrentUserResponse(current.userId(), current.fullName(), current.role(), companyName,
-            Permission.grantedTo(current.role()));
-    }
-
-    /** Girişin cevabı: firmasız platform yöneticisinde rol ve izin yoktur. */
-    @Transactional(readOnly = true)
-    public CurrentUserResponse describe(SignIn signIn) {
-        AppUser user = signIn.user();
-        return workspaces.resolve(user.getId(), signIn.companyId())
-            .map(membership -> describe(new CurrentUser(user.getId(), membership.getCompanyId(), membership.getRole(),
-                user.getFullName(), user.isPlatformAdmin())))
-            .orElseGet(() -> new CurrentUserResponse(user.getId(), user.getFullName(), null, "", List.of()));
+            Permission.grantedTo(current.role(), access.statusOf(current.companyId()).features()));
     }
 }

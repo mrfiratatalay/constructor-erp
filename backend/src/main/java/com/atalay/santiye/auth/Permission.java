@@ -1,6 +1,8 @@
 package com.atalay.santiye.auth;
 
+import com.atalay.santiye.billing.Features;
 import com.atalay.santiye.user.UserRole;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -8,17 +10,18 @@ import java.util.Set;
 /**
  * Rolün açtığı işler, tek yerde. Arayüz düğmeleri rol adına göre değil bu anahtarlara göre gösterir; uçlar da
  * aynı anahtarla korunur (@PreAuthorize("hasAuthority('VIEW_MATERIALS')")). Rol matrisi değişince yalnızca burası
- * değişir.
+ * değişir. Her izin bir modüle aittir: firmanın paketinde o modül yoksa izin de verilmez (rol × paket), böylece
+ * arayüz izne bakarak modülü de kendiliğinden gizler.
  */
 public enum Permission {
-    VIEW_MATERIALS,
-    CREATE_MATERIAL_MOVEMENT,
-    UPDATE_MATERIAL_MOVEMENT,
-    CANCEL_MATERIAL_MOVEMENT,
-    MANAGE_MATERIAL_CATALOG,
-    EXPORT_MATERIALS,
-    VIEW_PRODUCTION,
-    MANAGE_PRODUCTION;
+    VIEW_MATERIALS(Features.MATERIALS),
+    CREATE_MATERIAL_MOVEMENT(Features.MATERIALS),
+    UPDATE_MATERIAL_MOVEMENT(Features.MATERIALS),
+    CANCEL_MATERIAL_MOVEMENT(Features.MATERIALS),
+    MANAGE_MATERIAL_CATALOG(Features.MATERIALS),
+    EXPORT_MATERIALS(Features.MATERIALS),
+    VIEW_PRODUCTION(Features.PRODUCTION),
+    MANAGE_PRODUCTION(Features.PRODUCTION);
 
     /**
      * Şef sevkiyatı görür, kendi şantiyesinden çıkarır ve döküm alır. Malzeme kartını da açabilir: sevkiyat
@@ -29,6 +32,12 @@ public enum Permission {
     private static final Set<Permission> SITE_LEAD = EnumSet.of(VIEW_MATERIALS, CREATE_MATERIAL_MOVEMENT,
         MANAGE_MATERIAL_CATALOG, EXPORT_MATERIALS, VIEW_PRODUCTION, MANAGE_PRODUCTION);
 
+    private final String feature;
+
+    Permission(String feature) {
+        this.feature = feature;
+    }
+
     public static List<Permission> grantedTo(UserRole role) {
         Set<Permission> granted = switch (role) {
             case OWNER, WAREHOUSE -> EnumSet.complementOf(EnumSet.of(MANAGE_PRODUCTION));
@@ -36,5 +45,10 @@ public enum Permission {
             case WORKER -> EnumSet.noneOf(Permission.class);
         };
         return List.copyOf(granted);
+    }
+
+    /** Rolün izinlerinden yalnızca firmanın paketinde açık modüllere ait olanlar. */
+    public static List<Permission> grantedTo(UserRole role, Collection<String> features) {
+        return grantedTo(role).stream().filter(permission -> features.contains(permission.feature)).toList();
     }
 }

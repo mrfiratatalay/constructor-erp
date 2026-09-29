@@ -61,7 +61,7 @@ public class SessionContexts {
     private WorkspaceView workspaceOf(Company company, CurrentUser current) {
         WorkspaceStatus status = access.statusOf(company.getId());
         return new WorkspaceView(company.getId(), company.getName(), company.getSlug(), company.getLogoUrl(),
-            company.getPhone(), company.getEmail(), current.role(), Permission.grantedTo(current.role()),
+            company.getPhone(), company.getEmail(), current.role(), Permission.grantedTo(current.role(), status.features()),
             status.features().stream().sorted().toList(), accessOf(status));
     }
 
