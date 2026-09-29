@@ -188,7 +188,7 @@ Sunucunun saati değiştirilemediği için çekim, şefin girişini kaydettikten
   ("işaretl / endi").
 - Masaüstünde şantiye akışı açılışta dibe iner ama yalnızca mesajlara bakarak; sistem satırları ("… katıldı") ayrı
   istekle sonradan gelince ekran onları takip etmez. Yeni katılan birinin satırı patron kaydırana kadar altta
-  gizli kalır (`useFeedBottom`, `useSiteTimeline`). Çekimde akış elle dibe kaydırıldı.
+  gizli kalır (`useFeedBottom`, `useSiteTimeline`). **Düzeltildi** (ayrı commit): dip, en alttaki öğe ve öğe sayısıyla izlenir.
 - Malzeme listesi Türkçe alfabeye göre sıralanmıyor: "Çelik kalıp" ve "Çimento" en sonda, "Tuğla"dan sonra
   (`MaterialCatalog`, `lower(name)`; veritabanının dili `en_US`).
 - Telefonda "İlerleme kaydedildi" bildirimi stilsizdi (zeminsiz, başlığın üstüne binen düz yazı): `showNotify`'ın

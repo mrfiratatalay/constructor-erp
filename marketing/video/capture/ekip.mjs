@@ -69,9 +69,6 @@ async function filmWorker(page, token) {
 async function filmDesk(page) {
   await page.goto(`/santiyeler/${ids.sites.kartal}`)
   const joined = page.getByText(`${NEW_WORKER.name} davet bağlantısıyla katıldı`).last()
-  // Akış açılışta yalnızca mesajlara göre dibe iner; sonradan gelen sistem satırları altta kalır (PLAN.md,
-  // bulgular). Patronun yapacağı gibi en alta kaydırılır.
-  await joined.evaluate((line) => (line.closest('.el-scrollbar__wrap').scrollTop = 1e6))
   await film.shot(page, 'desk-feed', 1800)
   await film.mark(joined, 'desk-joined-line')
   await film.tap(page.locator('.side-nav').getByText('Yoklama', { exact: true }), 'desk-tap-roll')
