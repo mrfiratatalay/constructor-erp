@@ -111,3 +111,11 @@ html .el-calendar {
 html a.el-button {
   text-decoration: none;
 }
+
+/*
+ * Açılır liste yüksekliğini Element Plus derlenmiş sabitten (32 px) alır, --el-component-size'tan değil: formlarda yazı
+ * kutusundan (40 px) alçak kalıyordu. Aynı değişkene bağlanır; size="small" ve "large" kendi kurallarıyla öndedir.
+ */
+html .el-select__wrapper {
+  min-height: var(--el-component-size);
+}

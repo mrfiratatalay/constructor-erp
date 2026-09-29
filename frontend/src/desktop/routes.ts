@@ -13,6 +13,7 @@ export const routes = buildRoutes({
   sites: sitesPage,
   siteFeed: sitesPage,
   siteField: sitesPage,
+  siteProduction: sitesPage,
   siteTasks: sitesPage,
   attendance: attendancePage,
   memberAttendance: attendancePage,

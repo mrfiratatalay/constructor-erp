@@ -1,4 +1,5 @@
 import type { Tone } from '@/core/puantaj/puantajLabels'
+import type { TagTone } from '@/core/format/statusTone'
 
 /** Vant'ın etiket ve düğme "type" adları; gri Vant'ta "default"tur. */
 export type VanType = 'success' | 'warning' | 'danger' | 'primary' | 'default'
@@ -16,3 +17,7 @@ const COLORS: Record<Tone, string> = {
 }
 
 export const vanColor = (tone: Tone): string => COLORS[tone]
+
+/** Durum etiketinin tonu (imalat: süren iş mavi) çubuk ve simge renginde: Vant'ın tema değişkeni. */
+export const tagColor = (tone: TagTone): string =>
+  vanColor(tone === 'progress' ? 'primary' : tone === 'neutral' ? 'info' : tone)

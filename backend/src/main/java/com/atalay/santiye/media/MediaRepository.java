@@ -15,16 +15,22 @@ interface MediaRepository extends JpaRepository<Media, UUID> {
 
     List<Media> findByPostIdInOrderByPosition(Collection<UUID> postIds);
 
+    List<Media> findByProductionEntryIdInOrderByPosition(Collection<UUID> entryIds);
+
     List<Media> findByStatus(MediaStatus status);
 
     @Query("select new com.atalay.santiye.common.persistence.SiteCount(m.siteId, count(m)) from Media m "
         + "where m.siteId in :siteIds and m.kind = com.atalay.santiye.media.MediaKind.PHOTO "
+        + "and (m.postId is not null or m.productionEntryId is null) "
         + "and m.createdAt >= :since group by m.siteId")
     List<SiteCount> countPhotosSince(Collection<UUID> siteIds, Instant since);
 
-    /** Bugünün hazır fotoğrafları, en yeniden eskiye. Günde birkaç düzine; şantiye başına en yeni seçilir. */
+    /**
+     * Bugünün hazır fotoğrafları, en yeniden eskiye. Günde birkaç düzine; şantiye başına en yeni seçilir. Saha'ya
+     * yansıtılmamış imalat fotoğrafı sayılmaz: onu yalnızca imalatı görenler görür (sayaçta da aynı kural).
+     */
     @Query("select m from Media m where m.siteId in :siteIds and m.kind = com.atalay.santiye.media.MediaKind.PHOTO "
-        + "and m.status = com.atalay.santiye.media.MediaStatus.READY and m.createdAt >= :since order by m.createdAt desc")
+        + "and (m.postId is not null or m.productionEntryId is null) and m.status = com.atalay.santiye.media.MediaStatus.READY and m.createdAt >= :since order by m.createdAt desc")
     List<Media> findReadyPhotosSince(Collection<UUID> siteIds, Instant since);
 
     /**

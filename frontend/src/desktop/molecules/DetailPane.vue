@@ -4,8 +4,9 @@
  * altta sabit çubuk (ör. gönderme). Şantiye ve kişi ayrıntısı aynı düzeni kullanır.
  * tabs: başlığın altında ikinci satır (şantiyenin Sohbet / Saha sekmeleri).
  * bottom: içerik azken dibe yaslanır — sohbet böyle durur (WhatsApp Masaüstü).
+ * wide: kartlı takip ekranı (İmalat) okuma genişliğine sıkışmaz, panele yayılır.
  */
-const { bottom = false } = defineProps<{ bottom?: boolean }>()
+const { bottom = false, wide = false } = defineProps<{ bottom?: boolean; wide?: boolean }>()
 </script>
 
 <template>
@@ -13,7 +14,8 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
     <header v-if="$slots.header" class="detail-pane__header"><slot name="header" /></header>
     <nav v-if="$slots.tabs" class="detail-pane__tabs"><slot name="tabs" /></nav>
     <el-scrollbar class="detail-pane__body" :class="{ 'detail-pane__body--bottom': bottom }">
-      <div class="detail-pane__content" :class="{ 'detail-pane__content--bottom': bottom }"><slot /></div>
+      <div class="detail-pane__content"
+        :class="{ 'detail-pane__content--bottom': bottom, 'detail-pane__content--wide': wide }"><slot /></div>
     </el-scrollbar>
     <footer v-if="$slots.footer" class="detail-pane__footer">
       <div class="detail-pane__footer-inner"><slot name="footer" /></div>
@@ -65,6 +67,10 @@ const { bottom = false } = defineProps<{ bottom?: boolean }>()
   flex: 1;
   align-content: end;
   width: 100%;
+}
+
+.detail-pane__content--wide {
+  max-width: var(--layout-board-width);
 }
 
 .detail-pane__footer {

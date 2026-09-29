@@ -20,6 +20,11 @@ export const ROUTES = {
   siteFeed: { path: '/santiyeler/:siteId', meta: { detail: true, title: 'Şantiye' } },
   // Şantiyenin Saha sekmesi (günlük); Sohbet ile aynı sayfadır, yalnızca sekme değişir.
   siteField: { path: '/santiyeler/:siteId/saha', meta: { detail: true, title: 'Saha' } },
+  // Şantiyenin İmalat sekmesi; Sohbet ve Saha ile aynı sayfadır. Çalışan göremez (sekmesi de yoktur).
+  siteProduction: {
+    path: '/santiyeler/:siteId/ilerleme',
+    meta: { detail: true, permission: 'VIEW_PRODUCTION', title: 'İlerleme' },
+  },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
   // Yoklama firmanındır, şantiyenin değil: şef her sabah alır, patron ay sonunda puantajı görür. Sekme ve ay
   // adreste durur (?sekme=puantaj&ay=2026-09). Kişi ya da ekibin ayı: telefonda ayrı sayfa, masaüstünde sağdan panel.

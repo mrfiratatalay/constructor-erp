@@ -27,9 +27,15 @@ public class MediaRemoval {
         this.storage = storage;
     }
 
+    /**
+     * İmalat girişinin dosyası silinmez, yalnızca gönderiden ayrılır: Saha'daki yansıması silinse de girişin
+     * kanıtı imalatta kalır.
+     */
     @Transactional
     public void removeForPost(UUID postId) {
-        removeAll(media.findByPostIdInOrderByPosition(List.of(postId)));
+        List<Media> items = media.findByPostIdInOrderByPosition(List.of(postId));
+        items.stream().filter(Media::belongsToEntry).forEach(Media::detachFromPost);
+        removeAll(items.stream().filter(item -> !item.belongsToEntry()).toList());
     }
 
     /** Tek bir medya: ör. değiştirilen şantiye fotoğrafının eskisi. */

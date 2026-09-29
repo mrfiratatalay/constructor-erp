@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { StatusTone } from '@/core/format/statusTone'
+import type { TagTone } from '@/core/format/statusTone'
 
 /** Anlam tonunu Vant etiket tipine çevirir; yumuşak renkler mobile/styles/theme.css'te. */
 const VAN_TYPE = {
@@ -7,9 +7,10 @@ const VAN_TYPE = {
   warning: 'warning',
   success: 'success',
   neutral: 'default',
+  progress: 'primary',
 } as const
 
-const { tone } = defineProps<{ tone: StatusTone }>()
+const { tone } = defineProps<{ tone: TagTone }>()
 </script>
 
 <template>

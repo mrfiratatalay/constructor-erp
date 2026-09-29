@@ -8,7 +8,10 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Gönderinin dosyası; postId boşsa şantiyenin kendi fotoğrafıdır (WhatsApp'taki grup fotoğrafı). */
+/**
+ * Gönderinin dosyası; postId boşsa şantiyenin kendi fotoğrafıdır (WhatsApp'taki grup fotoğrafı) ya da imalat
+ * girişinin Saha'ya yansıtılmamış dosyasıdır (productionEntryId dolu).
+ */
 @Entity
 @Table(name = "media")
 public class Media {
@@ -16,6 +19,7 @@ public class Media {
     @Id
     private UUID id;
     private UUID postId;
+    private UUID productionEntryId;
     private UUID siteId;
     private UUID companyId;
     @Enumerated(EnumType.STRING)
@@ -35,6 +39,7 @@ public class Media {
     Media(MediaOwner owner, MediaKind kind, int position, Upload upload) {
         this.id = UUID.randomUUID();
         this.postId = owner.postId();
+        this.productionEntryId = owner.productionEntryId();
         this.siteId = owner.siteId();
         this.companyId = owner.companyId();
         this.kind = kind;
@@ -68,6 +73,19 @@ public class Media {
 
     public UUID getId() {
         return id;
+    }
+
+    /** İmalat girişinin dosyası: Saha gönderisi silinse de girişte kalır. */
+    boolean belongsToEntry() {
+        return productionEntryId != null;
+    }
+
+    void detachFromPost() {
+        this.postId = null;
+    }
+
+    public UUID getProductionEntryId() {
+        return productionEntryId;
     }
 
     public UUID getPostId() {
