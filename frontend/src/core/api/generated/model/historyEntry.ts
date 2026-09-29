@@ -7,6 +7,7 @@
 import type { HistoryEntryKind } from './historyEntryKind'
 
 export interface HistoryEntry {
+  shipmentId: string
   kind: HistoryEntryKind
   actorName: string
   /** @nullable */

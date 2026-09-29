@@ -7,7 +7,7 @@ import { dayDividerText } from '@/core/field/fieldDays'
 import { fieldMenu } from '@/core/field/fieldMenu'
 import { fieldSummary } from '@/core/field/fieldSummary'
 import { useFieldUpdates } from '@/core/field/useFieldUpdates'
-import { useFieldMaterialRefs } from '@/core/materials/useFieldMaterialRefs'
+import { useFieldShipmentRefs } from '@/core/shipments/useFieldShipmentRefs'
 import PostMenu from '@/desktop/molecules/PostMenu.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
 import { useFieldMenuActions } from '@/desktop/postActions'
@@ -27,7 +27,7 @@ const { correcting, run } = useFieldMenuActions()
 const summary = computed(() => fieldSummary(days.value, site.photoUrl ?? null))
 const viewer = ref<{ urls: string[]; index: number } | null>(null)
 const root = useTemplateRef<HTMLElement>('root')
-const materials = useFieldMaterialRefs(() => site.id)
+const materials = useFieldShipmentRefs(() => site.id)
 const router = useRouter()
 const openMaterial = (movementId: string) => router.push({ name: 'materials', query: { hareket: movementId } })
 

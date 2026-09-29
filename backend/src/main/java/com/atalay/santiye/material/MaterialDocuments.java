@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Hareketin belgeleri: irsaliye, fatura fotoğrafı, teslim tutanağı. Yalnızca PDF, JPG ve PNG; her biri en çok 10 MB.
- * Belge eklenmesi hareketin geçmişine yazılır.
+ * Sevkiyatın irsaliyesi: depoda kamyon yüklenirken telefonla çekilen fotoğraf ya da PDF. Yalnızca PDF, JPG ve PNG;
+ * her biri en çok 10 MB. Belge eklenmesi sevkiyatın geçmişine yazılır.
  */
 @Service
 public class MaterialDocuments {
@@ -26,26 +26,25 @@ public class MaterialDocuments {
         "image/png", "png");
 
     private final MaterialDocumentRepository documents;
-    private final MaterialMovementRepository movements;
+    private final Shipments shipments;
     private final MaterialFiles files;
-    private final MovementHistory history;
+    private final ShipmentHistory history;
     private final Clock clock;
 
-    MaterialDocuments(MaterialDocumentRepository documents, MaterialMovementRepository movements, MaterialFiles files,
-        MovementHistory history, Clock clock) {
+    MaterialDocuments(MaterialDocumentRepository documents, Shipments shipments, MaterialFiles files,
+        ShipmentHistory history, Clock clock) {
         this.documents = documents;
-        this.movements = movements;
+        this.shipments = shipments;
         this.files = files;
         this.history = history;
         this.clock = clock;
     }
 
     @Transactional
-    public List<DocumentView> attach(CurrentUser user, UUID movementId, List<MultipartFile> uploads) {
-        MaterialMovement movement = movements.findByIdAndCompanyId(movementId, user.companyId())
-            .orElseThrow(() -> ApiException.notFound("Hareket bulunamadı."));
+    public List<DocumentView> attach(CurrentUser user, UUID shipmentId, List<MultipartFile> uploads) {
+        Shipment shipment = shipments.require(user, shipmentId);
         uploads.forEach(MaterialDocuments::requireAcceptable);
-        return uploads.stream().map(upload -> store(user, movement, upload)).toList();
+        return uploads.stream().map(upload -> store(user, shipment, upload)).toList();
     }
 
     /** İndirilecek belge: yalnızca kendi firmasının. */
@@ -55,21 +54,21 @@ public class MaterialDocuments {
             .orElseThrow(() -> ApiException.notFound("Belge bulunamadı."));
     }
 
-    static DocumentView viewOf(UUID id, DocumentFile file, Instant at) {
-        return new DocumentView(id, file.fileName(), file.contentType(), file.sizeBytes(),
-            "/api/material-documents/" + id, at);
-    }
-
-    private DocumentView store(CurrentUser user, MaterialMovement movement, MultipartFile upload) {
+    private DocumentView store(CurrentUser user, Shipment shipment, MultipartFile upload) {
         var file = new DocumentFile(fileNameOf(upload), upload.getContentType(), upload.getSize());
-        MaterialDocument document = documents.save(new MaterialDocument(movement, file, user.userId(), clock.instant()));
+        MaterialDocument document = documents.save(new MaterialDocument(shipment, file, user.userId(), clock.instant()));
         try {
             files.save(document, upload);
         } catch (IOException problem) {
             throw new UncheckedIOException(problem);
         }
-        history.record(movement.getId(), MovementEventKind.DOCUMENT_ADDED, user, file.fileName());
+        history.record(shipment.getId(), ShipmentEventKind.DOCUMENT_ADDED, user, file.fileName());
         return viewOf(document.getId(), file, clock.instant());
+    }
+
+    private static DocumentView viewOf(UUID id, DocumentFile file, Instant at) {
+        return new DocumentView(id, file.fileName(), file.contentType(), file.sizeBytes(),
+            "/api/material-documents/" + id, at);
     }
 
     private static void requireAcceptable(MultipartFile upload) {

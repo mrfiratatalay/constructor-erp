@@ -13,30 +13,8 @@ export interface MaterialRequest {
   name: string
   /**
    * @minLength 0
-   * @maxLength 40
-   * @nullable
-   */
-  code?: string | null
-  /**
-   * @minLength 0
-   * @maxLength 60
-   */
-  category: string
-  /**
-   * @minLength 0
    * @maxLength 20
    */
   unit: string
-  /**
-   * @minimum 0
-   * @nullable
-   */
-  minStock?: number | null
-  /**
-   * @minLength 0
-   * @maxLength 500
-   * @nullable
-   */
-  description?: string | null
   active: boolean
 }

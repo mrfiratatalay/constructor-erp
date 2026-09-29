@@ -10,8 +10,7 @@ export type HistoryEntryKind = (typeof HistoryEntryKind)[keyof typeof HistoryEnt
 export const HistoryEntryKind = {
   CREATED: 'CREATED',
   DELIVERED: 'DELIVERED',
-  UPDATED: 'UPDATED',
-  CANCELLED: 'CANCELLED',
   RETURN_ADDED: 'RETURN_ADDED',
+  CANCELLED: 'CANCELLED',
   DOCUMENT_ADDED: 'DOCUMENT_ADDED',
 } as const

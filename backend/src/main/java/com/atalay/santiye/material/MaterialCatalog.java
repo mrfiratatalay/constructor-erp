@@ -14,23 +14,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Malzeme kartları. Ad ve kod firmada tekildir. Hareketi olan malzemenin birimi değişmez: "300 Torba" geçmişte
- * yazılmışken birim "Ton" olursa defter yanlış okunur. Kart silinmez, pasifleşir.
+ * Malzeme kartları: ad ve birim. Ayrı bir malzeme ekranı yoktur; kart sevkiyat formunda adı yazılarak açılır.
+ * Ad firmada tekildir. Kart silinmez, pasifleşir: geçmiş sevkiyatlarda adı yerinde kalır.
  */
 @Service
 public class MaterialCatalog {
 
-    private static final String SELECT =
-        "select id, name, code, category, unit, min_stock, description, active from materials ";
+    private static final String SELECT = "select id, name, unit, active from materials ";
 
     private final MaterialRepository materials;
-    private final MaterialMovementRepository movements;
     private final JdbcClient jdbc;
     private final Clock clock;
 
-    MaterialCatalog(MaterialRepository materials, MaterialMovementRepository movements, JdbcClient jdbc, Clock clock) {
+    MaterialCatalog(MaterialRepository materials, JdbcClient jdbc, Clock clock) {
         this.materials = materials;
-        this.movements = movements;
         this.jdbc = jdbc;
         this.clock = clock;
     }
@@ -56,16 +53,12 @@ public class MaterialCatalog {
     public MaterialView update(CurrentUser user, UUID materialId, MaterialRequest request) {
         Material material = materials.findByIdAndCompanyId(materialId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Malzeme bulunamadı."));
-        MaterialRequest tidy = tidied(request);
-        if (!tidy.unit().equalsIgnoreCase(material.getUnit()) && movements.existsByMaterialId(materialId)) {
-            throw ApiException.badRequest("Hareketi olan malzemenin birimi değişmez: geçmiş kayıtlar yanlış okunur.");
-        }
-        describe(user.companyId(), material, tidy);
+        describe(user.companyId(), material, tidied(request));
         materials.flush();
         return view(materialId);
     }
 
-    MaterialView view(UUID materialId) {
+    private MaterialView view(UUID materialId) {
         return jdbc.sql(SELECT + "where id = :id").param("id", materialId).query(MaterialView.class).single();
     }
 
@@ -73,14 +66,10 @@ public class MaterialCatalog {
         if (materials.nameTaken(companyId, request.name(), material.getId())) {
             throw ApiException.conflict("Bu adla bir malzeme zaten var: " + request.name() + ".");
         }
-        if (request.code() != null && materials.codeTaken(companyId, request.code(), material.getId())) {
-            throw ApiException.conflict("Bu kod başka bir malzemede: " + request.code() + ".");
-        }
         material.describe(request);
     }
 
     private static MaterialRequest tidied(MaterialRequest request) {
-        return new MaterialRequest(tidy(request.name()), tidy(request.code()), tidy(request.category()),
-            tidy(request.unit()), request.minStock(), tidy(request.description()), request.active());
+        return new MaterialRequest(tidy(request.name()), tidy(request.unit()), request.active());
     }
 }

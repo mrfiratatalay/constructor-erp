@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 /**
- * Hareketin şantiyenin Saha akışındaki izi. Gönderi yalnızca referanstır: kart hareketin güncel durumunu buradan
+ * Sevkiyatın şantiyenin Saha akışındaki izi. Gönderi yalnızca referanstır: kart sevkiyatın güncel durumunu buradan
  * okur, ayrı bir kopya olarak düzenlenmez.
  */
 @Entity
@@ -15,15 +15,15 @@ class MaterialFieldPost {
 
     @Id
     private UUID postId;
-    private UUID movementId;
+    private UUID shipmentId;
     private UUID siteId;
 
     protected MaterialFieldPost() {
     }
 
-    MaterialFieldPost(UUID postId, UUID movementId, UUID siteId) {
+    MaterialFieldPost(UUID postId, UUID shipmentId, UUID siteId) {
         this.postId = postId;
-        this.movementId = movementId;
+        this.shipmentId = shipmentId;
         this.siteId = siteId;
     }
 }
