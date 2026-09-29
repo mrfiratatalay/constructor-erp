@@ -13,7 +13,7 @@ export const routes = buildRoutes({
   apply: { redirectTo: 'login' },
   setup: { redirectTo: 'login' },
   platformDashboard: () => import('./pages/PlatformDashboardPage.vue'),
-  platformTenants: { redirectTo: 'login' },
+  platformTenants: () => import('./pages/PlatformTenantsPage.vue'),
   platformTenant: { redirectTo: 'login' },
   platformLeads: { redirectTo: 'login' },
   platformPlans: { redirectTo: 'login' },
