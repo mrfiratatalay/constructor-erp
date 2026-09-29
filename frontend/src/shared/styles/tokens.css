@@ -34,6 +34,25 @@
   --field-issue-bg: #fff8e1;
   --field-quiet: #cbd5e4;
 
+  /*
+   * Malzeme hareket türleri (hareket rozeti): mavi şantiyeye gönderim, turuncu kullanım, soft kırmızı dışarı verme,
+   * mor transfer, yeşil geliş, teal iade, gri sayım. Durum etiketleri bunlarla karışmaz: onlar durum renkleriyledir.
+   */
+  --move-site: #1d4ed8;
+  --move-site-bg: #e8effd;
+  --move-used: #c2410c;
+  --move-used-bg: #fff1e6;
+  --move-out: #be123c;
+  --move-out-bg: #ffecef;
+  --move-transfer: #7e22ce;
+  --move-transfer-bg: #f3e8ff;
+  --move-in: #15803d;
+  --move-in-bg: #e5f6eb;
+  --move-return: #0f766e;
+  --move-return-bg: #ddf4f0;
+  --move-count: #475569;
+  --move-count-bg: #eef1f5;
+
   /* Metin ve yüzeyler: soğuk beton grisi ailesi */
   --text-strong: #141a2e;
   --text-muted: #5b6577;

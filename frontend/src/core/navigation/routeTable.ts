@@ -23,7 +23,7 @@ export const ROUTES = {
   // Şantiyenin İmalat sekmesi; Sohbet ve Saha ile aynı sayfadır. Çalışan göremez (sekmesi de yoktur).
   siteProduction: {
     path: '/santiyeler/:siteId/imalat',
-    meta: { detail: true, productionOnly: true, title: 'İmalat' },
+    meta: { detail: true, permission: 'VIEW_PRODUCTION', title: 'İmalat' },
   },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
   // Yoklama firmanındır, şantiyenin değil: şef her sabah alır, patron ay sonunda puantajı görür. Sekme ve ay
@@ -35,6 +35,9 @@ export const ROUTES = {
   },
   // Çalışanın kendi ayı: kaydını o gün görür, yanlışsa işaretleyeni arar. Patron ve şef yoklamada sayılmaz.
   myPuantaj: { path: '/puantajim', meta: { workerOnly: true, title: 'Puantajım' } },
+  // Malzemeler firmanındır, şantiyenin değil: hareketler ve stok aynı sayfada sekmedir (?sekme=stok). Süzgeçler ve
+  // açık hareket adreste durur (?tur=TO_SITE&hareket=…): Saha kartı hareketin ayrıntısına buradan bağlanır.
+  materials: { path: '/malzemeler', meta: { permission: 'VIEW_MATERIALS', title: 'Malzemeler' } },
   profile: { path: '/ben', meta: { title: 'Hesabım' } },
 } as const satisfies Record<string, { path: string; meta: RouteMeta }>
 

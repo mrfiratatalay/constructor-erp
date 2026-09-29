@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * alır (patron, şef, depo sorumlusu). Oturum çerezle gider: arayüz bu adrese düz bir bağlantıyla gider.
  */
 @RestController
-@PreAuthorize("hasAnyRole('OWNER', 'SITE_LEAD', 'STOREKEEPER')")
+@PreAuthorize("hasAuthority('VIEW_PRODUCTION')")
 @Tag(name = "Production")
 public class ProductionExportController {
 

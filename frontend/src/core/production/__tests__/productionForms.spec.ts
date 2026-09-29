@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 import type { ProductionEntryView, ProductionItemView } from '@/core/api/generated/model'
-import { canEnterProduction, canSeeProduction } from '@/core/production/productionRoles'
+import { canEnterProduction, canSeeProduction } from '@/core/production/productionPermissions'
 import { entryFileProblem } from '@/core/production/entryFiles'
 import {
   emptyEntryForm,
@@ -27,15 +27,17 @@ const demir = {
 } as ProductionItemView
 
 describe('kim ne yapar', () => {
-  it('patron, şef ve depo sorumlusu görür; yalnızca şef girer; çalışan hiç görmez', () => {
-    expect(
-      ['OWNER', 'SITE_LEAD', 'STOREKEEPER', 'WORKER'].map((role) =>
-        canSeeProduction(role as never),
-      ),
-    ).toEqual([true, true, true, false])
-    expect(canEnterProduction('SITE_LEAD')).toBe(true)
-    expect(canEnterProduction('OWNER')).toBe(false)
-    expect(canEnterProduction('STOREKEEPER')).toBe(false)
+  it('görmek VIEW_PRODUCTION, girmek MANAGE_PRODUCTION ister; izni olmayan (çalışan) hiç görmez', () => {
+    const lead = { permissions: ['VIEW_PRODUCTION', 'MANAGE_PRODUCTION'] as const }
+    const keeper = { permissions: ['VIEW_PRODUCTION'] as const }
+    expect([lead, keeper, { permissions: [] }, undefined].map((user) => canSeeProduction(user as never))).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ])
+    expect(canEnterProduction(lead as never)).toBe(true)
+    expect(canEnterProduction(keeper as never)).toBe(false)
   })
 })
 

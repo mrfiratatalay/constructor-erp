@@ -63,8 +63,8 @@ async function submit() {
         </van-field>
         <van-field v-model="form.unit" label="Birim" maxlength="12" required />
         <van-cell><template #title><ChoiceChips v-model="unit" :options="units" /></template></van-cell>
-        <DateField v-model="form.startDate" label="Başlangıç" clearable />
-        <DateField v-model="form.plannedEnd" label="Planlanan bitiş" :min="startDay" clearable />
+        <DateField v-model="form.startDate" label="Başlangıç" any-day clearable />
+        <DateField v-model="form.plannedEnd" label="Planlanan bitiş" any-day :min="startDay" clearable />
         <van-field v-model="form.note" label="Açıklama" type="textarea" rows="2" autosize maxlength="500"
           show-word-limit placeholder="A ve B blok demir imalatları." />
       </van-cell-group>

@@ -40,7 +40,7 @@ const composer = useComposer(target)
 const fieldComposer = useComposer(target, { fieldUpdate: true })
 const panel = ref<Panel | null>(null)
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
-const tabs = computed(() => siteTabsFor(user.value?.role))
+const tabs = computed(() => siteTabsFor(user.value))
 
 const toggle = (which: Panel) => (panel.value = panel.value === which ? null : which)
 /** Aramada bulunan mesaja sohbette gidilir: akış adresteki ?mesaj=… ile o mesajı bulur. */

@@ -80,7 +80,7 @@ public abstract class ApiTestSupport {
 
     /** Aynı yoldan gelip patronun depo sorumlusu yaptığı biri: "depocunun telefonu". İmalatı görür, girmez. */
     protected Cookie signedInStorekeeper(Cookie owner, String fullName) {
-        return signedInAs(owner, fullName, "STOREKEEPER");
+        return signedInAs(owner, fullName, "WAREHOUSE");
     }
 
     private Cookie signedInAs(Cookie owner, String fullName, String role) {

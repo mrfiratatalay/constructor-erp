@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** İmalatı yalnızca patron, şef ve depo sorumlusu görür; çalışan göremez (sekmesi de yoktur). */
 @RestController
-@PreAuthorize("hasAnyRole('OWNER', 'SITE_LEAD', 'STOREKEEPER')")
+@PreAuthorize("hasAuthority('VIEW_PRODUCTION')")
 @Tag(name = "Production")
 public class ProductionController {
 

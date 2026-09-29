@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PostView } from '@/core/api/generated/model'
+import type { FieldMaterialRef, PostView } from '@/core/api/generated/model'
 import { fieldKind } from '@/core/field/fieldKind'
 import FieldMedia from '@/shared/molecules/FieldMedia.vue'
 import FieldRow from '@/shared/molecules/FieldRow.vue'
+import MaterialFieldCard from '@/shared/molecules/MaterialFieldCard.vue'
 
 /**
  * Bir saha güncellemesi: ne oldu (yazının kendisi başlıktır), kim yazdı, altında kanıtı (fotoğraf, video, ses).
- * Silinen güncellemenin yerinde iz kalır (İlke 6). ⋯ menüsü kabuktan yuvayla gelir.
+ * Silinen güncellemenin yerinde iz kalır (İlke 6). ⋯ menüsü kabuktan yuvayla gelir. Malzeme hareketinden gelen
+ * gönderinin altında hareketin kartı durur (güncel durumuyla; dokununca hareketin ayrıntısı).
  */
-const { post } = defineProps<{ post: PostView }>()
-const emit = defineEmits<{ openPhotos: [urls: string[], index: number] }>()
+const { post, material = undefined } = defineProps<{ post: PostView; material?: FieldMaterialRef }>()
+const emit = defineEmits<{ openPhotos: [urls: string[], index: number]; openMaterial: [movementId: string] }>()
 
 const kind = computed(() => (post.deletion ? 'note' : fieldKind(post)))
 </script>
@@ -27,6 +29,7 @@ const kind = computed(() => (post.deletion ? 'note' : fieldKind(post)))
           {{ post.author.fullName }}<span v-if="post.editedAt"> · düzenlendi</span>
         </p>
       </div>
+      <MaterialFieldCard v-if="material" :reference="material" @open="(id) => emit('openMaterial', id)" />
       <FieldMedia :media="post.media" @open-photos="(urls, index) => emit('openPhotos', urls, index)" />
     </template>
     <template v-if="$slots.menu && !post.deletion" #menu><slot name="menu" /></template>

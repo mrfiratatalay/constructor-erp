@@ -10,7 +10,7 @@ import {
 const uniquePhone = () => `05${String(Math.floor(Math.random() * 1e9)).padStart(9, '0')}`
 
 /**
- * Firmanın bağlantısıyla katılan (API) ve patronun rol verdiği biri: şef (SITE_LEAD), depo sorumlusu (STOREKEEPER)
+ * Firmanın bağlantısıyla katılan (API) ve patronun rol verdiği biri: şef (SITE_LEAD), depo sorumlusu (WAREHOUSE)
  * ya da çalışan olarak kalan (WORKER). Oturumu ve kimliği döner.
  */
 export async function memberAs(
@@ -34,7 +34,7 @@ export async function memberAs(
 
 interface MemberSpec {
   fullName: string
-  role: 'SITE_LEAD' | 'STOREKEEPER' | 'WORKER'
+  role: 'SITE_LEAD' | 'WAREHOUSE' | 'WORKER'
 }
 
 /** Başka birinin telefonu: aynı cihaz türünde ayrı bir tarayıcı, o kişinin oturumuyla. */

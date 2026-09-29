@@ -13,26 +13,29 @@ export interface RoleChangeCopy {
 export const ROLE_OF_ACTION: Record<RoleAction, MemberViewRole> = {
   makeOwner: 'OWNER',
   makeLead: 'SITE_LEAD',
-  makeStorekeeper: 'STOREKEEPER',
+  makeStorekeeper: 'WAREHOUSE',
   makeWorker: 'WORKER',
 }
 
 const COPY: Record<MemberViewRole, Omit<RoleChangeCopy, 'title'> & { noun: string }> = {
   OWNER: {
     noun: 'patron',
-    message: 'Kişileri düzeltir, rollerini değiştirir, firmadan çıkarır; geçmiş yoklamayı düzeltir ve puantajı indirir.',
+    message:
+      'Kişileri düzeltir, rollerini değiştirir, firmadan çıkarır; geçmiş yoklamayı düzeltir ve puantajı indirir.',
     confirm: 'Patron yap',
     done: 'Patron yapıldı',
   },
   SITE_LEAD: {
     noun: 'şef',
-    message: 'Her sabah yoklamayı alır; kendisi yoklamada sayılmaz. Kişileri yönetemez.',
+    message:
+      'Her sabah yoklamayı alır; kendisi yoklamada sayılmaz. Sahadaki malzeme hareketini girer ve teslim alır.',
     confirm: 'Şef yap',
     done: 'Şef yapıldı',
   },
-  STOREKEEPER: {
+  WAREHOUSE: {
     noun: 'depo sorumlusu',
-    message: 'Şantiyelerin imalatını görür (girmez); çalışan gibi yoklamada sayılır. Kişileri yönetemez.',
+    message:
+      'Malzeme kartlarını, hareketleri ve stoğu yönetir; iptal ve sayım düzeltmesi yapar. Yoklamada sayılmaz.',
     confirm: 'Depo sorumlusu yap',
     done: 'Depo sorumlusu yapıldı',
   },
@@ -49,10 +52,7 @@ export function roleChangeCopy(fullName: string, role: MemberViewRole): RoleChan
   return { title: `${fullName} ${noun} olsun mu?`, ...copy }
 }
 
-/**
- * Kişinin menüsünde sahip olmadığı üç rol: "Patron yap", "Şef yap", "Depo sorumlusu yap", "Çalışan yap" (bu
- * sırayla).
- */
+/** Kişinin menüsünde sahip olmadığı roller: "Patron yap", "Şef yap", "Depo sorumlusu yap", "Çalışan yap". */
 export function roleActions(current: MemberViewRole): { action: RoleAction; label: string }[] {
   return (Object.keys(ROLE_OF_ACTION) as RoleAction[])
     .filter((action) => ROLE_OF_ACTION[action] !== current)

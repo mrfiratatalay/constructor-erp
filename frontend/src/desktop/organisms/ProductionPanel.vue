@@ -7,7 +7,7 @@ import type { ProductionItemView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { productionExportUrl } from '@/core/production/productionAccess'
 import { recentRows } from '@/core/production/productionBoard'
-import { canEnterProduction } from '@/core/production/productionRoles'
+import { canEnterProduction } from '@/core/production/productionPermissions'
 import { useProductionBoard } from '@/core/production/useProductionBoard'
 import { useProductionItemEditor } from '@/core/production/useProductionItemEditor'
 import ProductionFilters from '@/desktop/molecules/ProductionFilters.vue'
@@ -26,7 +26,7 @@ import ProductionRecentEntries from '@/desktop/organisms/ProductionRecentEntries
  */
 const { siteId } = defineProps<{ siteId: string }>()
 const { data: user } = useCurrentUser()
-const canEnter = computed(() => canEnterProduction(user.value?.role))
+const canEnter = computed(() => canEnterProduction(user.value))
 const { isLoading, isError, retry, items, recentEntries, summary, counts, options, shown, filter, clearFilter } =
   useProductionBoard(() => siteId)
 const rows = computed(() => recentRows(recentEntries.value, items.value))

@@ -1,7 +1,7 @@
 # Kızılkan Şantiye — Ekran Tasarımı Kararları
 
 22 Eylül 2026'da kararlaştırıldı, aynı gün dördüncü turda sadeleştirildi; 23 Eylül'de Şantiyeler modülü
-ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24-25 Eylül'de kişiler, 28 Eylül'de yoklama ve roller. Ekran düzeniyle
+ayrıntı ayrıntı yeniden kararlaştırıldı (telefon önce: patron şantiyelere telefondan bakar), 24-25 Eylül'de kişiler, 28 Eylül'de yoklama, roller ve malzemeler. Ekran düzeniyle
 ilgili bir tercih yapılacağı zaman önce buraya bakılır. Kurallar değil, kararlardır; gerekçesiyle birlikte değişir.
 
 ## Tek ölçüt: tek cümle testi
@@ -242,6 +242,54 @@ yalnızca bileşenin kendi tonundan gelir; durum tonları iki kütüphaneye de b
 Durum seçimi her yerde aynı: yan yana (telefonda 2×2 büyük) düğmeler, seçili olan kendi renginde dolu. Etiketin
 içinde her zaman yazı ya da ayrı şekilli bir işaret vardır, anlam yalnızca renge kalmaz (İlke 2).
 
+## Malzemeler (firmanın stoğu ve malzeme hareketleri)
+
+28 Eylül'de kararlaştırıldı (Fırat'ın "Malzeme Modülü" task dokümanı ve ekran referansı). Yoklama gibi firmanındır,
+şantiyenin değil: malzeme ana depoda, bir şantiyede, yolda ya da başka bir firmada ödünç olabilir. Menüde Şantiyeler
+ve Yoklama'nın yanında **Malzemeler**; masaüstünde şantiye listesi kolonu yoktur, geniş çalışma alanı açılır.
+
+> **"Malzeme kartı malzemeyi tanımlar, hareket malzemenin ne yaptığını anlatır, stok bu hareketlerin sonucudur."**
+
+| Karar | Neden |
+|---|---|
+| **Stok elle yazılmaz.** Bir kolon değil, hareketlerin toplamıdır: teslim edilmiş girişler eksi çıkışlar. | Stoğu elle düzeltilen defter kavgaya döner; kim, ne zaman, neden sorusunun cevabı kaybolur. |
+| **Tür ile durum ayrıdır.** "Transfer" türdür, "Yolda" o transferin durumudur. Tür renkli rozetle (mavi gönderim, turuncu kullanım, soft kırmızı dışarı, mor transfer, yeşil geliş, teal iade), durum kütüphanenin durum etiketiyle çizilir. | İkisi aynı dilde çizilseydi "Transfer Yolda" satırı iki durum gibi okunurdu. |
+| **Stok eksiye düşmez.** Kaynakta kullanılabilirden fazlası çıkamaz; form miktarın altında "Kullanılabilir: 900 Torba" yazar, sunucu malzemenin satırını kilitleyip yeniden sayar. | Aynı anda iki çıkış aynı stoğu iki kez harcamasın. |
+| **Yoldaki ve kontrol bekleyen** hareket kaynaktan düşer, hedefe **teslimde** girer ("Teslim alındı" / "Kontrol edildi"). | Kamyondaki çimento ne depodadır ne şantiyede. |
+| **Hareket silinmez.** İptal edilir, nedeni zorunludur; geçmişte "İptal · neden · kim · ne zaman" kalır. Miktar, malzeme ve lokasyon düzeltilmez (iptal + yeni hareket); açıklama, kullanım alanı, iade tarihi düzeltilir ve geçmişe yazılır. | İlke 6: defter iz bırakmadan değişmez. |
+| **Ödünç iadesi ödünçten başlar.** Beklenen İadeler'de "İade Al": malzeme, firma, kalan miktar ve dönüş lokasyonu çıkıştan gelir. Kısmi iade olur: 100 verildi, 60 döndü → 40 bekler, durum "Kısmi İade". | Boş formdan girilen iade yanlış firmaya, yanlış malzemeye bağlanırdı. |
+| **Sayım farkı ayrı bir harekettir** ("Sayım Düzeltmesi"): stok satırındaki "Sayım"dan girilir; sistem, sayılan, fark, neden. Normal hareket seçenekleri arasında yoktur. | Büyük bir "Stok düzelt" düğmesi her yanlışı sayımla kapatmaya davet ederdi. |
+| **Üstteki kartlar toplam stok göstermez**: kalem, hareket, kayıt sayar. Kartlar tıklanır (Stok sekmesi, bu ayın gönderimleri, dışarı verilenler, beklenen iadeler). | Ton, torba ve m² tek sayıda toplanamaz. |
+| **Düğmeler rol adına değil izne göre** görünür (`VIEW_MATERIALS`, `CREATE_MATERIAL_MOVEMENT`, `CANCEL_MATERIAL_MOVEMENT`, `MANAGE_MATERIAL_CATALOG`, `CONFIRM_DELIVERY`, `EXPORT_MATERIALS`, `STOCK_ADJUSTMENT`…). Rol → izin eşlemesi backend'de tek yerde (`Permission`). | Rol matrisi değişince arayüz değişmesin. |
+
+**Roller (dördüncü rol).** Patron ve **Depo Sorumlusu** her şeyi yapar; şef hareketi girer, teslim alır ve Excel alır;
+çalışan malzemeyi görmez. Depo sorumlusu yoklamada sayılmaz, yoklama almaz; uygulamayı açınca doğrudan Malzemeler'e
+düşer. Patron onu Katılımcılar'dan "Depo sorumlusu yap" ile seçer.
+
+```
+Ana Sayfa › Malzemeler
+Malzemeler  (Rol: Depo Sorumlusu)                         [Excel İndir] [+ Malzeme Hareketi]
+┌ Toplam Malzeme ┐ ┌ Bu Ay Şantiyelere ┐ ┌ Dışarı Verilen ┐ ┌ Beklenen İadeler ┐
+ Hareketler | Stok
+[Tümü 124] [Şantiyeye Giden 58] [Kullanılan 24] [Dışarı Verilen 12] [Transfer 18] [Gelen 12] [İade]
+[📅 Son 30 gün ▾] [Lokasyon] [Malzeme] [Firma] [Durum] [🔍 Ara]
+Tarih · Malzeme · Hareket · Nereden · Nereye · Miktar · Durum · Açıklama · ⋯
+```
+
+| Parça | Karar |
+|---|---|
+| Liste | Sunucuda süzülür ve sayfalanır; süzgeçler birlikte çalışır ve **adreste** durur (`?tur=TO_SITE&tarih=buay&lokasyon=…&ara=…`). Seçili süzgeçler etiket olarak görünür, "Filtreleri temizle". Tür çiplerinin sayıları tür dışındaki süzgeçlerle sayılır. Arama: malzeme adı ya da kodu, firma, lokasyon, açıklama, hareket numarası (MH-000123). |
+| Boş liste | İki ayrı durumdur: hiç hareket yoksa "Henüz malzeme hareketi bulunmuyor" + "+ Malzeme Hareketi"; süzgeç yüzünden boşsa "Bu filtrelere uygun kayıt bulunamadı" + "Filtreleri temizle". Yüklenirken iskelet, hata olursa "Tekrar dene". |
+| + Malzeme Hareketi | Masaüstünde sağdan çekmece (ekranın üçte biri), telefonda tam ekran. Önce işlem türü (altı kart), sonra yalnızca o türün alanları. Birim malzemeden gelir. Malzeme listede yoksa yetkili kişi "Yeni malzeme oluştur"la kartı açar; form kaybolmaz, yeni kart formda seçili gelir. Firma listeden seçilir ya da adı yazılır (ayrı firma ekranı yok). Belge sürükle-bırak (PDF, JPG, PNG, 10 MB). Şantiyeye dokunan harekette "Saha akışına yansıt". Kayıttan sonra kısa özet: "Şantiyeye Gönderildi · Çimento, 300 Torba · Ana Depo → Çamburnu Plaza". |
+| Hareket ayrıntısı | Adreste `?hareket=…`: yol, bilgiler, ödünçte geri dönüş çubuğu ve bağlı iadeler, belgeler, Saha referansı, değişmez geçmiş. Altta duruma ve izne göre: Teslim alındı, İade al, Düzelt, İptal et. |
+| Stok | "Bu malzeme şu an nerede?": malzeme başına toplam kullanılabilir, kaç lokasyonda, durum (Normal / Kritik / Tükendi), son hareket. Satır açılınca lokasyon kırılımı (Ana Depo 610 · Çamburnu 260) ve yolda / kontrol bekleyen / dışarıda (ödünç) miktar. Malzeme kartında (`?kart=…`) özet sayılar, son hareketler, beklenen iadeler, belgeler. |
+| Excel | Tek çalışma kitabı: Hareketler (ekrandaki süzgeçlerle), Stok Özeti (lokasyon sütunlarıyla), Beklenen İadeler; sayfalar seçilir. `malzeme_raporu_2026-09-01_2026-09-30.xlsx`. |
+| Saha | Şantiyeye dokunan hareket o şantiyenin Saha akışına referans gönderi olarak düşer ("Malzeme geldi: Çimento, 300 Torba (Ana Depo → Çamburnu Plaza)"). Gönderi bir kopya değildir: kartın durumu hareketten okunur (iptal edilirse "İptal" der), dokununca hareketin ayrıntısı açılır. Transfer iki şantiye arasındaysa ikisine de düşer. |
+
+**Sonraki iterasyonlara bırakılanlar** (dokümandaki gibi): çoklu birim ve dönüşüm, barkod / QR, depo sayım modu,
+kritik stok bildirimi, satın alma ve tedarikçi fiyatları, hakediş ve muhasebe bağlantısı. Ödünç iadesi yalnızca
+ödünç çıkışına bağlanır; satılan ya da destek verilen malzemenin iadesi yoktur.
+
 ## Şantiye bilgisi (WhatsApp'taki grup bilgisi)
 
 Başlığa dokununca: telefonda alttan açılır, masaüstünde akışın sağında panel olur (akış kararmaz).
@@ -279,9 +327,10 @@ görür ve yazar; şef ayrıca yoklama alır, patron ayrıca kişileri yönetir.
 etiketi yazar (WhatsApp'ta yalnızca yöneticinin etiketi olduğu gibi; kişilerin çoğu çalışandır). O güne kadar
 bağlantıyla gelip şef yazılmış herkes çalışan yapıldı (V16): patron gerçek şefleri kendisi seçer.
 
-**Dördüncü rol: Depo sorumlusu (28 Eylül, Musa).** Patron Katılımcılar'dan birini "Depo sorumlusu yap"la seçer.
-Çalışan gibi yoklamada sayılır (menüsünde Puantajım vardır), ayrıca şantiyelerin İmalat'ını görür, girmez
-(TASARIM-IMALAT.md). İleride depo ve malzeme de bu role bağlanır. Katılımcılarda "Depo sorumlusu" etiketi yazar.
+**Dördüncü rol: Depo sorumlusu (28 Eylül).** Patron Katılımcılar'dan birini "Depo sorumlusu yap"la seçer.
+Malzemeyi ve stoğu yönetir, uygulamayı Malzemeler'de açar; yoklamada sayılmaz, yoklama almaz. Şantiyelerin
+İmalat'ını görür, girmez (TASARIM-IMALAT.md). Kim neyi yapar rol adında değil izinlerdedir (backend `Permission`).
+Katılımcılarda "Depo Sorumlusu" etiketi yazar.
 
 **Kimsenin durumu yazmaz.** "Henüz girmedi", "son görülme", "linki açmadı" bizim teknik derdimizdir, dayının
 değil. Biri giremezse gerçek hayattaki gibi arar, patron ona giriş linki gönderir.
@@ -334,11 +383,15 @@ Kabuk açılışta bir kez seçilir; kabuğun içi her genişliğe kendiliğinde
 
 ## Navigasyon
 
-| | Patron | Şef | Çalışan |
-|---|---|---|---|
-| 1 | Şantiyeler | Şantiyeler | Şantiyeler |
-| 2 | Yoklama | Yoklama | Puantajım |
-| 3 | Ben | Ben | Ben |
+| | Patron | Şef | Depo Sorumlusu | Çalışan |
+|---|---|---|---|---|
+| 1 | Şantiyeler | Şantiyeler | Şantiyeler | Şantiyeler |
+| 2 | Yoklama | Yoklama | Malzemeler | Puantajım |
+| 3 | Malzemeler | Malzemeler | Ben | Ben |
+| 4 | Ben | Ben | | |
+
+Malzemeler menüde rol adına göre değil, malzemeyi görme iznine (`VIEW_MATERIALS`) göre durur; depo sorumlusu
+uygulamayı açınca doğrudan Malzemeler'e düşer (28 Eylül).
 
 Yoklama patronun ve şefin menüsündedir (28 Eylül): şef her sabah alır, patron ay sonunda puantajı görür. Çalışan
 yoklamada sayılır; onun menüsünde yerine kendi ayı Puantajım vardır. Kimse ötekinin adresine giremez: çalışan

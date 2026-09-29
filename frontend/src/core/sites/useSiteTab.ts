@@ -1,8 +1,8 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { MemberViewRole } from '@/core/api/generated/model'
+import type { CurrentUserResponse } from '@/core/api/generated/model'
 import type { RouteName } from '@/core/navigation/routeTable'
-import { canSeeProduction } from '@/core/production/productionRoles'
+import { canSeeProduction } from '@/core/production/productionPermissions'
 
 /**
  * Şantiyenin yüzleri: Sohbet (WhatsApp grubu), Saha (şantiyenin günlüğü, en yenisi üstte) ve İmalat (gerçekleşen
@@ -22,8 +22,8 @@ const SITE_TABS: ReadonlyArray<SiteTabItem> = [
 ]
 
 /** Kişinin göreceği sekmeler: çalışanda Sohbet ve Saha, imalatı görenlerde İmalat da. */
-export function siteTabsFor(role: MemberViewRole | undefined): SiteTabItem[] {
-  return SITE_TABS.filter((item) => item.tab !== 'production' || canSeeProduction(role))
+export function siteTabsFor(user: Pick<CurrentUserResponse, 'permissions'> | undefined): SiteTabItem[] {
+  return SITE_TABS.filter((item) => item.tab !== 'production' || canSeeProduction(user))
 }
 
 const ROUTE_OF: Record<SiteTab, RouteName> = {

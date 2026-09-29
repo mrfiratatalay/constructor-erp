@@ -10,6 +10,6 @@ export type MemberViewRole = (typeof MemberViewRole)[keyof typeof MemberViewRole
 export const MemberViewRole = {
   OWNER: 'OWNER',
   SITE_LEAD: 'SITE_LEAD',
+  WAREHOUSE: 'WAREHOUSE',
   WORKER: 'WORKER',
-  STOREKEEPER: 'STOREKEEPER',
 } as const

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** İmalata veriyi yalnızca şantiye şefi girer: imalat açar, düzeltir, siler ve günlük girişleri yapar. */
 @RestController
-@PreAuthorize("hasRole('SITE_LEAD')")
+@PreAuthorize("hasAuthority('MANAGE_PRODUCTION')")
 @Tag(name = "Production")
 public class ProductionEditController {
 

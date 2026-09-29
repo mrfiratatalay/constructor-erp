@@ -15,6 +15,7 @@ const PAGES: PageSet = {
   attendance: page,
   memberAttendance: page,
   myPuantaj: page,
+  materials: page,
   profile: page,
 }
 

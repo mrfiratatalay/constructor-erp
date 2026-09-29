@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 import type { SiteView } from '@/core/api/generated/model'
 import { useCurrentUser } from '@/core/auth/currentUser'
 import { dayDividerText } from '@/core/field/fieldDays'
 import { fieldMenu } from '@/core/field/fieldMenu'
 import { fieldSummary } from '@/core/field/fieldSummary'
 import { useFieldUpdates } from '@/core/field/useFieldUpdates'
+import { useFieldMaterialRefs } from '@/core/materials/useFieldMaterialRefs'
 import PostMenu from '@/desktop/molecules/PostMenu.vue'
 import PostCorrectDialog from '@/desktop/organisms/PostCorrectDialog.vue'
 import { useFieldMenuActions } from '@/desktop/postActions'
@@ -25,6 +27,9 @@ const { correcting, run } = useFieldMenuActions()
 const summary = computed(() => fieldSummary(days.value, site.photoUrl ?? null))
 const viewer = ref<{ urls: string[]; index: number } | null>(null)
 const root = useTemplateRef<HTMLElement>('root')
+const materials = useFieldMaterialRefs(() => site.id)
+const router = useRouter()
+const openMaterial = (movementId: string) => router.push({ name: 'materials', query: { hareket: movementId } })
 
 /** Günlük bugünden başlar: panelin kaydırması sohbetten (dipten) kalmasın. Kayan öğe sağ panelin gövdesidir. */
 onMounted(() => root.value?.closest('.el-scrollbar__wrap')?.scrollTo({ top: 0 }))
@@ -39,8 +44,8 @@ onMounted(() => root.value?.closest('.el-scrollbar__wrap')?.scrollTo({ top: 0 })
     <section v-for="(day, index) in days" :key="day.key" class="field-column__day">
       <FieldDayTitle :text="index === 0 ? day.title : dayDividerText(day)" :lead="index === 0" />
       <QueuedFieldEntry v-for="post in day.pending" :key="post.id" :post="post" />
-      <FieldEntry v-for="post in day.entries" :key="post.id" :post="post"
-        @open-photos="(urls, start) => (viewer = { urls, index: start })">
+      <FieldEntry v-for="post in day.entries" :key="post.id" :post="post" :material="materials.refOf(post.id)"
+        @open-photos="(urls, start) => (viewer = { urls, index: start })" @open-material="openMaterial">
         <template #menu>
           <PostMenu :items="fieldMenu(post, user)" @select="(action) => run(action, post)" />
         </template>

@@ -18,7 +18,6 @@ const show = defineModel<boolean>('show', { required: true })
 const { siteId, item } = defineProps<{ siteId: string; item: ProductionItemView | null }>()
 const { form, reset, save, problem, overflow, quantity, isSaving } = useProductionEntry(() => siteId)
 const files = ref<UploaderFileListItem[]>([])
-const today = new Date()
 const workers = computed({
   get: () => form.workerCount?.toString() ?? '',
   set: (text: string) => (form.workerCount = text ? Number(text) : undefined),
@@ -79,7 +78,7 @@ async function submit() {
           <template #extra>{{ item.unit }}</template>
         </van-field>
         <van-field v-model="workers" label="Çalışan sayısı" type="digit" maxlength="3" placeholder="12" />
-        <DateField v-model="form.day" label="Tarih" :max="today" required />
+        <DateField v-model="form.day" label="Tarih" required />
         <van-field v-model="form.note" label="Not" type="textarea" rows="2" autosize maxlength="500" show-word-limit
           placeholder="A Blok 4. kat donatı tamamlandı." />
         <van-field label="Fotoğraf / belge">

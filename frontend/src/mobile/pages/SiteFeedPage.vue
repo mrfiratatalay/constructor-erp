@@ -43,7 +43,7 @@ const searchOpen = ref(false)
 const moreOpen = ref(false)
 
 const callable = computed(() => (site.value ? callablePeople(site.value, user.value) : []))
-const tabs = computed(() => siteTabsFor(user.value?.role))
+const tabs = computed(() => siteTabsFor(user.value))
 const MORE = [{ name: 'Şantiye bilgisi', key: 'info' }, { name: 'Bu şantiyede ara', key: 'search' }]
 
 function onMore(action: { key: string }) {

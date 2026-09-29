@@ -7,11 +7,13 @@ import com.atalay.santiye.support.IntegrationTest;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** Depo sorumlusu: patron Katılımcılar'dan seçer; çalışan gibi yoklamada sayılır, yoklama alamaz. */
+/**
+ * Depo sorumlusu (WAREHOUSE): patron Katılımcılar'dan seçer. Yoklamada sayılmaz, yoklama alamaz; ilerlemeyi görür,
+ * girmez (izinleri: VIEW_PRODUCTION var, MANAGE_PRODUCTION yok).
+ */
 @IntegrationTest
 class StorekeeperRoleTest extends ApiTestSupport {
 
@@ -25,14 +27,17 @@ class StorekeeperRoleTest extends ApiTestSupport {
         String site = contentOf(get("/api/sites/" + siteId, owner));
         List<String> keepers = JsonPath.read(site, "$.storekeepers[*].id");
         List<String> workers = JsonPath.read(site, "$.workers[*].id");
+        String me = contentOf(get("/api/auth/me", keeper));
+        List<String> permissions = JsonPath.read(me, "$.permissions");
 
         assertThat(keepers).contains(keeperId);
         assertThat(workers).doesNotContain(keeperId);
-        assertThat(read(contentOf(get("/api/auth/me", keeper)), "$.role")).isEqualTo("STOREKEEPER");
+        assertThat(read(me, "$.role")).isEqualTo("WAREHOUSE");
+        assertThat(permissions).contains("VIEW_PRODUCTION").doesNotContain("MANAGE_PRODUCTION");
     }
 
     @Test
-    void theStorekeeperIsCountedInPuantajButCannotTakeIt() {
+    void theStorekeeperIsNotCountedInPuantajAndCannotTakeIt() {
         Cookie owner = loginAsOwner();
         Cookie keeper = signedInStorekeeper(owner, "Depocu Nuri");
         String today = LocalDate.now().toString();
@@ -40,9 +45,7 @@ class StorekeeperRoleTest extends ApiTestSupport {
         String puantaj = contentOf(get("/api/puantaj?from=%s&to=%s".formatted(today, today), owner));
         List<String> names = JsonPath.read(puantaj, "$.entries[?(@.archived == false)].name");
 
-        assertThat(names).contains("Depocu Nuri");
-        String mine = contentOf(get("/api/puantaj/me?month=" + YearMonth.now(), keeper));
-        assertThat((Boolean) JsonPath.read(mine, "$.counted")).isTrue();
+        assertThat(names).doesNotContain("Depocu Nuri");
         assertThat(get("/api/puantaj?from=%s&to=%s".formatted(today, today), keeper)).hasStatus(403);
     }
 }

@@ -6,7 +6,7 @@ import { shortDay } from '@/core/format/dates'
 import { productionExportUrl } from '@/core/production/productionAccess'
 import { recentRows, STATUS_FILTERS, type RecentRow } from '@/core/production/productionBoard'
 import { entryAmount } from '@/core/production/productionFormat'
-import { canEnterProduction } from '@/core/production/productionRoles'
+import { canEnterProduction } from '@/core/production/productionPermissions'
 import { useProductionBoard } from '@/core/production/useProductionBoard'
 import { useProductionItemEditor } from '@/core/production/useProductionItemEditor'
 import ProductionItemCard from '@/mobile/molecules/ProductionItemCard.vue'
@@ -22,7 +22,7 @@ import ProductionItemSheet from '@/mobile/organisms/ProductionItemSheet.vue'
  */
 const { siteId } = defineProps<{ siteId: string }>()
 const { data: user } = useCurrentUser()
-const canEnter = computed(() => canEnterProduction(user.value?.role))
+const canEnter = computed(() => canEnterProduction(user.value))
 const { isLoading, isError, retry, items, recentEntries, summary, counts, options, shown, filter, clearFilter } =
   useProductionBoard(() => siteId)
 const rows = computed(() => recentRows(recentEntries.value, items.value))

@@ -73,7 +73,7 @@ test('depo sorumlusu imalatı görür ama giremez; çalışanın İmalat sekmesi
   })
   const keeper = await memberAs(owner, baseURL!, token, {
     fullName: unique('Depocu'),
-    role: 'STOREKEEPER',
+    role: 'WAREHOUSE',
   })
   const worker = await memberAs(owner, baseURL!, token, {
     fullName: unique('Usta'),
