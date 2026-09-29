@@ -58,6 +58,11 @@ public class WorkspaceAccess {
         cache.remove(companyId);
     }
 
+    /** Paketin modülleri değişince o paketteki bütün firmalar etkilenir. */
+    public void evictAll() {
+        cache.clear();
+    }
+
     /** Bugünü kapsayan dönem; yoksa en son biten (ya da başlayacak) dönem (bkz. Periods). */
     public Optional<Subscription> current(UUID companyId) {
         return Periods.current(subscriptions.findByCompanyIdOrderByStartsOnDesc(companyId), LocalDate.now(clock));

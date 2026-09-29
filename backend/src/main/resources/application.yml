@@ -69,6 +69,11 @@ app:
     owner-email: ${BOOTSTRAP_OWNER_EMAIL:}
     owner-password: ${BOOTSTRAP_OWNER_PASSWORD:}
 
+server:
+  # Ters vekil (nginx) arkasında istemcinin gerçek adresi X-Forwarded-For'dan okunur (başvuru formu sınırı için);
+  # Tomcat bu başlığa yalnızca iç ağdaki vekilden geldiğinde güvenir.
+  forward-headers-strategy: native
+
 management:
   endpoints:
     web:
