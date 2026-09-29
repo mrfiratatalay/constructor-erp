@@ -9,7 +9,7 @@ import ChoiceChips from '@/mobile/molecules/ChoiceChips.vue'
 import DateField from '@/mobile/molecules/DateField.vue'
 
 /**
- * "Yeni İmalat" (ve düzenleme), alttan: tür, isteğe bağlı ad, taşeron, toplam miktar ve birim, başlangıç, planlanan
+ * "Yeni İş Kalemi" (ve düzenleme), alttan: tür, isteğe bağlı ad, taşeron, toplam miktar ve birim, başlangıç, planlanan
  * bitiş (gecikme buna göre), açıklama. Telefonda açılır liste yerine: alan yazılır, altındaki hazır seçeneklerden biri
  * tek dokunuşla da seçilir. Listede olmayan taşeron yazılırsa kaydederken eklenir (yoklamaya da girer).
  */
@@ -37,7 +37,7 @@ async function submit() {
   if (problem.value) return showFailToast(problem.value)
   try {
     await editor.save()
-    showSuccessToast(isNew.value ? 'İmalat oluşturuldu' : 'İmalat güncellendi')
+    showSuccessToast(isNew.value ? 'İş kalemi oluşturuldu' : 'İş kalemi güncellendi')
     show.value = false
   } catch (error) {
     showFailToast(errorMessage(error))
@@ -46,12 +46,12 @@ async function submit() {
 </script>
 
 <template>
-  <van-action-sheet v-model:show="show" :title="isNew ? 'Yeni İmalat' : 'İmalatı düzenle'" teleport="body">
+  <van-action-sheet v-model:show="show" :title="isNew ? 'Yeni İş Kalemi' : 'İş kalemini düzenle'" teleport="body">
     <van-form label-width="7.5em" @submit="submit">
       <van-cell-group inset>
-        <van-field v-model="form.trade" label="İmalat türü" placeholder="Demir İşleri" maxlength="60" required />
+        <van-field v-model="form.trade" label="İş türü" placeholder="Demir İşleri" maxlength="60" required />
         <van-cell><template #title><ChoiceChips v-model="trade" :options="trades" /></template></van-cell>
-        <van-field v-model="form.title" label="İmalat adı" placeholder="İsteğe bağlı: A Blok Demir" maxlength="120" />
+        <van-field v-model="form.title" label="Kalem adı" placeholder="İsteğe bağlı: A Blok Demir" maxlength="120" />
         <van-field v-model="crewText" label="Taşeron" placeholder="Seç ya da yeni taşeron yaz" maxlength="120" />
         <van-cell v-if="crewOptions.length">
           <template #title><ChoiceChips v-model="form.crewId" :options="crewOptions" /></template>
@@ -66,11 +66,11 @@ async function submit() {
         <DateField v-model="form.startDate" label="Başlangıç" any-day clearable />
         <DateField v-model="form.plannedEnd" label="Planlanan bitiş" any-day :min="startDay" clearable />
         <van-field v-model="form.note" label="Açıklama" type="textarea" rows="2" autosize maxlength="500"
-          show-word-limit placeholder="A ve B blok demir imalatları." />
+          show-word-limit placeholder="A ve B blok demir işleri." />
       </van-cell-group>
       <div class="item-sheet__submit">
         <van-button type="primary" native-type="submit" block round :loading="isSaving">
-          {{ isNew ? 'İmalatı oluştur' : 'Kaydet' }}
+          {{ isNew ? 'İş kalemini oluştur' : 'Kaydet' }}
         </van-button>
       </div>
     </van-form>

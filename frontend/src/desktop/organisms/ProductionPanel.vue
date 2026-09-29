@@ -60,10 +60,10 @@ function updateFromDetail() {
 }
 
 async function remove(item: ProductionItemView) {
-  const agreed = await ElMessageBox.confirm('Girişi olmayan imalat silinir; girişi olan silinmez.', `${item.name} silinsin mi?`,
+  const agreed = await ElMessageBox.confirm('Girişi olmayan iş kalemi silinir; girişi olan silinmez.', `${item.name} silinsin mi?`,
     { confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç', type: 'warning' }).then(() => true, () => false)
   if (!agreed) return
-  await editor.removeItem(item).then(() => ElMessage.success('İmalat silindi'), (error) => ElMessage.error(errorMessage(error)))
+  await editor.removeItem(item).then(() => ElMessage.success('İş kalemi silindi'), (error) => ElMessage.error(errorMessage(error)))
 }
 </script>
 
@@ -71,28 +71,28 @@ async function remove(item: ProductionItemView) {
   <div class="production" data-testid="production-panel">
     <el-row justify="space-between" class="production__head">
       <div class="production__intro">
-        <h2 class="production__title">İmalat Takibi</h2>
-        <el-text type="info">İmalatların ilerlemesi, taşeronların günlük girişleri ve gerçekleşen üretim.</el-text>
+        <h2 class="production__title">İlerleme Takibi</h2>
+        <el-text type="info">İş kalemlerinin ilerlemesi, taşeronların günlük girişleri ve gerçekleşen üretim.</el-text>
       </div>
       <el-space :size="8" class="production__actions">
         <el-button tag="a" :href="productionExportUrl(siteId)" download :icon="Download">Rapor / Excel</el-button>
-        <el-button v-if="canEnter" type="primary" :icon="Plus" @click="openItem(null)">İmalat ekle</el-button>
+        <el-button v-if="canEnter" type="primary" :icon="Plus" @click="openItem(null)">İş kalemi ekle</el-button>
       </el-space>
     </el-row>
-    <el-result v-if="isError" icon="error" title="İmalat verileri yüklenemedi."
+    <el-result v-if="isError" icon="error" title="İlerleme verileri yüklenemedi."
       sub-title="Bağlantıyı kontrol edip tekrar deneyin.">
       <template #extra><el-button type="primary" @click="retry">Tekrar dene</el-button></template>
     </el-result>
     <el-skeleton v-else-if="isLoading" :rows="8" animated />
-    <el-empty v-else-if="!items.length" description="Henüz imalat bulunmuyor">
-      <el-text v-if="!canEnter" type="info">Şantiye şefi ilk imalatı açınca burada görünür.</el-text>
-      <el-button v-else type="primary" :icon="Plus" @click="openItem(null)">İlk imalatı ekle</el-button>
+    <el-empty v-else-if="!items.length" description="Henüz iş kalemi yok">
+      <el-text v-if="!canEnter" type="info">Şantiye şefi ilk iş kalemini açınca burada görünür.</el-text>
+      <el-button v-else type="primary" :icon="Plus" @click="openItem(null)">İlk iş kalemini ekle</el-button>
     </el-empty>
     <template v-else>
       <ProductionSummary :summary="summary" />
       <ProductionFilters v-model:status="filter.status" v-model:crew-id="filter.crewId" v-model:trade="filter.trade"
         v-model:query="filter.query" :counts="counts" :crews="options.crews" :trades="options.trades" />
-      <el-empty v-if="!shown.length" :image-size="64" description="Süzgece uyan imalat yok">
+      <el-empty v-if="!shown.length" :image-size="64" description="Süzgece uyan iş kalemi yok">
         <el-button @click="clearFilter">Süzgeci temizle</el-button>
       </el-empty>
       <ProductionItemRow v-for="item in shown" :key="item.id" :item="item" :can-enter="canEnter"

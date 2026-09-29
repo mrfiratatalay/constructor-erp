@@ -28,12 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProductionExport {
 
-    private static final List<Column> ITEM_COLUMNS = List.of(new Column("Tür", 16), new Column("İmalat", 26),
+    private static final List<Column> ITEM_COLUMNS = List.of(new Column("Tür", 16), new Column("İş kalemi", 26),
         new Column("Taşeron", 20), new Column("Toplam", 11), new Column("Birim", 8), new Column("Gerçekleşen", 12),
         new Column("Kalan", 11), new Column("İlerleme", 10), new Column("Bugün", 9), new Column("Durum", 14),
         new Column("Başlangıç", 12), new Column("Planlanan bitiş", 15), new Column("Son güncelleme", 17),
         new Column("Not", 36));
-    private static final List<Column> ENTRY_COLUMNS = List.of(new Column("Tarih", 12), new Column("İmalat", 26),
+    private static final List<Column> ENTRY_COLUMNS = List.of(new Column("Tarih", 12), new Column("İş kalemi", 26),
         new Column("Taşeron", 20), new Column("Miktar", 11), new Column("Birim", 8), new Column("Çalışan", 9),
         new Column("Not", 40), new Column("Dosya", 7), new Column("Saha'da", 8), new Column("Giren", 18),
         new Column("Girildiği an", 17));
@@ -52,7 +52,7 @@ public class ProductionExport {
         List<ProductionEntryView> entries = reads.allEntries(siteId);
         ByteArrayOutputStream file = new ByteArrayOutputStream();
         try (Workbook workbook = new Workbook(file, "Kizilkan Santiye", "1.0")) {
-            writeItems(workbook.newWorksheet("İmalatlar"), items);
+            writeItems(workbook.newWorksheet("İş kalemleri"), items);
             writeEntries(workbook.newWorksheet("Günlük girişler"), entries, items);
         } catch (IOException problem) {
             throw new UncheckedIOException(problem);

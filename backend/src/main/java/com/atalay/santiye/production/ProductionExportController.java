@@ -37,7 +37,7 @@ public class ProductionExportController {
     @GetMapping(value = "/sites/{siteId}/production/export", produces = XLSX)
     public ResponseEntity<byte[]> exportProduction(@AuthenticationPrincipal CurrentUser user,
         @PathVariable UUID siteId) {
-        String fileName = "imalat-" + LocalDate.now(clock) + ".xlsx";
+        String fileName = "ilerleme-" + LocalDate.now(clock) + ".xlsx";
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(XLSX))
             .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(fileName).build().toString())

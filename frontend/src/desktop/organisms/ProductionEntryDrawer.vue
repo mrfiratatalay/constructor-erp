@@ -10,7 +10,7 @@ import { useProductionEntry } from '@/core/production/useProductionEntry'
 import TradeIcon from '@/shared/atoms/TradeIcon.vue'
 
 /**
- * "Günlük İmalat Güncellemesi", sağdan çekmece; modülün en sık işi: "Demir İşleri → Güncelle → 3,5 → Kaydet".
+ * "Günlük İlerleme", sağdan çekmece; modülün en sık işi: "Demir İşleri → Güncelle → 3,5 → Kaydet".
  * Üstte imalat ve mevcut durumu; bugün yapılan (birim imalatındır), çalışan sayısı, tarih (bugün; geçmiş güne
  * değiştirilebilir), not, fotoğraf ve PDF, "Saha akışına yansıt" (kapalı gelir: Saha'yı çalışanlar da görür).
  * Toplamı aşan giriş sorulur. Yüzde, kalan ve toplamı sunucu hesaplar.
@@ -52,7 +52,7 @@ async function submit() {
     await save(item, files.value.flatMap((file) => (file.raw ? [file.raw] : [])))
     const field = form.onField ? ' Saha akışına da eklendi.' : ''
     const message = `${item.name} için ${entryAmount(quantity.value, item.unit)} kaydedildi.${field}`
-    ElNotification.success({ title: 'İmalat güncellendi', message })
+    ElNotification.success({ title: 'İlerleme kaydedildi', message })
     show.value = false
   } catch (error) {
     ElMessage.error(errorMessage(error))
@@ -61,9 +61,9 @@ async function submit() {
 </script>
 
 <template>
-  <el-drawer v-model="show" size="480px" append-to-body title="Günlük İmalat Güncellemesi">
+  <el-drawer v-model="show" size="480px" append-to-body title="Günlük İlerleme">
     <template v-if="item">
-      <el-text type="info">Bugünkü gerçekleşen imalat miktarını kaydedin.</el-text>
+      <el-text type="info">Bugün yapılan işin miktarını kaydedin.</el-text>
       <el-card shadow="never" class="entry__card">
         <el-space :size="12">
           <TradeIcon :trade="item.trade" />

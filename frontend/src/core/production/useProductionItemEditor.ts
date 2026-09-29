@@ -36,7 +36,7 @@ function useItemMutations(siteId: MaybeRefOrGetter<string>) {
 }
 
 /**
- * "Yeni İmalat" ve düzenleme: aynı form, açılırken boş ya da imalatın bilgileriyle gelir. Taşeron listede yoksa şef
+ * "Yeni İş Kalemi" ve düzenleme: aynı form, açılırken boş ya da imalatın bilgileriyle gelir. Taşeron listede yoksa şef
  * adını yazar; kaydederken ekip olarak eklenir (yoklamaya da girer). Silme yalnızca girişi olmayan imalatta olur.
  */
 export function useProductionItemEditor(

@@ -23,7 +23,7 @@ const rowOf = (row: unknown) => row as RecentRow
       <el-table-column label="Tarih" width="90">
         <template #default="{ row }">{{ shortDay(rowOf(row).entry.day) }}</template>
       </el-table-column>
-      <el-table-column label="İmalat" min-width="150">
+      <el-table-column label="İş kalemi" min-width="150">
         <template #default="{ row }">
           <el-space :size="8">
             <TradeIcon :trade="rowOf(row).item.trade" :size="24" />

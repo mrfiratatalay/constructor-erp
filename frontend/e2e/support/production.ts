@@ -76,16 +76,16 @@ export function productionParts(page: Page, mobile: boolean) {
       ? page.locator('.van-action-sheet:visible').filter({ hasText: title })
       : page.getByRole('dialog', { name: title })
   const card = (name: string) => page.getByTestId('production-item').filter({ hasText: name })
-  const newItem = panel('Yeni İmalat')
-  const entry = panel('Günlük İmalat Güncellemesi')
+  const newItem = panel('Yeni İş Kalemi')
+  const entry = panel('Günlük İlerleme')
   return {
     card,
     entry,
     history: page.getByTestId('production-history-entry'),
-    /** "Yeni İmalat": tür (hazır seçenek), yeni taşeron (yazılarak), toplam miktar; birim "ton" gelir. */
+    /** "Yeni İş Kalemi": tür (hazır seçenek), yeni taşeron (yazılarak), toplam miktar; birim "ton" gelir. */
     createItem: async (trade: string, crew: string, total: string) => {
       await page
-        .getByRole('button', { name: /İmalat ekle|İlk imalatı ekle/ })
+        .getByRole('button', { name: /İş kalemi ekle|İlk iş kalemini ekle/ })
         .first()
         .click()
       if (mobile) {
@@ -96,7 +96,7 @@ export function productionParts(page: Page, mobile: boolean) {
         await pickOrType(page, newItem.locator('.el-select').nth(1), crew)
       }
       await newItem.getByPlaceholder('120').fill(total)
-      await newItem.getByRole('button', { name: 'İmalatı oluştur' }).click()
+      await newItem.getByRole('button', { name: 'İş kalemini oluştur' }).click()
       await expect(newItem).toBeHidden()
     },
     /** Kartın "Güncelle"si → bugün yapılan → (istenirse Saha'ya yansıt) → kaydet. */

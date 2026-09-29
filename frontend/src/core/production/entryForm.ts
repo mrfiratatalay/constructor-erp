@@ -4,7 +4,7 @@ import { quantityLabel } from '@/core/production/productionFormat'
 import { parseQuantity, quantityProblem } from '@/core/production/quantityInput'
 
 /**
- * "Günlük İmalat Güncellemesi" penceresinin alanları. Birim sorulmaz: imalat açılırken belirlendi. Tarih bugünle
+ * "Günlük İlerleme" penceresinin alanları. Birim sorulmaz: imalat açılırken belirlendi. Tarih bugünle
  * gelir, geçmiş güne değiştirilebilir. Saha'ya yansıtma kapalı gelir: Saha'yı çalışanlar da görür. Miktar yazıdır
  * ("3,5"): Türkçe ondalık virgülü sayı kutusundan geçmez (quantityInput).
  */

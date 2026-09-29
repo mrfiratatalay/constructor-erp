@@ -41,10 +41,10 @@ describe('kim ne yapar', () => {
   })
 })
 
-describe('Yeni İmalat formu', () => {
+describe('Yeni İş Kalemi formu', () => {
   it('tür, toplam ve birim ister; bitiş başlangıçtan önce olamaz', () => {
     const filled = { ...EMPTY_ITEM_FORM, trade: 'Sıva', total: '12.000', unit: 'm²' }
-    expect(itemFormProblem(EMPTY_ITEM_FORM)).toBe('İmalat türünü seç ya da yaz.')
+    expect(itemFormProblem(EMPTY_ITEM_FORM)).toBe('İş türünü seç ya da yaz.')
     expect(itemFormProblem({ ...filled, total: '' })).toBe('Toplam miktarı yaz.')
     expect(itemFormProblem({ ...filled, total: '0' })).toBe('Toplam miktar sıfırdan büyük olmalı.')
     expect(itemFormProblem({ ...filled, startDate: '2026-10-10', plannedEnd: '2026-10-01' })).toBe(
@@ -76,7 +76,7 @@ describe('Yeni İmalat formu', () => {
   })
 })
 
-describe('Günlük İmalat Güncellemesi', () => {
+describe('Günlük İlerleme', () => {
   it('bugünle ve Saha kapalı gelir; 0 girilebilir, ileri gün girilemez', () => {
     const form = emptyEntryForm(today)
     expect(form).toMatchObject({ day: '2026-09-28', onField: false })

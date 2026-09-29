@@ -26,8 +26,8 @@ test('şef imalat açar ve günlük girer; yapılan, kalan ve yüzde hesaplanır
   const production = productionParts(page, isMobile)
   const crew = unique('Kaya Demir')
 
-  await page.goto(`/santiyeler/${site.id}/imalat`)
-  await expect(page.getByText('Henüz imalat bulunmuyor')).toBeVisible(SLOW)
+  await page.goto(`/santiyeler/${site.id}/ilerleme`)
+  await expect(page.getByText('Henüz iş kalemi yok')).toBeVisible(SLOW)
   await production.createItem('Demir İşleri', crew, '120')
   await expect(production.card('Demir İşleri')).toContainText('0 / 120 ton', SLOW)
   await expect(production.card('Demir İşleri')).toContainText(crew)
@@ -82,17 +82,17 @@ test('depo sorumlusu imalatı görür ama giremez; çalışanın İmalat sekmesi
   await itemViaApi(lead.api, site.id, 120)
 
   await page.context().addCookies((await keeper.api.storageState()).cookies)
-  await page.goto(`/santiyeler/${site.id}/imalat`)
+  await page.goto(`/santiyeler/${site.id}/ilerleme`)
   const production = productionParts(page, isMobile)
   await expect(production.card('Demir İşleri')).toContainText('0 / 120 ton', SLOW)
   await expect(page.getByRole('button', { name: 'Güncelle' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'İmalat ekle' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'İş kalemi ekle' })).toHaveCount(0)
 
   const workerPage = await pageOf(browser, testInfo, worker.api)
   await workerPage.goto(`/santiyeler/${site.id}`)
   await expect(workerPage.getByText('Saha', { exact: true }).first()).toBeVisible(SLOW)
-  await expect(workerPage.getByText('İmalat', { exact: true })).toHaveCount(0)
-  await workerPage.goto(`/santiyeler/${site.id}/imalat`)
+  await expect(workerPage.getByText('İlerleme', { exact: true })).toHaveCount(0)
+  await workerPage.goto(`/santiyeler/${site.id}/ilerleme`)
   await expect(workerPage).toHaveURL(/\/santiyeler$/, SLOW)
 })
 
@@ -118,7 +118,7 @@ test("şef Saha'ya yansıtınca giriş çalışanın Saha akışında görünür
   await page.context().addCookies((await lead.api.storageState()).cookies)
   const production = productionParts(page, isMobile)
 
-  await page.goto(`/santiyeler/${site.id}/imalat`)
+  await page.goto(`/santiyeler/${site.id}/ilerleme`)
   await expect(production.card('Demir İşleri')).toBeVisible(SLOW)
   await production.enter('Demir İşleri', '2', true)
   await expect(production.card('Demir İşleri')).toContainText('2 / 50 ton', SLOW)
@@ -127,6 +127,6 @@ test("şef Saha'ya yansıtınca giriş çalışanın Saha akışında görünür
   await workerPage.goto(`/santiyeler/${site.id}/saha`)
   await expect(
     // Masaüstünde soldaki şantiye listesi de önizlemesini yazar ("Şef: 📐 İmalat…"): Saha satırı tam yazısıyla.
-    workerPage.getByText('📐 İmalat · Demir İşleri: +2 ton · 2 / 50 ton (%4)', { exact: true }),
+    workerPage.getByText('📐 İlerleme · Demir İşleri: +2 ton · 2 / 50 ton (%4)', { exact: true }),
   ).toBeVisible(SLOW)
 })

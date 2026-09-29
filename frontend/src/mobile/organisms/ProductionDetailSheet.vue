@@ -37,7 +37,7 @@ async function remove(entry: ProductionEntryView) {
 </script>
 
 <template>
-  <van-action-sheet v-model:show="show" :title="item?.name ?? 'İmalat'" teleport="body">
+  <van-action-sheet v-model:show="show" :title="item?.name ?? 'İş kalemi'" teleport="body">
     <van-skeleton v-if="isLoading || !item || !status" title :row="5" class="detail-sheet__loading" />
     <template v-else>
       <van-cell-group inset>

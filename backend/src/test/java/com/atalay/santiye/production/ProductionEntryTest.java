@@ -29,7 +29,7 @@ class ProductionEntryTest extends ProductionTestSupport {
 
         assertThat(addEntry(lead, itemId, Entry.today("1.5").toField(), TestMedia.photo())).hasStatus(201);
         String field = fieldUpdates(owner, siteId);
-        assertThat(fieldBodies(owner, siteId)).containsExactly("📐 İmalat · Demir İşleri: +1,5 ton · 3,5 / 120 ton (%2,9)");
+        assertThat(fieldBodies(owner, siteId)).containsExactly("📐 İlerleme · Demir İşleri: +1,5 ton · 3,5 / 120 ton (%2,9)");
         assertThat(JsonPath.<List<Object>>read(field, "$.items[0].media")).hasSize(1);
 
         String detail = detail(owner, itemId);

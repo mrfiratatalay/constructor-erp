@@ -7,7 +7,7 @@ import { tradeChoices, UNIT_PRESETS } from '@/core/production/itemForm'
 import type { useProductionItemEditor } from '@/core/production/useProductionItemEditor'
 
 /**
- * "Yeni İmalat" (ve düzenleme), sağdan çekmece: tür (listeden ya da yeni), isteğe bağlı ad, taşeron (listede yoksa
+ * "Yeni İş Kalemi" (ve düzenleme), sağdan çekmece: tür (listeden ya da yeni), isteğe bağlı ad, taşeron (listede yoksa
  * adı yazılır, kaydederken eklenir), toplam miktar ve birim, başlangıç, planlanan bitiş (gecikme buna göre), açıklama.
  * Kaydedilemiyorsa nedeni ilk denemeden sonra düğmenin yanında yazar.
  */
@@ -31,7 +31,7 @@ async function submit() {
   if (problem.value) return
   try {
     await editor.save()
-    ElMessage.success(isNew.value ? 'İmalat oluşturuldu' : 'İmalat güncellendi')
+    ElMessage.success(isNew.value ? 'İş kalemi oluşturuldu' : 'İş kalemi güncellendi')
     show.value = false
   } catch (error) {
     ElMessage.error(errorMessage(error))
@@ -40,15 +40,15 @@ async function submit() {
 </script>
 
 <template>
-  <el-drawer v-model="show" size="460px" append-to-body :title="isNew ? 'Yeni İmalat' : 'İmalatı düzenle'">
-    <el-text type="info">Şantiyede takip edilecek imalatın türünü, taşeronunu ve toplam miktarını yazın.</el-text>
+  <el-drawer v-model="show" size="460px" append-to-body :title="isNew ? 'Yeni İş Kalemi' : 'İş kalemini düzenle'">
+    <el-text type="info">Şantiyede takip edilecek iş kaleminin türünü, taşeronunu ve toplam miktarını yazın.</el-text>
     <el-form label-position="top" class="item-form" @submit.prevent="submit">
-      <el-form-item label="İmalat türü" required>
+      <el-form-item label="İş türü" required>
         <el-select v-model="form.trade" filterable allow-create default-first-option placeholder="Seç ya da yaz">
           <el-option v-for="name in trades" :key="name" :label="name" :value="name" />
         </el-select>
       </el-form-item>
-      <el-form-item label="İmalat adı (isteğe bağlı)">
+      <el-form-item label="Kalem adı (isteğe bağlı)">
         <el-input v-model="form.title" maxlength="120" placeholder="A Blok Demir İşleri" />
       </el-form-item>
       <el-form-item label="Taşeron / ekip">
@@ -87,14 +87,14 @@ async function submit() {
       </el-row>
       <el-form-item label="Açıklama">
         <el-input v-model="form.note" type="textarea" :rows="3" maxlength="500" show-word-limit
-          placeholder="A ve B blok demir imalatları." />
+          placeholder="A ve B blok demir işleri." />
       </el-form-item>
     </el-form>
     <template #footer>
       <el-text v-if="tried && problem" type="danger" size="small" class="item-form__problem">{{ problem }}</el-text>
       <el-button @click="show = false">İptal</el-button>
       <el-button type="primary" :loading="isSaving" @click="submit">
-        {{ isNew ? 'İmalatı oluştur' : 'Kaydet' }}
+        {{ isNew ? 'İş kalemini oluştur' : 'Kaydet' }}
       </el-button>
     </template>
   </el-drawer>

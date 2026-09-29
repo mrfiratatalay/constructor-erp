@@ -9,7 +9,7 @@ import type { BoardSummary } from '@/core/production/productionBoard'
 const { summary } = defineProps<{ summary: BoardSummary }>()
 
 const cards = computed(() => [
-  { title: 'Aktif imalat', value: summary.active, note: `Toplam ${summary.total} kalem`, alert: false },
+  { title: 'Aktif iş kalemi', value: summary.active, note: `Toplam ${summary.total} kalem`, alert: false },
   { title: 'Tamamlanan', value: summary.completed, note: `%${summary.completedPercent} tamamlandı`, alert: false },
   { title: 'Geciken', value: summary.delayed, note: 'Planın gerisinde', alert: summary.delayed > 0 },
   { title: 'Bugün güncellenen', value: summary.updatedToday, note: 'Son 24 saat', alert: false },

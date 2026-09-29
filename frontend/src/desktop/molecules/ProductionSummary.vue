@@ -20,13 +20,13 @@ interface Card {
 }
 
 const cards = computed<Card[]>(() => [
-  { title: 'Aktif imalat', value: summary.active, unit: 'iş kalemi', note: `Toplam ${summary.total} kalem`,
+  { title: 'Aktif', value: summary.active, unit: 'iş kalemi', note: `Toplam ${summary.total} kalem`,
     icon: Layers, color: 'primary' },
   { title: 'Tamamlanan', value: summary.completed, unit: 'iş kalemi', note: `%${summary.completedPercent} tamamlandı`,
     icon: CircleCheck, color: 'success' },
   { title: 'Geciken', value: summary.delayed, unit: 'kayıt', note: 'Planın gerisinde', icon: Clock,
     color: summary.delayed ? 'danger' : 'info' },
-  { title: 'Bugün güncellenen', value: summary.updatedToday, unit: 'imalat', note: 'Son 24 saat', icon: ChartColumn,
+  { title: 'Bugün güncellenen', value: summary.updatedToday, unit: 'iş kalemi', note: 'Son 24 saat', icon: ChartColumn,
     color: 'primary' },
 ])
 </script>

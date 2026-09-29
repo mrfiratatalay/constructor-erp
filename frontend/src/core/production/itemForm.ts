@@ -19,7 +19,7 @@ export const TRADE_PRESETS = [
 /** Birimin hazır seçenekleri; başka bir birim de yazılabilir. "%": fiziksel miktarı net olmayan iş (asansör). */
 export const UNIT_PRESETS = ['ton', 'kg', 'm²', 'm³', 'metre', 'adet', 'daire', 'kat', '%']
 
-/** "Yeni İmalat" penceresinin alanları. Seçim kutusu seçilmemişi undefined bekler (Element Plus, Vant). */
+/** "Yeni İş Kalemi" penceresinin alanları. Seçim kutusu seçilmemişi undefined bekler (Element Plus, Vant). */
 export interface ItemForm {
   trade: string
   title: string
@@ -58,7 +58,7 @@ export function itemFormOf(item: ProductionItemView): ItemForm {
 
 /** Kaydedilemeyecek formun nedeni (düğmenin altında yazar); kaydedilebiliyorsa null. */
 export function itemFormProblem(form: ItemForm): string | null {
-  if (!form.trade.trim()) return 'İmalat türünü seç ya da yaz.'
+  if (!form.trade.trim()) return 'İş türünü seç ya da yaz.'
   const total = quantityProblem(form.total, 'Toplam miktarı yaz.')
   if (total) return total
   if (!parseQuantity(form.total)) return 'Toplam miktar sıfırdan büyük olmalı.'

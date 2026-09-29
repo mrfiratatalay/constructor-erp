@@ -28,14 +28,14 @@ const COPY: Record<MemberViewRole, Omit<RoleChangeCopy, 'title'> & { noun: strin
   SITE_LEAD: {
     noun: 'şef',
     message:
-      'Her sabah yoklamayı alır; kendisi yoklamada sayılmaz. Sahadaki malzeme hareketini girer ve teslim alır.',
+      "Her sabah yoklamayı alır; kendisi yoklamada sayılmaz. Sahadaki malzeme hareketini girer ve teslim alır; İlerleme'ye günlük girişleri yapar.",
     confirm: 'Şef yap',
     done: 'Şef yapıldı',
   },
   WAREHOUSE: {
     noun: 'depo sorumlusu',
     message:
-      'Malzeme kartlarını, hareketleri ve stoğu yönetir; iptal ve sayım düzeltmesi yapar. Yoklamada sayılmaz.',
+      "Malzeme kartlarını, hareketleri ve stoğu yönetir; iptal ve sayım düzeltmesi yapar. İlerleme'yi görür. Yoklamada sayılmaz.",
     confirm: 'Depo sorumlusu yap',
     done: 'Depo sorumlusu yapıldı',
   },

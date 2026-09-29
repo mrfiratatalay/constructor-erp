@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * İmalat açmak, düzeltmek, silmek (yalnızca şef; controller denetler). Girişi olan imalat silinmez: girişler
+ * İmalat açmak, düzeltmek, silmek (yalnızca şef; controller denetler). Girişi olan iş kalemi silinmez: girişler
  * şantiyenin kaydıdır, önce onlar silinir.
  */
 @Service
@@ -54,7 +54,7 @@ public class ProductionItems {
     public void delete(CurrentUser user, UUID itemId) {
         ProductionItem item = reads.require(user, itemId);
         if (entries.existsByItemIdAndDeletedAtIsNull(itemId)) {
-            throw ApiException.conflict("Girişi olan imalat silinmez: önce günlük girişlerini sil.");
+            throw ApiException.conflict("Girişi olan iş kalemi silinmez: önce günlük girişlerini sil.");
         }
         item.delete(clock.instant());
     }

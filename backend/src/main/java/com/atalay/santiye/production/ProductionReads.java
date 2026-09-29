@@ -91,7 +91,7 @@ public class ProductionReads {
     /** Başka firmanın ya da silinmiş imalatın varlığı belli edilmez: bulunamadı. */
     ProductionItem require(CurrentUser user, UUID itemId) {
         return items.findByIdAndCompanyIdAndDeletedAtIsNull(itemId, user.companyId())
-            .orElseThrow(() -> ApiException.notFound("İmalat bulunamadı."));
+            .orElseThrow(() -> ApiException.notFound("İş kalemi bulunamadı."));
     }
 
     private ProductionItemView view(CurrentUser user, ProductionItem item, List<ProductionEntry> list) {

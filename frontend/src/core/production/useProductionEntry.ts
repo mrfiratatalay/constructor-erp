@@ -24,7 +24,7 @@ async function whileBusy<T>(flag: Ref<boolean>, work: () => Promise<T>): Promise
 }
 
 /**
- * "Günlük İmalat Güncellemesi": bugün yapılan, çalışan sayısı, tarih, not, dosyalar, Saha'ya yansıt. Girişin
+ * "Günlük İlerleme": bugün yapılan, çalışan sayısı, tarih, not, dosyalar, Saha'ya yansıt. Girişin
  * kimliği pencere açılırken üretilir ve kaydedilene kadar değişmez: yeniden denenen istek ikinci giriş açmaz.
  */
 export function useProductionEntry(siteId: MaybeRefOrGetter<string>) {

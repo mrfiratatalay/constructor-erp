@@ -22,8 +22,8 @@ export const ROUTES = {
   siteField: { path: '/santiyeler/:siteId/saha', meta: { detail: true, title: 'Saha' } },
   // Şantiyenin İmalat sekmesi; Sohbet ve Saha ile aynı sayfadır. Çalışan göremez (sekmesi de yoktur).
   siteProduction: {
-    path: '/santiyeler/:siteId/imalat',
-    meta: { detail: true, permission: 'VIEW_PRODUCTION', title: 'İmalat' },
+    path: '/santiyeler/:siteId/ilerleme',
+    meta: { detail: true, permission: 'VIEW_PRODUCTION', title: 'İlerleme' },
   },
   siteTasks: { path: '/santiyeler/:siteId/gorevler', meta: { detail: true, title: 'Görevler' } },
   // Yoklama firmanındır, şantiyenin değil: şef her sabah alır, patron ay sonunda puantajı görür. Sekme ve ay

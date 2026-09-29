@@ -10,7 +10,7 @@ import DateField from '@/mobile/molecules/DateField.vue'
 import TradeIcon from '@/shared/atoms/TradeIcon.vue'
 
 /**
- * "Günlük İmalat Güncellemesi", alttan: sahanın en sık işi, "Demir → Güncelle → 3,5 → Kaydet". Miktar kutusu
+ * "Günlük İlerleme", alttan: sahanın en sık işi, "Demir → Güncelle → 3,5 → Kaydet". Miktar kutusu
  * telefonun sayı klavyesini açar ve virgülü kabul eder; birim imalatındır. Çalışan sayısı, tarih (ileri gün yok),
  * not, fotoğraf ve PDF, "Saha akışına yansıt" (kapalı gelir). Toplamı aşan giriş sorulur.
  */
@@ -48,7 +48,7 @@ async function submit() {
   try {
     await save(item, files.value.flatMap((file) => (file.file ? [file.file] : [])))
     const field = form.onField ? ' Saha akışına da eklendi.' : ''
-    showNotify({ type: 'success', message: `İmalat güncellendi: ${item.name} ${entryAmount(quantity.value, item.unit)}.${field}` })
+    showNotify({ type: 'success', message: `İlerleme kaydedildi: ${item.name} ${entryAmount(quantity.value, item.unit)}.${field}` })
     show.value = false
   } catch (error) {
     showFailToast(errorMessage(error))
@@ -57,7 +57,7 @@ async function submit() {
 </script>
 
 <template>
-  <van-action-sheet v-model:show="show" title="Günlük İmalat Güncellemesi" teleport="body">
+  <van-action-sheet v-model:show="show" title="Günlük İlerleme" teleport="body">
     <van-form v-if="item" label-width="8.5em" @submit="submit">
       <van-cell-group inset>
         <van-cell center :title="item.name" :label="`Taşeron: ${item.crew?.name ?? 'atanmadı'}`">

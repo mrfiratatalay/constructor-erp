@@ -35,10 +35,10 @@ const optionOf = (item: unknown) => item as (typeof options.value)[number]
       <el-select v-model="crewId" placeholder="Taşeron: tümü" clearable filterable aria-label="Taşeron">
         <el-option v-for="crew in crews" :key="crew.id" :label="crew.name" :value="crew.id" />
       </el-select>
-      <el-select v-model="trade" placeholder="İmalat türü: tümü" clearable filterable aria-label="İmalat türü">
+      <el-select v-model="trade" placeholder="İş türü: tümü" clearable filterable aria-label="İş türü">
         <el-option v-for="name in trades" :key="name" :label="name" :value="name" />
       </el-select>
-      <el-input v-model="query" placeholder="Ara…" clearable aria-label="İmalat ara">
+      <el-input v-model="query" placeholder="Ara…" clearable aria-label="İş kalemi ara">
         <template #prefix><Search :size="15" /></template>
       </el-input>
     </div>

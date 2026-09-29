@@ -18,7 +18,7 @@ export interface SiteTabItem {
 const SITE_TABS: ReadonlyArray<SiteTabItem> = [
   { tab: 'chat', label: 'Sohbet' },
   { tab: 'field', label: 'Saha' },
-  { tab: 'production', label: 'İmalat' },
+  { tab: 'production', label: 'İlerleme' },
 ]
 
 /** Kişinin göreceği sekmeler: çalışanda Sohbet ve Saha, imalatı görenlerde İmalat da. */

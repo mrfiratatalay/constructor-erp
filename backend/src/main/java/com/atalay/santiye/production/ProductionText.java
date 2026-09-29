@@ -27,11 +27,11 @@ final class ProductionText {
 
     /**
      * Saha'ya yansıyan girişin yazısı; Saha'da başlık, sohbet listesinde önizleme olur:
-     * "📐 İmalat · Demir İşleri: +3,5 ton · 62 / 120 ton (%51,7)" ve varsa altında not.
+     * "📐 İlerleme · Demir İşleri: +3,5 ton · 62 / 120 ton (%51,7)" ve varsa altında not.
      */
     static String fieldBody(ProductionItem item, ProductionEntry entry, ProductionFigures after) {
         String unit = item.getUnit();
-        String line = "📐 İmalat · %s: +%s %s · %s / %s %s (%s)".formatted(item.name(), number(entry.getQuantity()),
+        String line = "📐 İlerleme · %s: +%s %s · %s / %s %s (%s)".formatted(item.name(), number(entry.getQuantity()),
             unit, number(after.done()), number(after.total()), unit, percent(after.percent()));
         return entry.getNote() == null ? line : line + "\n" + entry.getNote();
     }

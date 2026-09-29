@@ -90,7 +90,7 @@ Herkes aynı listeyi görür; tek şantiyesi olan şef de. Sekmenin adı herkes 
 | Parça | Karar |
 |---|---|
 | Akış yönü | En eski üstte, en yenisi altta; sayfa açılınca dibe iner. Yukarı kaydırınca geçmiş yüklenir, ekran zıplamaz. |
-| Başlık | Şantiye fotoğrafı, ad, altında katılımcıların ilk adları ve "Sen". Başlığa dokununca bilgi açılır; sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Altında Sohbet · Saha sekmeleri; patron, şef ve depo sorumlusunda İmalat da (bkz. TASARIM-IMALAT.md). |
+| Başlık | Şantiye fotoğrafı, ad, altında katılımcıların ilk adları ve "Sen". Başlığa dokununca bilgi açılır; sağda 📞 ve ⋮ (Şantiye bilgisi, Bu şantiyede ara). Altında Sohbet · Saha sekmeleri; patron, şef ve depo sorumlusunda İlerleme de (bkz. TASARIM-ILERLEME.md). |
 | 📞 | 25 Eylül'de kararlaştırıldı. Aranabilecekler: patron ve katılımcılar, numarası olanlar, kişinin kendisi hariç (şef patronu da buradan arar). Tek kişi varsa doğrudan onu arar (dayının en sık işi tek dokunuş); birden fazlaysa alttan liste açılır: ad, rol, numara. Önceden "telefonu olan ilk katılımcı" aranıyordu: ikinci şef buradan hiç aranamıyordu. |
 | Sistem satırları | "Patron şantiyeyi kurdu", "Mahmut davet bağlantısıyla katıldı", "Patron, Mahmut'u çıkardı" (WhatsApp gibi). Katılma ve çıkarma firmanın her şantiyesine düşer: herkes her şantiyededir. Şantiye başına üyelik varken yazılmış eski satırlar ("Patron, Musa'yı ekledi", "Musa eklendi") olduğu gibi durur. |
 | Gönderme çubuğu | `[＋] [yazı] 📷 🎤` (iPhone WhatsApp). ＋: Fotoğraf ve video · Belge (PDF). 📷 doğrudan kamera. Yazı varken 📷 ve 🎤 yerine ➤. Masaüstünde `[＋] [yazı 😊] 🎤`. |
@@ -329,7 +329,7 @@ bağlantıyla gelip şef yazılmış herkes çalışan yapıldı (V16): patron g
 
 **Dördüncü rol: Depo sorumlusu (28 Eylül).** Patron Katılımcılar'dan birini "Depo sorumlusu yap"la seçer.
 Malzemeyi ve stoğu yönetir, uygulamayı Malzemeler'de açar; yoklamada sayılmaz, yoklama almaz. Şantiyelerin
-İmalat'ını görür, girmez (TASARIM-IMALAT.md). Kim neyi yapar rol adında değil izinlerdedir (backend `Permission`).
+İlerleme'sini görür, girmez (TASARIM-ILERLEME.md). Kim neyi yapar rol adında değil izinlerdedir (backend `Permission`).
 Katılımcılarda "Depo Sorumlusu" etiketi yazar.
 
 **Kimsenin durumu yazmaz.** "Henüz girmedi", "son görülme", "linki açmadı" bizim teknik derdimizdir, dayının

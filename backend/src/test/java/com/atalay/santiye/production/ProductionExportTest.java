@@ -33,7 +33,7 @@ class ProductionExportTest extends ProductionTestSupport {
         MvcTestResult report = get(uri, owner);
 
         assertThat(report).hasStatus(200);
-        assertThat(report.getResponse().getHeader("Content-Disposition")).contains("imalat-").contains(".xlsx");
+        assertThat(report.getResponse().getHeader("Content-Disposition")).contains("ilerleme-").contains(".xlsx");
         String texts = sharedStrings(report.getResponse().getContentAsByteArray());
         assertThat(texts).contains("Demir İşleri", "Rapor Demir", "Devam ediyor", "Rapor Şefi", "Günlük girişler");
         assertThat(get(uri, keeper)).hasStatus(200);

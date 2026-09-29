@@ -69,27 +69,27 @@ function updateFromDetail() {
 
 <template>
   <div class="production-tab" data-testid="production-panel">
-    <van-empty v-if="isError" image="error" description="İmalat verileri yüklenemedi.">
+    <van-empty v-if="isError" image="error" description="İlerleme verileri yüklenemedi.">
       <van-button round type="primary" @click="retry">Tekrar dene</van-button>
     </van-empty>
     <van-skeleton v-else-if="isLoading" title :row="6" />
-    <van-empty v-else-if="!items.length" description="Henüz imalat bulunmuyor">
-      <van-button v-if="canEnter" round type="primary" icon="plus" @click="openItem(null)">İlk imalatı ekle</van-button>
-      <p v-else class="production-tab__hint">Şantiye şefi ilk imalatı açınca burada görünür.</p>
+    <van-empty v-else-if="!items.length" description="Henüz iş kalemi yok">
+      <van-button v-if="canEnter" round type="primary" icon="plus" @click="openItem(null)">İlk iş kalemini ekle</van-button>
+      <p v-else class="production-tab__hint">Şantiye şefi ilk iş kalemini açınca burada görünür.</p>
     </van-empty>
     <template v-else>
       <ProductionSummaryGrid :summary="summary" />
       <div class="production-tab__actions">
-        <van-button v-if="canEnter" type="primary" round icon="plus" @click="openItem(null)">İmalat ekle</van-button>
+        <van-button v-if="canEnter" type="primary" round icon="plus" @click="openItem(null)">İş kalemi ekle</van-button>
         <van-button round plain icon="description" :url="productionExportUrl(siteId)">Excel</van-button>
       </div>
-      <van-search v-model="filter.query" shape="round" placeholder="İmalat, tür ya da taşeron ara" class="production-tab__search" />
+      <van-search v-model="filter.query" shape="round" placeholder="İş kalemi, tür ya da taşeron ara" class="production-tab__search" />
       <van-dropdown-menu class="production-tab__filters">
         <van-dropdown-item v-model="filter.status" :options="statusOptions" />
         <van-dropdown-item v-model="crew" :options="crewOptions" />
         <van-dropdown-item v-model="trade" :options="tradeOptions" />
       </van-dropdown-menu>
-      <van-empty v-if="!shown.length" image-size="64" description="Süzgece uyan imalat yok">
+      <van-empty v-if="!shown.length" image-size="64" description="Süzgece uyan iş kalemi yok">
         <van-button round @click="clearFilter">Süzgeci temizle</van-button>
       </van-empty>
       <ProductionItemCard v-for="item in shown" :key="item.id" :item="item" :can-enter="canEnter"
