@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionEntryView } from '@/core/api/generated/model'
 import { fullDate } from '@/core/format/dates'
@@ -12,6 +12,7 @@ import {
   quantityLabel,
 } from '@/core/production/productionFormat'
 import { useProductionDetail } from '@/core/production/useProductionDetail'
+import { confirmAction } from '@/mobile/confirmAction'
 import StatusTag from '@/mobile/atoms/StatusTag.vue'
 import ProductionEntryCell from '@/mobile/molecules/ProductionEntryCell.vue'
 import { tagColor } from '@/mobile/markTones'
@@ -29,8 +30,7 @@ const amount = (value: number) => `${quantityLabel(value)} ${item.value?.unit ??
 const dateOr = (isoDate: string | null | undefined) => (isoDate ? fullDate(isoDate) : '—')
 
 async function remove(entry: ProductionEntryView) {
-  const agreed = await showConfirmDialog({ title: 'Giriş silinsin mi?', message: 'Toplamdan düşer.',
-    confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç' }).then(() => true, () => false)
+  const agreed = await confirmAction({ title: 'Giriş silinsin mi?', message: 'Toplamdan düşer.', confirm: 'Sil' })
   if (!agreed) return
   await deleteEntry(entry).then(() => showSuccessToast('Giriş silindi'), (error) => showFailToast(errorMessage(error)))
 }

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { Copy, MessageCircle } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import { copyText } from '@/core/team/loginLink'
 import { useJoinLink } from '@/core/team/useJoinLink'
+import { confirmAction } from '@/mobile/confirmAction'
 
 /**
  * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Herkes onu WhatsApp grubuna atar; tıklayan
@@ -18,12 +19,11 @@ async function copy() {
 }
 
 async function confirmReset() {
-  const confirmed = await showConfirmDialog({
+  const confirmed = await confirmAction({
     title: 'Bağlantı sıfırlansın mı?',
     message: 'Eski bağlantı çalışmaz; yenisini WhatsApp grubuna yeniden atman gerekir. Katılmış olanlar içeride kalır.',
-    confirmButtonText: 'Sıfırla',
-    cancelButtonText: 'Vazgeç',
-  }).then(() => true, () => false)
+    confirm: 'Sıfırla',
+  })
   if (!confirmed) return
   await reset().then(() => showSuccessToast('Yeni bağlantı hazır'), (error) => showFailToast(errorMessage(error)))
 }

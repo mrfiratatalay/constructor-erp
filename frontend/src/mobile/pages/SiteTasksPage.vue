@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { ListChecks } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { TaskView, TaskViewStatus } from '@/core/api/generated/model'
@@ -10,6 +10,7 @@ import { useCurrentUser } from '@/core/auth/currentUser'
 import { assigneeChoices } from '@/core/tasks/assigneeChoices'
 import { canDeleteTask } from '@/core/tasks/taskPermissions'
 import { useSiteTasks, type TaskForm } from '@/core/tasks/useSiteTasks'
+import { confirmAction } from '@/mobile/confirmAction'
 import TaskFormPopup from '@/mobile/organisms/TaskFormPopup.vue'
 import TaskRowCell from '@/mobile/organisms/TaskRowCell.vue'
 import TaskSheet from '@/mobile/organisms/TaskSheet.vue'
@@ -61,13 +62,11 @@ function move(task: TaskView, status: TaskViewStatus) {
 
 /** Silmek onay ister: görev ve bilgileri kalıcı olarak gider. */
 async function remove(task: TaskView) {
-  const confirmed = await showConfirmDialog({
+  const confirmed = await confirmAction({
     title: 'Görev silinsin mi?',
     message: `"${task.title}" kalıcı olarak silinir.`,
-    confirmButtonText: 'Sil',
-    confirmButtonColor: 'var(--status-danger)',
-    cancelButtonText: 'Vazgeç',
-  }).then(() => true, () => false)
+    confirm: 'Sil',
+  })
   if (!confirmed) return
   selectedId.value = null
   if (await attempt(() => deleteTask(task))) showSuccessToast('Silindi')
