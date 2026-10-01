@@ -35,6 +35,18 @@ export const PRODUCT_POINTS = [
   },
 ] as const
 
+export const PRODUCT_BENEFITS = [
+  { icon: 'phone', title: 'Sahada telefon', text: 'Güncellemeyi işin yapıldığı yerde kaydedin.' },
+  { icon: 'monitor', title: 'Ofiste bilgisayar', text: 'Şantiyeleri ve kayıtları geniş ekranda yönetin.' },
+  { icon: 'sync', title: 'Aynı çalışma alanı', text: 'Ekip, malzeme ve yapılan iş bir arada.' },
+] as const
+
+export const PRODUCT_AUDIENCES = [
+  { icon: 'chart', role: 'Patron ve ofis', title: 'Şantiyelerinize hâkim olun.', text: 'Günlük güncellemeleri, puantajı ve işlerin ilerlemesini ilgili kayıtlarla birlikte değerlendirin.' },
+  { icon: 'camera', role: 'Şantiye şefi', title: 'İşi sahadan kaydedin.', text: 'Fotoğrafı ve saha notunu paylaşın, yoklamayı alın, yapılacak işleri ekibinizle takip edin.' },
+  { icon: 'truck', role: 'Depo sorumlusu', title: 'Malzemenin izini tutun.', text: 'Girişleri, sevkiyatları ve iadeleri kaydedin. Hangi malzemenin geri beklendiğini görün.' },
+] as const
+
 export const START_STEPS = [
   { title: 'İhtiyacınızı konuşalım', text: 'Şantiyelerinizi ve ekibinizin çalışma şeklini anlatın. Ürünü birlikte değerlendirelim.' },
   { title: 'Paketinizi belirleyelim', text: 'Ekip büyüklüğünüz ve kullanacağınız modüller için uygun paketi seçelim.' },

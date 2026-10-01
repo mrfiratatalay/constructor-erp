@@ -7,8 +7,9 @@ import MarketingIcon from '@/shared/atoms/MarketingIcon.vue'
 
 <template>
   <ul class="product-points">
-    <li v-for="point in PRODUCT_POINTS" :key="point.title" class="product-points__item">
-      <span class="product-points__icon"><MarketingIcon :name="point.icon" /></span>
+    <li v-for="(point, index) in PRODUCT_POINTS" :key="point.title" class="product-points__item">
+      <div class="product-points__top"><span class="product-points__icon"><MarketingIcon :name="point.icon" /></span>
+        <span class="product-points__index">0{{ index + 1 }}</span></div>
       <h3>{{ point.title }}</h3>
       <p>{{ point.text }}</p>
     </li>
@@ -18,45 +19,47 @@ import MarketingIcon from '@/shared/atoms/MarketingIcon.vue'
 <style scoped>
 .product-points {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .product-points__item {
-  padding: var(--space-6);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid var(--mk-line, var(--border-soft));
+  border-radius: 16px;
   background: var(--surface);
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: border-color .2s;
 }
 
 .product-points__item:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border-color: var(--brand-tint-strong);
 }
+.product-points__top { display: flex; align-items: center; justify-content: space-between; }
+.product-points__index { color: var(--text-subtle); font-size: 11px; font-variant-numeric: tabular-nums; }
 
 .product-points__icon {
   display: inline-grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: var(--brand-tint);
   color: var(--brand-primary);
 }
 
 .product-points h3 {
-  margin: var(--space-4) 0 var(--space-2);
-  font-size: var(--text-md);
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 18px;
   font-weight: var(--weight-bold);
 }
 
 .product-points p {
   margin: 0;
-  color: var(--text-muted);
-  line-height: 1.6;
+  color: var(--mk-muted, var(--text-muted));
+  font-size: 14px;
+  line-height: 1.8;
 }
 </style>
