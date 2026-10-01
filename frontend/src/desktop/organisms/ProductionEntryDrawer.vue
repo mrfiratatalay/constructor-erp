@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
-import { ElMessage, ElMessageBox, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
 import { FileText, ImagePlus, Trash2 } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionItemView } from '@/core/api/generated/model'
 import { ENTRY_FILE_ACCEPT, ENTRY_FILE_LIMIT, entryFileProblem } from '@/core/production/entryFiles'
 import { barPercent, entryAmount, percentLabel, progressLine } from '@/core/production/productionFormat'
 import { useProductionEntry } from '@/core/production/useProductionEntry'
+import { confirmAction } from '@/desktop/confirmAction'
 import TradeIcon from '@/shared/atoms/TradeIcon.vue'
 
 /**
@@ -40,8 +41,7 @@ function onPicked(file: UploadFile) {
 }
 
 const confirmOverflow = (question: string) =>
-  ElMessageBox.confirm(question, 'Toplamı aşıyor', { confirmButtonText: 'Evet, kaydet', cancelButtonText: 'Vazgeç',
-    type: 'warning' }).then(() => true, () => false)
+  confirmAction({ title: 'Toplamı aşıyor', message: question, confirm: 'Evet, kaydet', danger: false })
 
 async function submit() {
   tried.value = true

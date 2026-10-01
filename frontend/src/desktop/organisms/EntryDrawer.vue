@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
 import type { RosterEntryView } from '@/core/api/generated/model'
 import { useCalendarDay } from '@/core/puantaj/useCalendarDay'
 import { useEntryMonth } from '@/core/puantaj/useEntryMonth'
 import { useRoster } from '@/core/puantaj/useRoster'
+import { confirmAction } from '@/desktop/confirmAction'
 import EntryCalendar from '@/desktop/molecules/EntryCalendar.vue'
 import EntryName from '@/desktop/molecules/EntryName.vue'
 import EntryTotals from '@/desktop/molecules/EntryTotals.vue'
@@ -27,9 +28,7 @@ watch([() => entryId, () => day], () => (day ? select(day) : reset()))
 
 async function archive(entry: RosterEntryView) {
   const message = 'Bugünden sonra listede görünmez; geçmiş günleri puantajda kalır.'
-  const confirmed = await ElMessageBox.confirm(message, `${entry.name} listeden çıkarılsın mı?`, {
-    confirmButtonText: 'Çıkar', cancelButtonText: 'Vazgeç', type: 'warning',
-  }).then(() => true, () => false)
+  const confirmed = await confirmAction({ title: `${entry.name} listeden çıkarılsın mı?`, message, confirm: 'Çıkar' })
   if (!confirmed) return
   await roster.archive(entry.id).then(() => emit('close'), (error) => ElMessage.error(errorMessage(error)))
 }

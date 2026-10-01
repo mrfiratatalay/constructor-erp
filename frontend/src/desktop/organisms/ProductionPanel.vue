@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Download, Plus } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionItemView } from '@/core/api/generated/model'
@@ -10,6 +10,7 @@ import { recentRows } from '@/core/production/productionBoard'
 import { canEnterProduction } from '@/core/production/productionPermissions'
 import { useProductionBoard } from '@/core/production/useProductionBoard'
 import { useProductionItemEditor } from '@/core/production/useProductionItemEditor'
+import { confirmAction } from '@/desktop/confirmAction'
 import ProductionFilters from '@/desktop/molecules/ProductionFilters.vue'
 import ProductionItemRow from '@/desktop/molecules/ProductionItemRow.vue'
 import ProductionSummary from '@/desktop/molecules/ProductionSummary.vue'
@@ -60,8 +61,8 @@ function updateFromDetail() {
 }
 
 async function remove(item: ProductionItemView) {
-  const agreed = await ElMessageBox.confirm('Girişi olmayan iş kalemi silinir; girişi olan silinmez.', `${item.name} silinsin mi?`,
-    { confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç', type: 'warning' }).then(() => true, () => false)
+  const message = 'Girişi olmayan iş kalemi silinir; girişi olan silinmez.'
+  const agreed = await confirmAction({ title: `${item.name} silinsin mi?`, message, confirm: 'Sil' })
   if (!agreed) return
   await editor.removeItem(item).then(() => ElMessage.success('İş kalemi silindi'), (error) => ElMessage.error(errorMessage(error)))
 }

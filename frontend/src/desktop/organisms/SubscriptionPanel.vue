@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { CalendarPlus } from 'lucide-vue-next'
 import type { SubscriptionView, TenantDetail } from '@/core/api/generated/model'
 import { errorMessage } from '@/core/api/errors'
@@ -9,6 +9,7 @@ import { useTenantActions } from '@/core/admin/useTenantActions'
 import { stateOf } from '@/core/billing/billingLabels'
 import { dayWithYear } from '@/core/format/dates'
 import { formatMoney } from '@/core/format/money'
+import { confirmAction } from '@/desktop/confirmAction'
 import ExtendSubscriptionDialog from '@/desktop/organisms/ExtendSubscriptionDialog.vue'
 
 /** Firmanın abonelik dönemleri: yeni dönem (uzat), dönemin paketini değiştir, askıya al / devam ettir / iptal. */
@@ -24,15 +25,15 @@ async function run(task: () => Promise<unknown>, done: string) {
     await task()
     ElMessage.success(done)
   } catch (error) {
-    if (error !== 'cancel' && error !== 'close') ElMessage.error(errorMessage(error))
+    ElMessage.error(errorMessage(error))
   }
 }
 
-const setStatus = (period: SubscriptionView, status: 'ACTIVE' | 'SUSPENDED' | 'CANCELLED', label: string) =>
-  run(async () => {
-    await ElMessageBox.confirm(`${period.planName} dönemi: ${label}?`, 'Abonelik', { confirmButtonText: label, cancelButtonText: 'Vazgeç' })
-    await changePeriodStatus(period.id, status)
-  }, `Dönem: ${label.toLocaleLowerCase('tr')}.`)
+async function setStatus(period: SubscriptionView, status: 'ACTIVE' | 'SUSPENDED' | 'CANCELLED', label: string) {
+  const message = `${period.planName} dönemi: ${label}?`
+  if (!(await confirmAction({ title: 'Abonelik', message, confirm: label, danger: status !== 'ACTIVE' }))) return
+  await run(() => changePeriodStatus(period.id, status), `Dönem: ${label.toLocaleLowerCase('tr')}.`)
+}
 </script>
 
 <template>
