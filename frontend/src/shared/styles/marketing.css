@@ -1,0 +1,25 @@
+/* Pazarlama yüzeyinin ölçeği uygulama ekranlarının yoğunluğunu değiştirmemeli. */
+.marketing-site {
+  --mk-ink: #15213d;
+  --mk-muted: #647084;
+  --mk-paper: #f7f9fc;
+  --mk-line: #e2e7ef;
+  --mk-dark: #101e3b;
+  --mk-yellow: var(--brand-signature);
+  --mk-width: 1280px;
+  --mk-gutter: clamp(20px, 4vw, 64px);
+  --mk-space: clamp(56px, 7vw, 104px);
+  color: var(--mk-ink);
+  background: var(--surface);
+  overflow-x: clip;
+}
+.marketing-container { width: 100%; max-width: var(--mk-width); margin-inline: auto; padding-inline: var(--mk-gutter); }
+.marketing-section { width: 100%; max-width: var(--mk-width); margin-inline: auto; padding: var(--mk-space) var(--mk-gutter); }
+.marketing-site a { text-underline-offset: 4px; }
+.marketing-site a:focus-visible,
+.marketing-site button:focus-visible { outline-offset: 4px; }
+.marketing-site .el-button,
+.marketing-site .van-button { font-weight: var(--weight-semibold); }
+.marketing-site .el-button--large { min-height: 48px; padding-inline: 22px; }
+.marketing-site [id] { scroll-margin-top: 92px; }
+.marketing-eyebrow { font-size: 11px; font-weight: var(--weight-bold); letter-spacing: .12em; text-transform: uppercase; }
