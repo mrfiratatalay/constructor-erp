@@ -41,6 +41,11 @@ export function useSalesRequest(plans: () => PublicPlanView[]) {
 
   const problem = ref<string | null>(null)
   const mutation = useSubmitSalesRequest()
+  // Uyarı açıkken alan düzeltilince uyarı yeniden değerlendirilir: sıradaki eksiği söyler ya da kalkar.
+  watch(form, () => {
+    if (problem.value) problem.value = problemOf(form)
+    if (mutation.isError.value) mutation.reset()
+  })
   const submit = () => {
     problem.value = problemOf(form)
     if (problem.value) return
