@@ -54,6 +54,11 @@ public class AppUser {
         return passwordHash != null;
     }
 
+    /** Firmanın bağlantısıyla gelen saha hesabı: şifresi de platform rolü de yoktur, kendini bağlantıyla tanıtır. */
+    public boolean isLinkOnly() {
+        return passwordHash == null && platformRole == null;
+    }
+
     public boolean isPlatformAdmin() {
         return platformRole == PlatformRole.SUPER_ADMIN;
     }

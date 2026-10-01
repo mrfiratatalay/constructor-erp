@@ -42,7 +42,11 @@ public class InviteService {
         return new InviteLink(properties.baseUrl() + "/davet/" + token, expiresAt);
     }
 
-    /** Link açıldığında kişi hâlâ o firmada olmalı: çıkarıldıktan sonra açılan eski link içeri almaz. */
+    /**
+     * Link açıldığında kişi hâlâ o firmada olmalı: çıkarıldıktan sonra açılan eski link içeri almaz. Kimliğinin tamamı da
+     * hâlâ o firmada olmalı (TeamService.issueLoginLink): link üretildikten sonra şifre ya da başka bir firma kazanan
+     * hesap linkle devredilmez.
+     */
     @Transactional
     public SignIn accept(String token) {
         Instant now = clock.instant();
@@ -53,7 +57,9 @@ public class InviteService {
         if (workspaces.active(invite.getCompanyId(), invite.getUserId()).isEmpty()) {
             throw ApiException.badRequest(INVALID_LINK);
         }
-        AppUser user = users.findById(invite.getUserId()).orElseThrow(() -> ApiException.badRequest(INVALID_LINK));
+        AppUser user = users.findById(invite.getUserId())
+            .filter(found -> workspaces.isConfinedTo(found, invite.getCompanyId()))
+            .orElseThrow(() -> ApiException.badRequest(INVALID_LINK));
         return new SignIn(user, invite.getCompanyId());
     }
 }

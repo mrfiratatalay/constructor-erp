@@ -14,6 +14,7 @@ import com.atalay.santiye.tenant.Member;
 import com.atalay.santiye.tenant.Members;
 import com.atalay.santiye.tenant.Membership;
 import com.atalay.santiye.tenant.MembershipRepository;
+import com.atalay.santiye.tenant.Workspaces;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
@@ -38,10 +39,11 @@ public class TeamService {
     private final SessionService sessions;
     private final SiteEvents events;
     private final PlanLimits limits;
+    private final Workspaces workspaces;
     private final Clock clock;
 
     TeamService(UserRepository users, MembershipRepository memberships, Members members, InviteService invites,
-        SessionService sessions, SiteEvents events, PlanLimits limits, Clock clock) {
+        SessionService sessions, SiteEvents events, PlanLimits limits, Workspaces workspaces, Clock clock) {
         this.users = users;
         this.memberships = memberships;
         this.members = members;
@@ -49,6 +51,7 @@ public class TeamService {
         this.sessions = sessions;
         this.events = events;
         this.limits = limits;
+        this.workspaces = workspaces;
         this.clock = clock;
     }
 
@@ -117,11 +120,20 @@ public class TeamService {
         return phone;
     }
 
+    /**
+     * Giriş linki kimliği olduğu gibi devreder: yalnızca kimliğinin tamamı bu firmada olan saha hesabına verilir.
+     * Şifreyle giren biri kendi şifresiyle girer; ona link üretilebilseydi bu firmanın patronu onun yerine oturum açıp
+     * onun başka firmalarına ya da platform yönetimine geçebilirdi.
+     */
     @Transactional
     public InviteLink issueLoginLink(CurrentUser owner, UUID memberId) {
         Member member = findMember(owner, memberId);
         if (!member.isActive()) {
             throw ApiException.badRequest("Firmadan çıkarılmış bir kişiye giriş linki gönderilemez.");
+        }
+        if (!workspaces.isConfinedTo(member.user(), owner.companyId())) {
+            throw ApiException.badRequest("Bu kişi kendi e-posta ve şifresiyle giriyor; giriş linki yalnızca firmanın "
+                + "bağlantısıyla katılan ekibe gönderilir.");
         }
         return invites.issue(member.user(), owner.companyId());
     }

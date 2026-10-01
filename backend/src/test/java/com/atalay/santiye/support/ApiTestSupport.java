@@ -83,7 +83,8 @@ public abstract class ApiTestSupport {
         return signedInAs(owner, fullName, "WAREHOUSE");
     }
 
-    private Cookie signedInAs(Cookie owner, String fullName, String role) {
+    /** Firmanın bağlantısıyla gelip patronun verilen role aldığı biri (OWNER verilirse ikinci bir patron). */
+    protected Cookie signedInAs(Cookie owner, String fullName, String role) {
         String phone = uniquePhone();
         Cookie member = sessionCookieOf(join(joinToken(owner), null, fullName, phone));
         String promotion = "{\"fullName\": \"%s\", \"phone\": \"%s\", \"role\": \"%s\", \"active\": true}"

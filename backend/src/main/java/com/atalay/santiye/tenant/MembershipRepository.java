@@ -17,6 +17,9 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
 
     boolean existsByCompanyIdAndRoleAndActiveTrue(UUID companyId, UserRole role);
 
+    /** Kişinin bu firma dışında (aktif ya da firmadan çıkarılmış) bir üyeliği var mı. */
+    boolean existsByUserIdAndCompanyIdNot(UUID userId, UUID companyId);
+
     /** Firmanın kişileri adlarıyla birlikte, tek sorguda: kişi listesi, katılımcılar, puantaj buradan okur. */
     @Query("""
         select new com.atalay.santiye.tenant.Member(u, m) from Membership m join AppUser u on u.id = m.userId
