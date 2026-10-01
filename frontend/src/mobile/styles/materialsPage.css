@@ -24,4 +24,18 @@
 .materials__list-heading > span { color: var(--text-muted); font-size: 11px; white-space: nowrap; }
 .materials__list { display: grid; gap: var(--space-3); min-width: 0; }
 .materials__loading { padding: var(--space-5); border-radius: var(--radius-md); background: var(--surface); }
-.materials__pagination { margin-top: var(--space-2); }
+/* Vant'ın esneyen yön düğmeleri geniş mobil sütunda sayfalama alanını gereksiz büyütüyordu. */
+.materials__pagination {
+  --van-pagination-height: 44px;
+  --van-pagination-item-width: 44px;
+  --van-pagination-font-size: var(--text-sm);
+  justify-self: center;
+  max-width: 100%;
+  margin-top: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+.materials__pagination :deep(.van-pagination__items) { justify-content: center; }
+.materials__pagination :deep(.van-pagination__item) { flex: 0 0 auto; }
+.materials__pagination :deep(.van-pagination__item--prev),
+.materials__pagination :deep(.van-pagination__item--next) { padding-inline: var(--space-3); }
