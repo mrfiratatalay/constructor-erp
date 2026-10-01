@@ -1,101 +1,60 @@
 <script setup lang="ts">
-import { ClipboardCheck, HardHat, Layers, Package } from 'lucide-vue-next'
+import { nextTick, ref, useId } from 'vue'
+import { Boxes, ClipboardCheck, HardHat } from 'lucide-vue-next'
+import { PREVIEW_TABS, type PreviewView } from '@/core/marketing/productPreview'
 import ProductMark from '@/shared/atoms/ProductMark.vue'
 import PreviewBoard from '@/shared/molecules/PreviewBoard.vue'
+import PreviewAttendance from '@/shared/molecules/PreviewAttendance.vue'
+import PreviewMaterials from '@/shared/molecules/PreviewMaterials.vue'
 
-/**
- * Tanıtım sayfasındaki ürün önizlemesi: gerçek ekranın sadeleştirilmiş çizimi. Ekran görüntüsü yerine çizim, çünkü
- * veriye bağlı değildir ve her ekranda keskin görünür. Dar ekranda yan menü gizlenir.
- */
-const NAV = [
-  { icon: HardHat, label: 'Şantiyeler', active: true },
-  { icon: ClipboardCheck, label: 'Yoklama' },
-  { icon: Package, label: 'Malzemeler' },
-  { icon: Layers, label: 'İlerleme' },
-]
+const selected = ref<PreviewView>('field')
+const id = useId()
+const icons = { field: HardHat, attendance: ClipboardCheck, materials: Boxes }
+
+function navigateTabs(event: KeyboardEvent) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+  event.preventDefault()
+  const current = PREVIEW_TABS.findIndex((tab) => tab.value === selected.value)
+  const offset = event.key === 'ArrowRight' ? 1 : -1
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? PREVIEW_TABS.length - 1
+    : (current + offset + PREVIEW_TABS.length) % PREVIEW_TABS.length
+  selected.value = PREVIEW_TABS[next]!.value
+  void nextTick(() => document.getElementById(`${id}-${selected.value}`)?.focus())
+}
 </script>
 
 <template>
-  <div class="preview" role="img" aria-label="Constructor ERP şantiye ekranı önizlemesi">
-    <div class="preview__bar"><i /><i /><i /><span>app.constructor-erp.com/santiyeler</span></div>
-    <div class="preview__body">
-      <nav class="preview__nav blueprint">
-        <ProductMark :size="28" surface="dark" />
-        <span v-for="item in NAV" :key="item.label" :class="{ 'is-active': item.active }">
-          <component :is="item.icon" :size="15" /> {{ item.label }}
-        </span>
-      </nav>
-      <PreviewBoard />
+  <div class="product-preview">
+    <header class="product-preview__bar">
+      <ProductMark :size="24" /><strong>Constructor ERP</strong><span>Örnek görünüm</span>
+    </header>
+    <div class="product-preview__tabs" role="tablist" aria-label="Ürün ekranları" @keydown="navigateTabs">
+      <button v-for="tab in PREVIEW_TABS" :id="`${id}-${tab.value}`" :key="tab.value" type="button" role="tab"
+        :aria-selected="selected === tab.value" :aria-controls="`${id}-panel`" :tabindex="selected === tab.value ? 0 : -1"
+        :class="{ 'is-active': selected === tab.value }" @click="selected = tab.value">
+        <component :is="icons[tab.value]" :size="15" aria-hidden="true" />{{ tab.label }}
+      </button>
     </div>
+    <div :id="`${id}-panel`" class="product-preview__content" role="tabpanel" :aria-labelledby="`${id}-${selected}`" tabindex="0">
+      <PreviewBoard v-if="selected === 'field'" />
+      <PreviewAttendance v-else-if="selected === 'attendance'" />
+      <PreviewMaterials v-else />
+    </div>
+    <footer class="product-preview__footer"><span>Telefon ve bilgisayarda aynı çalışma alanı</span><span>Örnek veriler</span></footer>
   </div>
 </template>
 
 <style scoped>
-.preview {
-  overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: var(--radius-lg);
-  background: var(--canvas);
-  box-shadow: var(--shadow-deep);
-  color: var(--text-strong);
-  font-size: var(--text-xs);
-  text-align: left;
-}
-
-.preview__bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.preview__bar i {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border-strong);
-}
-
-.preview__bar span {
-  margin-left: var(--space-3);
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: var(--surface-muted);
-  color: var(--text-subtle);
-}
-
-.preview__body {
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  min-height: 300px;
-}
-
-.preview__nav {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4) var(--space-3);
-  color: rgb(255 255 255 / 0.75);
-}
-
-.preview__nav span {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 7px 8px;
-  border-radius: 8px;
-}
-
-.preview__nav .is-active {
-  background: var(--brand-signature);
-  color: var(--brand-deep);
-  font-weight: var(--weight-bold);
-}
-
-@media (width < 720px) {
-  .preview__body { grid-template-columns: 1fr; }
-  .preview__nav { display: none; }
-}
+.product-preview { min-width: 0; overflow: hidden; border: 1px solid rgb(255 255 255 / .22); border-radius: 18px; background: var(--surface); box-shadow: 0 28px 70px rgb(0 0 0 / .24); color: var(--text-strong); text-align: left; }
+.product-preview__bar { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--border-soft); }
+.product-preview__bar strong { font-size: 12px; letter-spacing: -.02em; }
+.product-preview__bar > span { margin-left: auto; padding: 3px 6px; background: var(--surface-muted); border-radius: 5px; color: var(--text-muted); font-size: 9px; white-space: nowrap; }
+.product-preview__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 8px; background: var(--surface-muted); }
+.product-preview__tabs button { display: flex; justify-content: center; align-items: center; gap: 5px; min-height: 40px; padding: 6px 3px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--text-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.product-preview__tabs button svg { flex: none; }
+.product-preview__tabs button:hover { color: var(--brand-primary); }
+.product-preview__tabs .is-active { border-color: var(--border-soft); background: var(--surface); color: var(--brand-primary); box-shadow: var(--shadow-sm); font-weight: var(--weight-semibold); }
+.product-preview__content { min-height: 358px; padding: 20px 18px; }
+.product-preview__content:focus-visible { outline-offset: -4px; }
+.product-preview__footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 12px 16px; border-top: 1px solid var(--border-soft); color: var(--text-muted); background: var(--surface-muted); font-size: 9px; }
 </style>
