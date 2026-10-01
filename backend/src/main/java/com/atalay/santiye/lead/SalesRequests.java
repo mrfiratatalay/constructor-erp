@@ -3,6 +3,7 @@ package com.atalay.santiye.lead;
 import com.atalay.santiye.audit.AuditAction;
 import com.atalay.santiye.audit.AuditEvent;
 import com.atalay.santiye.audit.PlatformAudit;
+import com.atalay.santiye.billing.PublicPlans;
 import com.atalay.santiye.common.error.ApiException;
 import java.time.Clock;
 import java.util.UUID;
@@ -14,18 +15,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class SalesRequests {
 
     private final SalesRequestRepository requests;
+    private final PublicPlans plans;
     private final PlatformAudit audit;
     private final Clock clock;
 
-    SalesRequests(SalesRequestRepository requests, PlatformAudit audit, Clock clock) {
+    SalesRequests(SalesRequestRepository requests, PublicPlans plans, PlatformAudit audit, Clock clock) {
         this.requests = requests;
+        this.plans = plans;
         this.audit = audit;
         this.clock = clock;
     }
 
+    /**
+     * Form herkese açıktır: seçilen paket sitede gösterilenlerden biri değilse (uydurulmuş ya da gizli bir kimlik)
+     * başvuru paketsiz kaydedilir. Kimlik doğrulanmadan yazılsaydı var olmayan paket veritabanının yabancı anahtarına
+     * takılıp oturumsuz istekte sunucu hatası (500) dönerdi.
+     */
     @Transactional
     public SalesRequest submit(SalesRequestForm form) {
-        return requests.save(new SalesRequest(form, clock.instant()));
+        boolean offered = form.planId() == null || plans.isOnSale(form.planId());
+        return requests.save(new SalesRequest(offered ? form : form.withoutPlan(), clock.instant()));
     }
 
     @Transactional

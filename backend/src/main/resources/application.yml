@@ -23,6 +23,16 @@ spring:
     problemdetails:
       enabled: true
 
+  # JSON istek gövdesi küçüktür: en uzun metin alanı 4.000 karakter (gönderi), en büyük gövde birkaç on KB (yoklama
+  # listesi). Sınır olmasa oturumsuz uçlara (giriş, başvuru) tek alanda 20 MB'lık metinler gönderilip, aynı anda açılan
+  # isteklerle sunucunun belleği tüketilebilirdi. Dosyalar multipart gelir, bu sınıra girmez.
+  jackson:
+    factory:
+      constraints:
+        read:
+          max-document-length: 1048576
+          max-string-length: 65536
+
   servlet:
     # 60 sn'lik telefon videosu 150 MB'a çıkabilir; birkaç fotoğrafla birlikte tek istekte gelir.
     multipart:
@@ -57,6 +67,10 @@ app:
   push:
     # Web Push servisleri (Apple, Google) sorun olursa bu adrese ulaşır.
     subject: ${PUSH_SUBJECT:mailto:destek@constructor-erp.local}
+  # Backend bir vekilin (Vercel) arkasındayken yalnızca bu sırrı taşıyan isteği kabul eder ve kişinin adresini vekilden
+  # okur (common/web/ProxyGate). Boşsa kapı kurulmaz: Docker ve VPS'te istek nginx'ten gelir.
+  proxy:
+    secret: ${PROXY_SECRET:}
   # Constructor ERP ekibinin ilk süper yöneticisi (platform yönetimi); yalnızca hiç süper yönetici yokken açılır.
   platform:
     admin-name: ${PLATFORM_ADMIN_NAME:}

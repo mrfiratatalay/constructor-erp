@@ -15,7 +15,8 @@ services:
       POSTGRES_DB: santiye
       POSTGRES_USER: ${DB_USERNAME:-santiye}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-santiye} # yalnızca local; production şifresi ortam değişkeninden gelir
-    # Yalnızca bu makineye açık: varsayılan şifreli veritabanı yerel ağdaki herkese görünmesin.
+    # Yalnızca bu bilgisayardan (127.0.0.1) erişilir: kullanıcı süper kullanıcıdır ve şifresi herkesçe bilinir. Docker
+    # yayınladığı portu güvenlik duvarının (ufw) önüne koyar; adres yazılmazsa veritabanı bütün ağa açılırdı.
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
@@ -54,8 +55,8 @@ services:
       APP_PLATFORM_ADMIN_EMAIL: ${PLATFORM_ADMIN_EMAIL:-admin@constructor-erp.local}
       APP_PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-admin123}
       TZ: Europe/Istanbul
-    # Yalnızca bu makineye açık (Swagger, Vite geliştirme sunucusu): dışarıdan gelen istek arayüzün nginx'inden geçer,
-    # o da X-Forwarded-For'u gerçek adresle yazar. Doğrudan açık olsaydı başlık nginx'siz taklit edilebilirdi.
+    # Dışarıdan herkes arayüzün (web) içinden gelir; API yalnızca bu bilgisayardan doğrudan açılır (API dokümanı). Ağa
+    # açık olsaydı nginx atlanır, istemci kendi yazdığı X-Forwarded-For ile giriş deneme sınırını aşabilirdi.
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     volumes:

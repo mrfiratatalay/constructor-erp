@@ -31,7 +31,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionService sessions, SessionCookies cookies,
         WorkspaceAccess access) throws Exception {
         return http
-            // CSRF token'ı yerine SameSite=Strict çerez kullanıyoruz (bkz. SessionCookies).
+            // CSRF token'ı yerine SameSite=Strict çerez ve köken denetimi (bkz. SessionCookies, CrossOriginWriteFilter).
             .csrf(AbstractHttpConfigurer::disable)
             // Spring'in kendi oturumu yok; kimliği her istekte kendi çerezimizden okuyoruz.
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,6 +53,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasAuthority(SessionAuthenticationFilter.WORKSPACE)
                 .anyRequest().denyAll())
             .addFilterBefore(new SessionAuthenticationFilter(sessions, cookies, access), UsernamePasswordAuthenticationFilter.class)
+            // SameSite çerezinin yetmediği yer: aynı alan adının başka bir alt adresinden gelen yazma isteği.
+            .addFilterBefore(new CrossOriginWriteFilter(), SessionAuthenticationFilter.class)
             // Firma bağlamı (RLS) kimlik doğrulandıktan sonra, yalnızca oturumdan kurulur.
             .addFilterAfter(new TenantContextFilter(SecurityConfig::companyOf), SessionAuthenticationFilter.class)
             .build();
