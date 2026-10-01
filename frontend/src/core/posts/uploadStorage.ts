@@ -13,6 +13,8 @@ export interface QueuedPost {
   replyToId?: string | null
   /** Saha sekmesinden yazıldı; eski sürümde kuyruğa girenlerde yoktur. */
   fieldUpdate?: boolean
+  /** Yazan kişi: gönderi yalnızca onun oturumunda gider. Eski sürümde kuyruğa girenlerde yoktur. */
+  authorId?: string
 }
 
 // Adı ürünün eski adını taşır ve bilerek değişmez: değişirse telefonlarda gönderilmeyi bekleyen gönderiler kaybolur.
