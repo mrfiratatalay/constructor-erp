@@ -67,6 +67,10 @@ app:
   push:
     # Web Push servisleri (Apple, Google) sorun olursa bu adrese ulaşır.
     subject: ${PUSH_SUBJECT:mailto:destek@constructor-erp.local}
+  # Backend bir vekilin (Vercel) arkasındayken yalnızca bu sırrı taşıyan isteği kabul eder ve kişinin adresini vekilden
+  # okur (common/web/ProxyGate). Boşsa kapı kurulmaz: Docker ve VPS'te istek nginx'ten gelir.
+  proxy:
+    secret: ${PROXY_SECRET:}
   # Constructor ERP ekibinin ilk süper yöneticisi (platform yönetimi); yalnızca hiç süper yönetici yokken açılır.
   platform:
     admin-name: ${PLATFORM_ADMIN_NAME:}
