@@ -51,6 +51,7 @@ git clone <depo-adresi> && cd atalay-santiye
 
 Ayarlar (portlar, ilk firma, platform yöneticisi, şifreler) `.env` ile değiştirilir: `cp .env.example .env`.
 Dosya yoksa `.env.example`'daki değerlerin aynısı varsayılan olarak geçerlidir.
+Ağa yalnızca arayüz (5173) açılır; veritabanı (5432) ve API (8080) yalnızca bu bilgisayardan erişilir.
 
 Windows PowerShell'de betikler yerine doğrudan:
 
