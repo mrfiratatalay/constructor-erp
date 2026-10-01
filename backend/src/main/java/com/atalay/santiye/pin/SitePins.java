@@ -37,7 +37,7 @@ public class SitePins {
         if (pins.findByUser(user.userId()).size() >= MAX_PINS) {
             throw ApiException.conflict("En fazla " + MAX_PINS + " şantiye sabitlenebilir.");
         }
-        pins.save(new SitePin(id, clock.instant()));
+        pins.insertIfAbsent(user.userId(), siteId, clock.instant());
     }
 
     @Transactional
