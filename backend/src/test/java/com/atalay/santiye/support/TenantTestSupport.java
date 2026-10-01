@@ -21,23 +21,35 @@ public abstract class TenantTestSupport extends ApiTestSupport {
     protected record Tenant(String companyId, Cookie owner) {
     }
 
+    /** Platformun açtığı, kurulumu henüz yapılmamış firma ve kurulum linkinin anahtarı. */
+    protected record OpenedTenant(String companyId, String setupToken) {
+    }
+
     protected MvcTestResult login(String email, String password) {
         return postJson("/api/auth/login", null,
             "{\"email\": \"%s\", \"password\": \"%s\"}".formatted(email, password));
     }
 
-    protected Tenant createTenantOwnedBy(String email, String password) {
+    protected OpenedTenant openTenant() {
         Cookie admin = sessionCookieOf(login(ADMIN_EMAIL, ADMIN_PASSWORD));
         String tenant = "{\"name\": \"Firma %s\", \"planId\": \"%s\", \"months\": 12}"
             .formatted(UUID.randomUUID(), professionalPlan(admin));
         MvcTestResult created = postJson("/api/platform/tenants", admin, tenant);
         assertThat(created).hasStatus(201);
         String url = read(contentOf(created), "$.invite.url");
+        return new OpenedTenant(read(contentOf(created), "$.companyId"), url.substring(url.lastIndexOf('/') + 1));
+    }
+
+    protected MvcTestResult completeSetup(String setupToken, String email, String password) {
         String setup = """
             {"company": {"name": "Kurulan Firma"},
              "owner": {"fullName": "Çok Firmalı Patron", "email": "%s", "password": "%s"}}""".formatted(email, password);
-        Cookie owner = sessionCookieOf(postJson("/api/setup/" + url.substring(url.lastIndexOf('/') + 1), null, setup));
-        return new Tenant(read(contentOf(created), "$.companyId"), owner);
+        return postJson("/api/setup/" + setupToken, null, setup);
+    }
+
+    protected Tenant createTenantOwnedBy(String email, String password) {
+        OpenedTenant opened = openTenant();
+        return new Tenant(opened.companyId(), sessionCookieOf(completeSetup(opened.setupToken(), email, password)));
     }
 
     protected static String uniqueEmail() {
