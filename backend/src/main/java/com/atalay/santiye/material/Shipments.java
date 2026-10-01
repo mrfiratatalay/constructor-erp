@@ -60,8 +60,23 @@ public class Shipments {
         Shipment shipment = new Shipment(request.id(), user.companyId(), route, user.userId(), clock.instant());
         LocalDate day = request.day() == null ? LocalDate.now(clock) : request.day();
         shipment.describe(day, MaterialTexts.tidy(request.description()), expectsReturn(route, request),
-            request.returnOfId());
+            returnedShipment(user, request.returnOfId()));
         return shipment;
+    }
+
+    /**
+     * İade kaydı yalnızca bu firmanın dışarı verilen bir sevkiyatına bağlanır. Kimlik doğrulanmadan yazılsaydı başka
+     * firmanın sevkiyatına bağlanabilirdi: veritabanının yabancı anahtar denetimi firma ayrımına (RLS) bakmaz.
+     */
+    private UUID returnedShipment(CurrentUser user, UUID returnOfId) {
+        if (returnOfId == null) {
+            return null;
+        }
+        Shipment out = require(user, returnOfId);
+        if (out.getType() != ShipmentType.OUTBOUND) {
+            throw ApiException.badRequest("İade yalnızca dışarı verilen bir sevkiyata bağlanır.");
+        }
+        return out.getId();
     }
 
     /** "Geri gelecek mi?" yalnızca dışarı verilende sorulur; kendi şantiyemize giden mal zaten bizimdir. */
