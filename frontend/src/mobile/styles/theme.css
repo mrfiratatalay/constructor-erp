@@ -118,3 +118,19 @@ html .van-empty__image:has(> .lucide, > .van-icon) {
   height: auto;
   color: var(--text-subtle);
 }
+
+/*
+ * Vant toast'ı kelimeyi ortasından böler (break-all) ve ikonlu toast 88 px'te sabittir: sunucunun uzun hata cümlesi
+ * ("Paketinizin aktif şantiye sınırı doldu…") harf harf kırılıp okunmuyordu. Kelime bölünmez; uzun mesajda kutu
+ * içeriği kadar (en çok ekranın %70'i) genişler, kısa mesajda kare kalır.
+ */
+html .van-toast {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+html .van-toast--fail,
+html .van-toast--success {
+  width: fit-content;
+  min-width: var(--van-toast-default-width);
+}
