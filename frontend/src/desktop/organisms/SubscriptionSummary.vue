@@ -6,6 +6,7 @@ import { useCompanySubscription } from '@/core/tenant/useCompanySubscription'
 
 /** Patronun abonelik özeti: paket, dönem, kullanım ve paketteki modüller. Değiştirmek Constructor ERP ekibinin işidir. */
 const { subscription, usage, state } = useCompanySubscription()
+const PROGRESS_STATUS = { full: 'exception', near: 'warning', ok: undefined } as const
 </script>
 
 <template>
@@ -27,8 +28,8 @@ const { subscription, usage, state } = useCompanySubscription()
     <div class="subscription__usage">
       <div v-for="item in usage" :key="item.label">
         <span>{{ item.label }} <b>{{ item.text }}</b></span>
-        <el-progress :percentage="item.percent" :show-text="false" :stroke-width="8"
-          :status="item.percent >= 100 ? 'exception' : item.percent >= 80 ? 'warning' : undefined" />
+        <el-progress v-if="item.limited" :percentage="item.percent" :show-text="false" :stroke-width="8"
+          :status="PROGRESS_STATUS[item.level]" />
       </div>
     </div>
     <el-divider content-position="left">Paketinizdeki modüller</el-divider>
