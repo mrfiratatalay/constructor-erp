@@ -24,7 +24,8 @@ const year = new Date().getFullYear()
         </nav>
         <div class="marketing-top__actions">
           <RouterLink :to="{ name: 'login' }" class="marketing-top__login">Giriş yap</RouterLink>
-          <RouterLink :to="{ name: 'apply' }"><el-button type="primary" class="marketing-top__cta">
+          <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom><el-button tag="a" :href="href"
+            type="primary" class="marketing-top__cta" @click="navigate">
             Tanıtım isteyin<ArrowRight :size="15" aria-hidden="true" />
           </el-button></RouterLink>
         </div>

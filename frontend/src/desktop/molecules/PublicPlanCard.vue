@@ -25,8 +25,9 @@ const { plan } = defineProps<{ plan: PublicPlanView }>()
       </li>
     </ul>
     <p v-else class="public-plan__empty">Paket kapsamını tanıtım görüşmesinde birlikte değerlendirelim.</p>
-    <RouterLink :to="{ name: 'apply', query: { paket: plan.code } }" class="public-plan__link">
-      <el-button :type="plan.highlighted ? 'primary' : 'default'" size="large" class="public-plan__cta">
+    <RouterLink :to="{ name: 'apply', query: { paket: plan.code } }" custom v-slot="{ href, navigate }">
+      <el-button tag="a" :href="href" :type="plan.highlighted ? 'primary' : 'default'" size="large"
+        class="public-plan__link public-plan__cta" @click="navigate">
         {{ plan.monthlyPrice == null ? 'Teklif isteyin' : 'Bu paketi seçin' }}<ArrowRight :size="16" aria-hidden="true" />
       </el-button>
     </RouterLink>
@@ -53,7 +54,7 @@ const { plan } = defineProps<{ plan: PublicPlanView }>()
 .public-plan__features li.public-plan__feature--off { color: var(--mk-muted); }
 .public-plan__feature--off svg { opacity: .5; }
 .public-plan__empty { flex: 1; margin: 24px 0; padding-top: 24px; border-top: 1px solid var(--mk-line); color: var(--mk-muted); font-size: 13px; line-height: 1.7; }
-.public-plan__link { display: block; margin-top: auto; text-decoration: none; }
+.public-plan__link { display: flex; flex: none; margin-top: auto; text-decoration: none; }
 .public-plan__cta { width: 100%; height: 46px; border-radius: 10px; font-size: 13px; font-weight: var(--weight-semibold); }
 .public-plan__cta :deep(span) { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
 .public-plan--highlighted .public-plan__cta { --el-button-bg-color: var(--mk-ink); --el-button-border-color: var(--mk-ink); --el-button-hover-bg-color: var(--brand-deep); --el-button-hover-border-color: var(--brand-deep); --el-button-active-bg-color: var(--mk-dark); --el-button-active-border-color: var(--mk-dark); }

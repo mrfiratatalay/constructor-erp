@@ -15,7 +15,9 @@ const { plans, isLoading, isError, refetch } = usePublicPlans()
       <template #image><PackageSearch :size="40" aria-hidden="true" /></template>
       <div class="plan-grid__state-actions">
         <el-button @click="refetch()">Yeniden deneyin</el-button>
-        <RouterLink :to="{ name: 'apply' }"><el-button type="primary">Tanıtım isteyin</el-button></RouterLink>
+        <RouterLink :to="{ name: 'apply' }" custom v-slot="{ href, navigate }">
+          <el-button tag="a" :href="href" type="primary" @click="navigate">Tanıtım isteyin</el-button>
+        </RouterLink>
       </div>
     </el-empty>
   </div>
@@ -23,7 +25,9 @@ const { plans, isLoading, isError, refetch } = usePublicPlans()
     <el-empty description="Henüz yayınlanmış paket yok." :image-size="64">
       <template #image><PackageSearch :size="40" aria-hidden="true" /></template>
       <p class="plan-grid__empty-note">Firmanıza uygun seçenekleri birlikte değerlendirebiliriz.</p>
-      <RouterLink :to="{ name: 'apply' }"><el-button type="primary">Tanıtım isteyin</el-button></RouterLink>
+      <RouterLink :to="{ name: 'apply' }" custom v-slot="{ href, navigate }">
+        <el-button tag="a" :href="href" type="primary" @click="navigate">Tanıtım isteyin</el-button>
+      </RouterLink>
     </el-empty>
   </div>
   <div v-else class="plan-grid">
@@ -38,6 +42,7 @@ const { plans, isLoading, isError, refetch } = usePublicPlans()
 .plan-grid__state :deep(.el-empty__image) { display: grid; place-items: center; color: var(--mk-muted); }
 .plan-grid__state :deep(.el-empty__description p) { color: var(--mk-muted); font-size: 14px; }
 .plan-grid__state-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.plan-grid__state-actions :deep(.el-button + .el-button) { margin-left: 0; }
 .plan-grid__state-actions a { text-decoration: none; }
 .plan-grid__empty-note { margin: 0 0 20px; color: var(--mk-muted); font-size: 13px; line-height: 1.7; }
 </style>

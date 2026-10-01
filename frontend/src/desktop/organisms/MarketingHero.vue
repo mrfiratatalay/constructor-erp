@@ -14,11 +14,11 @@ const PROMISES = ['Tarayıcıda çalışır', 'Telefon ve bilgisayarda', 'Firman
         <p>Sahadan güncellemeler, yoklama, malzeme hareketleri ve işin ilerlemesi aynı yerde.
           Ekibiniz telefondan kaydeder, siz ofisten takip edersiniz.</p>
         <div class="hero__actions">
-          <RouterLink :to="{ name: 'apply' }">
-            <el-button type="primary" size="large" class="hero__primary">Tanıtım isteyin<ArrowRight :size="17" aria-hidden="true" /></el-button>
+          <RouterLink :to="{ name: 'apply' }" custom v-slot="{ href, navigate }">
+            <el-button tag="a" :href="href" type="primary" size="large" class="hero__primary" @click="navigate">Tanıtım isteyin<ArrowRight :size="17" aria-hidden="true" /></el-button>
           </RouterLink>
-          <RouterLink :to="{ name: 'landing', hash: '#ozellikler' }">
-            <el-button size="large" plain class="hero__secondary">Ürünü keşfedin</el-button>
+          <RouterLink :to="{ name: 'landing', hash: '#ozellikler' }" custom v-slot="{ href, navigate }">
+            <el-button tag="a" :href="href" size="large" plain class="hero__secondary" @click="navigate">Ürünü keşfedin</el-button>
           </RouterLink>
         </div>
         <ul class="hero__promises">
@@ -50,6 +50,7 @@ const PROMISES = ['Tarayıcıda çalışır', 'Telefon ve bilgisayarda', 'Firman
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
 .hero__actions a { text-decoration: none; }
 .hero__actions :deep(.el-button) { height: 50px; padding-inline: 24px; border-radius: 10px; font-size: 14px; font-weight: var(--weight-semibold); }
+.hero__actions :deep(.el-button + .el-button) { margin-left: 0; }
 .hero__primary {
   --el-button-bg-color: var(--mk-yellow);
   --el-button-border-color: var(--mk-yellow);

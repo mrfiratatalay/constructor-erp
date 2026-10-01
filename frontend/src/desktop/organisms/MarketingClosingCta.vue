@@ -8,8 +8,8 @@ import { ArrowRight } from 'lucide-vue-next'
       <h2>Bir sonraki iş gününe daha net başlayın.</h2>
       <p>Constructor ERP’yi firmanızın iş akışı üzerinden birlikte değerlendirelim.</p>
       <div class="marketing-closing__actions">
-        <RouterLink :to="{ name: 'apply' }">
-          <el-button type="primary" size="large" class="marketing-closing__primary">
+        <RouterLink :to="{ name: 'apply' }" custom v-slot="{ href, navigate }">
+          <el-button tag="a" :href="href" type="primary" size="large" class="marketing-closing__primary" @click="navigate">
             Tanıtım isteyin<ArrowRight :size="17" aria-hidden="true" />
           </el-button>
         </RouterLink>
