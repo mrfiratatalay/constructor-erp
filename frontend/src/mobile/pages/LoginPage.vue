@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
 const email = ref('')
 const password = ref('')
-const { login, isPending, errorText } = usePasswordLogin()
+const { login, isPending, errorText, clearError } = usePasswordLogin()
+watch([email, password], clearError)
 const devAccount = devLogin()
 
 function fillDevAccount() {
@@ -25,9 +26,10 @@ function fillDevAccount() {
         <van-field v-model="email" name="email" label="E-posta" type="email" autocomplete="username"
           placeholder="ornek@firma.com" :rules="[{ required: true, message: 'E-posta gerekli' }]" />
         <van-field v-model="password" name="password" label="Şifre" type="password" autocomplete="current-password"
-          placeholder="••••••••" :rules="[{ required: true, message: 'Şifre gerekli' }]" />
+          :rules="[{ required: true, message: 'Şifre gerekli' }]" />
       </van-cell-group>
-      <van-notice-bar v-if="errorText" type="danger" :text="errorText" wrapable />
+      <van-notice-bar v-if="errorText" left-icon="warning-o" color="var(--status-danger)"
+        background="var(--status-danger-bg)" :text="errorText" wrapable />
       <van-button type="primary" native-type="submit" block round size="large" :loading="isPending">
         Giriş yap
       </van-button>
