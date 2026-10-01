@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import MarketingClosingCta from '@/mobile/organisms/MarketingClosingCta.vue'
 import MarketingFaq from '@/mobile/organisms/MarketingFaq.vue'
 import MarketingHero from '@/mobile/organisms/MarketingHero.vue'
 import PublicPlanList from '@/mobile/organisms/PublicPlanList.vue'
 import MarketingLayout from '@/mobile/templates/MarketingLayout.vue'
 import SectionHeading from '@/shared/molecules/SectionHeading.vue'
+import MarketingBenefits from '@/shared/organisms/MarketingBenefits.vue'
+import MarketingRoles from '@/shared/organisms/MarketingRoles.vue'
 import ProductPoints from '@/shared/organisms/ProductPoints.vue'
 import StartSteps from '@/shared/organisms/StartSteps.vue'
 </script>
@@ -11,37 +14,36 @@ import StartSteps from '@/shared/organisms/StartSteps.vue'
 <template>
   <MarketingLayout>
     <MarketingHero />
-    <section class="landing__section">
-      <SectionHeading eyebrow="Neler var?" title="Şantiyenin bütün defterleri tek yerde"
-        lead="Saha telefondan girer, ofis bilgisayardan yönetir." />
+    <MarketingBenefits />
+    <section id="ozellikler" class="marketing-section">
+      <SectionHeading eyebrow="İŞİNİZİN BÜTÜNÜ" title="Her şantiyeyi aynı netlikle görün."
+        lead="Saha ekibinin günlük işleri, ofisin ihtiyaç duyduğu kayıtlarla aynı yerde." />
       <ProductPoints />
     </section>
-    <section class="landing__section blueprint landing__band">
-      <SectionHeading surface="dark" eyebrow="Nasıl başlanır?" title="Bir günde kullanmaya başlarsınız"
-        lead="Kredi kartı gerekmez: ödeme havale ya da elden." />
-      <StartSteps />
+    <MarketingRoles />
+    <section id="baslangic" class="landing-mobile__start">
+      <div class="marketing-section">
+        <SectionHeading surface="dark" eyebrow="İLK ADIM" title="Firmanıza uygun bir başlangıç."
+          lead="İhtiyaçlarınızı konuşalım, ekibiniz için çalışma alanını birlikte hazırlayalım." />
+        <StartSteps />
+      </div>
     </section>
-    <section class="landing__section landing__section--muted">
-      <SectionHeading eyebrow="Paketler" title="Ekibinizin büyüklüğüne göre" lead="Aylık fiyatlar, KDV hariç." />
-      <PublicPlanList />
+    <section id="paketler" class="landing-mobile__plans">
+      <div class="marketing-section">
+        <SectionHeading eyebrow="PAKETLER" title="Ekibiniz kadar büyüyen bir alan."
+          lead="Kişi, aktif şantiye ve modül ihtiyaçlarınıza göre paketleri inceleyin. Aylık fiyatlar, KDV hariç." />
+        <PublicPlanList />
+      </div>
     </section>
-    <section class="landing__section">
-      <SectionHeading eyebrow="Sık sorulanlar" title="Aklınıza takılanlar" />
+    <section id="sss" class="marketing-section">
+      <SectionHeading eyebrow="SIK SORULANLAR" title="Başlamadan önce merak ettikleriniz." />
       <MarketingFaq />
     </section>
+    <MarketingClosingCta />
   </MarketingLayout>
 </template>
 
 <style scoped>
-.landing__section {
-  padding: var(--space-10) var(--space-4);
-}
-
-.landing__section--muted {
-  background: var(--canvas);
-}
-
-.landing__band {
-  color: var(--brand-on-deep);
-}
+.landing-mobile__start { color: #fff; background: var(--mk-dark); }
+.landing-mobile__plans { border-top: 1px solid var(--mk-line); border-bottom: 1px solid var(--mk-line); background: var(--mk-paper); }
 </style>
