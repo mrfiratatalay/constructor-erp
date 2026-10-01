@@ -86,3 +86,38 @@ Her değişiklikten sonra ilgili kontrol çalıştırılır; kırmızıyken iş 
 | Backend | `cd backend && ./mvnw verify` | Checkstyle (anayasa) + testler |
 | Frontend | `cd frontend && npm run check` | ESLint (anayasa + mimari) + tip + unit test |
 | Frontend uçtan uca | `cd frontend && npm run test:e2e` | Telefon ve masaüstü ekranında Playwright |
+
+## Üretim: Vercel (arayüz) + Render (backend, veritabanı)
+
+```text
+tarayıcı ──► Vercel: arayüz (https://…vercel.app)
+               └─ /api/* ──► Render: backend (Docker, prod profili) ──► Render PostgreSQL
+```
+
+- Arayüz ve API tarayıcıya aynı adreste görünür: Vercel `/api` isteklerini Render'a iletir (`frontend/vercel.ts`). Oturum
+  çerezi (SameSite=Strict) ve backend'in köken denetimi bunu ister.
+- Vercel her isteğe `PROXY_SECRET`'ı ekler; backend bu sırrı taşımayan isteği reddeder ve kişinin adresini Vercel'den
+  okur (`ProxyGate`). Render adresine doğrudan gelen istek 404 alır.
+- Backend `prod` profiliyle açılır; açılışta ayarlar denetlenir (`ProductionSettingsAudit`), eksik ya da güvensiz ayarla
+  sunucu açılmaz. Render tarafını `render.yaml` kurar (Render → New → Blueprint).
+
+| Render (backend) | Değer |
+|---|---|
+| `APP_BASE_URL` | Vercel adresi, sonunda `/` olmadan: `https://…vercel.app` (davet ve kurulum linkleri) |
+| `PLATFORM_ADMIN_NAME`, `PLATFORM_ADMIN_EMAIL`, `PLATFORM_ADMIN_PASSWORD` | İlk süper yönetici: gerçek e-posta, şifre en az 16 karakter |
+| `PUSH_SUBJECT` | `mailto:` + gerçek bir e-posta (bildirim servisleri sorun olursa buraya yazar) |
+| `PROXY_SECRET` | Render üretir; aynısı Vercel'e yazılır |
+| `DB_*`, `MEDIA_ROOT`, `JAVA_TOOL_OPTIONS`, `TZ` | `render.yaml` doldurur |
+
+| Vercel (arayüz; Production ve Preview) | Değer |
+|---|---|
+| `API_ORIGIN` | Render servisinin adresi: `https://…onrender.com` |
+| `PROXY_SECRET` | Render'daki değerin aynısı |
+| `VITE_SALES_PHONE`, `VITE_SALES_EMAIL` | İsteğe bağlı: tanıtım sitesindeki iletişim |
+
+Vercel'de proje kökü (Root Directory) `frontend` olur; geri kalanını `vercel.ts` söyler.
+
+Ücretsiz planın sınırları: Render servisi 15 dakika istek almazsa uyur, ilk istek yaklaşık bir dakika bekler. Dosya
+sistemi her deploy, uyku ve yeniden başlatmada silinir (yüklenen fotoğraf, video, belge, logo gider). Veritabanı 1 GB'tır,
+yedeği yoktur ve 30 gün sonra sona erer. VPS'e geçerken aynı Docker imajları `prod` profiliyle çalışır; veritabanı adresi
+tek değişkenle (`DB_URL`) verilir, `PROXY_SECRET` verilmez (önde nginx vardır).
