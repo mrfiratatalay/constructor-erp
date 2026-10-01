@@ -52,7 +52,9 @@ export function installSessionExpiry(router: Router, queryClient: QueryClient) {
     const wasSignedIn = queryClient.getQueryData(sessionContextQuery.queryKey) !== undefined
     if (isUnauthorized(error) && wasSignedIn) {
       queryClient.clear()
-      await router.replace({ name: 'login' })
+      // Yeniden girişten sonra kişi bulunduğu sayfaya döner (useSignIn next'i okur), ana sayfaya değil.
+      const here = router.currentRoute.value
+      await router.replace({ name: 'login', query: here.meta.public ? {} : { next: here.fullPath } })
     } else if (isWorkspaceLocked(error) && wasSignedIn) {
       await queryClient.invalidateQueries({ queryKey: sessionContextQuery.queryKey })
       await router.replace({ name: 'workspaceLocked' })
