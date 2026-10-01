@@ -46,7 +46,7 @@ async function send() {
 
 <template>
   <div class="field-composer" :class="{ 'field-composer--issue': issue }">
-    <van-tag v-if="issue" round closable size="medium" class="field-composer__issue" @close="issue = false">
+    <van-tag v-if="issue" round closeable size="medium" class="field-composer__issue" @close="issue = false">
       <TriangleAlert :size="13" />Sorun
     </van-tag>
     <AttachmentThumbs v-if="attachments.length" :attachments="attachments" @remove="composer.remove" />
