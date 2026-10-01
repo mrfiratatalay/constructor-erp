@@ -19,7 +19,6 @@ import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,9 +59,8 @@ public class TeamService {
     /**
      * Bağlantıyla gelen kişi kendini çalışan olarak ekler; şefi patron seçer. Numara firmada aktif birinin ise yeni
      * hesap açılmaz: kimse başkasının numarasını yazıp onun yerine giremesin; o kişi patrondan giriş linki ister.
-     * Firmadan çıkarılmış birinin numarasıysa eski üyeliği geri açılır: yazdıkları zaten şantiyelerde duruyor. Bu
-     * yalnızca kimliğinin tamamı bu firmada olan saha hesabında olur (Workspaces.isConfinedTo): şifreyle giren biri
-     * başka bir firmanın patronu ya da platform yöneticisi olabilir, numarasını yazan onun yerine geçemez.
+     * Gelen kişiye her zaman yeni bir hesap açılır. Numara doğrulanmadığı için firmadan çıkarılmış birinin numarasını
+     * yazan onun kimliğini (mesajları, puantajı, başka firmaları) devralamaz; çıkarılanın yazdıkları onun adıyla kalır.
      */
     @Transactional
     public AppUser joinByLink(UUID companyId, String fullName, String phone) {
@@ -70,22 +68,14 @@ public class TeamService {
             throw ApiException.badRequest("Adını yaz.");
         }
         String checked = checkedPhone(phone);
-        Optional<Member> holder = holderOf(companyId, checked, null);
-        if (holder.filter(Member::isActive).isPresent()) {
+        if (activeHolderOf(companyId, checked, null).isPresent()) {
             throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
         }
-        if (holder.filter(removed -> !workspaces.isConfinedTo(removed.user(), companyId)).isPresent()) {
-            throw ApiException.badRequest("Bu numaranın hesabı e-posta ve şifreyle giriyor; bağlantıyla katılamaz.");
-        }
         limits.requireSeat(companyId);
-        AppUser person = holder.map(Member::user).orElseGet(() -> new AppUser("", clock.instant()));
+        AppUser person = new AppUser(PersonNames.tidy(fullName), clock.instant());
         person.updateProfile(PersonNames.tidy(fullName), checked);
         users.save(person);
-        Membership membership = holder.map(Member::membership)
-            .orElseGet(() -> new Membership(companyId, person.getId(), UserRole.WORKER, clock.instant()));
-        membership.changeRole(UserRole.WORKER);
-        membership.setActive(true);
-        memberships.save(membership);
+        memberships.save(new Membership(companyId, person.getId(), UserRole.WORKER, clock.instant()));
         return person;
     }
 
@@ -120,7 +110,7 @@ public class TeamService {
         String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
         requireOwnIdentity(owner, member, PersonNames.tidy(request.fullName()), phone);
         if (phone != null) {
-            holderOf(owner.companyId(), phone, member.getId()).ifPresent(TeamService::rejectTaken);
+            activeHolderOf(owner.companyId(), phone, member.getId()).ifPresent(TeamService::rejectTaken);
         }
         if (!member.isActive() && request.active()) {
             limits.requireSeat(owner.companyId());
@@ -163,14 +153,14 @@ public class TeamService {
     }
 
     /**
-     * Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız karşılaştırmak için hepsi okunur. Aynı
-     * numara hem aktif hem çıkarılmış birinde kalmışsa aktif olan döner: numara onundur.
+     * Numarası bu olan aktif kişi. Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız
+     * karşılaştırmak için hepsi okunur. Firmadan çıkarılmış birinin eski numarası yeni gelene engel olmaz.
      */
-    private Optional<Member> holderOf(UUID companyId, String phone, UUID exceptId) {
-        return members.of(companyId).stream()
+    private Optional<Member> activeHolderOf(UUID companyId, String phone, UUID exceptId) {
+        return members.activeOf(companyId).stream()
             .filter(member -> !member.getId().equals(exceptId) && member.getPhone() != null)
             .filter(member -> PhoneNumbers.same(member.getPhone(), phone))
-            .max(Comparator.comparing(Member::isActive));
+            .findFirst();
     }
 
     private static void rejectTaken(Member holder) {

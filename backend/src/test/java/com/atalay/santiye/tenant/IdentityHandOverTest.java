@@ -29,7 +29,7 @@ class IdentityHandOverTest extends TenantTestSupport {
         assertThat(postJson("/api/team/members/" + victim + "/login-link", coOwner, "")).hasStatus(400);
     }
 
-    /** Çıkarılan saha hesabı numarasıyla geri gelir (TeamMembersTest); şifreyle giren biri bu yoldan devralınmaz. */
+    /** Çıkarılan birinin numarasıyla bağlantıdan gelen yeni bir hesap alır; o kişinin kimliğine hiç ulaşamaz. */
     @Test
     void theJoinLinkNeverHandsOverSomeoneWhoSignsInWithAPassword() {
         String email = uniqueEmail();
@@ -41,7 +41,9 @@ class IdentityHandOverTest extends TenantTestSupport {
         assertThat(patchJson("/api/team/members/" + victim, first.owner(), owner(phone, true))).hasStatusOk();
         assertThat(patchJson("/api/team/members/" + victim, coOwner, owner(phone, false))).hasStatusOk();
 
-        assertThat(join(joinToken(coOwner), null, "Numarayı Bilen", phone)).hasStatus(400);
+        Cookie newcomer = sessionCookieOf(join(joinToken(coOwner), null, "Numarayı Bilen", phone));
+
+        assertThat(userIdOf(newcomer)).isNotEqualTo(victim);
         assertThat(login(email, PASSWORD)).hasStatusOk();
     }
 

@@ -24,5 +24,5 @@ public record ShipmentRequest(
     boolean expectsReturn,
     @Nullable LocalDate day,
     @Nullable @Size(max = 500) String description,
-    @NotEmpty @Valid List<ShipmentLineRequest> lines) {
+    @NotEmpty @Size(max = 100) List<@Valid ShipmentLineRequest> lines) {
 }

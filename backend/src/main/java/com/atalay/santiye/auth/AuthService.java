@@ -48,7 +48,7 @@ public class AuthService {
             attempts.failed(clientAddress, account);
             throw ApiException.unauthorized("E-posta ya da şifre hatalı.");
         }
-        attempts.succeeded(account);
+        attempts.succeeded(clientAddress, account);
         UUID companyId = workspaces.resolve(user.getId(), null).map(Membership::getCompanyId).orElse(null);
         if (companyId == null && !user.isPlatformAdmin()) {
             throw ApiException.unauthorized("Hesabın hiçbir firmada etkin değil. Firmanın yöneticisine başvur.");

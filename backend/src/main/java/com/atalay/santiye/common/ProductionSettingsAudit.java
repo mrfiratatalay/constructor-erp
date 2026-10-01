@@ -13,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
 /** Geliştirme ayarlarıyla canlıya çıkılmasını ve sessizce yarım kalan ilk kurulumu engeller. */
@@ -23,15 +24,21 @@ class ProductionSettingsAudit implements ApplicationRunner {
 
     private final Environment environment;
     private final UserRepository users;
+    private final JdbcClient jdbc;
 
-    ProductionSettingsAudit(Environment environment, UserRepository users) {
+    ProductionSettingsAudit(Environment environment, UserRepository users, JdbcClient jdbc) {
         this.environment = environment;
         this.users = users;
+        this.jdbc = jdbc;
     }
 
     @Override
     public void run(ApplicationArguments args) {
         require(!environment.matchesProfiles("local", "e2e"), "prod, local/e2e profilleriyle birlikte kullanılamaz.");
+        // Süper kullanıcı (ya da BYPASSRLS) firma ayrımının veritabanı katmanını (RLS) aşar; uygulama her isteğin
+        // başında role geçse de bir SQL hatası ona geri dönüp bütün firmaları, hatta sunucuyu ele geçirebilirdi.
+        require(!databaseUserBypassesRowSecurity(), "Production veritabanı kullanıcısı süper kullanıcı olmamalı ve RLS'i "
+            + "aşamamalı (BYPASSRLS): tabloların sahibi olan sıradan bir kullanıcıyla bağlanın.");
         require(enabled("app.session.secure-cookie"), "Production oturum çerezi Secure olmalı.");
         require(!enabled("springdoc.api-docs.enabled") && !enabled("springdoc.swagger-ui.enabled"),
             "Production API dokümanı kapalı olmalı.");
@@ -78,6 +85,11 @@ class ProductionSettingsAudit implements ApplicationRunner {
         String password = environment.getRequiredProperty(prefix + fields.getLast());
         require(!email.toLowerCase(Locale.ROOT).endsWith(".local"), "Production kurulumunda gerçek bir e-posta kullanın.");
         require(password.length() >= 16, "Production kurulum şifresi en az 16 karakter olmalı.");
+    }
+
+    private boolean databaseUserBypassesRowSecurity() {
+        return jdbc.sql("select rolsuper or rolbypassrls from pg_roles where rolname = session_user")
+            .query(Boolean.class).single();
     }
 
     private boolean hasText(String key) {

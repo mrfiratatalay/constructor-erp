@@ -14,16 +14,29 @@ class LoginThrottleTest extends TenantTestSupport {
 
     private static final String PASSWORD = "Dogru-Sifre-77";
 
-    /** Tek hesaba çok yerden şifre denemek: onuncu hatadan sonra doğru şifre bile beklemek zorunda. */
+    /** Bir yerden bir hesaba şifre denemek o yeri durdurur; hesabın sahibi kendi telefonundan girmeye devam eder. */
     @Test
-    void anAccountIsShieldedAfterTenWrongPasswords() {
+    void anAttackerCannotLockTheOwnerOutOfTheirAccount() {
         String email = uniqueEmail();
         createTenantOwnedBy(email, PASSWORD);
         for (int attempt = 0; attempt < 10; attempt++) {
-            assertThat(loginFrom("203.0.113." + attempt, email, "yanlis-" + attempt)).hasStatus(401);
+            assertThat(loginFrom("203.0.113.66", email, "yanlis-" + attempt)).hasStatus(401);
         }
 
-        assertThat(loginFrom("203.0.113.200", email, PASSWORD)).hasStatus(429);
+        assertThat(loginFrom("203.0.113.66", email, PASSWORD)).hasStatus(429);
+        assertThat(loginFrom("203.0.113.67", email, PASSWORD)).hasStatusOk();
+    }
+
+    /** Bir hesaba çok yerden dağıtık deneme: toplam elli hatadan sonra doğru şifre bile beklemek zorunda. */
+    @Test
+    void anAccountIsShieldedAfterFiftyWrongPasswordsFromAnywhere() {
+        String email = uniqueEmail();
+        createTenantOwnedBy(email, PASSWORD);
+        for (int attempt = 0; attempt < 50; attempt++) {
+            assertThat(loginFrom("198.18.0." + attempt, email, "yanlis")).hasStatus(401);
+        }
+
+        assertThat(loginFrom("198.18.1.1", email, PASSWORD)).hasStatus(429);
     }
 
     /** Tek yerden çok hesap denemek: yirminci hatadan sonra bu adres bekler, başka adres beklemez. */
@@ -38,18 +51,18 @@ class LoginThrottleTest extends TenantTestSupport {
     }
 
     @Test
-    void aSuccessfulLoginForgetsEarlierMistakes() {
+    void aSuccessfulLoginForgetsEarlierMistakesFromThatPlace() {
         String email = uniqueEmail();
         createTenantOwnedBy(email, PASSWORD);
         for (int attempt = 0; attempt < 9; attempt++) {
-            assertThat(loginFrom("192.0.2." + attempt, email, "yanlis")).hasStatus(401);
+            assertThat(loginFrom("192.0.2.10", email, "yanlis")).hasStatus(401);
         }
-        assertThat(loginFrom("192.0.2.50", email, PASSWORD)).hasStatusOk();
+        assertThat(loginFrom("192.0.2.10", email, PASSWORD)).hasStatusOk();
 
         for (int attempt = 0; attempt < 9; attempt++) {
-            assertThat(loginFrom("192.0.2." + (100 + attempt), email, "yanlis")).hasStatus(401);
+            assertThat(loginFrom("192.0.2.10", email, "yanlis")).hasStatus(401);
         }
-        assertThat(loginFrom("192.0.2.200", email, PASSWORD)).hasStatusOk();
+        assertThat(loginFrom("192.0.2.10", email, PASSWORD)).hasStatusOk();
     }
 
     private MvcTestResult loginFrom(String address, String email, String password) {

@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { useRoute, useRouter } from 'vue-router'
 import type { SessionContextView } from '@/core/api/generated/model'
 import { homeOf } from '@/core/auth/homeRoute'
+import { returnPath } from '@/core/auth/returnPath'
 import { rememberSessionContext } from '@/core/auth/sessionContext'
 
 /**
@@ -16,7 +17,6 @@ export function useSignIn() {
   return async (context: SessionContextView) => {
     queryClient.clear()
     rememberSessionContext(queryClient, context)
-    const next = typeof route.query.next === 'string' ? route.query.next : null
-    await router.replace(next ?? { name: homeOf(context) })
+    await router.replace(returnPath(route.query.next) ?? { name: homeOf(context) })
   }
 }

@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.atalay.santiye.support.ApiTestSupport;
 import com.atalay.santiye.support.IntegrationTest;
+import com.atalay.santiye.support.PostDraft;
 import jakarta.servlet.http.Cookie;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 @IntegrationTest
@@ -26,18 +28,29 @@ class TeamMembersTest extends ApiTestSupport {
             .extractingPath("$.detail").isEqualTo("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
     }
 
+    /**
+     * Numara doğrulanmaz: çıkarılan birinin numarasıyla gelen (kendisi de olsa, numarayı bilen başkası da olsa) yeni bir
+     * hesapla girer. Eski hesabın mesajlarına dokunamaz; onlar yazanın adıyla yerinde kalır.
+     */
     @Test
-    void removedPersonComesBackWithTheSameNumber() {
+    void removedPersonComesBackAsANewAccountThatCannotTouchTheOldOne() {
         Cookie owner = loginAsOwner();
         String token = joinToken(owner);
         String phone = uniquePhone();
-        String memberId = userIdOf(sessionCookieOf(join(token, null, "Oğuz Kalfa", phone)));
+        Cookie first = sessionCookieOf(join(token, null, "Oğuz Kalfa", phone));
+        String memberId = userIdOf(first);
+        String site = createSite(owner, "Geri Dönüş Şantiyesi " + UUID.randomUUID());
+        PostDraft old = PostDraft.to(site, "Kalıp söküldü");
+        assertThat(sendPost(first, old)).hasStatus(201);
 
-        String removal = "{\"fullName\": \"Oğuz Kalfa\", \"phone\": \"%s\", \"role\": \"SITE_LEAD\", \"active\": false}"
+        String removal = "{\"fullName\": \"Oğuz Kalfa\", \"phone\": \"%s\", \"role\": \"WORKER\", \"active\": false}"
             .formatted(phone);
         assertThat(patchJson("/api/team/members/" + memberId, owner, removal)).hasStatusOk();
+        Cookie again = sessionCookieOf(join(token, null, "Oğuz Kalfa", phone));
 
-        assertThat(userIdOf(sessionCookieOf(join(token, null, "Oğuz Kalfa", phone)))).isEqualTo(memberId);
+        assertThat(userIdOf(again)).isNotEqualTo(memberId);
+        assertThat(patchJson("/api/posts/" + old.id(), again, "{\"body\": \"Değiştirdim\", \"issue\": false}"))
+            .hasStatus(403);
     }
 
     @Test
