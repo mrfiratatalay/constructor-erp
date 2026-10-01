@@ -18,5 +18,6 @@ RUN npm run build-only
 
 FROM nginx:alpine AS runtime
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY --from=build /build/dist /usr/share/nginx/html
 EXPOSE 80

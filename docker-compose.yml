@@ -15,8 +15,9 @@ services:
       POSTGRES_DB: santiye
       POSTGRES_USER: ${DB_USERNAME:-santiye}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-santiye} # yalnızca local; production şifresi ortam değişkeninden gelir
+    # Yalnızca bu makineye açık: varsayılan şifreli veritabanı yerel ağdaki herkese görünmesin.
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       # PG 18+ imajı veriyi /var/lib/postgresql altında sürüme göre tutar; /data'ya bağlanmaz
       - postgres_data:/var/lib/postgresql
@@ -53,8 +54,10 @@ services:
       APP_PLATFORM_ADMIN_EMAIL: ${PLATFORM_ADMIN_EMAIL:-admin@constructor-erp.local}
       APP_PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-admin123}
       TZ: Europe/Istanbul
+    # Yalnızca bu makineye açık (Swagger, Vite geliştirme sunucusu): dışarıdan gelen istek arayüzün nginx'inden geçer,
+    # o da X-Forwarded-For'u gerçek adresle yazar. Doğrudan açık olsaydı başlık nginx'siz taklit edilebilirdi.
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "127.0.0.1:${API_PORT:-8080}:8080"
     volumes:
       # Fotoğraf, video ve sesler: kap silinse de kalır.
       - media_data:/data/media
