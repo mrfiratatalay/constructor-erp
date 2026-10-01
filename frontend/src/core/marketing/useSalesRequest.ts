@@ -22,14 +22,13 @@ const blankToNull = (value: string) => (value.trim() ? value.trim() : null)
 function problemOf(form: SalesRequestForm): string | null {
   if (!form.companyName.trim()) return 'Firmanızın adını yazın.'
   if (!form.contactName.trim()) return 'Adınızı yazın.'
-  return form.phone.replace(/\D/g, '').length >= 10 ? null : 'Size ulaşabileceğimiz bir telefon numarası yazın.'
+  const phoneLength = form.phone.replace(/\D/g, '').length
+  if (phoneLength < 10 || phoneLength > 15) return 'Size ulaşabileceğimiz bir telefon numarası yazın.'
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return 'Geçerli bir e-posta adresi yazın.'
+  return null
 }
 
-/**
- * Tanıtım sitesindeki başvuru. POS olmadığı için satış buradan başlar: ekip arar, ödeme alınır, firma açılır.
- * Fiyat sayfasından gelen ?paket=kod seçili paketi doldurur.
- */
-export function useSalesRequest(plans: () => PublicPlanView[]) {
+function useRequestForm(plans: () => PublicPlanView[]) {
   const route = useRoute()
   const form = reactive<SalesRequestForm>({
     companyName: '', contactName: '', phone: '', email: '', city: '', siteCount: null, planId: undefined, message: '', website: '',
@@ -38,7 +37,12 @@ export function useSalesRequest(plans: () => PublicPlanView[]) {
     if (form.planId) return
     form.planId = list.find((plan) => plan.code === route.query.paket)?.id
   }, { immediate: true })
+  return form
+}
 
+/** Başvuru, gerçek satış kuyruğuna gönderilir; paket seçimi fiyat sayfasındaki bağlantıdan gelir. */
+export function useSalesRequest(plans: () => PublicPlanView[]) {
+  const form = useRequestForm(plans)
   const problem = ref<string | null>(null)
   const mutation = useSubmitSalesRequest()
   // Uyarı açıkken alan düzeltilince uyarı yeniden değerlendirilir: sıradaki eksiği söyler ya da kalkar.
@@ -47,10 +51,12 @@ export function useSalesRequest(plans: () => PublicPlanView[]) {
     if (mutation.isError.value) mutation.reset()
   })
   const submit = () => {
+    if (mutation.isPending.value || mutation.isSuccess.value) return
     problem.value = problemOf(form)
     if (problem.value) return
     mutation.mutate({ data: {
-      ...form, email: blankToNull(form.email), city: blankToNull(form.city), message: blankToNull(form.message),
+      ...form, companyName: form.companyName.trim(), contactName: form.contactName.trim(), phone: form.phone.trim(),
+      email: blankToNull(form.email), city: blankToNull(form.city), message: blankToNull(form.message),
     } })
   }
   return {
