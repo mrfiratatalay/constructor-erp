@@ -29,7 +29,9 @@ function onQuantity(value: string) {
   <van-swipe-cell>
     <van-cell is-link center :title="material?.name ?? 'Malzeme seç'" :label="stockText" @click="emit('pick')" />
     <van-field :model-value="quantity ?? ''" type="number" inputmode="decimal" label="Miktar" placeholder="0"
-      :suffix="material?.unit" @update:model-value="onQuantity" />
+      @update:model-value="onQuantity">
+      <template v-if="material" #button><span class="line__unit">{{ material.unit }}</span></template>
+    </van-field>
     <template #right>
       <van-button square type="danger" text="Sil" class="line__remove" @click="emit('remove')" />
     </template>
@@ -37,6 +39,10 @@ function onQuantity(value: string) {
 </template>
 
 <style scoped>
+.line__unit {
+  color: var(--text-muted);
+}
+
 .line__remove {
   height: 100%;
 }
