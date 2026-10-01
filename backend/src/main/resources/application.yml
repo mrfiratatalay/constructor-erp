@@ -1,11 +1,11 @@
 spring:
   application:
     name: santiye-api
-  # Profil verilmezse local çalışır; production'da SPRING_PROFILES_ACTIVE=prod verilir.
-  profiles:
-    default: local
+  # Varsayılan profil yoktur: profil verilmeden açılan sunucu güvenli varsayılanlarla çalışır (hazır hesap açılmaz,
+  # çerez Secure, API dokümanı kapalı). Geliştirmede "local" açıkça verilir: ./mvnw spring-boot:run (pom.xml),
+  # testler (IntegrationTest), Docker (docker-compose.yml) ve uçtan uca testler (playwright.config.ts) bunu yapar.
 
-  # Local değerler varsayılan; production'da ortam değişkenleri bunları ezer (Madde 5).
+  # Veritabanı adresi geliştirme içindir; production'da ortam değişkenleri bunları ezer (Madde 5).
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/santiye}
     username: ${DB_USERNAME:santiye}
@@ -80,11 +80,11 @@ management:
       exposure:
         include: health,info
 
-# API dokümanı localde açık; production'da API_DOCS_ENABLED=false ile kapatılır
-# (açık bırakılırsa tüm endpoint haritası herkese görünür).
+# API dokümanı varsayılan olarak kapalıdır (açık kalırsa bütün uç haritası herkese görünür); local profil açar.
+# Gerekirse API_DOCS_ENABLED=true ile açılır.
 springdoc:
   api-docs:
-    enabled: ${API_DOCS_ENABLED:true}
+    enabled: ${API_DOCS_ENABLED:false}
   swagger-ui:
-    enabled: ${API_DOCS_ENABLED:true}
+    enabled: ${API_DOCS_ENABLED:false}
     path: /swagger-ui.html

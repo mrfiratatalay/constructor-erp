@@ -71,6 +71,9 @@ Gerekenler: Docker, Node 24 (`.nvmrc`), Java 25.
 | Frontend | `cd frontend && npm install && npm run dev` | http://localhost:5173 |
 
 İki kip aynı portları kullanır: geliştirmeye geçmeden önce `./scripts/stop.sh`.
+Backend'in varsayılan profili yoktur: profilsiz açılan sunucu hazır hesap kurmaz, çerezi `Secure` yapar, API dokümanını
+kapatır. `./mvnw spring-boot:run`, testler ve Docker `local` profilini kendiliğinden verir; IDE'den çalıştırırken
+etkin profil olarak `local` yazılır.
 Docker kipinin medya dosyaları kendi biriminde durur, geliştirme kipininkiler `backend/.data/media` altında.
 
 ## Kontrol
