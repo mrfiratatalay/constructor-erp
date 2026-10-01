@@ -1,0 +1,76 @@
+# Render Blueprint: backend (Docker) ve PostgreSQL. Render → New → Blueprint bu dosyayı okur. İkisi de Frankfurt'ta:
+# Türkiye'ye en yakın bölge; backend veritabanına iç ağdan bağlandığı için aynı bölge şart.
+#
+# Ücretsiz planın sınırları: servis 15 dakika istek almazsa uyur (ilk istek yaklaşık bir dakika bekler); dosya sistemi her
+# deploy, uyku ve yeniden başlatmada silinir (yüklenen fotoğraf, video, belge ve logo gider); veritabanı 1 GB'tır, yedeği
+# yoktur ve 30 gün sonra sona erer. Kalıcı kullanım için servis ücretli plana alınıp /data/media'ya disk bağlanır,
+# veritabanı ücretli plana geçer ya da sistem VPS'e taşınır (docker-compose, prod profili).
+databases:
+  - name: constructor-erp-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "18"
+    databaseName: santiye
+    user: santiye
+    # Dışarıdan hiçbir bağlantı kabul edilmez: veritabanına yalnızca Render içindeki backend ulaşır.
+    ipAllowList: []
+
+services:
+  - type: web
+    name: constructor-erp-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    autoDeployTrigger: commit
+    # Yalnızca backend değişince yeniden kurulur: ücretsiz planda her yeniden başlatma yüklenen dosyaları siler.
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: constructor-erp-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: constructor-erp-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: constructor-erp-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: constructor-erp-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: constructor-erp-db
+          property: password
+      - key: MEDIA_ROOT
+        value: /data/media
+      - key: TZ
+        value: Europe/Istanbul
+      # 512 MB bellek ve 0,1 CPU: yığın küçük tutulur, JIT hafif derler (açılış ve uyanma hızlanır).
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=60 -XX:+UseSerialGC -XX:TieredStopAtLevel=1
+      # Vercel'in her isteğe eklediği sır (frontend/vercel.ts, backend ProxyGate). Render üretir, aynısı Vercel'e yazılır.
+      - key: PROXY_SECRET
+        generateValue: true
+      # Bundan sonrakiler blueprint kurulurken sorulur (README, Üretim).
+      - key: APP_BASE_URL
+        sync: false
+      - key: PLATFORM_ADMIN_NAME
+        sync: false
+      - key: PLATFORM_ADMIN_EMAIL
+        sync: false
+      - key: PLATFORM_ADMIN_PASSWORD
+        sync: false
+      - key: PUSH_SUBJECT
+        sync: false

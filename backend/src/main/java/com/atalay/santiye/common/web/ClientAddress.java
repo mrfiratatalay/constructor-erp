@@ -7,9 +7,10 @@ import java.util.HexFormat;
 import java.util.regex.Pattern;
 
 /**
- * İstemcinin adresi, sınırların (AttemptCounter) anahtarı olarak. Ters vekil arkasında gerçek adres Tomcat'in
- * X-Forwarded-For işlemesinden gelir (server.forward-headers-strategy). IPv6'da tek bir kullanıcının elinde koca bir
- * /64 bloğu olur: adres o bloğa indirgenir, yoksa her istekte yeni bir adres kullanıp sınır aşılabilirdi.
+ * İstemcinin adresi, sınırların (AttemptCounter) anahtarı olarak. nginx arkasında gerçek adres Tomcat'in
+ * X-Forwarded-For işlemesinden (server.forward-headers-strategy), Vercel arkasında ProxyGate'ten gelir. IPv6'da tek
+ * bir kullanıcının elinde koca bir /64 bloğu olur: adres o bloğa indirgenir, yoksa her istekte yeni bir adres kullanıp
+ * sınır aşılabilirdi.
  */
 public final class ClientAddress {
 
