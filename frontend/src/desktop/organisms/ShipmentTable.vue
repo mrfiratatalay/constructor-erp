@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ShipmentRow } from '@/core/api/generated/model'
+import { dayWithYear } from '@/core/format/dates'
 import { shipmentNumber } from '@/core/shipments/quantity'
 import { cancelledLabel, linesText, routeText, waitingText } from '@/core/shipments/shipmentLabels'
 
@@ -12,9 +13,6 @@ defineEmits<{ open: [shipmentId: string] }>()
 
 /** Element Plus satırı gevşek tiple verir; tablo tek tür satır gösterdiği için burada daraltılır. */
 const asRow = (row: unknown) => row as ShipmentRow
-
-const dayText = (day: string) =>
-  new Date(day).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
 </script>
 
 <template>
@@ -22,7 +20,7 @@ const dayText = (day: string) =>
     @row-click="(row) => $emit('open', asRow(row).id)">
     <el-table-column label="Tarih" width="150">
       <template #default="{ row }">
-        {{ dayText(asRow(row).day) }}
+        {{ dayWithYear(asRow(row).day) }}
         <div class="table__note">{{ shipmentNumber(asRow(row).number) }}</div>
       </template>
     </el-table-column>
