@@ -51,6 +51,7 @@ git clone <depo-adresi> && cd atalay-santiye
 
 Ayarlar (portlar, ilk firma, platform yöneticisi, şifreler) `.env` ile değiştirilir: `cp .env.example .env`.
 Dosya yoksa `.env.example`'daki değerlerin aynısı varsayılan olarak geçerlidir.
+Ağa yalnızca arayüz (5173) açılır; veritabanı (5432) ve API (8080) yalnızca bu bilgisayardan erişilir.
 
 Windows PowerShell'de betikler yerine doğrudan:
 
@@ -71,6 +72,9 @@ Gerekenler: Docker, Node 24 (`.nvmrc`), Java 25.
 | Frontend | `cd frontend && npm install && npm run dev` | http://localhost:5173 |
 
 İki kip aynı portları kullanır: geliştirmeye geçmeden önce `./scripts/stop.sh`.
+Backend'in varsayılan profili yoktur: profilsiz açılan sunucu hazır hesap kurmaz, çerezi `Secure` yapar, API dokümanını
+kapatır. `./mvnw spring-boot:run`, testler ve Docker `local` profilini kendiliğinden verir; IDE'den çalıştırırken
+etkin profil olarak `local` yazılır.
 Docker kipinin medya dosyaları kendi biriminde durur, geliştirme kipininkiler `backend/.data/media` altında.
 
 ## Kontrol

@@ -12,3 +12,10 @@ app:
     admin-name: Constructor Destek
     admin-email: admin@constructor-erp.local
     admin-password: admin123
+
+# Frontend tipleri (Orval) geliştirmede buradan üretilir.
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:true}

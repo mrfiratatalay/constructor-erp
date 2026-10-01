@@ -4,7 +4,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { CompanyProfileForm } from '@/core/tenant/companyProfileForm'
 
 const show = defineModel<boolean>('show', { required: true })
-const { form, busy, dirty } = defineProps<{ form: CompanyProfileForm; busy: boolean; dirty: boolean }>()
+const form = defineModel<CompanyProfileForm>('form', { required: true })
+const { busy, dirty } = defineProps<{ busy: boolean; dirty: boolean }>()
 const emit = defineEmits<{ save: [] }>()
 const editor = ref<FormInstance>()
 const rules: FormRules<CompanyProfileForm> = {

@@ -4,6 +4,7 @@ import { PAYMENT_METHODS, stateOf } from '@/core/billing/billingLabels'
 import { dayWithYear } from '@/core/format/dates'
 import { formatMoney } from '@/core/format/money'
 import { useCompanySubscription } from '@/core/tenant/useCompanySubscription'
+import { vanType } from '@/mobile/markTones'
 
 const { subscription, isPending, isError, refetch } = useCompanySubscription()
 const tab = ref('periods')
@@ -29,7 +30,7 @@ async function retry() {
           <article v-for="(period, index) in subscription.periods" :key="`${period.startsOn}-${index}`" class="company-history__entry">
             <div class="company-history__row">
               <h3>{{ period.planName }}</h3>
-              <van-tag :type="stateOf(period.state).tone === 'info' ? 'default' : stateOf(period.state).tone" round>{{ stateOf(period.state).label }}</van-tag>
+              <van-tag :type="vanType(stateOf(period.state).tone)" round>{{ stateOf(period.state).label }}</van-tag>
             </div>
             <p class="company-history__date"><van-icon name="calendar-o" />{{ dayWithYear(period.startsOn) }} – {{ dayWithYear(period.endsOn) }}</p>
             <p v-if="period.monthlyPrice != null" class="company-history__price">{{ formatMoney(period.monthlyPrice) }}<span> / ay</span></p>

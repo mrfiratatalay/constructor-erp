@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,9 @@ public class IssueController {
         return issues.listIssues(user, open, siteId);
     }
 
+    /** Sorunu patron ve şef çözer (IssueService); sahadan sorunu bildiren çalışan kendi bildirimini kapatamaz. */
     @PostMapping("/posts/{postId}/resolve")
+    @PreAuthorize("hasAnyRole('OWNER', 'SITE_LEAD')")
     public PostView resolveIssue(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID postId,
         @Valid @RequestBody ResolveIssueRequest request) {
         return issues.resolveIssue(user, postId, request.note());

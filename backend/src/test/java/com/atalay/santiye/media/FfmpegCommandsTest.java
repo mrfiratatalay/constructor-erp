@@ -27,6 +27,15 @@ class FfmpegCommandsTest {
     }
 
     @Test
+    void everyCommandReadsItsInputOnlyFromALocalFile() {
+        for (MediaKind kind : MediaKind.values()) {
+            for (List<String> command : FfmpegCommands.forMedia(kind, FILES, LIMITS)) {
+                assertThat(String.join(" ", command)).contains("-protocol_whitelist file -i ");
+            }
+        }
+    }
+
+    @Test
     void longSideLimitKeepsPortraitAndLandscapeProportions() {
         assertThat(FfmpegCommands.longSide(1280))
             .isEqualTo("scale='if(gt(iw,ih),min(1280,iw),-2)':'if(gt(iw,ih),-2,min(1280,ih))'");

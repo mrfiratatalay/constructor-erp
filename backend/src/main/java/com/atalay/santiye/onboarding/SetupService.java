@@ -70,7 +70,7 @@ public class SetupService {
 
     @Transactional
     public SignIn complete(String token, CompleteSetupRequest request) {
-        OnboardingInvite invite = invites.requireUsable(token);
+        OnboardingInvite invite = invites.lockUsable(token);
         Company company = companyOf(invite);
         Instant now = clock.instant();
         SetupCompany details = request.company();

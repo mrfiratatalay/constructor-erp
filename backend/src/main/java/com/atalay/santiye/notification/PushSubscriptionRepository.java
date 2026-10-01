@@ -19,4 +19,8 @@ interface PushSubscriptionRepository extends JpaRepository<PushSubscription, UUI
     @Modifying
     @Query("delete from PushSubscription s where s.endpoint = :endpoint")
     void deleteByEndpoint(String endpoint);
+
+    @Modifying
+    @Query("delete from PushSubscription s where s.endpoint = :endpoint and s.userId = :userId")
+    void deleteByEndpointAndUserId(String endpoint, UUID userId);
 }

@@ -33,7 +33,7 @@ function fillDevAccount() {
       <van-button type="primary" native-type="submit" block round size="large" :loading="isPending">
         Giriş yap
       </van-button>
-      <!-- Yalnızca hesap derlemede ortamdan verildiyse: yerel geliştirme ve yerel Docker (core/auth/devLogin). -->
+      <!-- Yalnızca geliştirme sunucusunda, hesap .env.development.local'da verildiyse (core/auth/devLogin). -->
       <van-button v-if="devAccount" block round plain type="primary" @click="fillDevAccount">
         Patron olarak doldur
       </van-button>

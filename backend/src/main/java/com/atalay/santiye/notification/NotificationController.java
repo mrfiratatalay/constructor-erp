@@ -6,10 +6,8 @@ import com.atalay.santiye.notification.dto.PushPublicKey;
 import com.atalay.santiye.notification.dto.PushSubscribeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.time.Clock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,16 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationController {
 
     private final VapidKeys keys;
-    private final PushSubscriptionRepository subscriptions;
+    private final PushSubscriptions subscriptions;
     private final NotificationRepository notifications;
-    private final Clock clock;
 
-    NotificationController(VapidKeys keys, PushSubscriptionRepository subscriptions,
-        NotificationRepository notifications, Clock clock) {
+    NotificationController(VapidKeys keys, PushSubscriptions subscriptions, NotificationRepository notifications) {
         this.keys = keys;
         this.subscriptions = subscriptions;
         this.notifications = notifications;
-        this.clock = clock;
     }
 
     @GetMapping("/push-key")
@@ -40,18 +35,15 @@ public class NotificationController {
         return new PushPublicKey(keys.publicKey());
     }
 
-    /** Aynı cihaz tekrar abone olursa yeni kayıt açılmaz; cihaz artık bu kişiye bildirim alır. */
     @PostMapping("/subscriptions")
-    @Transactional
     public void subscribePush(@AuthenticationPrincipal CurrentUser user, @Valid @RequestBody PushSubscribeRequest request) {
-        subscriptions.findByEndpoint(request.endpoint()).ifPresentOrElse(
-            existing -> existing.assignTo(user.userId()),
-            () -> subscriptions.save(new PushSubscription(user.userId(), request.endpoint(), clock.instant())));
+        subscriptions.subscribe(user.userId(), request.endpoint());
     }
 
     @DeleteMapping("/subscriptions")
-    public void unsubscribePush(@Valid @RequestBody PushSubscribeRequest request) {
-        subscriptions.deleteByEndpoint(request.endpoint());
+    public void unsubscribePush(@AuthenticationPrincipal CurrentUser user,
+        @Valid @RequestBody PushSubscribeRequest request) {
+        subscriptions.unsubscribe(user.userId(), request.endpoint());
     }
 
     /** Telefon dürtülünce bunu okur ve gösterir. Hiç bildirim yoksa 204. */

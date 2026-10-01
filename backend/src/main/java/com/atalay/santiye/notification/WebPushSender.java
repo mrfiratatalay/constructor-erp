@@ -33,8 +33,15 @@ class WebPushSender {
         this.clock = clock;
     }
 
-    /** false: abonelik artık geçersiz (uygulama silinmiş ya da izin kaldırılmış), silinmeli. */
+    /**
+     * false: abonelik artık geçersiz (uygulama silinmiş ya da izin kaldırılmış), silinmeli. Push servisi olmayan bir
+     * adrese (bu kural gelmeden kaydedilmiş olabilir) hiç istek atılmaz; o kayıt da silinir.
+     */
     boolean send(String endpoint) {
+        if (!PushEndpoints.isAllowed(endpoint)) {
+            log.warn("Push servisi olmayan bildirim adresi silindi: {}", endpoint);
+            return false;
+        }
         try {
             HttpResponse<Void> response = http.send(request(endpoint), HttpResponse.BodyHandlers.discarding());
             int status = response.statusCode();

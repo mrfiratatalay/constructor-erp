@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 class DailyReminders {
+
+    private static final Logger log = LoggerFactory.getLogger(DailyReminders.class);
 
     private final CompanyRepository companies;
     private final SiteRepository sites;
@@ -44,20 +48,29 @@ class DailyReminders {
         this.clock = clock;
     }
 
+    /** Firmalar birbirinden bağımsızdır: birinde çıkan hata (ör. bozuk bir abonelik) ötekilerin özetini durdurmaz. */
     @Scheduled(cron = "0 0 18 * * *", zone = "${app.timezone}")
     void summarizeForOwners() {
         for (Company company : companies.findAll()) {
-            if (company.getStatus() != CompanyStatus.ACTIVE) {
-                continue;
+            try {
+                summarizeFor(company);
+            } catch (RuntimeException failure) {
+                log.warn("Günlük özet gönderilemedi: {}", company.getId(), failure);
             }
-            List<Site> silent = silentSitesOf(company);
-            if (silent.isEmpty()) {
-                continue;
-            }
-            List<UUID> owners = members.activeIdsWithRole(company.getId(), UserRole.OWNER);
-            String names = silent.stream().map(Site::getName).collect(Collectors.joining(", "));
-            notifier.deliver(owners, new NotificationContent("Bugün haber gelmeyen şantiyeler", names, "/santiyeler"));
         }
+    }
+
+    private void summarizeFor(Company company) {
+        if (company.getStatus() != CompanyStatus.ACTIVE) {
+            return;
+        }
+        List<Site> silent = silentSitesOf(company);
+        if (silent.isEmpty()) {
+            return;
+        }
+        List<UUID> owners = members.activeIdsWithRole(company.getId(), UserRole.OWNER);
+        String names = silent.stream().map(Site::getName).collect(Collectors.joining(", "));
+        notifier.deliver(owners, new NotificationContent("Bugün haber gelmeyen şantiyeler", names, "/santiyeler"));
     }
 
     /** Aktif olup bugün hiç gönderi gelmeyen şantiyeler. */

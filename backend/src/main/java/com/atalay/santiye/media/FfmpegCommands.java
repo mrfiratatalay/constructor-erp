@@ -11,6 +11,11 @@ final class FfmpegCommands {
 
     private static final List<String> QUIET = List.of("-hide_banner", "-loglevel", "error", "-y");
     private static final List<String> NO_METADATA = List.of("-map_metadata", "-1");
+    /**
+     * Girdi yalnızca yerel dosyadan okunur. Yüklenen "video" ağ adresleri içeren bir oynatma listesi (DASH, HLS)
+     * olabilir; ffmpeg 8 yerel dosyanın içinden ağa çıkmayı zaten reddediyor, kural sürümün varsayılanına bırakılmaz.
+     */
+    private static final List<String> LOCAL_INPUT_ONLY = List.of("-protocol_whitelist", "file");
 
     private FfmpegCommands() {
     }
@@ -54,6 +59,7 @@ final class FfmpegCommands {
         var command = new ArrayList<String>();
         command.add(limits.ffmpeg());
         command.addAll(QUIET);
+        command.addAll(LOCAL_INPUT_ONLY);
         command.addAll(List.of("-i", input));
         command.addAll(NO_METADATA);
         command.addAll(options);

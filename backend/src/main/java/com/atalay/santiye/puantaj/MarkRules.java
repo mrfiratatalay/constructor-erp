@@ -38,8 +38,8 @@ final class MarkRules {
         if (status != DayStatus.PRESENT) {
             throw ApiException.badRequest("Mesai yalnızca Geldi gününe yazılır.");
         }
-        boolean onStep = overtime.remainder(STEP).signum() == 0;
-        if (overtime.compareTo(MAX_OVERTIME) > 0 || !onStep) {
+        // Önce büyüklük: bölme (remainder) devasa bir sayıda milyarlarca basamak hesaplar ve sunucuyu kilitler.
+        if (overtime.compareTo(MAX_OVERTIME) > 0 || overtime.remainder(STEP).signum() != 0) {
             throw ApiException.badRequest("Mesai yarım saatlik adımlarla, en çok 16 saat yazılır.");
         }
     }

@@ -15,8 +15,10 @@ services:
       POSTGRES_DB: santiye
       POSTGRES_USER: ${DB_USERNAME:-santiye}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-santiye} # yalnızca local; production şifresi ortam değişkeninden gelir
+    # Yalnızca bu bilgisayardan (127.0.0.1) erişilir: kullanıcı süper kullanıcıdır ve şifresi herkesçe bilinir. Docker
+    # yayınladığı portu güvenlik duvarının (ufw) önüne koyar; adres yazılmazsa veritabanı bütün ağa açılırdı.
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       # PG 18+ imajı veriyi /var/lib/postgresql altında sürüme göre tutar; /data'ya bağlanmaz
       - postgres_data:/var/lib/postgresql
@@ -53,8 +55,10 @@ services:
       APP_PLATFORM_ADMIN_EMAIL: ${PLATFORM_ADMIN_EMAIL:-admin@constructor-erp.local}
       APP_PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-admin123}
       TZ: Europe/Istanbul
+    # Dışarıdan herkes arayüzün (web) içinden gelir; API yalnızca bu bilgisayardan doğrudan açılır (API dokümanı). Ağa
+    # açık olsaydı nginx atlanır, istemci kendi yazdığı X-Forwarded-For ile giriş deneme sınırını aşabilirdi.
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "127.0.0.1:${API_PORT:-8080}:8080"
     volumes:
       # Fotoğraf, video ve sesler: kap silinse de kalır.
       - media_data:/data/media
@@ -74,11 +78,9 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-      # Giriş ekranındaki "Patron olarak doldur" düğmesi: backend'in ilk yöneticisiyle aynı hesap (yukarıdaki api).
-      # Bu değerler verilmeden derlenen arayüzde düğme hiç çıkmaz.
+      # Derlenen arayüze yalnızca herkese açık bilgi girer: paket, sayfayı açan herkesin elindedir. Hesap ve şifre
+      # buraya hiç verilmez ("Patron olarak doldur" yalnızca geliştirme sunucusundadır, core/auth/devLogin).
       args:
-        VITE_DEV_LOGIN_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
-        VITE_DEV_LOGIN_PASSWORD: ${OWNER_PASSWORD:-patron123}
         VITE_SALES_PHONE: ${SALES_PHONE:-}
         VITE_SALES_EMAIL: ${SALES_EMAIL:-}
     ports:

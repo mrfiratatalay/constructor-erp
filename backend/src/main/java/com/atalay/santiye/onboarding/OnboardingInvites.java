@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -79,8 +80,19 @@ public class OnboardingInvites {
 
     /** Kurulum sihirbazı için: link geçerliyse davet, değilse aynı mesaj (geçersiz/süresi dolmuş ayırt edilmez). */
     OnboardingInvite requireUsable(String token) {
-        return invites.findByTokenHash(SecureTokens.hash(token))
-            .filter(invite -> invite.isUsable(clock.instant()))
+        return usable(invites.findByTokenHash(SecureTokens.hash(token)));
+    }
+
+    /**
+     * Kurulumu tamamlarken: link kilitlenir. Aynı link aynı anda iki kez gönderilirse ikincisi birincinin bitmesini
+     * bekler ve kullanıldığını görür; kilitsiz ikisi de geçer, linki ele geçiren sessizce ikinci patron olurdu.
+     */
+    OnboardingInvite lockUsable(String token) {
+        return usable(invites.findLockedByTokenHash(SecureTokens.hash(token)));
+    }
+
+    private OnboardingInvite usable(Optional<OnboardingInvite> found) {
+        return found.filter(invite -> invite.isUsable(clock.instant()))
             .orElseThrow(() -> ApiException.badRequest(
                 "Bu kurulum linki geçersiz ya da süresi dolmuş. Constructor ERP ekibinden yeni link isteyin."));
     }

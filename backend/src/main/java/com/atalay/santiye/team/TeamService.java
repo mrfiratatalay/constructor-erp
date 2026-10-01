@@ -14,10 +14,13 @@ import com.atalay.santiye.tenant.Member;
 import com.atalay.santiye.tenant.Members;
 import com.atalay.santiye.tenant.Membership;
 import com.atalay.santiye.tenant.MembershipRepository;
+import com.atalay.santiye.tenant.Workspaces;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -38,10 +41,11 @@ public class TeamService {
     private final SessionService sessions;
     private final SiteEvents events;
     private final PlanLimits limits;
+    private final Workspaces workspaces;
     private final Clock clock;
 
     TeamService(UserRepository users, MembershipRepository memberships, Members members, InviteService invites,
-        SessionService sessions, SiteEvents events, PlanLimits limits, Clock clock) {
+        SessionService sessions, SiteEvents events, PlanLimits limits, Workspaces workspaces, Clock clock) {
         this.users = users;
         this.memberships = memberships;
         this.members = members;
@@ -49,13 +53,16 @@ public class TeamService {
         this.sessions = sessions;
         this.events = events;
         this.limits = limits;
+        this.workspaces = workspaces;
         this.clock = clock;
     }
 
     /**
      * Bağlantıyla gelen kişi kendini çalışan olarak ekler; şefi patron seçer. Numara firmada aktif birinin ise yeni
      * hesap açılmaz: kimse başkasının numarasını yazıp onun yerine giremesin; o kişi patrondan giriş linki ister.
-     * Firmadan çıkarılmış birinin numarasıysa eski üyeliği geri açılır: yazdıkları zaten şantiyelerde duruyor.
+     * Firmadan çıkarılmış birinin numarasıysa eski üyeliği geri açılır: yazdıkları zaten şantiyelerde duruyor. Bu
+     * yalnızca kimliğinin tamamı bu firmada olan saha hesabında olur (Workspaces.isConfinedTo): şifreyle giren biri
+     * başka bir firmanın patronu ya da platform yöneticisi olabilir, numarasını yazan onun yerine geçemez.
      */
     @Transactional
     public AppUser joinByLink(UUID companyId, String fullName, String phone) {
@@ -66,6 +73,9 @@ public class TeamService {
         Optional<Member> holder = holderOf(companyId, checked, null);
         if (holder.filter(Member::isActive).isPresent()) {
             throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
+        }
+        if (holder.filter(removed -> !workspaces.isConfinedTo(removed.user(), companyId)).isPresent()) {
+            throw ApiException.badRequest("Bu numaranın hesabı e-posta ve şifreyle giriyor; bağlantıyla katılamaz.");
         }
         limits.requireSeat(companyId);
         AppUser person = holder.map(Member::user).orElseGet(() -> new AppUser("", clock.instant()));
@@ -108,6 +118,7 @@ public class TeamService {
             throw ApiException.badRequest("Kendini firmadan çıkaramaz ya da kendi rolünü değiştiremezsin.");
         }
         String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
+        requireOwnIdentity(owner, member, PersonNames.tidy(request.fullName()), phone);
         if (phone != null) {
             holderOf(owner.companyId(), phone, member.getId()).ifPresent(TeamService::rejectTaken);
         }
@@ -117,11 +128,32 @@ public class TeamService {
         return phone;
     }
 
+    /**
+     * Ad ve numara kişinin kimliğidir. Şifreyle giren biri başka firmalarda da aynı kimlikle görünür: onun adını ve
+     * numarasını yalnızca kendisi değiştirir, bu firmanın patronu başka bir firmadaki kaydı değiştiremez.
+     */
+    private void requireOwnIdentity(CurrentUser owner, Member member, String fullName, String phone) {
+        boolean changes = !Objects.equals(member.getFullName(), fullName) || !Objects.equals(member.getPhone(), phone);
+        boolean someoneElse = !member.getId().equals(owner.userId());
+        if (changes && someoneElse && !workspaces.isConfinedTo(member.user(), owner.companyId())) {
+            throw ApiException.badRequest("Bu kişinin adını ve numarasını yalnızca kendisi değiştirebilir.");
+        }
+    }
+
+    /**
+     * Giriş linki kimliği olduğu gibi devreder: yalnızca kimliğinin tamamı bu firmada olan saha hesabına verilir.
+     * Şifreyle giren biri kendi şifresiyle girer; ona link üretilebilseydi bu firmanın patronu onun yerine oturum açıp
+     * onun başka firmalarına ya da platform yönetimine geçebilirdi.
+     */
     @Transactional
     public InviteLink issueLoginLink(CurrentUser owner, UUID memberId) {
         Member member = findMember(owner, memberId);
         if (!member.isActive()) {
             throw ApiException.badRequest("Firmadan çıkarılmış bir kişiye giriş linki gönderilemez.");
+        }
+        if (!workspaces.isConfinedTo(member.user(), owner.companyId())) {
+            throw ApiException.badRequest("Bu kişi kendi e-posta ve şifresiyle giriyor; giriş linki yalnızca firmanın "
+                + "bağlantısıyla katılan ekibe gönderilir.");
         }
         return invites.issue(member.user(), owner.companyId());
     }
@@ -130,12 +162,15 @@ public class TeamService {
         return members.find(owner.companyId(), memberId).orElseThrow(() -> ApiException.notFound("Kişi bulunamadı."));
     }
 
-    /** Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız karşılaştırmak için hepsi okunur. */
+    /**
+     * Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız karşılaştırmak için hepsi okunur. Aynı
+     * numara hem aktif hem çıkarılmış birinde kalmışsa aktif olan döner: numara onundur.
+     */
     private Optional<Member> holderOf(UUID companyId, String phone, UUID exceptId) {
         return members.of(companyId).stream()
             .filter(member -> !member.getId().equals(exceptId) && member.getPhone() != null)
             .filter(member -> PhoneNumbers.same(member.getPhone(), phone))
-            .findFirst();
+            .max(Comparator.comparing(Member::isActive));
     }
 
     private static void rejectTaken(Member holder) {
