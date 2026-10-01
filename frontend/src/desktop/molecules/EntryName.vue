@@ -15,12 +15,30 @@ const subtitle = computed(() => (entry.archived ? 'Listeden çıktı' : entrySub
 </script>
 
 <template>
-  <el-space :size="12">
+  <el-space :size="12" class="entry-name">
     <el-avatar v-if="entry.kind === 'CREW'" shape="square" :size="36"><Users :size="18" /></el-avatar>
     <UserAvatar v-else :name="entry.name" :size="36" />
     <el-space direction="vertical" alignment="flex-start" :size="0">
-      <el-link underline="never" @click="emit('open')"><b>{{ entryTitle(entry) }}</b></el-link>
+      <el-link underline="never" class="entry-name__link" :title="entryTitle(entry)" @click="emit('open')">
+        <b>{{ entryTitle(entry) }}</b>
+      </el-link>
       <el-text v-if="subtitle" type="info" size="small">{{ subtitle }}</el-text>
     </el-space>
   </el-space>
 </template>
+
+<style scoped>
+/* Ad sütunu dardır (200 px): çok uzun ad satırı beş satıra şişirmesin, en fazla iki satır; tamamı title'da. */
+.entry-name__link :deep(.el-link__inner) {
+  min-width: 0;
+}
+
+.entry-name__link b {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+</style>
