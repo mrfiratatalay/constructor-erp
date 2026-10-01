@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { ElMessage, type UploadUserFile } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
 import { withUnit } from '@/core/shipments/quantity'
-import { draftProblem, emptyDraft, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
+import { draftProblem, emptyDraft, newLine, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
 import { useShipmentOptions } from '@/core/shipments/useShipmentOptions'
 import { useShipmentSave } from '@/core/shipments/useShipmentSave'
 import { useStockAt } from '@/core/shipments/useStockAt'
@@ -88,7 +88,7 @@ async function submit() {
       </template>
 
       <el-form-item label="2 · Ne, ne kadar?">
-        <div v-for="(line, index) in draft.lines" :key="index" class="dialog__line">
+        <div v-for="(line, index) in draft.lines" :key="line.key" class="dialog__line">
           <el-select v-model="line.materialId" placeholder="Malzeme" filterable class="dialog__material">
             <el-option v-for="material in materials" :key="material.id" :label="material.name" :value="material.id" />
             <template #footer>
@@ -105,7 +105,7 @@ async function submit() {
             Depoda: {{ withUnit(stock.quantityOf(line.materialId), unitOf(line.materialId)) }}
           </el-text>
         </div>
-        <el-button link type="primary" @click="draft.lines.push({ materialId: '', quantity: null })">
+        <el-button link type="primary" @click="draft.lines.push(newLine())">
           + Bir şey daha ekle
         </el-button>
       </el-form-item>

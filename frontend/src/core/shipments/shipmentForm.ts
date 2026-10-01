@@ -7,8 +7,15 @@ import type { ShipmentRequest } from '@/core/api/generated/model'
 export type TargetKind = 'SITE' | 'OUTSIDE' | 'INBOUND'
 
 export interface LineDraft {
+  /** Satırın ekrandaki kimliği (sunucuya gitmez): ortadan satır silinince seçici ve miktar kutusu kaymasın. */
+  key: string
   materialId: string
   quantity: number | null
+}
+
+/** Formdaki boş kalem satırı. */
+export function newLine(): LineDraft {
+  return { key: crypto.randomUUID(), materialId: '', quantity: null }
 }
 
 /**
@@ -30,7 +37,7 @@ export function emptyDraft(): ShipmentDraft {
     destinationId: null,
     partyName: '',
     expectsReturn: false,
-    lines: [{ materialId: '', quantity: null }],
+    lines: [newLine()],
     description: '',
   }
 }
