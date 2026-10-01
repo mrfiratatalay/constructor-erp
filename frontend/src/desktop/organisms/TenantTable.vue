@@ -18,7 +18,7 @@ const asRow = (row: unknown) => row as TenantRow
       <template #default="{ row }">
         <div class="tenant-table__company">
           <CompanyLogo :name="row.name" :size="34" />
-          <span><strong>{{ row.name }}</strong><small>{{ row.slug }}{{ row.city ? ` · ${row.city}` : '' }}</small></span>
+          <span :title="row.name"><strong>{{ row.name }}</strong><small>{{ row.slug }}{{ row.city ? ` · ${row.city}` : '' }}</small></span>
         </div>
       </template>
     </el-table-column>
@@ -62,8 +62,24 @@ const asRow = (row: unknown) => row as TenantRow
   gap: var(--space-3);
 }
 
+/* Uzun firma adı dört satıra, kısa adı (slug) yarım kırılıyordu: ad en çok iki satır, kısa ad tek satır. */
 .tenant-table__company span {
   display: grid;
+  min-width: 0;
+}
+
+.tenant-table__company strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.tenant-table__company small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tenant-table__company small,
