@@ -1,0 +1,20 @@
+.movement-sheet { display: flex; flex-direction: column; height: 92dvh; overflow: hidden; background: var(--surface); }
+.movement-sheet > .van-nav-bar { flex-shrink: 0; border-bottom: 1px solid var(--border-soft); }
+.movement-sheet__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: var(--space-4); }
+.movement-sheet__body > section + section { margin-top: var(--space-5); }
+.movement-sheet__heading { margin-bottom: var(--space-4); }
+.movement-sheet__number { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.movement-sheet__number strong { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.movement-sheet__heading h2 { margin: var(--space-3) 0 var(--space-1); font-size: var(--text-lg); }
+.movement-sheet__heading p { margin: 0; color: var(--text-muted); font-size: var(--text-xs); }
+.movement-sheet__route { border: 1px solid var(--border-soft); border-radius: var(--radius-md); background: var(--surface-muted); padding: var(--space-4); margin-bottom: var(--space-5); }
+.movement-sheet__waiting { color: var(--status-warning); font-size: var(--text-xs); margin: calc(-1 * var(--space-3)) 0 var(--space-5); }
+.movement-sheet__note h3 { margin: 0 0 var(--space-3); color: var(--text-muted); font-size: var(--text-xs); letter-spacing: .05em; }
+.movement-sheet__note p { margin: 0; font-size: var(--text-sm); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.movement-sheet__metadata { display: grid; gap: var(--space-2); margin: var(--space-5) 0; padding: var(--space-4) 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.movement-sheet__metadata div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); font-size: var(--text-xs); }
+.movement-sheet__metadata dt { flex-shrink: 0; color: var(--text-muted); }
+.movement-sheet__metadata dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.movement-sheet__footer { display: flex; flex-shrink: 0; gap: var(--space-2); border-top: 1px solid var(--border-soft); padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); background: var(--surface); }
+.movement-sheet__main-action { flex: 1; min-width: 0; padding-inline: var(--space-2); font-size: var(--text-xs); }
+.movement-sheet__more { margin-left: auto; min-width: 46px; padding-inline: var(--space-2); }

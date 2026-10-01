@@ -1,24 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { MaterialView } from '@/core/api/generated/model'
-import { withUnit } from '@/core/shipments/quantity'
-
-/**
- * Sevkiyatın bir kalemi: malzeme ve miktar. Seçme işini üstteki form yapar (tek seçici, her satıra bir tane
- * değil); burada yalnızca seçilen gösterilir. Seçilince altında o yerdeki kalan yazar ("Depoda: 300 Torba"):
- * ayrı bir stok ekranı yoktur, sayı merak edildiği tek anda burada durur.
- */
 const quantity = defineModel<number | null>('quantity', { required: true })
-const { material, available } = defineProps<{ material: MaterialView | null; available: number }>()
+const { material } = defineProps<{ material: MaterialView | null }>()
 const emit = defineEmits<{ pick: []; remove: [] }>()
-
-/**
- * "Depoda: 300 Torba" yalnızca gerçekten bir şey varken yazılır. Yeni açılmış ya da girişi hiç yazılmamış
- * malzemenin sayısı sıfırdır; "Depoda: 0" depo boş demek değil, kayıt yok demektir ve okuyanı yanıltır.
- */
-const stockText = computed(() =>
-  material && available > 0 ? `Depoda: ${withUnit(available, material.unit)}` : '',
-)
 
 function onQuantity(value: string) {
   quantity.value = value === '' ? null : Number(value)
@@ -26,24 +10,22 @@ function onQuantity(value: string) {
 </script>
 
 <template>
-  <van-swipe-cell>
-    <van-cell is-link center :title="material?.name ?? 'Malzeme seç'" :label="stockText" @click="emit('pick')" />
-    <van-field :model-value="quantity ?? ''" type="number" inputmode="decimal" label="Miktar" placeholder="0"
-      @update:model-value="onQuantity">
-      <template v-if="material" #button><span class="line__unit">{{ material.unit }}</span></template>
+  <div class="material-line">
+    <van-cell is-link center :title="material?.name ?? 'Malzeme seçin'" @click="emit('pick')" />
+    <van-field :model-value="quantity ?? ''" type="number" inputmode="decimal" label="Miktar"
+      placeholder="0" @update:model-value="onQuantity">
+      <template #button>
+        <div class="material-line__actions">
+          <span v-if="material" class="material-line__unit">{{ material.unit }}</span>
+          <van-button size="mini" plain type="danger" icon="delete-o" aria-label="Malzeme satırını sil"
+            @click="emit('remove')" />
+        </div>
+      </template>
     </van-field>
-    <template #right>
-      <van-button square type="danger" text="Sil" class="line__remove" @click="emit('remove')" />
-    </template>
-  </van-swipe-cell>
+  </div>
 </template>
 
 <style scoped>
-.line__unit {
-  color: var(--text-muted);
-}
-
-.line__remove {
-  height: 100%;
-}
+.material-line__actions { display: flex; align-items: center; gap: var(--space-3); }
+.material-line__unit { color: var(--text-muted); font-size: var(--text-sm); }
 </style>

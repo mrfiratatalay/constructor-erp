@@ -2,144 +2,126 @@
 import { computed, ref, watch } from 'vue'
 import { showFailToast, showSuccessToast, type UploaderFileListItem } from 'vant'
 import { errorMessage } from '@/core/api/errors'
-import { draftProblem, emptyDraft, newLine, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
-import { useShipmentOptions } from '@/core/shipments/useShipmentOptions'
-import { useShipmentSave } from '@/core/shipments/useShipmentSave'
-import { useStockAt } from '@/core/shipments/useStockAt'
+import type { MovementKind } from '@/core/shipments/movementPresentation'
+import { MOVEMENT_COPY } from '@/core/shipments/movementForm'
+import { shipmentNumber, withUnit } from '@/core/shipments/quantity'
+import { newLine } from '@/core/shipments/shipmentForm'
+import { useMovementComposer } from '@/core/shipments/useMovementComposer'
+import { confirmAction } from '@/mobile/confirmAction'
 import MaterialLineField from '@/mobile/molecules/MaterialLineField.vue'
+import MovementTargetField from '@/mobile/molecules/MovementTargetField.vue'
+import MovementReturnField from '@/mobile/molecules/MovementReturnField.vue'
+import MovementUploadField from '@/mobile/molecules/MovementUploadField.vue'
 import MaterialPickerSheet from '@/mobile/organisms/MaterialPickerSheet.vue'
 
-/**
- * Sevkiyat çıkarmak: üç soru. Nereye, ne kadar, irsaliye. "Nereden" sorulmaz — çıkış her zaman ana depodur.
- * Hareket türü de sorulmaz: nereye gittiğinden sunucu hesaplar. Dışarı verilende tek ek soru çıkar:
- * geri gelecek mi?
- */
 const show = defineModel<boolean>('show', { required: true })
+const { initialKind = 'SITE' } = defineProps<{ initialKind?: MovementKind }>()
 const emit = defineEmits<{ saved: [shipmentId: string] }>()
-
-const { sites, mainDepot, materials } = useShipmentOptions()
-const { save, isSaving } = useShipmentSave()
-const stock = useStockAt(() => mainDepot.value?.id ?? null)
-
-const draft = ref<ShipmentDraft>(emptyDraft())
+const { draft, returnId, original, awaiting, returnsLoading, returnsError, refetch, reset,
+  sites, mainDepot, materials, create, receive, isSaving } = useMovementComposer()
 const files = ref<UploaderFileListItem[]>([])
-const outside = computed(() => draft.value.targetKind === 'OUTSIDE')
-const inbound = computed(() => draft.value.targetKind === 'INBOUND')
-/** Hedef seçilene kadar liste açık durur; seçilince tek satıra iner, çünkü dokuz şantiyeli firmada form uzar. */
-const choosing = ref(true)
-/** Malzeme seçici tek tanedir; hangi kalem için açıldığı burada tutulur. */
 const pickingLine = ref<number | null>(null)
-
-const targetName = computed(() => {
-  if (outside.value) return 'Başka firmaya'
-  if (inbound.value) return 'Depoya mal geldi'
-  return sites.value.find((site) => site.id === draft.value.destinationId)?.name ?? ''
-})
-const materialOf = (materialId: string) => materials.value.find((item) => item.id === materialId) ?? null
+const submitting = ref(false)
+const busy = computed(() => submitting.value || isSaving.value)
+const copy = computed(() => MOVEMENT_COPY[initialKind])
+const returning = computed(() => initialKind === 'RETURN')
+const materialOf = (id: string) => materials.value.find((item) => item.id === id) ?? null
 
 watch(show, (open) => {
-  if (open) {
-    draft.value = emptyDraft()
-    files.value = []
-    choosing.value = true
-  }
-})
+  if (!open) return
+  reset(initialKind)
+  files.value = []
+  pickingLine.value = null
+}, { immediate: true })
 
-function pickTarget(kind: ShipmentDraft['targetKind'], siteId: string | null) {
-  draft.value.targetKind = kind
-  draft.value.destinationId = siteId
-  choosing.value = false
-}
-
-function chooseMaterial(materialId: string) {
+function chooseMaterial(id: string) {
   const line = draft.value.lines[pickingLine.value ?? 0]
-  if (line) line.materialId = materialId
+  if (line) line.materialId = id
   pickingLine.value = null
 }
 
+async function confirmReturn() {
+  if (!original.value) throw new Error('Geri beklenen bir hareket seçin.')
+  const lines = original.value.lines.map((line) => `${line.materialName}: ${withUnit(line.quantity, line.unit)}`)
+  const confirmed = await confirmAction({
+    title: 'Tamamı geri geldi mi?', danger: false, confirm: 'Tamamı geri geldi',
+    message: `${shipmentNumber(original.value.number)} · ${original.value.toName}\n\n${lines.join('\n')}\n\nTüm malzemeler tam miktarıyla geri alınacak.`,
+  })
+  return confirmed ? receive() : null
+}
+
 async function submit() {
-  const problem = draftProblem(draft.value)
-  if (problem) return showFailToast(problem)
-  if (!mainDepot.value) return showFailToast('Depo bulunamadı.')
+  if (busy.value) return
+  submitting.value = true
   try {
-    const documents = files.value.map((item) => item.file).filter((file): file is File => !!file)
-    const detail = await save(requestOf(draft.value, mainDepot.value.id), documents)
-    showSuccessToast('Sevkiyat kaydedildi')
+    const documents = files.value.flatMap((file) => file.file ? [file.file] : [])
+    const detail = await (returning.value ? confirmReturn() : create(documents))
+    if (!detail) return
+    showSuccessToast(returning.value ? 'Malzemelerin geri dönüşü kaydedildi.' : 'Malzeme hareketi kaydedildi.')
     show.value = false
     emit('saved', detail.row.id)
   } catch (error) {
     showFailToast(errorMessage(error))
+  } finally {
+    submitting.value = false
   }
 }
 </script>
 
 <template>
-  <van-popup v-model:show="show" position="bottom" :style="{ height: '100%' }" teleport="body">
-    <van-nav-bar title="Sevkiyat çıkar" left-text="Vazgeç" safe-area-inset-top @click-left="show = false" />
-
-    <div class="form">
-      <van-divider content-position="left">1 · Nereye gidiyor?</van-divider>
-      <van-cell-group v-if="!choosing" inset>
-        <van-cell is-link :title="targetName" @click="choosing = true" />
-      </van-cell-group>
-      <van-cell-group v-else inset>
-        <van-cell v-for="site in sites" :key="site.id" :title="site.name" clickable
-          @click="pickTarget('SITE', site.id)" />
-        <van-cell title="Başka firmaya" clickable @click="pickTarget('OUTSIDE', null)" />
-        <van-cell title="Depoya mal geldi" clickable @click="pickTarget('INBOUND', null)" />
-      </van-cell-group>
-      <van-cell-group v-if="outside || inbound" inset>
-        <van-field v-model="draft.partyName" :label="inbound ? 'Kimden' : 'Kime'"
-          placeholder="Firma ya da kişi adı" />
-        <van-cell v-if="outside" title="Geri gelecek mi?">
-          <template #right-icon><van-switch v-model="draft.expectsReturn" size="22" /></template>
-        </van-cell>
-      </van-cell-group>
-
-      <van-divider content-position="left">2 · Ne, ne kadar?</van-divider>
-      <van-cell-group v-for="(line, index) in draft.lines" :key="line.key" inset>
-        <MaterialLineField v-model:quantity="line.quantity" :material="materialOf(line.materialId)"
-          :available="stock.quantityOf(line.materialId)" @pick="pickingLine = index"
-          @remove="draft.lines.splice(index, 1)" />
-      </van-cell-group>
-      <div class="form__add">
-        <van-button size="small" icon="plus" round block
-          @click="draft.lines.push(newLine())">
-          Bir şey daha ekle
-        </van-button>
-      </div>
-
-      <van-divider content-position="left">3 · İrsaliye</van-divider>
-      <van-cell-group inset>
-        <van-field label="Fotoğraf">
-          <template #input>
-            <van-uploader v-model="files" accept="image/*,application/pdf" capture="environment" :max-count="3" />
-          </template>
-        </van-field>
-        <van-field v-model="draft.description" label="Açıklama" type="textarea" rows="2" autosize
-          placeholder="Anlaşma, kim teslim aldı…" />
-      </van-cell-group>
-
-      <div class="form__send">
-        <van-button type="primary" block round :loading="isSaving" @click="submit">Gönder</van-button>
-      </div>
+  <van-popup v-model:show="show" position="bottom" teleport="body" :close-on-click-overlay="!busy"
+    :style="{ height: '100%' }" class="movement-form">
+    <van-nav-bar :title="copy.title" :left-text="busy ? '' : 'Vazgeç'" safe-area-inset-top
+      @click-left="!busy && (show = false)" />
+    <div class="movement-form__body" :class="{ 'movement-form__body--busy': busy }" :inert="busy">
+      <p class="movement-form__intro">{{ copy.subtitle }}</p>
+      <MovementReturnField v-if="returning" v-model="returnId" :awaiting="awaiting" :original="original"
+        :loading="returnsLoading" :failed="returnsError" @retry="refetch()" />
+      <template v-else>
+        <section>
+          <van-divider content-position="left">{{ initialKind === 'INBOUND' ? 'Kaynak' : 'Hedef' }}</van-divider>
+          <MovementTargetField v-model="draft" :sites="sites" :depot-name="mainDepot?.name ?? 'Ana depo yükleniyor…'" />
+        </section>
+        <section>
+          <van-divider content-position="left">Malzemeler</van-divider>
+          <van-cell-group v-for="(line, index) in draft.lines" :key="line.key" inset class="movement-form__line">
+            <MaterialLineField v-model:quantity="line.quantity" :material="materialOf(line.materialId)"
+              @pick="pickingLine = index" @remove="draft.lines.splice(index, 1)" />
+          </van-cell-group>
+          <div class="movement-form__add">
+            <van-button size="small" icon="plus" round block @click="draft.lines.push(newLine())">Malzeme ekle</van-button>
+          </div>
+        </section>
+        <section>
+          <van-divider content-position="left">İrsaliye · İsteğe bağlı</van-divider>
+          <MovementUploadField v-model="files" />
+        </section>
+        <section>
+          <van-divider content-position="left">Açıklama · İsteğe bağlı</van-divider>
+          <van-cell-group inset>
+            <van-field v-model="draft.description" type="textarea" rows="3" autosize maxlength="500" show-word-limit
+              placeholder="Teslim alan kişi veya not…" aria-label="Açıklama" />
+          </van-cell-group>
+        </section>
+      </template>
     </div>
-
+    <footer class="movement-form__footer">
+      <van-button type="primary" block round :loading="busy" :disabled="returning && !original"
+        @click="submit">{{ copy.submit }}</van-button>
+    </footer>
     <MaterialPickerSheet :show="pickingLine !== null" :materials="materials" @choose="chooseMaterial"
       @update:show="(open: boolean) => !open && (pickingLine = null)" />
   </van-popup>
 </template>
 
 <style scoped>
-.form {
-  overflow-y: auto;
-  height: calc(100% - var(--van-nav-bar-height));
-  padding-bottom: var(--van-padding-xl);
-  background: var(--van-background);
-}
-
-.form__add,
-.form__send {
-  padding: var(--van-padding-md);
-}
+.movement-form { display: flex; flex-direction: column; background: var(--van-background); }
+.movement-form > :deep(.van-nav-bar) { flex-shrink: 0; }
+.movement-form :deep(.van-nav-bar__title) { font-size: var(--text-sm); max-width: 67%; }
+.movement-form__body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: var(--space-5); }
+.movement-form__body--busy { pointer-events: none; }
+.movement-form__intro { margin: var(--space-4) var(--space-5); color: var(--text-muted); font-size: var(--text-sm); line-height: 1.6; }
+.movement-form__line { margin-bottom: var(--space-3); }
+.movement-form__add { padding: 0 var(--space-4); }
+.movement-form__footer { flex-shrink: 0; padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border-soft); }
 </style>
