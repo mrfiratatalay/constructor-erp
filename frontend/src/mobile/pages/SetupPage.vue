@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/mobile/molecules/LinkFailed.vue'
 import { showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import { SETUP_STEPS } from '@/core/onboarding/setupSteps'
@@ -29,9 +30,7 @@ async function onUpload(file: File) {
       <BrandLogo size="md" />
     </header>
     <van-loading v-if="wizard.isLoading.value" class="setup-page__loading" vertical>Yükleniyor…</van-loading>
-    <van-empty v-else-if="!invite" image="error" :description="wizard.inviteError.value ?? 'Bağlantı açılamadı'">
-      <RouterLink :to="{ name: 'login' }"><van-button round type="primary">Giriş sayfasına git</van-button></RouterLink>
-    </van-empty>
+    <LinkFailed v-else-if="!invite" :message="wizard.inviteError.value ?? 'Bağlantı açılamadı'" />
     <template v-else>
       <div class="setup-page__intro">
         <small>Hoş geldiniz · Kurulum</small>

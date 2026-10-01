@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/desktop/molecules/LinkFailed.vue'
 import { useInviteAcceptance } from '@/core/auth/useInviteAcceptance'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
@@ -8,7 +9,7 @@ const { errorText } = useInviteAcceptance()
 <template>
   <main class="invite-page">
     <BrandLogo />
-    <el-result v-if="errorText" icon="error" title="Giriş yapılamadı" :sub-title="errorText" />
+    <LinkFailed v-if="errorText" title="Giriş yapılamadı" :message="errorText" />
     <p v-else class="invite-page__loading">Giriş yapılıyor…</p>
   </main>
 </template>

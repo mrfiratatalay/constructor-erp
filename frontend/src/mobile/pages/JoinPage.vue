@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/mobile/molecules/LinkFailed.vue'
 import { ref, watch } from 'vue'
 import { showFailToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
@@ -28,7 +29,7 @@ async function submit() {
   <main class="join-page">
     <BrandLogo />
     <van-loading v-if="isLoading" vertical size="32" />
-    <van-empty v-else-if="loadError" image="error" :description="loadError" />
+    <LinkFailed v-else-if="loadError" :message="loadError" />
     <van-form v-else-if="invite && !invite.alreadyInside" class="join-page__form" @submit="submit">
       <header class="join-page__head">
         <p>Şantiye ekibine katıl</p>
