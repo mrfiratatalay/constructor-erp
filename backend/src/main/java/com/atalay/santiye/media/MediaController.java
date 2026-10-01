@@ -1,6 +1,7 @@
 package com.atalay.santiye.media;
 
 import com.atalay.santiye.auth.CurrentUser;
+import com.atalay.santiye.auth.Permission;
 import com.atalay.santiye.common.error.ApiException;
 import com.atalay.santiye.site.SiteAccess;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -13,6 +14,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,8 +45,9 @@ class MediaController {
     }
 
     @GetMapping("/{mediaId}")
-    ResponseEntity<Resource> getMediaFile(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID mediaId) {
-        Media item = readable(user, mediaId);
+    ResponseEntity<Resource> getMediaFile(@AuthenticationPrincipal CurrentUser user, Authentication authentication,
+        @PathVariable UUID mediaId) {
+        Media item = readable(user, authentication, mediaId);
         ResponseEntity.BodyBuilder response = ok(item.getKind().displayContentType());
         if (item.getKind() == MediaKind.DOCUMENT && item.getFileName() != null) {
             response.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
@@ -54,22 +57,36 @@ class MediaController {
     }
 
     @GetMapping("/{mediaId}/thumbnail")
-    ResponseEntity<Resource> getMediaThumbnail(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID mediaId) {
-        Media item = readable(user, mediaId);
+    ResponseEntity<Resource> getMediaThumbnail(@AuthenticationPrincipal CurrentUser user, Authentication authentication,
+        @PathVariable UUID mediaId) {
+        Media item = readable(user, authentication, mediaId);
         if (!item.getKind().hasThumbnail()) {
             throw ApiException.notFound("Önizleme yok.");
         }
         return ok(MediaType.IMAGE_JPEG_VALUE).body(existing(storage.thumbnailResource(item)));
     }
 
-    /** Başka firmanın ya da görülemeyen şantiyenin dosyası "bulunamadı" döner. */
-    private Media readable(CurrentUser user, UUID mediaId) {
+    /**
+     * Başka firmanın ya da görülemeyen şantiyenin dosyası "bulunamadı" döner. Saha'ya yansıtılmamış imalat dosyası da
+     * yalnızca ilerlemeyi görenlere (VIEW_PRODUCTION) açılır: çalışan onu ancak adresini ele geçirerek isteyebilir.
+     */
+    private Media readable(CurrentUser user, Authentication authentication, UUID mediaId) {
         Media item = media.findById(mediaId)
             .filter(candidate -> candidate.getCompanyId().equals(user.companyId()))
             .filter(candidate -> candidate.getStatus() == MediaStatus.READY)
+            .filter(candidate -> !productionOnly(candidate) || canViewProduction(authentication))
             .orElseThrow(() -> ApiException.notFound("Dosya bulunamadı."));
         siteAccess.requireVisible(user, item.getSiteId());
         return item;
+    }
+
+    private static boolean productionOnly(Media item) {
+        return item.getPostId() == null && item.getProductionEntryId() != null;
+    }
+
+    private static boolean canViewProduction(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+            .anyMatch(authority -> Permission.VIEW_PRODUCTION.name().equals(authority.getAuthority()));
     }
 
     /** Kaydı olup diskte dosyası olmayan medya (ör. başka ortamda yüklenmiş) sunucu hatası değil, "bulunamadı"dır. */
