@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { UserPlus } from 'lucide-vue-next'
 import { dayTitle, todayIsoDate } from '@/core/format/dates'
+import { useDailyPuantaj } from '@/core/puantaj/useDailyPuantaj'
 import { usePuantajTab } from '@/core/puantaj/usePuantajTab'
 import PuantajTabs from '@/mobile/molecules/PuantajTabs.vue'
 import MonthPanel from '@/mobile/organisms/MonthPanel.vue'
@@ -19,6 +20,8 @@ const route = useRoute()
 const router = useRouter()
 const { tab, setTab } = usePuantajTab()
 const selecting = ref(false)
+// Liste boşken "Seç" seçilecek kimse olmayan bir moda götürüyordu; ilk kişi eklenince görünür (sorgu önbellekten gelir).
+const { isEmpty } = useDailyPuantaj()
 const formOpen = ref(false)
 
 watch(tab, () => (selecting.value = false))
@@ -31,7 +34,7 @@ const openEntry = (entryId: string) =>
   <MobilePage title="Yoklama" :subtitle="dayTitle(todayIsoDate())">
     <template #action>
       <van-space :size="8" align="center">
-        <van-button v-if="tab === 'today'" size="small" round plain type="primary" @click="selecting = !selecting">
+        <van-button v-if="tab === 'today' && !isEmpty" size="small" round plain type="primary" @click="selecting = !selecting">
           {{ selecting ? 'Bitti' : 'Seç' }}
         </van-button>
         <!-- İkon lucide'den: Vant'ın başlık çubuğu kendi ikonlarını ana renge boyar, dolu düğmede ikon kayboluyordu. -->
