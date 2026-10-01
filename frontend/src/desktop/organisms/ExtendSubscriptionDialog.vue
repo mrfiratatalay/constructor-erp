@@ -18,7 +18,7 @@ import PlanChoice from '@/desktop/molecules/PlanChoice.vue'
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
 const show = defineModel<boolean>('show', { required: true })
 const plans = useActivePlans()
-const { extend } = useTenantActions(() => tenant.summary.id)
+const { extend, isBusy } = useTenantActions(() => tenant.summary.id)
 const currentPlanId = () => tenant.subscriptions.find((period) => period.id === tenant.currentSubscriptionId)?.planId
 const form = ref({ planId: '', months: 1, note: '', payment: emptyPayment() })
 
@@ -28,6 +28,7 @@ watch(() => [form.value.planId, form.value.months], () => {
 })
 
 async function submit() {
+  if (isBusy.value) return
   try {
     const { planId, months, note, payment } = form.value
     await extend({ planId, months, note: note || null, payment: paymentRequestOf(payment) })
@@ -51,7 +52,7 @@ async function submit() {
     </el-form>
     <template #footer>
       <el-button @click="show = false">Vazgeç</el-button>
-      <el-button type="primary" @click="submit">Dönemi ekle</el-button>
+      <el-button type="primary" :loading="isBusy" @click="submit">Dönemi ekle</el-button>
     </template>
   </el-dialog>
 </template>

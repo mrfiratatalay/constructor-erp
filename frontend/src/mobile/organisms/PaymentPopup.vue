@@ -10,7 +10,7 @@ import PaymentFieldCells from '@/mobile/molecules/PaymentFieldCells.vue'
 /** Ödeme kaydet telefonda: bugünkü döneme bağlanır. */
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
 const show = defineModel<boolean>('show', { required: true })
-const { recordPayment } = useTenantActions(() => tenant.summary.id)
+const { recordPayment, isBusy } = useTenantActions(() => tenant.summary.id)
 const form = ref(emptyPayment())
 
 watch(show, (open) => {
@@ -19,6 +19,7 @@ watch(show, (open) => {
 })
 
 async function submit() {
+  if (isBusy.value) return
   const request = paymentRequestOf({ ...form.value, paid: true }, tenant.currentSubscriptionId ?? undefined)
   if (!request) return showFailToast('Tutar sıfırdan büyük olmalı')
   try {
@@ -36,7 +37,7 @@ async function submit() {
     <div class="payment">
       <h3>Ödeme kaydet</h3>
       <van-cell-group inset><PaymentFieldCells v-model="form" :optional="false" /></van-cell-group>
-      <van-button type="primary" block round @click="submit">Kaydet</van-button>
+      <van-button type="primary" block round :loading="isBusy" @click="submit">Kaydet</van-button>
     </div>
   </van-popup>
 </template>

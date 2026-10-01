@@ -15,7 +15,7 @@ import PaymentFieldCells from '@/mobile/molecules/PaymentFieldCells.vue'
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
 const show = defineModel<boolean>('show', { required: true })
 const plans = useActivePlans()
-const { extend } = useTenantActions(() => tenant.summary.id)
+const { extend, isBusy } = useTenantActions(() => tenant.summary.id)
 const planOptions = computed(() => plans.value.map((plan) => ({ value: plan.id, label: plan.name })))
 const monthOptions = MONTH_CHOICES.map((value) => ({ value: String(value), label: `${value} ay` }))
 const form = ref({ planId: '', months: '1', payment: emptyPayment() })
@@ -29,6 +29,7 @@ watch(() => [form.value.planId, form.value.months], () => {
 })
 
 async function submit() {
+  if (isBusy.value) return
   try {
     const { planId, months, payment } = form.value
     await extend({ planId, months: Number(months), payment: paymentRequestOf(payment) })
@@ -49,7 +50,7 @@ async function submit() {
         <van-field label="Süre"><template #input><ChoiceChips v-model="form.months" :options="monthOptions" /></template></van-field>
         <PaymentFieldCells v-model="form.payment" />
       </van-cell-group>
-      <van-button type="primary" block round @click="submit">Dönemi ekle</van-button>
+      <van-button type="primary" block round :loading="isBusy" @click="submit">Dönemi ekle</van-button>
     </div>
   </van-popup>
 </template>

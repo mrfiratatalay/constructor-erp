@@ -8,7 +8,7 @@ import { useTenantActions } from '@/core/admin/useTenantActions'
 /** Firmanın kimlik bilgilerini platform tarafında düzeltmek (müşteri kendi Firma sayfasından da düzeltebilir). */
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
 const show = defineModel<boolean>('show', { required: true })
-const { update } = useTenantActions(() => tenant.summary.id)
+const { update, isBusy } = useTenantActions(() => tenant.summary.id)
 const form = reactive({ name: '', phone: '', email: '', city: '' })
 
 watch(show, (open) => open && Object.assign(form, {
@@ -16,6 +16,7 @@ watch(show, (open) => open && Object.assign(form, {
 }))
 
 async function submit() {
+  if (isBusy.value) return
   try {
     await update({ name: form.name, phone: form.phone || null, email: form.email || null, city: form.city || null })
     show.value = false
@@ -36,7 +37,7 @@ async function submit() {
     </el-form>
     <template #footer>
       <el-button @click="show = false">Vazgeç</el-button>
-      <el-button type="primary" @click="submit">Kaydet</el-button>
+      <el-button type="primary" :loading="isBusy" @click="submit">Kaydet</el-button>
     </template>
   </el-dialog>
 </template>
