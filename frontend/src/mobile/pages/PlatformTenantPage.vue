@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import { lifecycleActions, type LifecycleAction } from '@/core/admin/tenantLifecycle'
 import { tenantBadge } from '@/core/admin/tenantStatus'
@@ -9,6 +9,7 @@ import { useTenantActions } from '@/core/admin/useTenantActions'
 import { useTenantDetail } from '@/core/admin/useTenantDetail'
 import { useTenantInvites } from '@/core/admin/useTenantInvites'
 import { dayWithYear, timeAgo } from '@/core/format/dates'
+import { confirmAction } from '@/mobile/confirmAction'
 import ExtendPeriodPopup from '@/mobile/organisms/ExtendPeriodPopup.vue'
 import OnboardingLinkPopup from '@/mobile/organisms/OnboardingLinkPopup.vue'
 import PaymentPopup from '@/mobile/organisms/PaymentPopup.vue'
@@ -29,13 +30,10 @@ const actions = computed(() => lifecycleActions(tenant.value?.summary.status ?? 
 
 async function apply({ action }: { action: LifecycleAction }) {
   choosing.value = false
-  try {
-    await showConfirmDialog({ title: action.label, message: action.confirm, confirmButtonText: action.label, cancelButtonText: 'Vazgeç' })
-    await changeStatus({ status: action.status, reason: null })
-    showSuccessToast('Güncellendi')
-  } catch (error) {
-    if (error !== 'cancel') showFailToast(errorMessage(error))
-  }
+  const danger = action.status !== 'ACTIVE'
+  if (!(await confirmAction({ title: action.label, message: action.confirm, confirm: action.label, danger }))) return
+  await changeStatus({ status: action.status, reason: null })
+    .then(() => showSuccessToast('Güncellendi'), (error) => showFailToast(errorMessage(error)))
 }
 </script>
 

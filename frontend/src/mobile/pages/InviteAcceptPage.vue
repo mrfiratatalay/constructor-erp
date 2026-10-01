@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/mobile/molecules/LinkFailed.vue'
 import { useInviteAcceptance } from '@/core/auth/useInviteAcceptance'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
@@ -8,7 +9,7 @@ const { errorText } = useInviteAcceptance()
 <template>
   <main class="invite-page">
     <BrandLogo />
-    <van-empty v-if="errorText" image="error" :description="errorText" />
+    <LinkFailed v-if="errorText" :message="errorText" />
     <van-loading v-else vertical size="32">Giriş yapılıyor…</van-loading>
   </main>
 </template>

@@ -99,3 +99,38 @@ html .van-cell__value:not(.van-field__value) {
   flex: none;
   max-width: 55%;
 }
+
+/*
+ * Boş durumda resim yerine ikon verilince (#image yuvası: lucide ya da van-icon) Vant'ın 160 px'lik resim kutusu
+ * kalıyordu: ikon kutunun sol üst köşesinde duruyor, yazıyla arasına yüz piksellik boşluk giriyordu. Kutu ikon
+ * kadar olur ve ortalanır; rengi boş durum yazısının soluk tonudur. Vant'ın hazır resimleri (error, search: 160'lık
+ * svg) bu kurala girmez, kendi boyunda kalır.
+ */
+/* Açıklama, ortalanmış ikonun altında sola yaslı duruyordu (Vant metni hizalamaz); boş durum ortadan okunur. */
+html .van-empty__description {
+  text-align: center;
+}
+
+html .van-empty__image:has(> .lucide, > .van-icon) {
+  display: grid;
+  place-items: center;
+  width: auto;
+  height: auto;
+  color: var(--text-subtle);
+}
+
+/*
+ * Vant toast'ı kelimeyi ortasından böler (break-all) ve ikonlu toast 88 px'te sabittir: sunucunun uzun hata cümlesi
+ * ("Paketinizin aktif şantiye sınırı doldu…") harf harf kırılıp okunmuyordu. Kelime bölünmez; uzun mesajda kutu
+ * içeriği kadar (en çok ekranın %70'i) genişler, kısa mesajda kare kalır.
+ */
+html .van-toast {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+html .van-toast--fail,
+html .van-toast--success {
+  width: fit-content;
+  min-width: var(--van-toast-default-width);
+}

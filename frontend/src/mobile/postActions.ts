@@ -1,8 +1,9 @@
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import type { PostView } from '@/core/api/generated/model'
 import type { PostMenuItem } from '@/core/posts/postMenu'
 import { usePostActions } from '@/core/posts/usePostActions'
+import { confirmAction } from '@/mobile/confirmAction'
 
 /** Menü öğeleri, Vant'ın alttan açılan menüsünün beklediği biçimde; silme kırmızı. */
 export function sheetItems<Action extends string>(items: PostMenuItem<Action>[]) {
@@ -38,13 +39,11 @@ export function useSheetActions() {
     attempt(() => actions.toggleField(post), post.fieldUpdate ? 'Sahadan çıkarıldı' : 'Sahaya eklendi')
 
   async function confirmDelete(post: PostView) {
-    const confirmed = await showConfirmDialog({
+    const confirmed = await confirmAction({
       title: 'Mesaj silinsin mi?',
       message: 'Yerinde "silindi" izi kalır; fotoğraf ve sesler kalıcı olarak silinir.',
-      confirmButtonText: 'Sil',
-      confirmButtonColor: 'var(--status-danger)',
-      cancelButtonText: 'Vazgeç',
-    }).then(() => true, () => false)
+      confirm: 'Sil',
+    })
     if (confirmed) await attempt(() => actions.deletePost(post.id), 'Silindi')
   }
 

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Copy, MessageCircle, RotateCcw } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import { copyText } from '@/core/team/loginLink'
 import { useJoinLink } from '@/core/team/useJoinLink'
+import { confirmAction } from '@/desktop/confirmAction'
 
 /**
  * Kişi ekle: firmanın tek bağlantısı (WhatsApp grup bağlantısı gibi). Herkes onu WhatsApp grubuna atar; tıklayan
@@ -18,11 +19,11 @@ async function copy() {
 }
 
 async function confirmReset() {
-  const confirmed = await ElMessageBox.confirm(
-    'Eski bağlantı çalışmaz; yenisini WhatsApp grubuna yeniden atman gerekir. Katılmış olanlar içeride kalır.',
-    'Bağlantı sıfırlansın mı?',
-    { confirmButtonText: 'Sıfırla', cancelButtonText: 'Vazgeç', type: 'warning' },
-  ).then(() => true, () => false)
+  const confirmed = await confirmAction({
+    title: 'Bağlantı sıfırlansın mı?',
+    message: 'Eski bağlantı çalışmaz; yenisini WhatsApp grubuna yeniden atman gerekir. Katılmış olanlar içeride kalır.',
+    confirm: 'Sıfırla',
+  })
   if (!confirmed) return
   await reset().then(() => ElMessage.success('Yeni bağlantı hazır'), (error) => ElMessage.error(errorMessage(error)))
 }

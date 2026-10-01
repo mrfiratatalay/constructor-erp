@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { showConfirmDialog, showFailToast } from 'vant'
+import { showFailToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import { entrySubtitle, entryTitle } from '@/core/puantaj/puantajLabels'
 import { useEntryMonth } from '@/core/puantaj/useEntryMonth'
 import { useRoster } from '@/core/puantaj/useRoster'
+import { confirmAction } from '@/mobile/confirmAction'
 import EntryTotalsList from '@/mobile/molecules/EntryTotalsList.vue'
 import MarkCalendar from '@/mobile/molecules/MarkCalendar.vue'
 import DaySheet from '@/mobile/organisms/DaySheet.vue'
@@ -35,8 +36,7 @@ function pickDay(day: string) {
 async function archive() {
   const name = row.value ? entryTitle(row.value.entry) : ''
   const message = 'Bugünden sonra listede görünmez; geçmiş günleri puantajda kalır.'
-  const confirmed = await showConfirmDialog({ title: `${name} listeden çıkarılsın mı?`, message,
-    confirmButtonText: 'Çıkar', cancelButtonText: 'Vazgeç' }).then(() => true, () => false)
+  const confirmed = await confirmAction({ title: `${name} listeden çıkarılsın mı?`, message, confirm: 'Çıkar' })
   if (!confirmed) return
   await roster.archive(entryId.value).then(() => router.back(), (error) => showFailToast(errorMessage(error)))
 }

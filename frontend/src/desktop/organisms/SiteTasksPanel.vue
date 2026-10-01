@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { ChevronLeft, ListChecks } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { TaskView, TaskViewStatus } from '@/core/api/generated/model'
@@ -10,6 +10,7 @@ import { useCurrentUser } from '@/core/auth/currentUser'
 import { assigneeChoices } from '@/core/tasks/assigneeChoices'
 import { canDeleteTask } from '@/core/tasks/taskPermissions'
 import { useSiteTasks, type TaskForm } from '@/core/tasks/useSiteTasks'
+import { confirmAction } from '@/desktop/confirmAction'
 import DetailPane from '@/desktop/molecules/DetailPane.vue'
 import TaskDrawer from '@/desktop/organisms/TaskDrawer.vue'
 import TaskFormDialog from '@/desktop/organisms/TaskFormDialog.vue'
@@ -61,9 +62,7 @@ function move(task: TaskView, status: TaskViewStatus) {
 
 /** Silmek onay ister: görev ve bilgileri kalıcı olarak gider. Vazgeçmek hata değildir. */
 async function remove(task: TaskView) {
-  const confirmed = await ElMessageBox.confirm(`"${task.title}" kalıcı olarak silinir.`, 'Görev silinsin mi?', {
-    confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç', type: 'warning', confirmButtonClass: 'el-button--danger',
-  }).then(() => true, () => false)
+  const confirmed = await confirmAction({ title: 'Görev silinsin mi?', message: `"${task.title}" kalıcı olarak silinir.`, confirm: 'Sil' })
   if (!confirmed) return
   selectedId.value = null
   if (await attempt(() => deleteTask(task))) ElMessage.success('Silindi')

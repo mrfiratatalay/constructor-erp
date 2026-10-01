@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { showConfirmDialog, showFailToast, showNotify, type UploaderFileListItem } from 'vant'
+import { showFailToast, showNotify, type UploaderFileListItem } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionItemView } from '@/core/api/generated/model'
 import { ENTRY_FILE_ACCEPT, ENTRY_FILE_LIMIT, entryFileProblem } from '@/core/production/entryFiles'
 import { barPercent, entryAmount, percentLabel, progressLine } from '@/core/production/productionFormat'
 import { useProductionEntry } from '@/core/production/useProductionEntry'
+import { confirmAction } from '@/mobile/confirmAction'
 import DateField from '@/mobile/molecules/DateField.vue'
 import TradeIcon from '@/shared/atoms/TradeIcon.vue'
 
@@ -37,8 +38,7 @@ function acceptable(picked: File | File[]) {
 }
 
 const confirmOverflow = (message: string) =>
-  showConfirmDialog({ title: 'Toplamı aşıyor', message, confirmButtonText: 'Evet, kaydet', cancelButtonText: 'Vazgeç' })
-    .then(() => true, () => false)
+  confirmAction({ title: 'Toplamı aşıyor', message, confirm: 'Evet, kaydet', danger: false })
 
 async function submit() {
   if (!item) return

@@ -29,9 +29,23 @@ const year = new Date().getFullYear()
 </template>
 
 <style scoped>
+/* Kısa sayfada (başvuru teşekkürü) alt bilgi ekranın dibine oturur; altında boş beyaz şerit kalmaz. */
 .marketing {
+  display: flex;
+  flex-direction: column;
   min-height: var(--layout-app-height);
   background: var(--surface);
+}
+
+.marketing > main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* Boşluğu sayfanın son bölümü doldurur: kendi zemin rengiyle uzar, alt bilginin üstünde beyaz şerit kalmaz. */
+.marketing > main > :last-child {
+  flex: 1;
 }
 
 .marketing__top {

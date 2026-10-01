@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { showConfirmDialog, showFailToast, showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import { errorMessage } from '@/core/api/errors'
 import { shipmentNumber, withUnit } from '@/core/shipments/quantity'
 import { cancelledLabel, HISTORY_LABELS, routeText, TYPE_LABELS, waitingText } from '@/core/shipments/shipmentLabels'
 import { useMaterialPermissions } from '@/core/shipments/useMaterialPermissions'
 import { useShipmentActions } from '@/core/shipments/useShipmentActions'
 import { useShipmentDetail } from '@/core/shipments/useShipmentDetail'
+import { confirmAction } from '@/mobile/confirmAction'
 
 /**
  * Sevkiyatın ayrıntısı: künyesi, kalemleri, irsaliyesi ve değişmez geçmişi. Teslim alma adımı yoktur — sevkiyat
@@ -33,12 +34,11 @@ async function onReceive() {
 
 /** İptalin nedeni zorunludur ve geçmişte kalır; kayıt silinmez. */
 async function onCancel() {
-  const asked = await showConfirmDialog({
+  const asked = await confirmAction({
     title: 'Sevkiyat iptal edilsin mi?',
     message: 'Kayıt silinmez, "İptal" olarak kalır.',
-    confirmButtonText: 'İptal et',
-    cancelButtonText: 'Vazgeç',
-  }).then(() => true, () => false)
+    confirm: 'İptal et',
+  })
   if (!asked || !shipmentId.value) return
   try {
     await cancel(shipmentId.value, 'Yanlış kayıt')
@@ -71,8 +71,9 @@ async function onCancel() {
       </van-cell-group>
 
       <van-cell-group v-if="detail.documents.length" inset title="İrsaliye">
+        <!-- Cell'in url'si aynı sekmede açar (location.href) ve kişi uygulamadan çıkar; gerçek bağlantı yeni sekmede. -->
         <van-cell v-for="document in detail.documents" :key="document.id" :title="document.fileName" is-link
-          :url="document.url" target="_blank" />
+          tag="a" :href="document.url" target="_blank" rel="noopener" />
       </van-cell-group>
 
       <van-cell-group inset title="Geçmiş">

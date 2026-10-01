@@ -1,6 +1,12 @@
 import { computed } from 'vue'
 import { useGetCompanySubscription } from '@/core/api/generated/account/account'
-import { stateOf, usageLabel, usagePercent } from '@/core/billing/billingLabels'
+import { stateOf, usageLabel, usageLevel, usagePercent } from '@/core/billing/billingLabels'
+
+/** Bir sınırın satırı. limited: paket sınır koyuyor mu; sınırsızda çubuk çizilmez (5 / sınırsız'ın doluluğu olmaz). */
+function usageRow(label: string, used: number, limit: number | null | undefined) {
+  const percent = usagePercent(used, limit)
+  return { label, text: usageLabel(used, limit), percent, limited: limit != null, level: usageLevel(percent) }
+}
 
 /**
  * Patronun abonelik özeti: paket, dönem, kullanım (kişi, şantiye / paket sınırı), paketteki modüller, geçmiş dönemler
@@ -12,8 +18,8 @@ export function useCompanySubscription() {
     const value = data.value
     if (!value) return []
     return [
-      { label: 'Kişi', text: usageLabel(value.activeUsers, value.maxUsers), percent: usagePercent(value.activeUsers, value.maxUsers) },
-      { label: 'Aktif şantiye', text: usageLabel(value.activeSites, value.maxSites), percent: usagePercent(value.activeSites, value.maxSites) },
+      usageRow('Kişi', value.activeUsers, value.maxUsers),
+      usageRow('Aktif şantiye', value.activeSites, value.maxSites),
     ]
   })
   return { subscription: data, isPending, usage, state: computed(() => stateOf(data.value?.state)) }

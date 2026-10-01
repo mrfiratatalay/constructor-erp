@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
-import { ElMessage, ElMessageBox, ElNotification, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
 import { FileText, ImagePlus, Trash2 } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionItemView } from '@/core/api/generated/model'
 import { ENTRY_FILE_ACCEPT, ENTRY_FILE_LIMIT, entryFileProblem } from '@/core/production/entryFiles'
 import { barPercent, entryAmount, percentLabel, progressLine } from '@/core/production/productionFormat'
 import { useProductionEntry } from '@/core/production/useProductionEntry'
+import { confirmAction } from '@/desktop/confirmAction'
 import TradeIcon from '@/shared/atoms/TradeIcon.vue'
 
 /**
@@ -40,8 +41,7 @@ function onPicked(file: UploadFile) {
 }
 
 const confirmOverflow = (question: string) =>
-  ElMessageBox.confirm(question, 'Toplamı aşıyor', { confirmButtonText: 'Evet, kaydet', cancelButtonText: 'Vazgeç',
-    type: 'warning' }).then(() => true, () => false)
+  confirmAction({ title: 'Toplamı aşıyor', message: question, confirm: 'Evet, kaydet', danger: false })
 
 async function submit() {
   tried.value = true
@@ -52,7 +52,8 @@ async function submit() {
     await save(item, files.value.flatMap((file) => (file.raw ? [file.raw] : [])))
     const field = form.onField ? ' Saha akışına da eklendi.' : ''
     const message = `${item.name} için ${entryAmount(quantity.value, item.unit)} kaydedildi.${field}`
-    ElNotification.success({ title: 'İlerleme kaydedildi', message })
+    // Platformdaki her başarı bildirimi gibi üstte ortada: burada tek başına sağ üstte bildirim kartı açılıyordu.
+    ElMessage.success(message)
     show.value = false
   } catch (error) {
     ElMessage.error(errorMessage(error))

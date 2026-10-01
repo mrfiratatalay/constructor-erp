@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { showFailToast, showSuccessToast, type UploaderFileListItem } from 'vant'
 import { errorMessage } from '@/core/api/errors'
-import { draftProblem, emptyDraft, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
+import { draftProblem, emptyDraft, newLine, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
 import { useShipmentOptions } from '@/core/shipments/useShipmentOptions'
 import { useShipmentSave } from '@/core/shipments/useShipmentSave'
 import { useStockAt } from '@/core/shipments/useStockAt'
@@ -97,14 +97,14 @@ async function submit() {
       </van-cell-group>
 
       <van-divider content-position="left">2 · Ne, ne kadar?</van-divider>
-      <van-cell-group v-for="(line, index) in draft.lines" :key="index" inset>
+      <van-cell-group v-for="(line, index) in draft.lines" :key="line.key" inset>
         <MaterialLineField v-model:quantity="line.quantity" :material="materialOf(line.materialId)"
           :available="stock.quantityOf(line.materialId)" @pick="pickingLine = index"
           @remove="draft.lines.splice(index, 1)" />
       </van-cell-group>
       <div class="form__add">
         <van-button size="small" icon="plus" round block
-          @click="draft.lines.push({ materialId: '', quantity: null })">
+          @click="draft.lines.push(newLine())">
           Bir şey daha ekle
         </van-button>
       </div>

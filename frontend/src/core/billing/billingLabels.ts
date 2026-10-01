@@ -37,3 +37,11 @@ export function usageLabel(used: number, limit: number | null | undefined): stri
 export function usagePercent(used: number, limit: number | null | undefined): number {
   return limit ? Math.min(100, Math.round((used / limit) * 100)) : 0
 }
+
+/** Sınır kullanımı: dolu (100), yaklaşıyor (80+) ya da rahat. Masaüstü ve telefon çubuğu aynı eşikle renklenir. */
+export type UsageLevel = 'full' | 'near' | 'ok'
+
+export function usageLevel(percent: number): UsageLevel {
+  if (percent >= 100) return 'full'
+  return percent >= 80 ? 'near' : 'ok'
+}

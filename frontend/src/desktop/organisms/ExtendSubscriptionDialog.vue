@@ -7,6 +7,7 @@ import { emptyPayment, paymentRequestOf } from '@/core/admin/paymentForm'
 import { suggestedAmount } from '@/core/admin/tenantForm'
 import { useActivePlans } from '@/core/admin/useActivePlans'
 import { useTenantActions } from '@/core/admin/useTenantActions'
+import { fullDate } from '@/core/format/dates'
 import PaymentFields from '@/desktop/molecules/PaymentFields.vue'
 import PlanChoice from '@/desktop/molecules/PlanChoice.vue'
 
@@ -17,7 +18,7 @@ import PlanChoice from '@/desktop/molecules/PlanChoice.vue'
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
 const show = defineModel<boolean>('show', { required: true })
 const plans = useActivePlans()
-const { extend } = useTenantActions(() => tenant.summary.id)
+const { extend, isBusy } = useTenantActions(() => tenant.summary.id)
 const currentPlanId = () => tenant.subscriptions.find((period) => period.id === tenant.currentSubscriptionId)?.planId
 const form = ref({ planId: '', months: 1, note: '', payment: emptyPayment() })
 
@@ -27,6 +28,7 @@ watch(() => [form.value.planId, form.value.months], () => {
 })
 
 async function submit() {
+  if (isBusy.value) return
   try {
     const { planId, months, note, payment } = form.value
     await extend({ planId, months, note: note || null, payment: paymentRequestOf(payment) })
@@ -41,8 +43,8 @@ async function submit() {
 <template>
   <el-dialog v-model="show" :title="`Abonelik: ${tenant.summary.name}`" width="640px">
     <el-form label-position="top" @submit.prevent="submit">
-      <el-alert v-if="tenant.summary.open" type="info" :closable="false" show-icon
-        :title="`Açık dönem ${tenant.summary.endsOn} tarihinde bitiyor; yeni dönem ertesi gün başlar.`" />
+      <el-alert v-if="tenant.summary.open && tenant.summary.endsOn" type="info" :closable="false" show-icon
+        class="extend__notice" :title="`Açık dönem ${fullDate(tenant.summary.endsOn)} tarihinde bitiyor; yeni dönem ertesi gün başlar.`" />
       <PlanChoice v-model:plan-id="form.planId" v-model:months="form.months" :plans="plans" />
       <el-form-item label="Not"><el-input v-model="form.note" maxlength="300" placeholder="ör. 3 aylık peşin" /></el-form-item>
       <el-divider content-position="left">Ödeme</el-divider>
@@ -50,7 +52,13 @@ async function submit() {
     </el-form>
     <template #footer>
       <el-button @click="show = false">Vazgeç</el-button>
-      <el-button type="primary" @click="submit">Dönemi ekle</el-button>
+      <el-button type="primary" :loading="isBusy" @click="submit">Dönemi ekle</el-button>
     </template>
   </el-dialog>
 </template>
+
+<style scoped>
+.extend__notice {
+  margin-block-end: var(--space-4);
+}
+</style>

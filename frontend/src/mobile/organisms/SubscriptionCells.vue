@@ -7,6 +7,7 @@ import { useCompanySubscription } from '@/core/tenant/useCompanySubscription'
 
 /** Patronun abonelik özeti telefonda: paket, dönem, kullanım, modüller, dönemler ve ödemeler (salt okunur). */
 const { subscription, usage, state } = useCompanySubscription()
+const BAR_COLOR = { full: 'var(--status-danger)', near: 'var(--status-warning)', ok: 'var(--brand-primary)' } as const
 const openSections = ref<string[]>([])
 </script>
 
@@ -21,7 +22,9 @@ const openSections = ref<string[]>([])
       </van-cell>
       <van-cell v-if="subscription.monthlyPrice != null" title="Aylık" :value="formatMoney(subscription.monthlyPrice)" />
       <van-cell v-for="item in usage" :key="item.label" :title="item.label" :value="item.text">
-        <template #label><van-progress :percentage="item.percent" :show-pivot="false" stroke-width="6" /></template>
+        <template v-if="item.limited" #label>
+          <van-progress :percentage="item.percent" :show-pivot="false" stroke-width="6" :color="BAR_COLOR[item.level]" />
+        </template>
       </van-cell>
     </van-cell-group>
     <van-cell-group inset title="Paketinizdeki modüller">

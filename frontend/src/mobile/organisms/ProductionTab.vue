@@ -138,5 +138,6 @@ function updateFromDetail() {
 .production-tab__hint {
   margin: 0;
   color: var(--text-muted);
+  text-align: center;
 }
 </style>

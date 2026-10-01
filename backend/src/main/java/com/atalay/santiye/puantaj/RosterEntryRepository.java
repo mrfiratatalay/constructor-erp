@@ -1,9 +1,11 @@
 package com.atalay.santiye.puantaj;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,6 +14,14 @@ interface RosterEntryRepository extends JpaRepository<RosterEntry, UUID> {
     List<RosterEntry> findByCompanyId(UUID companyId);
 
     Optional<RosterEntry> findByIdAndCompanyId(UUID id, UUID companyId);
+
+    /**
+     * İşaretlemeden önce kişinin satırı kilitlenir (select … for update): aynı güne aynı anda gelen iki işaret
+     * (çift tıklama, iki şef) ikisi de "kayıt yok" görüp eklemeye kalkıyor, ikincisi birincil anahtara takılıp 500
+     * dönüyordu. İkinci istek birincinin bitmesini bekler, sonra var olan işareti günceller.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<RosterEntry> findLockedByIdAndCompanyId(UUID id, UUID companyId);
 
     Optional<RosterEntry> findByCompanyIdAndUserId(UUID companyId, UUID userId);
 

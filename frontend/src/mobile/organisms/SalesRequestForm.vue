@@ -11,7 +11,9 @@ const planOptions = computed(() => plans.value.map((plan) => ({ value: plan.id, 
 </script>
 
 <template>
-  <van-empty v-if="isSent" image="success" description="Başvurunuz bize ulaştı. En geç bir iş günü içinde sizi arıyoruz.">
+  <!-- Vant'ın hazır resimleri yalnızca error/search/network: "success" adı kırık bir <img> çiziyordu. -->
+  <van-empty v-if="isSent" description="Başvurunuz bize ulaştı. En geç bir iş günü içinde sizi arıyoruz.">
+    <template #image><van-icon name="checked" size="64" color="var(--status-success)" /></template>
     <RouterLink :to="{ name: 'landing' }"><van-button round>Ana sayfaya dön</van-button></RouterLink>
   </van-empty>
   <van-form v-else @submit="submit">

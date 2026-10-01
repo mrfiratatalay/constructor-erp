@@ -28,6 +28,11 @@ function useSetupNavigation(forms: SetupForms) {
     if (found) problem.value = found
     else goTo(step.value + 1)
   }
+  // Uyarı açıkken kişi alanı düzeltirse uyarı da güncellenir (sıradaki eksiği söyler ya da kalkar); eski uyarı
+  // düzeltilmiş alanın altında kalıp kafa karıştırmasın.
+  watch(forms, () => {
+    if (problem.value) problem.value = stepProblem(step.value, forms)
+  })
   const skipSite = () => {
     forms.withSite = false
     goTo(SETUP_STEPS.length - 1)

@@ -58,7 +58,10 @@ class BootstrapOwner implements ApplicationRunner {
             return;
         }
         String name = properties.companyName();
-        Company company = companies.save(new Company(name, slugs.uniqueFor(name), clock.instant()));
+        // Patronu burada kurulduğu için sihirbaz yoktur: firma ilk andan kullanıma hazırdır, "kurulum bekliyor" sayılmaz.
+        Company company = new Company(name, slugs.uniqueFor(name), clock.instant());
+        company.completeSetup(clock.instant());
+        companies.save(company);
         AppUser owner = new AppUser(properties.ownerName(), clock.instant());
         owner.setPasswordLogin(properties.ownerEmail(), passwordEncoder.encode(properties.ownerPassword()));
         users.save(owner);

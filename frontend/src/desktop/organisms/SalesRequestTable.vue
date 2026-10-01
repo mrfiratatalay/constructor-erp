@@ -36,20 +36,20 @@ async function note(request: SalesRequestView) {
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Firma" min-width="160">
+    <el-table-column label="Firma" min-width="130">
       <template #default="{ row }"><strong>{{ asRequest(row).companyName }}</strong><br /><small>{{ asRequest(row).city ?? '' }}</small></template>
     </el-table-column>
-    <el-table-column label="Yetkili" min-width="220">
+    <el-table-column label="Yetkili" min-width="170">
       <template #default="{ row }">
         {{ asRequest(row).contactName }}<br />
         <a :href="`tel:${asRequest(row).phone}`">{{ asRequest(row).phone }}</a>
         <template v-if="asRequest(row).email"> · <a :href="`mailto:${asRequest(row).email}`">{{ asRequest(row).email }}</a></template>
       </template>
     </el-table-column>
-    <el-table-column label="Şantiye" prop="siteCount" width="90" align="right" />
+    <el-table-column label="Şantiye" prop="siteCount" width="80" align="right" />
     <el-table-column label="Paket" prop="planName" width="120" />
-    <el-table-column label="Geldi" width="140"><template #default="{ row }">{{ dateTime(asRequest(row).createdAt) }}</template></el-table-column>
-    <el-table-column label="Durum" width="150">
+    <el-table-column label="Geldi" width="130"><template #default="{ row }">{{ dateTime(asRequest(row).createdAt) }}</template></el-table-column>
+    <el-table-column label="Durum" width="130">
       <template #default="{ row }">
         <RouterLink v-if="asRequest(row).companyId" :to="{ name: 'platformTenant', params: { companyId: asRequest(row).companyId } }">
           <el-tag type="success">{{ asRequest(row).convertedCompanyName }}</el-tag>

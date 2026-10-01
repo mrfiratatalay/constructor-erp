@@ -73,7 +73,8 @@ public class RosterService {
 
     /** İşaretlenecek kalem: firmanın ve bugün listede. Listeden çıkmış kalemin geçmiş günleri değişmez. */
     RosterEntry requireMarkable(UUID companyId, UUID entryId, RosterPeople people) {
-        RosterEntry entry = require(companyId, entryId);
+        RosterEntry entry = entries.findLockedByIdAndCompanyId(entryId, companyId)
+            .orElseThrow(() -> ApiException.notFound("Listede böyle biri yok."));
         if (!people.isOnList(entry)) {
             throw ApiException.conflict("Listeden çıkmış kişi işaretlenemez.");
         }

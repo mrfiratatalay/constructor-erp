@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Link } from 'lucide-vue-next'
 import type { OnboardingInviteView, TenantDetail } from '@/core/api/generated/model'
 import { errorMessage } from '@/core/api/errors'
 import { INVITE_STATUSES } from '@/core/admin/adminLabels'
 import { useTenantInvites } from '@/core/admin/useTenantInvites'
 import { dateTime } from '@/core/format/dates'
+import { confirmAction } from '@/desktop/confirmAction'
 import OnboardingLinkDialog from '@/desktop/organisms/OnboardingLinkDialog.vue'
 
 /** Kurulum bağlantıları: yeni bağlantı (bekleyen eskisi iptal olur), geçmiş ve iptal. Bağlantı yalnızca üretildiği an görünür. */
@@ -14,13 +15,9 @@ const { invites, fresh, issue, isIssuing, revoke } = useTenantInvites(() => tena
 const asInvite = (row: unknown) => row as OnboardingInviteView
 
 async function cancel(invite: OnboardingInviteView) {
-  try {
-    await ElMessageBox.confirm('Bu bağlantı artık çalışmaz.', 'Bağlantıyı iptal et', { confirmButtonText: 'İptal et', cancelButtonText: 'Vazgeç' })
-    await revoke(invite.id)
-    ElMessage.success('Bağlantı iptal edildi.')
-  } catch (error) {
-    if (error !== 'cancel' && error !== 'close') ElMessage.error(errorMessage(error))
-  }
+  const title = 'Kurulum bağlantısı iptal edilsin mi?'
+  if (!(await confirmAction({ title, message: 'Bu bağlantı artık çalışmaz.', confirm: 'İptal et' }))) return
+  await revoke(invite.id).then(() => ElMessage.success('Bağlantı iptal edildi.'), (error) => ElMessage.error(errorMessage(error)))
 }
 </script>
 

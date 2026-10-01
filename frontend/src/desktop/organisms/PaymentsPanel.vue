@@ -13,7 +13,7 @@ import PaymentFields from '@/desktop/molecules/PaymentFields.vue'
 
 /** Firmadan alınan ödemeler (elden, havale): liste ve yeni kayıt. Dönem seçilirse ödeme o döneme bağlanır. */
 const { tenant } = defineProps<{ tenant: TenantDetail }>()
-const { recordPayment } = useTenantActions(() => tenant.summary.id)
+const { recordPayment, isBusy } = useTenantActions(() => tenant.summary.id)
 const recording = ref(false)
 const form = ref(emptyPayment())
 const periodId = ref<string | undefined>()
@@ -30,6 +30,7 @@ function start() {
 }
 
 async function submit() {
+  if (isBusy.value) return
   const request = paymentRequestOf({ ...form.value, paid: true }, periodId.value)
   if (!request) return ElMessage.warning('Tutar sıfırdan büyük olmalı.')
   try {
@@ -68,7 +69,7 @@ async function submit() {
       </el-form>
       <template #footer>
         <el-button @click="recording = false">Vazgeç</el-button>
-        <el-button type="primary" @click="submit">Kaydet</el-button>
+        <el-button type="primary" :loading="isBusy" @click="submit">Kaydet</el-button>
       </template>
     </el-dialog>
   </div>

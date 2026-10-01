@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { Truck } from 'lucide-vue-next'
 import { useMaterialPermissions } from '@/core/shipments/useMaterialPermissions'
 import { useShipments } from '@/core/shipments/useShipments'
+import { useWorkspace } from '@/core/tenant/useWorkspace'
 import ShipmentCell from '@/mobile/molecules/ShipmentCell.vue'
 import ShipmentFormSheet from '@/mobile/organisms/ShipmentFormSheet.vue'
 import ShipmentSheet from '@/mobile/organisms/ShipmentSheet.vue'
@@ -15,6 +16,7 @@ import MobilePage from '@/mobile/templates/MobilePage.vue'
 const search = ref('')
 const { shipments, outside, isLoading } = useShipments(search)
 const { canCreate } = useMaterialPermissions()
+const { workspace } = useWorkspace()
 
 const formOpen = ref(false)
 const openId = ref<string | null>(null)
@@ -23,7 +25,7 @@ const rest = computed(() => shipments.value.filter((row) => !row.awaitingReturn)
 </script>
 
 <template>
-  <MobilePage title="Malzemeler" brand>
+  <MobilePage title="Malzemeler" :logo-name="workspace?.name" :logo-url="workspace?.logoUrl" brand>
     <van-button v-if="canCreate" type="primary" size="large" block round icon="plus" @click="formOpen = true">
       Sevkiyat çıkar
     </van-button>

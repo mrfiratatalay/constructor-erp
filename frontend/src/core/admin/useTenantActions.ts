@@ -1,4 +1,4 @@
-import { toValue, type MaybeRefOrGetter } from 'vue'
+import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import {
   getGetTenantQueryKey,
@@ -32,8 +32,11 @@ export function useTenantActions(companyId: MaybeRefOrGetter<string>) {
   const periodStatus = useChangeSubscriptionStatus(options)
   const payment = useRecordPayment(options)
   const id = () => toValue(companyId)
+  /** Bir işlem sürerken düğmeler kilitlenir: çift tıklama ikinci ödemeyi ya da ikinci dönemi kaydetmesin. */
+  const isBusy = computed(() => [update, status, extend, plan, periodStatus, payment].some((m) => m.isPending.value))
 
   return {
+    isBusy,
     update: (data: Parameters<typeof update.mutateAsync>[0]['data']) => update.mutateAsync({ companyId: id(), data }),
     changeStatus: (data: Parameters<typeof status.mutateAsync>[0]['data']) => status.mutateAsync({ companyId: id(), data }),
     extend: (data: Parameters<typeof extend.mutateAsync>[0]['data']) => extend.mutateAsync({ companyId: id(), data }),

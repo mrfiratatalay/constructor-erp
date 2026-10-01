@@ -10,6 +10,23 @@ export interface ComposeTarget {
   name: string
 }
 
+/**
+ * Kuyruğa yazmak (IndexedDB) beklenirken form henüz dolu durur: Gönder'e çift dokunuş aynı mesajı iki kez kuyruğa
+ * koyuyor, sunucuya iki gönderi gidiyordu. Önceki çağrı bitmeden gelen çağrı yok sayılır.
+ */
+function oneAtATime(work: () => Promise<void>): () => Promise<void> {
+  let running = false
+  return async () => {
+    if (running) return
+    running = true
+    try {
+      await work()
+    } finally {
+      running = false
+    }
+  }
+}
+
 /** fieldUpdate: çubuk Saha sekmesindedir; giden her gönderi saha güncellemesidir. */
 export interface ComposeOptions {
   fieldUpdate?: boolean
@@ -32,7 +49,7 @@ export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>,
     () => !!toValue(target) && (body.value.trim() !== '' || files.attachments.value.length > 0),
   )
 
-  async function submit() {
+  const submit = oneAtATime(async () => {
     const site = toValue(target)
     if (!site || !canSend.value) return
     await queue.enqueue({
@@ -50,7 +67,7 @@ export function useComposer(target: MaybeRefOrGetter<ComposeTarget | undefined>,
     body.value = ''
     replyTo.value = null
     issue.value = false
-  }
+  })
 
   return { body, replyTo, issue, canSend, submit, ...files }
 }

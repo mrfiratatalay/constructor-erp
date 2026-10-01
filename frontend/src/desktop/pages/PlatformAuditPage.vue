@@ -31,7 +31,7 @@ const asEntry = (row: unknown) => row as AuditEntryView
             </template>
           </el-table-column>
           <el-table-column label="Özet" prop="summary" min-width="280" />
-          <el-table-column label="Firma" min-width="180">
+          <el-table-column label="Firma" min-width="180" show-overflow-tooltip>
             <template #default="{ row }">
               <RouterLink v-if="asEntry(row).companyId" :to="{ name: 'platformTenant', params: { companyId: asEntry(row).companyId } }">
                 {{ asEntry(row).companyName }}

@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
-/** Kişinin listede en üste sabitlediği şantiye; kişi ve şantiye başına tek satır. */
+/** Kişinin listede en üste sabitlediği şantiye; kişi ve şantiye başına tek satır. Satır SitePinRepository'de eklenir. */
 @Entity
 @Table(name = "site_pins")
 class SitePin {
@@ -15,11 +15,6 @@ class SitePin {
     private Instant pinnedAt;
 
     protected SitePin() {
-    }
-
-    SitePin(SitePinId id, Instant pinnedAt) {
-        this.id = id;
-        this.pinnedAt = pinnedAt;
     }
 
     SitePinId getId() {

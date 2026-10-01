@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/desktop/molecules/LinkFailed.vue'
 import { reactive, ref, watch } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
@@ -33,7 +34,7 @@ async function submit() {
   <main class="join-page">
     <BrandLogo />
     <el-skeleton v-if="isLoading" :rows="3" animated class="join-page__card" />
-    <el-result v-else-if="loadError" icon="error" title="Katılınamadı" :sub-title="loadError" />
+    <LinkFailed v-else-if="loadError" title="Katılınamadı" :message="loadError" />
     <section v-else-if="invite && !invite.alreadyInside" class="join-page__card">
       <header class="join-page__head">
         <p>Şantiye ekibine katıl</p>

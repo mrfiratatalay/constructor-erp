@@ -111,6 +111,7 @@
   --layout-reading-width: 760px; /* masaüstü sağ panel: akışın okunaklı genişliği */
   --layout-board-width: 1180px; /* masaüstü sağ panel: kartlı takip ekranı (İmalat) */
   --layout-list-width: clamp(280px, 28vw, 360px); /* masaüstü liste: dar pencerede incelir */
+  --layout-page-padding: var(--space-8); /* masaüstü tam sayfa (Yoklama, Malzemeler, Firma, platform): kenar boşluğu */
   --layout-nav-width: 72px; /* masaüstü sol menü kapalıyken: yalnızca ikonlar */
   --layout-nav-width-open: 256px; /* masaüstü sol menü açıkken: ikon + ad */
   --layout-info-width: clamp(320px, 26vw, 400px); /* masaüstü şantiye bilgisi paneli */

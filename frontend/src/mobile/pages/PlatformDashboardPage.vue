@@ -8,7 +8,7 @@ import MobilePage from '@/mobile/templates/MobilePage.vue'
 import CollectionsChart from '@/shared/molecules/CollectionsChart.vue'
 
 /** Platformun özeti telefonda: sayılar, tahsilat, yakında bitecek abonelikler ve son işlemler. */
-const { dashboard, stats } = useAdminDashboard()
+const { dashboard, isPending, isError, refetch, stats, hasCollections } = useAdminDashboard()
 const { logout } = useLogout()
 </script>
 
@@ -19,6 +19,10 @@ const { logout } = useLogout()
     </template>
     <van-notice-bar v-if="dashboard?.newSalesRequests" left-icon="bell" mode="link" class="admin-home__notice"
       :text="`${dashboard.newSalesRequests} yeni başvuru sizi bekliyor`" @click="$router.push({ name: 'platformLeads' })" />
+    <van-loading v-if="isPending" class="admin-home__state" vertical>Yükleniyor…</van-loading>
+    <van-empty v-else-if="isError" image="error" description="Özet yüklenemedi">
+      <van-button round size="small" @click="refetch()">Tekrar dene</van-button>
+    </van-empty>
     <van-grid :column-num="2" :border="false" :gutter="10" class="admin-home__stats">
       <van-grid-item v-for="stat in stats" :key="stat.key">
         <span class="admin-home__stat" :class="`is-${stat.tone}`">
@@ -27,7 +31,8 @@ const { logout } = useLogout()
       </van-grid-item>
     </van-grid>
     <van-cell-group v-if="dashboard" inset title="Tahsilat · son 6 ay">
-      <div class="admin-home__chart"><CollectionsChart :months="dashboard.collections" /></div>
+      <div v-if="hasCollections" class="admin-home__chart"><CollectionsChart :months="dashboard.collections" /></div>
+      <van-cell v-else title="Son 6 ayda kaydedilen ödeme yok" />
     </van-cell-group>
     <van-cell-group v-if="dashboard" inset title="Yakında bitecek abonelikler">
       <van-cell v-if="!dashboard.expiringSoon.length" title="Önümüzdeki 14 günde biten yok" />
@@ -36,13 +41,18 @@ const { logout } = useLogout()
         :to="{ name: 'platformTenant', params: { companyId: tenant.id } }" />
     </van-cell-group>
     <van-cell-group v-if="dashboard" inset title="Son işlemler">
+      <van-cell v-if="!dashboard.recentActivity.length" title="Henüz işlem yok" />
       <van-cell v-for="entry in dashboard.recentActivity" :key="entry.id" :title="entry.summary"
-        :label="`${AUDIT_ACTIONS[entry.action] ?? entry.action} · ${entry.companyName ?? ''}`" :value="timeAgo(entry.createdAt)" />
+        :label="[AUDIT_ACTIONS[entry.action] ?? entry.action, entry.companyName].filter(Boolean).join(' · ')" :value="timeAgo(entry.createdAt)" />
     </van-cell-group>
   </MobilePage>
 </template>
 
 <style scoped>
+.admin-home__state {
+  padding: var(--space-8) 0;
+}
+
 .admin-home__logout {
   border: 0;
   background: rgb(255 255 255 / 0.14);

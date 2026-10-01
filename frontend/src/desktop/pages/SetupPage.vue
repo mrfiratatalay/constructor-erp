@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LinkFailed from '@/desktop/molecules/LinkFailed.vue'
 import { ElMessage } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
 import { SETUP_STEPS } from '@/core/onboarding/setupSteps'
@@ -26,12 +27,8 @@ async function onUpload(file: File) {
   <AuthLayout>
     <el-card class="setup-page" shadow="never">
       <el-skeleton v-if="wizard.isLoading.value" :rows="6" animated />
-      <el-result v-else-if="!invite" icon="warning" title="Bu kurulum bağlantısı açılamadı"
-        :sub-title="wizard.inviteError.value ?? ''">
-        <template #extra>
-          <RouterLink :to="{ name: 'login' }"><el-button type="primary">Giriş sayfasına git</el-button></RouterLink>
-        </template>
-      </el-result>
+      <LinkFailed v-else-if="!invite" title="Bu kurulum bağlantısı açılamadı"
+        :message="wizard.inviteError.value ?? ''" />
       <template v-else>
         <p class="setup-page__eyebrow">Hoş geldiniz · Kurulum</p>
         <h2 class="setup-page__title">{{ invite.companyName }} çalışma alanını hazırlayalım</h2>

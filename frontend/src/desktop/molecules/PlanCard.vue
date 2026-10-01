@@ -36,6 +36,18 @@ const emit = defineEmits<{ edit: [] }>()
 </template>
 
 <style scoped>
+/* Kartlar ızgarada aynı boydadır; açıklaması uzun olan kartta Düzenle aşağı kayıp hizayı bozmasın, en alta oturur. */
+.plan-card {
+  height: 100%;
+}
+
+.plan-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+}
+
 .plan-card--highlighted {
   border-color: var(--brand-signature);
   box-shadow: 0 0 0 2px rgb(250 204 21 / 0.35);
@@ -94,6 +106,7 @@ li.is-off svg {
 
 .plan-card__foot {
   display: flex;
+  margin-top: auto;
   align-items: center;
   justify-content: space-between;
   color: var(--text-muted);
