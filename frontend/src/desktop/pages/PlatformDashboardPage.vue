@@ -14,7 +14,7 @@ import CollectionsChart from '@/shared/molecules/CollectionsChart.vue'
 
 /** Platformun özeti: firmalar, gelir, tahsilat, yakında bitecek abonelikler, son işlemler; yeni firma buradan açılır. */
 const router = useRouter()
-const { dashboard, stats } = useAdminDashboard()
+const { dashboard, isPending, isError, refetch, stats, hasCollections } = useAdminDashboard()
 const creating = ref(false)
 const created = ref<CreatedTenant | null>(null)
 const openTenant = (companyId: string) => router.push({ name: 'platformTenant', params: { companyId } })
@@ -37,12 +37,19 @@ function afterLink() {
         :title="`${dashboard.newSalesRequests} yeni başvuru sizi bekliyor.`">
         <RouterLink :to="{ name: 'platformLeads' }">Başvurulara git</RouterLink>
       </el-alert>
+      <el-skeleton v-if="isPending" :rows="8" animated />
+      <el-result v-else-if="isError" icon="error" title="Özet yüklenemedi" sub-title="Bağlantını kontrol edip tekrar dene.">
+        <template #extra><el-button @click="refetch()">Tekrar dene</el-button></template>
+      </el-result>
       <section class="dashboard__stats">
         <StatTile v-for="stat in stats" :key="stat.key" :label="stat.label" :value="stat.value" :hint="stat.hint"
           :tone="stat.tone" />
       </section>
       <section v-if="dashboard" class="dashboard__grid">
-        <el-card shadow="never" header="Tahsilat · son 6 ay"><CollectionsChart :months="dashboard.collections" /></el-card>
+        <el-card shadow="never" header="Tahsilat · son 6 ay">
+          <CollectionsChart v-if="hasCollections" :months="dashboard.collections" />
+          <el-empty v-else :image-size="64" description="Son 6 ayda kaydedilen ödeme yok" />
+        </el-card>
         <el-card shadow="never" header="Yakında bitecek abonelikler">
           <ExpiringList :tenants="dashboard.expiringSoon" @open="openTenant" />
         </el-card>
