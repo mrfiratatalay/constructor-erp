@@ -99,3 +99,16 @@ html .van-cell__value:not(.van-field__value) {
   flex: none;
   max-width: 55%;
 }
+
+/*
+ * Boş durumda resim yerine ikon verilince (#image yuvası: lucide ya da van-icon) Vant'ın 160 px'lik resim kutusu
+ * kalıyordu: ikon kutunun sol üst köşesinde duruyor, yazıyla arasına yüz piksellik boşluk giriyordu. Kutu ikon
+ * kadar olur ve ortalanır; rengi boş durum yazısının soluk tonudur.
+ */
+html .van-empty__image:not(:has(img)) {
+  display: grid;
+  place-items: center;
+  width: auto;
+  height: auto;
+  color: var(--text-subtle);
+}
