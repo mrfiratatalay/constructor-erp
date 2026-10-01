@@ -3,13 +3,12 @@ package com.atalay.santiye.attendance;
 import com.atalay.santiye.attendance.dto.AttendanceCounts;
 import com.atalay.santiye.attendance.dto.AttendanceDayView;
 import com.atalay.santiye.attendance.dto.AttendanceEntryView;
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
-import java.text.Collator;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Component
 class AttendanceViews {
 
-    private static final Collator TURKISH = Collator.getInstance(Locale.forLanguageTag("tr"));
     private static final AttendanceCounts NONE = new AttendanceCounts(0, 0, 0);
 
     private final AttendanceEntryRepository entries;
@@ -44,7 +42,7 @@ class AttendanceViews {
             .stream().collect(Collectors.toMap(SiteWorker::getId, Function.identity()));
         List<AttendanceEntryView> people = rows.stream()
             .map(row -> toView(row, byId.get(row.getId().workerId())))
-            .sorted(Comparator.comparing(view -> view.worker().fullName(), TURKISH))
+            .sorted(Comparator.comparing(view -> view.worker().fullName(), TurkishOrder.NAMES))
             .toList();
         String takenBy = users.findById(attendance.getTakenBy()).map(AppUser::getFullName).orElse(null);
         AttendanceCounts counts = Tally.of(rows.stream().map(AttendanceEntry::getStatus).toList());

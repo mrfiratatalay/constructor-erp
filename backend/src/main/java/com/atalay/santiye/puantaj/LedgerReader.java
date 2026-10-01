@@ -1,12 +1,11 @@
 package com.atalay.santiye.puantaj;
 
+import com.atalay.santiye.common.text.TurkishOrder;
 import com.atalay.santiye.tenant.Member;
 import com.atalay.santiye.tenant.Members;
-import java.text.Collator;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 @Component
 class LedgerReader {
 
-    private static final Collator TURKISH = Collator.getInstance(Locale.forLanguageTag("tr"));
 
     private final RosterEntryRepository entries;
     private final DayMarkRepository marks;
@@ -54,6 +52,6 @@ class LedgerReader {
 
     private static Comparator<RosterEntry> orderOf(RosterPeople people) {
         Comparator<RosterEntry> byKind = Comparator.comparing(RosterEntry::getKind);
-        return byKind.thenComparing(people::nameOf, TURKISH);
+        return byKind.thenComparing(people::nameOf, TurkishOrder.NAMES);
     }
 }
