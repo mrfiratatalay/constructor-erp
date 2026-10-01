@@ -2,8 +2,8 @@
 import { useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { ChevronLeft } from 'lucide-vue-next'
+import BrandTitle from '@/mobile/molecules/BrandTitle.vue'
 import PageTitle from '@/mobile/molecules/PageTitle.vue'
-import CompanyLogo from '@/shared/atoms/CompanyLogo.vue'
 
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
@@ -49,8 +49,7 @@ function goBack() {
     :border="!brand" :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed
     placeholder @click-left="!slots.heading && goBack()">
     <template v-if="brand" #left>
-      <span class="mobile-page__brand"><CompanyLogo :name="logoName ?? title" :logo-url="logoUrl" :size="30" surface="dark" />
-        {{ title }}</span>
+      <BrandTitle :title="title" :logo-name="logoName" :logo-url="logoUrl" />
     </template>
     <template v-else-if="slots.heading" #left>
       <span class="mobile-page__heading">
@@ -167,16 +166,6 @@ function goBack() {
   border: 0;
   background: transparent;
   color: var(--brand-primary);
-}
-
-.mobile-page__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--brand-on-deep);
-  font-size: var(--text-md);
-  font-weight: var(--weight-black);
-  letter-spacing: -0.01em;
 }
 
 .mobile-page__footer {
