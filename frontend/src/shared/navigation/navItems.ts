@@ -18,6 +18,7 @@ export interface NavItem {
   route: RouteName
   label: string
   icon: Component
+  section?: 'management'
   /** Yalnızca bu kabukta görünür (masaüstünde Hesabım paneldir, telefonda Firma Hesabım'ın içindedir). */
   only?: 'mobile' | 'desktop'
 }
@@ -32,8 +33,8 @@ const WORKSPACE_ITEMS: readonly NavItem[] = [
   { route: 'attendance', label: 'Yoklama', icon: ClipboardCheck },
   { route: 'myPuantaj', label: 'Puantajım', icon: CalendarCheck },
   { route: 'materials', label: 'Malzemeler', icon: Boxes },
-  { route: 'company', label: 'Firma', icon: Building2, only: 'desktop' },
-  { route: 'profile', label: 'Ben', icon: UserRound, only: 'mobile' },
+  { route: 'company', label: 'Firma', icon: Building2, only: 'desktop', section: 'management' },
+  { route: 'profile', label: 'Ben', icon: UserRound, only: 'mobile', section: 'management' },
 ]
 
 export function mainNavItems(user: WorkspaceViewer, platform: 'mobile' | 'desktop'): NavItem[] {

@@ -13,7 +13,7 @@ function usageRow(label: string, used: number, limit: number | null | undefined)
  * ve ödemeler. Salt okunur: POS yok, uzatma ve ödeme Constructor ERP ekibinin işidir.
  */
 export function useCompanySubscription() {
-  const { data, isPending } = useGetCompanySubscription()
+  const { data, isPending, isError, refetch } = useGetCompanySubscription()
   const usage = computed(() => {
     const value = data.value
     if (!value) return []
@@ -22,5 +22,5 @@ export function useCompanySubscription() {
       usageRow('Aktif şantiye', value.activeSites, value.maxSites),
     ]
   })
-  return { subscription: data, isPending, usage, state: computed(() => stateOf(data.value?.state)) }
+  return { subscription: data, isPending, isError, refetch, usage, state: computed(() => stateOf(data.value?.state)) }
 }

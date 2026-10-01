@@ -1,0 +1,16 @@
+.company-profile { padding: var(--space-5); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); background: var(--surface); }
+.company-profile__header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+.company-profile__header h2 { margin: 0; font-size: var(--text-base); font-weight: var(--weight-bold); }
+.company-profile__header .van-button { height: 32px; padding-inline: var(--space-3); border-color: var(--border-soft); color: var(--text-muted); font-size: var(--text-xs); }
+.company-profile__identity { display: flex; align-items: center; gap: var(--space-4); }
+.company-profile__identity > div { min-width: 0; }
+.company-profile__identity span { font-size: 10px; letter-spacing: .08em; font-weight: var(--weight-semibold); color: var(--text-subtle); }
+.company-profile__identity h3 { margin: 5px 0 0; font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: 1.4; overflow-wrap: anywhere; }
+.company-profile__logo-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.company-profile__logo-actions .van-button { height: 30px; padding-inline: var(--space-2); border-color: var(--border-soft); color: var(--text-muted); font-size: 11px; }
+.company-profile__contacts { display: grid; gap: var(--space-4); margin: var(--space-5) 0 0; border-top: 1px solid var(--border-soft); padding-top: var(--space-5); }
+.company-profile__contacts > div { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: var(--space-1) var(--space-3); }
+.company-profile__contacts .van-icon { flex: none; font-size: 18px; color: var(--text-muted); }
+.company-profile__contacts dt { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-3); color: var(--text-subtle); font-size: 11px; }
+.company-profile__contacts dd { grid-column: 2; margin: 0; color: var(--text-strong); font-size: var(--text-sm); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
+.company-profile__contacts dd.is-empty { color: var(--text-muted); font-weight: 400; }

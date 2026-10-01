@@ -1,0 +1,145 @@
+/* Yer tutucu: grid'de menünün kapladığı genişlik. Açık menü geniş pencerede yer kaplar, içerik yana kayar. */
+.side-nav {
+  position: relative;
+  z-index: 20;
+  width: var(--layout-nav-width);
+  height: var(--layout-app-height);
+  transition: width 0.2s ease;
+}
+
+.side-nav--open:not(.side-nav--floating) {
+  width: var(--layout-nav-width-open);
+}
+
+.side-nav__panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-5);
+  width: 100%;
+  padding: var(--space-4) 14px;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+/* Dar pencerede açık menü içeriğin üstüne kayar; arkası kararır, boşluğa tıklayınca kapanır. */
+.side-nav--floating .side-nav__panel {
+  width: var(--layout-nav-width-open);
+  box-shadow: var(--shadow-deep);
+}
+
+.side-nav__scrim {
+  position: fixed;
+  inset: 0;
+  background: rgb(15 23 42 / 0.35);
+}
+
+.side-nav__top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.side-nav--open .side-nav__top {
+  flex-direction: row;
+  gap: var(--space-2);
+}
+
+.side-nav__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.side-nav__group {
+  display: grid;
+  flex: none;
+  gap: var(--space-2);
+}
+
+.side-nav__group--management {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+}
+
+.side-nav__section-label {
+  padding: 0 11px var(--space-1);
+  color: rgb(255 255 255 / 0.48);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* İkon kapalıyken de açıkken de aynı yerde durur: menü açılınca göz ikonları yeniden aramaz. */
+.side-nav__item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-3);
+  width: 44px;
+  height: 44px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: rgb(255 255 255 / 0.72);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.side-nav--open .side-nav__items .side-nav__item {
+  width: 100%;
+}
+
+.side-nav__item:hover {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--brand-on-deep);
+}
+
+/* Sarı zemin üzerinde lacivert ikon ve yazı aktif menüyü belirginleştirir. */
+.side-nav__item--active,
+.side-nav__item--active:hover {
+  background: var(--brand-signature);
+  color: var(--brand-deep);
+}
+
+.side-nav__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--brand-on-deep);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.side-nav__who {
+  display: grid;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.side-nav__who strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-nav__who small {
+  color: rgb(255 255 255 / 0.72);
+  font-size: var(--text-sm);
+}
