@@ -43,12 +43,15 @@ public class PuantajMarks {
         return PuantajViews.markOf(marks.save(mark), people);
     }
 
-    /** Şefin seçtikleri tek hamlede: bir kalem kurala uymazsa hiçbiri kaydedilmez. */
+    /**
+     * Şefin seçtikleri tek hamlede: bir kalem kurala uymazsa hiçbiri kaydedilmez. Satırlar hep aynı sırada kilitlenir
+     * (kimliğe göre): iki şefin aynı kişileri farklı sırayla seçtiği toplu işaretler birbirini kilitlemesin.
+     */
     @Transactional
     public List<DayMarkView> markAll(CurrentUser user, LocalDate day, BulkMarkRequest request) {
         days.requireEditable(user, day);
         RosterPeople people = ledger.peopleOf(user.companyId());
-        return request.entryIds().stream().distinct().map(entryId -> {
+        return request.entryIds().stream().distinct().sorted().map(entryId -> {
             RosterEntry entry = roster.requireMarkable(user.companyId(), entryId, people);
             MarkRules.requireStatus(entry.getKind(), request.status());
             DayMark mark = markOf(user, day, entryId);
