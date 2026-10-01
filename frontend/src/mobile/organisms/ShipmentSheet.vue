@@ -71,8 +71,9 @@ async function onCancel() {
       </van-cell-group>
 
       <van-cell-group v-if="detail.documents.length" inset title="İrsaliye">
+        <!-- Cell'in url'si aynı sekmede açar (location.href) ve kişi uygulamadan çıkar; gerçek bağlantı yeni sekmede. -->
         <van-cell v-for="document in detail.documents" :key="document.id" :title="document.fileName" is-link
-          :url="document.url" target="_blank" />
+          tag="a" :href="document.url" target="_blank" rel="noopener" />
       </van-cell-group>
 
       <van-cell-group inset title="Geçmiş">
