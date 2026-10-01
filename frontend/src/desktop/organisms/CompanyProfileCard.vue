@@ -89,7 +89,7 @@ async function onSave() {
       <CompanyContactDetails :profile="profile" />
     </template>
     <el-empty v-else description="Firma bilgileri bulunamadı." :image-size="56" />
-    <CompanyProfileEditor v-model:show="editing" :form="form" :busy="isBusy || isSaving" :dirty="isDirty"
+    <CompanyProfileEditor v-model:show="editing" v-model:form="form" :busy="isBusy || isSaving" :dirty="isDirty"
       @save="onSave" />
   </el-card>
 </template>
