@@ -12,9 +12,10 @@ const asRow = (row: unknown) => row as TenantRow
 </script>
 
 <template>
+  <!-- Sütunlar 1366 px dizüstünde (sol menüyle) kaydırmadan sığar: toplam ~1000 px, Firma sütunu esner. -->
   <el-table v-loading="loading" :data="tenants" row-class-name="tenant-table__row" empty-text="Bu süzgece uyan firma yok"
     @row-click="(row: unknown) => emit('open', asRow(row).id)">
-    <el-table-column label="Firma" min-width="240">
+    <el-table-column label="Firma" min-width="220">
       <template #default="{ row }">
         <div class="tenant-table__company">
           <CompanyLogo :name="row.name" :size="34" />
@@ -22,13 +23,13 @@ const asRow = (row: unknown) => row as TenantRow
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Durum" width="140">
+    <el-table-column label="Durum" width="110">
       <template #default="{ row }">
         <el-tag :type="tenantBadge(asRow(row)).tone" effect="light">{{ tenantBadge(asRow(row)).label }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column label="Paket" prop="planName" width="130" />
-    <el-table-column label="Dönem sonu" width="170">
+    <el-table-column label="Paket" prop="planName" width="120" />
+    <el-table-column label="Dönem sonu" width="160">
       <template #default="{ row }">
         <template v-if="row.endsOn">
           {{ dayWithYear(row.endsOn) }}
@@ -39,14 +40,14 @@ const asRow = (row: unknown) => row as TenantRow
         <span v-else class="tenant-table__muted">—</span>
       </template>
     </el-table-column>
-    <el-table-column label="Kişi" prop="userCount" width="80" align="right" />
-    <el-table-column label="Şantiye" prop="siteCount" width="90" align="right" />
-    <el-table-column label="Son aktivite" width="150">
+    <el-table-column label="Kişi" prop="userCount" width="64" align="right" />
+    <el-table-column label="Şantiye" prop="siteCount" width="80" align="right" />
+    <el-table-column label="Son aktivite" width="130">
       <template #default="{ row }">
         <span :class="{ 'tenant-table__muted': !row.lastActivityAt }">{{ row.lastActivityAt ? timeAgo(row.lastActivityAt) : 'Hiç' }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Kurulum" width="130">
+    <el-table-column label="Kurulum" width="120">
       <template #default="{ row }">
         <el-tag v-if="row.setupCompleted" type="success" effect="plain" size="small">Tamamlandı</el-tag>
         <el-tag v-else type="primary" size="small">Bekliyor</el-tag>
