@@ -108,3 +108,10 @@ Kilitli çalışma alanına gelen istek `403` + `code: WORKSPACE_LOCKED` döner;
 12. **Menü:** `shared/navigation/navItems.ts`'e `permission` ve `feature` ile eklenir.
 13. **Platform aksiyonu:** kritikse `PlatformAudit` ile firma kimliğiyle kaydedilir.
 14. **Çapraz firma denemesi:** ikinci bir firmayla aynı kaydın kimliği denenir; okunamamalı, değişmemeli.
+15. **Kimlik:** kişinin kimliği (ad, numara, şifre) birden çok firmada paylaşılabilir. Firmanın patronu bir kimliği
+    yalnızca `Workspaces.isConfinedTo` doğruysa devreder (giriş linki, bağlantıyla geri dönüş) ya da adını değiştirir.
+16. **Gelen kimlik:** istekteki her başka kayıt kimliği (`returnOfId`, `materialId`…) firma filtresiyle bulunarak
+    doğrulanır; yabancı anahtar denetimi RLS'i atlar, başka firmanın kaydına bağlantıyı durdurmaz.
+17. **Herkese açık ya da şifre soran uç:** `AttemptCounter` ile sınırlanır, anahtar `ClientAddress`'ten alınır.
+18. **Dışarıya istek:** sunucu kullanıcının verdiği adrese körü körüne istek atmaz (SSRF); zorunluysa izinli
+    adres listesiyle (`PushEndpoints`).
