@@ -12,7 +12,8 @@ const payment = defineModel<PaymentForm>({ required: true })
 
 <template>
   <div class="payment-fields">
-    <el-form-item v-if="optional" label="Ödeme">
+    <!-- Etiket yok: formda üstünde zaten "Ödeme" bölüm başlığı durur, anahtarın iki yazısı da ne olduğunu söyler. -->
+    <el-form-item v-if="optional">
       <el-switch v-model="payment.paid" active-text="Ödeme alındı, şimdi kaydet" inactive-text="Ödeme sonra" />
     </el-form-item>
     <template v-if="payment.paid || !optional">
