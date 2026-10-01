@@ -5,8 +5,9 @@
       <h2>Bir sonraki iş gününe<br />daha net başlayın.</h2>
       <p>Constructor ERP’yi firmanızın iş akışı üzerinden birlikte değerlendirelim.</p>
       <div class="marketing-closing__actions">
-        <RouterLink :to="{ name: 'apply' }">
-          <van-button block color="var(--mk-yellow)" class="marketing-closing__primary">Tanıtım isteyin<van-icon name="arrow" /></van-button>
+        <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom>
+          <van-button tag="a" :href="href" block color="var(--mk-yellow)" class="marketing-closing__primary"
+            @click="navigate">Tanıtım isteyin<van-icon name="arrow" /></van-button>
         </RouterLink>
         <RouterLink :to="{ name: 'pricing' }" class="marketing-closing__pricing">Paketleri inceleyin<van-icon name="arrow" /></RouterLink>
       </div>

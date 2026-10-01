@@ -33,6 +33,7 @@ import StartSteps from '@/shared/organisms/StartSteps.vue'
         <SectionHeading eyebrow="PAKETLER" title="Ekibiniz kadar büyüyen bir alan."
           lead="Kişi, aktif şantiye ve modül ihtiyaçlarınıza göre paketleri inceleyin. Aylık fiyatlar, KDV hariç." />
         <PublicPlanList />
+        <RouterLink :to="{ name: 'pricing' }" class="landing-mobile__more">Paketleri ayrıntılı inceleyin →</RouterLink>
       </div>
     </section>
     <section id="sss" class="marketing-section">
@@ -46,4 +47,5 @@ import StartSteps from '@/shared/organisms/StartSteps.vue'
 <style scoped>
 .landing-mobile__start { color: #fff; background: var(--mk-dark); }
 .landing-mobile__plans { border-top: 1px solid var(--mk-line); border-bottom: 1px solid var(--mk-line); background: var(--mk-paper); }
+.landing-mobile__more { display: block; width: fit-content; margin: 28px auto 0; color: var(--mk-ink); font-size: 13px; font-weight: var(--weight-semibold); text-decoration: none; }
 </style>

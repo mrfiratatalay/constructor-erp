@@ -10,11 +10,13 @@ import ProductPreview from '@/shared/organisms/ProductPreview.vue'
         <h1><span>Saha hareketli.</span><em>Kontrol sizde.</em></h1>
         <p>Sahadan güncellemeler, yoklama, malzeme hareketleri ve ilerleme tek yerde. Ekibiniz telefondan çalışır, siz her yerden takip edersiniz.</p>
         <div class="marketing-hero__actions">
-          <RouterLink :to="{ name: 'apply' }">
-            <van-button block color="var(--mk-yellow)" class="marketing-hero__primary">Tanıtım isteyin<van-icon name="arrow" /></van-button>
+          <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom>
+            <van-button tag="a" :href="href" block color="var(--mk-yellow)" class="marketing-hero__primary"
+              @click="navigate">Tanıtım isteyin<van-icon name="arrow" /></van-button>
           </RouterLink>
-          <RouterLink :to="{ name: 'landing', hash: '#ozellikler' }">
-            <van-button block plain class="marketing-hero__secondary">Ürünü keşfedin<van-icon name="arrow-down" /></van-button>
+          <RouterLink v-slot="{ href, navigate }" :to="{ name: 'landing', hash: '#ozellikler' }" custom>
+            <van-button tag="a" :href="href" block plain class="marketing-hero__secondary"
+              @click="navigate">Ürünü keşfedin<van-icon name="arrow-down" /></van-button>
           </RouterLink>
         </div>
         <ul class="marketing-hero__promises">
@@ -46,5 +48,5 @@ import ProductPreview from '@/shared/organisms/ProductPreview.vue'
 .marketing-hero__promises { display: flex; flex-wrap: wrap; gap: 12px 18px; margin: 25px 0 0; padding: 0; list-style: none; }
 .marketing-hero__promises li { display: inline-flex; align-items: center; gap: 5px; color: rgb(255 255 255 / .56); font-size: 10px; }
 .marketing-hero__promises .van-icon { color: rgb(255 255 255 / .76); font-size: 12px; }
-.marketing-hero__preview { margin: 32px auto 0; }
+.marketing-hero__preview { max-width: 560px; margin: 32px auto 0; }
 </style>

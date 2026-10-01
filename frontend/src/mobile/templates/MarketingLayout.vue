@@ -54,15 +54,25 @@ const links = [
       </RouterLink>
     </nav>
     <div class="marketing-mobile-menu__action">
-      <RouterLink :to="{ name: 'apply' }" @click="menuOpen = false">
-        <van-button type="primary" block>Tanıtım isteyin</van-button>
+      <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom>
+        <van-button tag="a" :href="href" type="primary" block @click="(event) => { menuOpen = false; navigate(event) }">Tanıtım isteyin</van-button>
       </RouterLink>
     </div>
   </van-action-sheet>
 </template>
 
 <style scoped>
-.marketing-mobile { --mk-gutter: 20px; --mk-space: 64px; display: flex; flex-direction: column; min-height: var(--layout-app-height); background: #fff; }
+.marketing-mobile {
+  --mk-width: 760px;
+  --mk-gutter: 20px;
+  --mk-space: 64px;
+  --van-button-primary-background: var(--mk-ink);
+  --van-button-primary-border-color: var(--mk-ink);
+  display: flex;
+  flex-direction: column;
+  min-height: var(--layout-app-height);
+  background: #fff;
+}
 .marketing-mobile > main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .marketing-mobile__header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--mk-line); background: rgb(255 255 255 / .94); backdrop-filter: blur(16px); }
 .marketing-mobile__header-row { display: flex; align-items: center; gap: 10px; max-width: var(--mk-width); margin-inline: auto; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; }

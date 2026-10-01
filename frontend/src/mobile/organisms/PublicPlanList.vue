@@ -32,18 +32,22 @@ async function retry() {
       <ul class="public-plan__features">
         <li><Check :size="15" />Saha akışı ve şantiye sohbeti</li>
         <li v-for="feature in plan.features" :key="feature.key" :class="{ 'is-off': !feature.included }">
-          <Check v-if="feature.included" :size="15" /><Minus v-else :size="15" /><span>{{ feature.name }}</span>
+          <Check v-if="feature.included" :size="15" /><Minus v-else :size="15" />
+          <span>{{ feature.name }}<small v-if="!feature.included">Bu pakette yok</small></span>
         </li>
       </ul>
-      <RouterLink :to="{ name: 'apply', query: { paket: plan.code } }" class="public-plan__action">
-        <van-button block :type="plan.highlighted ? 'primary' : 'default'">
+      <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply', query: { paket: plan.code } }" custom>
+        <van-button tag="a" :href="href" block :type="plan.highlighted ? 'primary' : 'default'"
+          class="public-plan__action" @click="navigate">
           {{ plan.monthlyPrice == null ? 'Teklif isteyin' : 'Bu paketle görüşelim' }}<van-icon name="arrow" />
         </van-button>
       </RouterLink>
     </article>
   </div>
   <van-empty v-else description="Paket bilgileri henüz yayınlanmadı." image-size="72">
-    <RouterLink :to="{ name: 'apply' }"><van-button type="primary" size="small">Tanıtım isteyin</van-button></RouterLink>
+    <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom>
+      <van-button tag="a" :href="href" type="primary" size="small" @click="navigate">Tanıtım isteyin</van-button>
+    </RouterLink>
   </van-empty>
 </template>
 
@@ -51,7 +55,7 @@ async function retry() {
 .public-plans, .public-plans__loading { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); align-items: stretch; gap: 18px; }
 .public-plans__loading .van-skeleton { border: 1px solid var(--mk-line); border-radius: 18px; padding: 24px; background: #fff; }
 .public-plan { display: flex; flex-direction: column; min-width: 0; padding: 25px 22px; border: 1px solid var(--mk-line); border-radius: 18px; background: #fff; }
-.public-plan--highlighted { border-color: var(--brand-primary); box-shadow: 0 8px 26px rgb(21 33 61 / .07), inset 0 3px 0 var(--brand-primary); }
+.public-plan--highlighted { border-color: var(--mk-ink); box-shadow: inset 0 0 0 1px var(--mk-ink); }
 .public-plan__heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .public-plan h3 { margin: 0; color: var(--mk-ink); font-size: 19px; font-weight: 750; letter-spacing: -.03em; }
 .public-plan .van-tag { padding: 4px 9px; font-size: 9px; }
@@ -64,8 +68,10 @@ async function retry() {
 .public-plan__features li { display: flex; align-items: flex-start; gap: 10px; color: var(--mk-ink); font-size: 12px; line-height: 1.6; }
 .public-plan__features svg { flex: none; margin-top: 2px; color: var(--brand-primary); }
 .public-plan__features .is-off, .public-plan__features .is-off svg { color: #8d98a7; }
+.public-plan__features li > span { display: grid; gap: 3px; }
+.public-plan__features small { font-size: 10px; color: var(--mk-muted); }
 .public-plan__action { display: block; margin-top: auto; text-decoration: none; }
-.public-plan__action .van-button { height: 46px; border-radius: 10px; font-size: 12px; font-weight: 650; }
-.public-plan__action .van-button--default { border-color: var(--mk-line); color: var(--mk-ink); }
+.public-plan__action.van-button { height: 46px; border-radius: 10px; font-size: 12px; font-weight: 650; }
+.public-plan__action.van-button--default { border-color: var(--mk-line); color: var(--mk-ink); }
 .public-plan__action .van-icon { margin-left: 10px; font-size: 12px; }
 </style>
