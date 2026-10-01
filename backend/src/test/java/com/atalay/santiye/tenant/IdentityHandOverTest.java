@@ -45,6 +45,21 @@ class IdentityHandOverTest extends TenantTestSupport {
         assertThat(login(email, PASSWORD)).hasStatusOk();
     }
 
+    /** Ad kimliğindir ve öbür firmada da görünür: başkası değiştiremez, kişi kendisi değiştirir. */
+    @Test
+    void onlyThePersonRenamesAnAccountTheyShareWithAnotherCompany() {
+        String email = uniqueEmail();
+        Tenant first = createTenantOwnedBy(email, PASSWORD);
+        Tenant second = createTenantOwnedBy(email, PASSWORD);
+        Cookie coOwner = signedInAs(first.owner(), "Ortak Patron", "OWNER");
+        String person = userIdOf(first.owner());
+        String renamed = "{\"fullName\": \"Başka Ad\", \"role\": \"OWNER\", \"active\": true}";
+
+        assertThat(patchJson("/api/team/members/" + person, coOwner, renamed)).hasStatus(400);
+        assertThat(patchJson("/api/team/members/" + person, first.owner(), renamed)).hasStatusOk();
+        assertThat(get("/api/auth/me", second.owner())).bodyJson().extractingPath("$.fullName").isEqualTo("Başka Ad");
+    }
+
     private static String owner(String phone, boolean active) {
         return "{\"fullName\": \"Çok Firmalı Patron\", \"phone\": \"%s\", \"role\": \"OWNER\", \"active\": %s}"
             .formatted(phone, active);

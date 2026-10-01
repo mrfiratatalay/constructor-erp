@@ -20,6 +20,7 @@ import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -117,6 +118,7 @@ public class TeamService {
             throw ApiException.badRequest("Kendini firmadan çıkaramaz ya da kendi rolünü değiştiremezsin.");
         }
         String phone = request.phone() == null || request.phone().isBlank() ? null : checkedPhone(request.phone());
+        requireOwnIdentity(owner, member, PersonNames.tidy(request.fullName()), phone);
         if (phone != null) {
             holderOf(owner.companyId(), phone, member.getId()).ifPresent(TeamService::rejectTaken);
         }
@@ -124,6 +126,18 @@ public class TeamService {
             limits.requireSeat(owner.companyId());
         }
         return phone;
+    }
+
+    /**
+     * Ad ve numara kişinin kimliğidir. Şifreyle giren biri başka firmalarda da aynı kimlikle görünür: onun adını ve
+     * numarasını yalnızca kendisi değiştirir, bu firmanın patronu başka bir firmadaki kaydı değiştiremez.
+     */
+    private void requireOwnIdentity(CurrentUser owner, Member member, String fullName, String phone) {
+        boolean changes = !Objects.equals(member.getFullName(), fullName) || !Objects.equals(member.getPhone(), phone);
+        boolean someoneElse = !member.getId().equals(owner.userId());
+        if (changes && someoneElse && !workspaces.isConfinedTo(member.user(), owner.companyId())) {
+            throw ApiException.badRequest("Bu kişinin adını ve numarasını yalnızca kendisi değiştirebilir.");
+        }
     }
 
     /**
