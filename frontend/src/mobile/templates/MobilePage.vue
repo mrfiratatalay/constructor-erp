@@ -8,6 +8,7 @@ import CompanyLogo from '@/shared/atoms/CompanyLogo.vue'
 /**
  * Vant'ın başlık çubuğu; renk, yükseklik ve yazı ağırlığı tema değişkenlerinden gelir.
  * brand: ana ekranın lacivert, ızgaralı başlığı (firmanın logosu ve adı solda, action sağda); logoUrl firmanın logosu.
+ * logoName: logodaki baş harflerin kimin adından çıkacağı; başlık firmanın adı değilse (ör. "Malzemeler") verilir.
  * subtitle: başlığın altındaki ikinci satır (WhatsApp'ta grubun üyeleri gibi).
  * subbar: başlığın hemen altında, sayfa kayarken ona yapışık duran çubuk (şantiyede Sohbet / Saha).
  * footer: ekranın altında sabit duran alan (şantiye sayfasındaki gönderme çubuğu).
@@ -23,6 +24,7 @@ const {
   tabbar = true,
   bottom = false,
   logoUrl = null,
+  logoName = null,
 } = defineProps<{
   title: string
   subtitle?: string
@@ -31,6 +33,7 @@ const {
   tabbar?: boolean
   bottom?: boolean
   logoUrl?: string | null
+  logoName?: string | null
 }>()
 const slots = useSlots()
 const router = useRouter()
@@ -46,7 +49,7 @@ function goBack() {
     :border="!brand" :class="['mobile-page__bar', { 'mobile-page__bar--brand': brand }]" safe-area-inset-top fixed
     placeholder @click-left="!slots.heading && goBack()">
     <template v-if="brand" #left>
-      <span class="mobile-page__brand"><CompanyLogo :name="title" :logo-url="logoUrl" :size="30" surface="dark" />
+      <span class="mobile-page__brand"><CompanyLogo :name="logoName ?? title" :logo-url="logoUrl" :size="30" surface="dark" />
         {{ title }}</span>
     </template>
     <template v-else-if="slots.heading" #left>
