@@ -41,7 +41,7 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
         <el-button type="primary" size="large" native-type="submit" :loading="isPending" class="login-page__submit">
           Giriş yap
         </el-button>
-        <!-- Yalnızca hesap derlemede ortamdan verildiyse: yerel geliştirme ve yerel Docker (core/auth/devLogin). -->
+        <!-- Yalnızca geliştirme sunucusunda, hesap .env.development.local'da verildiyse (core/auth/devLogin). -->
         <el-button v-if="devAccount" text type="primary" @click="fillDevAccount">Patron olarak doldur</el-button>
       </el-form>
       <p class="login-page__hint">

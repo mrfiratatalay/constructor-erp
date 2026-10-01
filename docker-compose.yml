@@ -74,11 +74,9 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-      # Giriş ekranındaki "Patron olarak doldur" düğmesi: backend'in ilk yöneticisiyle aynı hesap (yukarıdaki api).
-      # Bu değerler verilmeden derlenen arayüzde düğme hiç çıkmaz.
+      # Derlenen arayüze yalnızca herkese açık bilgi girer: paket, sayfayı açan herkesin elindedir. Hesap ve şifre
+      # buraya hiç verilmez ("Patron olarak doldur" yalnızca geliştirme sunucusundadır, core/auth/devLogin).
       args:
-        VITE_DEV_LOGIN_EMAIL: ${OWNER_EMAIL:-patron@kizilkan.local}
-        VITE_DEV_LOGIN_PASSWORD: ${OWNER_PASSWORD:-patron123}
         VITE_SALES_PHONE: ${SALES_PHONE:-}
         VITE_SALES_EMAIL: ${SALES_EMAIL:-}
     ports:

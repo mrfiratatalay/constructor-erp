@@ -10,9 +10,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend/ ./
-# "Patron olarak doldur" düğmesinin hesabı docker-compose.yml'den gelir; verilmezse boş kalır, düğme çıkmaz.
-ARG VITE_DEV_LOGIN_EMAIL=""
-ARG VITE_DEV_LOGIN_PASSWORD=""
+# Derlenen paket herkese açıktır: buraya yalnızca herkese açık bilgi verilir, hesap ya da şifre asla.
 # Tanıtım sitesindeki satış telefonu ve e-postası; verilmezse site yalnızca başvuru formunu gösterir.
 ARG VITE_SALES_PHONE=""
 ARG VITE_SALES_EMAIL=""
