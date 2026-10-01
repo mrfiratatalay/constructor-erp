@@ -11,5 +11,7 @@ export function usePasswordLogin() {
     login: (email: string, password: string) => mutation.mutate({ data: { email, password } }),
     isPending: mutation.isPending,
     errorText: computed(() => (mutation.error.value ? errorMessage(mutation.error.value) : null)),
+    /** Kişi e-postayı ya da şifreyi düzeltmeye başlayınca eski "hatalı" uyarısı kalkar; yeni denemenin sonucu gelir. */
+    clearError: () => mutation.reset(),
   }
 }

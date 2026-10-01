@@ -1,11 +1,23 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref, watch } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
 import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
 import AuthLayout from '@/desktop/templates/AuthLayout.vue'
 
 const form = reactive({ email: '', password: '' })
-const { login, isPending, errorText } = usePasswordLogin()
+const { login, isPending, errorText, clearError } = usePasswordLogin()
+watch(form, clearError)
+// Tarayıcının "required" balonu yerine Element Plus kuralları: uyarı alanın altında ve Türkçe, telefondakiyle aynı dilde.
+const rules: FormRules = {
+  email: [{ required: true, message: 'E-posta gerekli', trigger: 'submit' }],
+  password: [{ required: true, message: 'Şifre gerekli', trigger: 'submit' }],
+}
+const formRef = ref<FormInstance>()
+
+async function submit() {
+  if (await formRef.value?.validate().catch(() => false)) login(form.email, form.password)
+}
 const devAccount = devLogin()
 const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
 </script>
@@ -15,14 +27,15 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
     <el-card class="login-page__card" shadow="never">
       <h2 class="login-page__title">Giriş yap</h2>
       <p class="login-page__lead">Firmanızın çalışma alanına ya da platform yönetimine girin.</p>
-      <el-form label-position="top" class="login-page__form" @submit.prevent="login(form.email, form.password)">
-        <el-form-item label="E-posta">
+      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="login-page__form"
+        @submit.prevent="submit">
+        <el-form-item label="E-posta" prop="email">
           <el-input v-model="form.email" type="email" size="large" autocomplete="username"
-            placeholder="ornek@firma.com" required />
+            placeholder="ornek@firma.com" />
         </el-form-item>
-        <el-form-item label="Şifre">
+        <el-form-item label="Şifre" prop="password">
           <el-input v-model="form.password" type="password" size="large" show-password
-            autocomplete="current-password" placeholder="••••••••" required />
+            autocomplete="current-password" />
         </el-form-item>
         <el-alert v-if="errorText" :title="errorText" type="error" :closable="false" show-icon />
         <el-button type="primary" size="large" native-type="submit" :loading="isPending" class="login-page__submit">
