@@ -30,8 +30,12 @@ public abstract class TenantTestSupport extends ApiTestSupport {
             "{\"email\": \"%s\", \"password\": \"%s\"}".formatted(email, password));
     }
 
+    protected Cookie loginAsPlatformAdmin() {
+        return sessionCookieOf(login(ADMIN_EMAIL, ADMIN_PASSWORD));
+    }
+
     protected OpenedTenant openTenant() {
-        Cookie admin = sessionCookieOf(login(ADMIN_EMAIL, ADMIN_PASSWORD));
+        Cookie admin = loginAsPlatformAdmin();
         String tenant = "{\"name\": \"Firma %s\", \"planId\": \"%s\", \"months\": 12}"
             .formatted(UUID.randomUUID(), professionalPlan(admin));
         MvcTestResult created = postJson("/api/platform/tenants", admin, tenant);
