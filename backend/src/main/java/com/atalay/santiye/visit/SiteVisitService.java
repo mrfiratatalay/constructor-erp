@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +31,12 @@ public class SiteVisitService {
     public SiteVisitView visit(CurrentUser user, UUID siteId) {
         siteAccess.requireVisible(user, siteId);
         Instant now = clock.instant();
-        SiteVisitId id = new SiteVisitId(user.userId(), siteId);
-        Optional<SiteVisit> existing = visits.findById(id);
-        Instant previous = existing.map(SiteVisit::getSeenAt).orElse(null);
-        existing.ifPresentOrElse(visit -> visit.seenAgain(now), () -> visits.save(new SiteVisit(id, now)));
+        if (visits.insertFirst(user.userId(), siteId, now) == 1) {
+            return new SiteVisitView(null);
+        }
+        SiteVisit visit = visits.findLocked(new SiteVisitId(user.userId(), siteId)).orElseThrow();
+        Instant previous = visit.getSeenAt();
+        visit.seenAgain(now);
         return new SiteVisitView(previous);
     }
 

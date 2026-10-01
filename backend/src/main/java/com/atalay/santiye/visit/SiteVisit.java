@@ -17,11 +17,6 @@ class SiteVisit {
     protected SiteVisit() {
     }
 
-    SiteVisit(SiteVisitId id, Instant seenAt) {
-        this.id = id;
-        this.seenAt = seenAt;
-    }
-
     void seenAgain(Instant at) {
         this.seenAt = at;
     }
