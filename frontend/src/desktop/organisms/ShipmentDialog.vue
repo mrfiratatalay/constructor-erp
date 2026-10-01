@@ -95,7 +95,9 @@ async function submit() {
               <el-button link type="primary" @click="addingFor = index">+ Listede yok, yeni malzeme ekle</el-button>
             </template>
           </el-select>
-          <el-input-number v-model="line.quantity" :min="0" :controls="false" placeholder="0" class="dialog__amount" />
+          <el-input-number v-model="line.quantity" :min="0" :controls="false" placeholder="0" class="dialog__amount">
+            <template #suffix>{{ unitOf(line.materialId) }}</template>
+          </el-input-number>
           <el-button link type="danger" :disabled="draft.lines.length === 1" @click="draft.lines.splice(index, 1)">
             Sil
           </el-button>
@@ -135,6 +137,11 @@ async function submit() {
   gap: var(--space-2);
   width: 100%;
   margin-block-end: var(--space-2);
+}
+
+/* el-input-number kendi 150 px genişliğinde kalıp 120 px'lik sütundan taşıyor, Sil düğmesinin üstüne biniyordu. */
+.dialog__amount {
+  width: 100%;
 }
 
 .dialog__stock {
