@@ -1,5 +1,6 @@
 package com.atalay.santiye.lead;
 
+import com.atalay.santiye.common.web.ClientAddress;
 import com.atalay.santiye.lead.dto.SalesRequestSubmission;
 import com.atalay.santiye.lead.dto.SubmittedSalesRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +33,7 @@ public class PublicSalesRequestController {
         if (submission.website() != null && !submission.website().isBlank()) {
             return new SubmittedSalesRequest(UUID.randomUUID());
         }
-        throttle.check(http.getRemoteAddr());
+        throttle.check(ClientAddress.of(http));
         return new SubmittedSalesRequest(requests.submit(formOf(submission)).getId());
     }
 

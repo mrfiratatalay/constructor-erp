@@ -45,4 +45,9 @@ public class ApiException extends ErrorResponseException {
     public static ApiException conflict(String detail) {
         return new ApiException(HttpStatus.CONFLICT, detail);
     }
+
+    /** Kısa sürede çok deneme (kaba kuvvet, sel): istemci biraz bekleyip yeniden dener. */
+    public static ApiException tooManyRequests(String detail) {
+        return new ApiException(HttpStatus.TOO_MANY_REQUESTS, detail);
+    }
 }
