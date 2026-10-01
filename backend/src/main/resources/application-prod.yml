@@ -1,0 +1,41 @@
+# Üretim profili (SPRING_PROFILES_ACTIVE=prod). Render da ileride VPS de aynı profili kullanır; değerler ortam
+# değişkenlerinden gelir (Madde 5). Açılışta ProductionSettingsAudit denetler: eksik ya da güvensiz ayarla sunucu açılmaz.
+spring:
+  datasource:
+    # VPS'te tek adres verilir (DB_URL); Render'da blueprint adresi parça parça verir (render.yaml).
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  flyway:
+    clean-disabled: true
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+
+server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
+  shutdown: graceful
+
+app:
+  session:
+    secure-cookie: true
+  invite:
+    base-url: ${APP_BASE_URL}
+  media:
+    root: ${MEDIA_ROOT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
