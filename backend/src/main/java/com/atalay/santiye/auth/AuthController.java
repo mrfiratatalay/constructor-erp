@@ -6,6 +6,7 @@ import com.atalay.santiye.auth.dto.LoginRequest;
 import com.atalay.santiye.auth.dto.SessionContextView;
 import com.atalay.santiye.auth.dto.SwitchWorkspaceRequest;
 import com.atalay.santiye.common.error.ApiException;
+import com.atalay.santiye.common.web.ClientAddress;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<SessionContextView> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
-        return signIn(auth.login(request.email(), request.password()), http);
+        return signIn(auth.login(request.email(), request.password(), ClientAddress.of(http)), http);
     }
 
     @PostMapping("/invites/accept")

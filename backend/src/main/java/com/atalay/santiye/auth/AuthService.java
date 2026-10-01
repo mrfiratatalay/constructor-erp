@@ -9,8 +9,8 @@ import com.atalay.santiye.tenant.Membership;
 import com.atalay.santiye.tenant.Workspaces;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
+import java.util.Locale;
 import java.util.UUID;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,27 +21,34 @@ public class AuthService {
     private final CompanyRepository companies;
     private final Workspaces workspaces;
     private final WorkspaceAccess access;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordCheck passwords;
+    private final LoginAttempts attempts;
 
     AuthService(UserRepository users, CompanyRepository companies, Workspaces workspaces, WorkspaceAccess access,
-        PasswordEncoder passwordEncoder) {
+        PasswordCheck passwords, LoginAttempts attempts) {
         this.users = users;
         this.companies = companies;
         this.workspaces = workspaces;
         this.access = access;
-        this.passwordEncoder = passwordEncoder;
+        this.passwords = passwords;
+        this.attempts = attempts;
     }
 
     /**
-     * Hata mesajı bilerek aynı: hangi e-postanın kayıtlı olduğunu dışarıya belli etmeyiz. Oturum kişinin en eski
-     * aktif üyeliğinin firmasında açılır; platform yöneticisi firmasız da girer.
+     * Hata mesajı ve süresi bilerek aynı: hangi e-postanın kayıtlı olduğunu dışarıya belli etmeyiz (PasswordCheck).
+     * Çok hatalı deneme 429 alır (LoginAttempts). Oturum kişinin en eski aktif üyeliğinin firmasında açılır; platform
+     * yöneticisi firmasız da girer.
      */
     @Transactional(readOnly = true)
-    public SignIn login(String email, String password) {
-        AppUser user = users.findByEmailIgnoreCase(email.trim())
-            .filter(AppUser::canLoginWithPassword)
-            .filter(candidate -> passwordEncoder.matches(password, candidate.getPasswordHash()))
-            .orElseThrow(() -> ApiException.unauthorized("E-posta ya da şifre hatalı."));
+    public SignIn login(String email, String password, String clientAddress) {
+        String account = email.trim().toLowerCase(Locale.ROOT);
+        attempts.requireAllowed(clientAddress, account);
+        AppUser user = users.findByEmailIgnoreCase(email.trim()).orElse(null);
+        if (!passwords.matches(user, password)) {
+            attempts.failed(clientAddress, account);
+            throw ApiException.unauthorized("E-posta ya da şifre hatalı.");
+        }
+        attempts.succeeded(account);
         UUID companyId = workspaces.resolve(user.getId(), null).map(Membership::getCompanyId).orElse(null);
         if (companyId == null && !user.isPlatformAdmin()) {
             throw ApiException.unauthorized("Hesabın hiçbir firmada etkin değil. Firmanın yöneticisine başvur.");
