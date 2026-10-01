@@ -19,6 +19,7 @@ import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
 import java.time.Clock;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,9 @@ public class TeamService {
     /**
      * Bağlantıyla gelen kişi kendini çalışan olarak ekler; şefi patron seçer. Numara firmada aktif birinin ise yeni
      * hesap açılmaz: kimse başkasının numarasını yazıp onun yerine giremesin; o kişi patrondan giriş linki ister.
-     * Firmadan çıkarılmış birinin numarasıysa eski üyeliği geri açılır: yazdıkları zaten şantiyelerde duruyor.
+     * Firmadan çıkarılmış birinin numarasıysa eski üyeliği geri açılır: yazdıkları zaten şantiyelerde duruyor. Bu
+     * yalnızca kimliğinin tamamı bu firmada olan saha hesabında olur (Workspaces.isConfinedTo): şifreyle giren biri
+     * başka bir firmanın patronu ya da platform yöneticisi olabilir, numarasını yazan onun yerine geçemez.
      */
     @Transactional
     public AppUser joinByLink(UUID companyId, String fullName, String phone) {
@@ -69,6 +72,9 @@ public class TeamService {
         Optional<Member> holder = holderOf(companyId, checked, null);
         if (holder.filter(Member::isActive).isPresent()) {
             throw ApiException.badRequest("Bu numara zaten kayıtlı. Patronundan giriş linki iste.");
+        }
+        if (holder.filter(removed -> !workspaces.isConfinedTo(removed.user(), companyId)).isPresent()) {
+            throw ApiException.badRequest("Bu numaranın hesabı e-posta ve şifreyle giriyor; bağlantıyla katılamaz.");
         }
         limits.requireSeat(companyId);
         AppUser person = holder.map(Member::user).orElseGet(() -> new AppUser("", clock.instant()));
@@ -142,12 +148,15 @@ public class TeamService {
         return members.find(owner.companyId(), memberId).orElseThrow(() -> ApiException.notFound("Kişi bulunamadı."));
     }
 
-    /** Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız karşılaştırmak için hepsi okunur. */
+    /**
+     * Firma küçük (birkaç on kişi): numaraları yazıldıkları biçimden bağımsız karşılaştırmak için hepsi okunur. Aynı
+     * numara hem aktif hem çıkarılmış birinde kalmışsa aktif olan döner: numara onundur.
+     */
     private Optional<Member> holderOf(UUID companyId, String phone, UUID exceptId) {
         return members.of(companyId).stream()
             .filter(member -> !member.getId().equals(exceptId) && member.getPhone() != null)
             .filter(member -> PhoneNumbers.same(member.getPhone(), phone))
-            .findFirst();
+            .max(Comparator.comparing(Member::isActive));
     }
 
     private static void rejectTaken(Member holder) {
