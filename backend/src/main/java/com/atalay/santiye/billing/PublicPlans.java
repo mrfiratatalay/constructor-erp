@@ -26,8 +26,18 @@ public class PublicPlans {
         List<FeatureInfo> features = catalog.features();
         Map<UUID, Set<String>> enabled = catalog.enabledByPlan();
         return plans.findAllByOrderBySortOrder().stream()
-            .filter(plan -> plan.getStatus() == PlanStatus.ACTIVE && plan.isVisible())
+            .filter(PublicPlans::onSale)
             .map(plan -> viewOf(plan, features, enabled.getOrDefault(plan.getId(), Set.of()))).toList();
+    }
+
+    /** Başvuruda seçilen paket sitede gösterilenlerden biri mi (uydurulmuş ya da gizli bir kimlik değil). */
+    @Transactional(readOnly = true)
+    public boolean isOnSale(UUID planId) {
+        return plans.findById(planId).filter(PublicPlans::onSale).isPresent();
+    }
+
+    private static boolean onSale(Plan plan) {
+        return plan.getStatus() == PlanStatus.ACTIVE && plan.isVisible();
     }
 
     private static PublicPlanView viewOf(Plan plan, List<FeatureInfo> features, Set<String> enabled) {
