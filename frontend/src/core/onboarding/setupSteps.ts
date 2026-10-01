@@ -15,11 +15,16 @@ export const SETUP_STEPS = [
 ] as const
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/** Sunucu şifreyi bcrypt ile saklar: yalnızca ilk 72 bayt sayılır, Türkçe harf iki bayttır (SetupOwners). */
+const MAX_PASSWORD_BYTES = 72
 
 function ownerProblem(owner: SetupForms['owner']): string | null {
   if (!owner.fullName.trim()) return 'Adınızı ve soyadınızı yazın.'
   if (!EMAIL.test(owner.email.trim())) return 'Giriş için geçerli bir e-posta adresi yazın.'
   if (owner.password.length < 8) return 'Şifre en az 8 karakter olmalı.'
+  if (new TextEncoder().encode(owner.password).length > MAX_PASSWORD_BYTES) {
+    return 'Şifre en çok 72 karakter olabilir; Türkçe harfler (ç, ğ, ı, ö, ş, ü) iki karakter sayılır.'
+  }
   return owner.password === owner.passwordAgain ? null : 'Şifreler birbirini tutmuyor.'
 }
 

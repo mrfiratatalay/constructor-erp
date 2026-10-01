@@ -9,6 +9,7 @@ import com.atalay.santiye.tenant.MembershipRepository;
 import com.atalay.santiye.user.AppUser;
 import com.atalay.santiye.user.UserRepository;
 import com.atalay.santiye.user.UserRole;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.UUID;
@@ -25,6 +26,8 @@ class SetupOwners {
 
     private static final int FAILED_LIMIT = 10;
     private static final Duration WINDOW = Duration.ofMinutes(15);
+    /** bcrypt şifrenin yalnızca ilk 72 baytını kullanır ve daha uzununu kaydetmeyi reddeder; Türkçe harf iki bayttır. */
+    private static final int MAX_PASSWORD_BYTES = 72;
 
     private final UserRepository users;
     private final MembershipRepository memberships;
@@ -66,6 +69,10 @@ class SetupOwners {
     }
 
     private AppUser newOwner(SetupOwner request, String email) {
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES) {
+            throw ApiException.badRequest("Şifre en çok 72 karakter olabilir; Türkçe harfler (ç, ğ, ı, ö, ş, ü) iki "
+                + "karakter sayılır.");
+        }
         AppUser owner = new AppUser(PersonNames.tidy(request.fullName()), clock.instant());
         owner.setPasswordLogin(email, passwordEncoder.encode(request.password()));
         return users.save(owner);
