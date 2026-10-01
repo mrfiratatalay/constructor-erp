@@ -1,124 +1,81 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next'
+import { ArrowRight, Check } from 'lucide-vue-next'
 import ProductPreview from '@/shared/organisms/ProductPreview.vue'
 
-/** Tanıtım sayfasının girişi: ne olduğu, kime olduğu, ilk adım. Sağda ürünün önizlemesi. */
-const PROMISES = ['Kurulum yok, tarayıcıda çalışır', 'Saha ekibine şifre yok', 'Verileriniz yalnızca size açık']
+const PROMISES = ['Tarayıcıda çalışır', 'Telefon ve bilgisayarda', 'Firmanıza özel alan']
 </script>
 
 <template>
-  <section class="hero blueprint">
+  <section class="hero">
     <div class="hero__inner">
       <div class="hero__copy">
-        <small>Müteahhitler için şantiye yönetimi</small>
-        <h1>Şantiyeleriniz WhatsApp gruplarında değil, <em>tek ekranda.</em></h1>
-        <p>
-          Sahadan fotoğraf ve sorunlar, yoklama ve puantaj, malzeme sevkiyatı, taşeron ilerlemesi. Şef telefondan
-          girer, siz ofisten görürsünüz.
-        </p>
+        <span class="hero__eyebrow">ŞANTİYE YÖNETİMİ, TEK BİR YERDE</span>
+        <h1><span>Saha hareketli.</span><span class="hero__highlight">Kontrol sizde.</span></h1>
+        <p>Sahadan güncellemeler, yoklama, malzeme hareketleri ve işin ilerlemesi aynı yerde.
+          Ekibiniz telefondan kaydeder, siz ofisten takip edersiniz.</p>
         <div class="hero__actions">
-          <RouterLink :to="{ name: 'apply' }"><el-button type="warning" size="large" round>Tanıtım isteyin</el-button></RouterLink>
-          <RouterLink :to="{ name: 'pricing' }"><el-button size="large" round plain>Paketleri inceleyin</el-button></RouterLink>
+          <RouterLink :to="{ name: 'apply' }">
+            <el-button type="primary" size="large" class="hero__primary">Tanıtım isteyin<ArrowRight :size="17" aria-hidden="true" /></el-button>
+          </RouterLink>
+          <RouterLink :to="{ name: 'landing', hash: '#ozellikler' }">
+            <el-button size="large" plain class="hero__secondary">Ürünü keşfedin</el-button>
+          </RouterLink>
         </div>
-        <ul>
-          <li v-for="promise in PROMISES" :key="promise"><Check :size="16" /> {{ promise }}</li>
+        <ul class="hero__promises">
+          <li v-for="promise in PROMISES" :key="promise"><Check :size="14" aria-hidden="true" />{{ promise }}</li>
         </ul>
       </div>
-      <ProductPreview class="hero__preview" />
+      <div class="hero__preview"><ProductPreview /></div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.hero {
-  color: var(--brand-on-deep);
-}
-
+.hero { color: var(--brand-on-deep); background: var(--mk-dark); }
 .hero__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: var(--space-10);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
   align-items: center;
-  max-width: var(--layout-board-width);
+  gap: clamp(40px, 5vw, 72px);
+  max-width: var(--mk-width);
   margin-inline: auto;
-  padding: 88px var(--space-6) 96px;
+  padding: var(--mk-space) var(--mk-gutter);
 }
-
-.hero small {
-  color: var(--brand-signature);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.hero h1 {
-  margin: var(--space-3) 0 0;
-  font-size: clamp(34px, 4.4vw, 54px);
-  font-weight: var(--weight-black);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-
-.hero em {
-  color: var(--brand-signature);
-  font-style: normal;
-}
-
-.hero p {
-  margin: var(--space-5) 0 0;
-  color: rgb(255 255 255 / 0.8);
-  font-size: var(--text-md);
-  line-height: 1.65;
-}
-
-.hero__actions {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-8);
-}
-
-.hero__actions .el-button--warning {
-  --el-button-bg-color: var(--brand-signature);
-  --el-button-border-color: var(--brand-signature);
-  --el-button-text-color: var(--brand-deep);
+.hero__copy { min-width: 0; }
+.hero__eyebrow { display: block; color: rgb(255 255 255 / 62%); font-size: 11px; font-weight: var(--weight-semibold); letter-spacing: .14em; line-height: 1.6; }
+.hero h1 { margin: 26px 0 0; font-size: clamp(48px, 5.5vw, 76px); font-weight: var(--weight-black); letter-spacing: -.055em; line-height: 1.08; text-wrap: initial; }
+.hero h1 span { display: block; }
+.hero__highlight { color: var(--mk-yellow); }
+.hero__copy > p { max-width: 43ch; margin: 28px 0 0; color: rgb(255 255 255 / 72%); font-size: clamp(15px, 1.35vw, 18px); line-height: 1.8; }
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
+.hero__actions a { text-decoration: none; }
+.hero__actions :deep(.el-button) { height: 50px; padding-inline: 24px; border-radius: 10px; font-size: 14px; font-weight: var(--weight-semibold); }
+.hero__primary {
+  --el-button-bg-color: var(--mk-yellow);
+  --el-button-border-color: var(--mk-yellow);
+  --el-button-text-color: var(--mk-dark);
   --el-button-hover-bg-color: #fde047;
   --el-button-hover-border-color: #fde047;
-  --el-button-hover-text-color: var(--brand-deep);
-  font-weight: var(--weight-bold);
+  --el-button-hover-text-color: var(--mk-dark);
+  --el-button-active-bg-color: var(--mk-yellow);
+  --el-button-active-border-color: var(--mk-yellow);
+  --el-button-active-text-color: var(--mk-dark);
 }
-
-.hero__actions .is-plain {
+.hero__primary :deep(span) { display: inline-flex; align-items: center; gap: 12px; }
+.hero__secondary {
   --el-button-bg-color: transparent;
   --el-button-text-color: var(--brand-on-deep);
-  --el-button-border-color: rgb(255 255 255 / 0.4);
-  --el-button-hover-bg-color: rgb(255 255 255 / 0.1);
+  --el-button-border-color: rgb(255 255 255 / 22%);
+  --el-button-hover-bg-color: rgb(255 255 255 / 7%);
+  --el-button-hover-border-color: rgb(255 255 255 / 44%);
   --el-button-hover-text-color: var(--brand-on-deep);
-  --el-button-hover-border-color: var(--brand-on-deep);
+  --el-button-active-bg-color: rgb(255 255 255 / 10%);
+  --el-button-active-border-color: rgb(255 255 255 / 44%);
+  --el-button-active-text-color: var(--brand-on-deep);
 }
-
-.hero ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-5);
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  list-style: none;
-  color: rgb(255 255 255 / 0.75);
-  font-size: var(--text-sm);
-}
-
-.hero li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.hero li svg {
-  color: var(--brand-signature);
-}
-
-@media (width < 1024px) {
-  .hero__inner { grid-template-columns: 1fr; padding-block: 64px; }
-}
+.hero__promises { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 32px 0 0; padding: 0; list-style: none; color: rgb(255 255 255 / 55%); font-size: 11px; }
+.hero__promises li { display: inline-flex; align-items: center; gap: 7px; }
+.hero__promises svg { flex: none; color: rgb(255 255 255 / 72%); }
+.hero__preview { min-width: 0; }
+.hero a:focus-visible { outline: 2px solid var(--mk-yellow); outline-offset: 5px; border-radius: 10px; }
 </style>

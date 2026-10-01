@@ -54,7 +54,7 @@ function navigateTabs(event: KeyboardEvent) {
 .product-preview__tabs button svg { flex: none; }
 .product-preview__tabs button:hover { color: var(--brand-primary); }
 .product-preview__tabs .is-active { border-color: var(--border-soft); background: var(--surface); color: var(--brand-primary); box-shadow: var(--shadow-sm); font-weight: var(--weight-semibold); }
-.product-preview__content { min-height: 358px; padding: 20px 18px; }
+.product-preview__content { height: 410px; padding: 20px 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .product-preview__content:focus-visible { outline-offset: -4px; }
 .product-preview__footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 12px 16px; border-top: 1px solid var(--border-soft); color: var(--text-muted); background: var(--surface-muted); font-size: 9px; }
 </style>

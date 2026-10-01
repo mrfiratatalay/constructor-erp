@@ -9,8 +9,8 @@ import SectionHeading from '@/shared/molecules/SectionHeading.vue'
 <template>
   <MarketingLayout>
     <section class="pricing__section">
-      <SectionHeading eyebrow="Fiyatlar" title="Sade paketler, gizli ücret yok"
-        lead="Fiyatlar aylık ve KDV hariçtir. Ödeme havale/EFT ya da elden; kredi kartı gerekmez. Paketinizi dilediğiniz zaman büyütürsünüz." />
+      <SectionHeading :level="1" eyebrow="Paketler ve fiyatlar" title="Ekibinize uygun çalışma alanı."
+        lead="Kişi, aktif şantiye ve modül ihtiyaçlarınıza göre paketleri değerlendirin. Aylık fiyatlar KDV hariçtir; ödeme havale/EFT ya da elden alınır." />
       <PublicPlanGrid />
     </section>
     <section class="pricing__section">
@@ -26,13 +26,13 @@ import SectionHeading from '@/shared/molecules/SectionHeading.vue'
 
 <style scoped>
 .pricing__section {
-  max-width: var(--layout-board-width);
+  max-width: var(--mk-width);
   margin-inline: auto;
-  padding: 80px var(--space-6);
+  padding: var(--mk-space) var(--mk-gutter);
 }
 
 .pricing__section--muted {
   max-width: none;
-  background: var(--canvas);
+  background: var(--mk-paper);
 }
 </style>
