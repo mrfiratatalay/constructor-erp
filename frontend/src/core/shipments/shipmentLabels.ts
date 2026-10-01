@@ -27,6 +27,8 @@ export const HISTORY_LABELS: Record<string, string> = {
   RETURN_ADDED: 'Malzeme geri geldi',
   CANCELLED: 'İptal edildi',
   DOCUMENT_ADDED: 'İrsaliye eklendi',
+  EDITED: 'Tarih ve açıklama düzenlendi',
+  UPDATED: 'Hareket düzenlendi',
 }
 
 /** Sevkiyatın yolu tek satırda: "Ana Depo → Çamburnu Plaza". Bir ucu yoksa yalnızca o uç yazılır. */

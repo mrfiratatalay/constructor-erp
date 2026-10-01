@@ -18,8 +18,9 @@ export function useShipmentActions() {
 
   /** Dışarıdaki malzeme geri geldi: malzeme, firma ve dönüş yeri çıkışın kendisinden gelir, form sorulmaz. */
   async function receive(shipmentId: string) {
-    await receiveReturn.mutateAsync({ shipmentId })
+    const detail = await receiveReturn.mutateAsync({ shipmentId })
     await refresh()
+    return detail
   }
 
   return {

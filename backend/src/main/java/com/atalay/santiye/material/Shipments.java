@@ -87,4 +87,9 @@ public class Shipments {
         return shipments.findByIdAndCompanyId(shipmentId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Sevkiyat bulunamadı."));
     }
+
+    Shipment requireForChange(CurrentUser user, UUID shipmentId) {
+        return shipments.findLockedByIdAndCompanyId(shipmentId, user.companyId())
+            .orElseThrow(() -> ApiException.notFound("Sevkiyat bulunamadı."));
+    }
 }

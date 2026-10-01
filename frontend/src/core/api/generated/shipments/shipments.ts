@@ -29,6 +29,7 @@ import type {
   ListShipmentsParams,
   ListStockAtParams,
   ShipmentDetail,
+  ShipmentEditRequest,
   ShipmentRequest,
   ShipmentRow,
   StockLevel,
@@ -495,6 +496,86 @@ export function useGetShipment<TData = Awaited<ReturnType<typeof getShipment>>, 
   return query
 }
 
+export const editShipment = (
+  shipmentId: MaybeRefOrGetter<string>,
+  shipmentEditRequest: MaybeRefOrGetter<ShipmentEditRequest>,
+  options?: SecondParameter<typeof apiRequest>,
+  signal?: AbortSignal,
+) => {
+  shipmentId = toValue(shipmentId)
+  shipmentEditRequest = toValue(shipmentEditRequest)
+
+  return apiRequest<ShipmentDetail>(
+    {
+      url: `/api/shipments/${shipmentId}`,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      data: shipmentEditRequest,
+      signal,
+    },
+    options,
+  )
+}
+
+export const getEditShipmentMutationKey = () => ['editShipment'] as const
+
+export const getEditShipmentMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof editShipment>>,
+    TError,
+    EditShipmentMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof apiRequest>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof editShipment>>,
+  TError,
+  EditShipmentMutationVariables,
+  TContext
+> => {
+  const mutationKey = getEditShipmentMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof editShipment>>,
+    EditShipmentMutationVariables
+  > = (props) => {
+    const { shipmentId, data } = props ?? {}
+
+    return editShipment(shipmentId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type EditShipmentMutationResult = NonNullable<Awaited<ReturnType<typeof editShipment>>>
+export type EditShipmentMutationBody = ShipmentEditRequest
+export type EditShipmentMutationError = unknown
+export type EditShipmentMutationVariables = { shipmentId: string; data: ShipmentEditRequest }
+
+export const useEditShipment = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof editShipment>>,
+      TError,
+      EditShipmentMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof apiRequest>
+  },
+  queryClient?: QueryClient,
+): UseMutationReturnType<
+  Awaited<ReturnType<typeof editShipment>>,
+  TError,
+  EditShipmentMutationVariables,
+  TContext
+> => {
+  return useMutation(getEditShipmentMutationOptions(options), queryClient)
+}
 export const listStockAt = (
   params: MaybeRefOrGetter<ListStockAtParams>,
   options?: SecondParameter<typeof apiRequest>,

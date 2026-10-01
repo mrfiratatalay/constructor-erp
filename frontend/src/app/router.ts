@@ -11,7 +11,7 @@ export function createAppRouter(routes: RouteRecordRaw[]) {
     scrollBehavior(to, from, saved) {
       if (saved) return saved
       if (to.hash) return { el: to.hash, top: TOP_BAR_OFFSET, behavior: 'smooth' }
-      // Yalnızca sekme ya da süzgeç değiştiyse (?sekme=stok) kişi olduğu yerde kalır.
+      // Aynı sayfada sekme, süzgeç ya da açık ayrıntı değiştiyse kişi olduğu yerde kalır.
       return to.path === from.path ? false : { top: 0 }
     },
   })

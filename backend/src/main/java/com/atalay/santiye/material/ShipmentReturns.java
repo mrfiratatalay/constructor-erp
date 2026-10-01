@@ -30,9 +30,14 @@ public class ShipmentReturns {
 
     @Transactional
     public UUID receive(CurrentUser user, UUID shipmentId) {
-        Shipment out = shipments.findByIdAndCompanyId(shipmentId, user.companyId())
+        Shipment out = shipments.findLockedByIdAndCompanyId(shipmentId, user.companyId())
             .orElseThrow(() -> ApiException.notFound("Sevkiyat bulunamadı."));
         requireReturnable(out);
+        var existing = shipments.findFirstByReturnOfIdAndCompanyIdAndStatusNot(shipmentId, user.companyId(),
+            ShipmentStatus.CANCELLED);
+        if (existing.isPresent()) {
+            return existing.get().getId();
+        }
         Shipment back = shipments.saveAndFlush(reverseOf(user, out));
         lines.findByShipmentId(out.getId())
             .forEach(line -> lines.save(new ShipmentLine(back.getId(), line.getMaterialId(), line.getQuantity())));

@@ -3,6 +3,7 @@ package com.atalay.santiye.material.dto;
 import com.atalay.santiye.material.ShipmentStatus;
 import com.atalay.santiye.material.ShipmentType;
 import jakarta.annotation.Nullable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,11 @@ public record ShipmentRow(
     ShipmentStatus status,
     @Nullable String fromName,
     @Nullable String toName,
+    @Nullable String fromKind,
+    @Nullable String toKind,
     LocalDate day,
+    Instant createdAt,
+    String createdByName,
     boolean expectsReturn,
     boolean awaitingReturn,
     @Nullable Integer daysOut,

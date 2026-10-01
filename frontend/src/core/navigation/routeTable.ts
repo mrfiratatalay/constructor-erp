@@ -42,11 +42,10 @@ export const ROUTES = {
   },
   // Çalışanın kendi ayı: kaydını o gün görür, yanlışsa işaretleyeni arar. Patron ve şef yoklamada sayılmaz.
   myPuantaj: { path: '/puantajim', meta: { workerOnly: true, feature: 'attendance', title: 'Puantajım' } },
-  // Malzemeler firmanındır, şantiyenin değil: hareketler ve stok aynı sayfada sekmedir (?sekme=stok). Süzgeçler ve
-  // açık hareket adreste durur (?tur=TO_SITE&hareket=…): Saha kartı hareketin ayrıntısına buradan bağlanır.
+  // Malzeme hareketleri firmanındır; Saha kartı ?hareket=… ile ilgili kaydın ayrıntısını açar.
   materials: {
     path: '/malzemeler',
-    meta: { permission: 'VIEW_MATERIALS', feature: 'materials', title: 'Malzemeler' },
+    meta: { permission: 'VIEW_MATERIALS', feature: 'materials', title: 'Malzeme Yönetimi' },
   },
   // Firmanın kimliği (ad, logo, iletişim) ve aboneliği: patronun.
   company: { path: '/firma', meta: { ownerOnly: true, detail: true, title: 'Firma' } },

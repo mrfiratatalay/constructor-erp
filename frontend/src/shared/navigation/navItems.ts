@@ -37,9 +37,9 @@ const WORKSPACE_ITEMS: readonly NavItem[] = [
 ]
 
 export function mainNavItems(user: WorkspaceViewer, platform: 'mobile' | 'desktop'): NavItem[] {
-  return WORKSPACE_ITEMS.filter((item) => !item.only || item.only === platform).filter((item) =>
-    routeAllows(ROUTES[item.route].meta, user),
-  )
+  return WORKSPACE_ITEMS.filter((item) => !item.only || item.only === platform)
+    .filter((item) => routeAllows(ROUTES[item.route].meta, user))
+    .map((item) => item.route === 'materials' && platform === 'desktop' ? { ...item, label: 'Malzeme Yönetimi' } : item)
 }
 
 /** Platform yönetiminin menüsü (yalnızca süper yönetici). */

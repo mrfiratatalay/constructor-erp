@@ -6,6 +6,7 @@ import com.atalay.santiye.material.dto.ShipmentRow;
 import jakarta.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -17,20 +18,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Sevkiyat listesi: WhatsApp'ın sohbet listesi gibi tek liste, en yeniden eskiye. Tür çipleri ile lokasyon, tarih
- * ve durum süzgeçleri kalktı; geriye yalnızca arama kaldı. Kalemler tek sorguda toplanır (N+1 yok).
+ * Malzeme hareketlerinin tamamı, en yeniden eskiye. Kalemler tek sorguda toplanır (N+1 yok);
+ * masaüstü sayfalaması ve dönem özetleri aynı kayıtlar üzerinden hesaplanır.
  */
 @Service
 class ShipmentRows {
 
     /** Sevkiyatın bir ucunun adı: depo kendi adıyla, şantiye şantiyenin adıyla, dışarısı firmanın adıyla. */
     private static final String SELECT = """
-        select s.id, s.number, s.type, s.status, s.day, s.expects_return,
+        select s.id, s.number, s.type, s.status, s.day, s.created_at, u.full_name as created_by_name, s.expects_return,
                (s.expects_return and not exists (select 1 from material_shipments r
                     where r.return_of_id = s.id and r.status <> 'CANCELLED')) as awaiting_return,
                coalesce(fl.name, fsite.name, case when s.source_id is null then p.name end) as from_name,
-               coalesce(tl.name, tsite.name, case when s.destination_id is null then p.name end) as to_name
+               coalesce(tl.name, tsite.name, case when s.destination_id is null then p.name end) as to_name,
+               coalesce(fl.kind, case when s.source_id is null and p.id is not null then 'EXTERNAL' end) as from_kind,
+               coalesce(tl.kind, case when s.destination_id is null and p.id is not null then 'EXTERNAL' end) as to_kind
         from material_shipments s
+        join users u on u.id = s.created_by
         left join stock_locations fl on fl.id = s.source_id
         left join sites fsite on fsite.id = fl.site_id
         left join stock_locations tl on tl.id = s.destination_id
@@ -41,10 +45,14 @@ class ShipmentRows {
           and (cast(:search as text) is null
                or lower(coalesce(s.description, '')) like cast(:search as text)
                or lower(coalesce(p.name, '')) like cast(:search as text)
+               or lower(coalesce(fl.name, fsite.name, '')) like cast(:search as text)
+               or lower(coalesce(tl.name, tsite.name, '')) like cast(:search as text)
+               or lower(u.full_name) like cast(:search as text)
+               or ('sv-' || lpad(cast(s.number as text), 6, '0')) like cast(:search as text)
+               or cast(s.number as text) like cast(:search as text)
                or exists (select 1 from material_shipment_lines sl join materials m on m.id = sl.material_id
                           where sl.shipment_id = s.id and lower(m.name) like cast(:search as text)))
         order by s.day desc, s.number desc
-        limit 200
         """;
 
     private static final String LINES = """
@@ -94,11 +102,12 @@ class ShipmentRows {
 
     /** Listenin bir satırı, kalemleri eklenmeden önce. */
     private record Header(UUID id, long number, ShipmentType type, ShipmentStatus status, LocalDate day,
-        boolean expectsReturn, boolean awaitingReturn, String fromName, String toName) {
+        Instant createdAt, String createdByName, boolean expectsReturn, boolean awaitingReturn,
+        String fromName, String toName, String fromKind, String toKind) {
 
         ShipmentRow row(List<ShipmentLineView> lines, LocalDate today) {
-            return new ShipmentRow(id, number, type, status, fromName, toName, day, expectsReturn, waiting(),
-                daysOut(today), lines);
+            return new ShipmentRow(id, number, type, status, fromName, toName, fromKind, toKind, day, createdAt,
+                createdByName, expectsReturn, waiting(), daysOut(today), lines);
         }
 
         /** Hâlâ dışarıda: geri gelmesi bekleniyor, iadesi henüz kaydedilmemiş ve iptal edilmemiş. */

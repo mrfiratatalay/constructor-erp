@@ -2,6 +2,7 @@ package com.atalay.santiye.material;
 
 import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.material.dto.ShipmentLineView;
+import com.atalay.santiye.material.dto.ShipmentReportFilter;
 import com.atalay.santiye.material.dto.ShipmentRow;
 import jakarta.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
@@ -40,10 +41,11 @@ class MaterialReport {
         this.clock = clock;
     }
 
-    byte[] workbook(CurrentUser user, @Nullable String search) {
+    byte[] workbook(CurrentUser user, ShipmentReportFilter filter) {
         var out = new ByteArrayOutputStream();
         try (Workbook workbook = new Workbook(out, "Constructor ERP", "1.0")) {
-            TableSheet.write(workbook.newWorksheet("Sevkiyatlar"), COLUMNS, linesOf(rows.list(user, search)),
+            List<ShipmentRow> filtered = ShipmentReportFilters.apply(rows.list(user, filter.search()), filter);
+            TableSheet.write(workbook.newWorksheet("Sevkiyatlar"), COLUMNS, linesOf(filtered),
                 clock.getZone());
         } catch (IOException problem) {
             throw new UncheckedIOException(problem);

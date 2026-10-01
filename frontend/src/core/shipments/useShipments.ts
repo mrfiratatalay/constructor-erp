@@ -7,8 +7,7 @@ import {
 import type { ShipmentRow } from '@/core/api/generated/model'
 
 /**
- * Sevkiyat listesi: WhatsApp'ın sohbet listesi gibi tek liste, en yeniden eskiye. Süzgeç yoktur, arama vardır.
- * Ayrıca "dışarıda" olanlar çıkarılır: geri gelmesi beklenip henüz dönmeyenler, peşine düşülecek tek şey.
+ * Firmanın hareket defteri en yeniden eskiye gelir. Mobil liste ve masaüstü çalışma alanı aynı kayıtları kullanır.
  */
 export function useShipments(search: MaybeRefOrGetter<string>) {
   const { data, isLoading, isError, refetch } = useListShipments(() => ({
@@ -28,7 +27,7 @@ export function useShipments(search: MaybeRefOrGetter<string>) {
 /** Kaydettikten sonra liste ve ayrıntı yeniden okunur; ekranda eski hali kalmaz. */
 export function useShipmentRefresh() {
   const queryClient = useQueryClient()
-  return () => queryClient.invalidateQueries({ queryKey: getListShipmentsQueryKey().slice(0, 1) })
+  return () => queryClient.invalidateQueries({ queryKey: getListShipmentsQueryKey() })
 }
 
 /** Açık olan sevkiyatın kimliği adreste durur, böylece Saha kartı doğrudan buraya bağlanabilir. */

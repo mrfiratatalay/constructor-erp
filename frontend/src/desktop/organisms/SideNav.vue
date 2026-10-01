@@ -15,7 +15,7 @@ import { mainNavItems, navRouteOf, type NavItem } from '@/shared/navigation/navI
 /**
  * Sol menü, Gmail'deki gibi ☰ ile açılır ve kapanır (ne zaman yana kaydığı, ne zaman üstüne kaydığı:
  * useNavMenu). Açıkken ikonların yanında adları yazar (TASARIM.md İlke 2); kapalıyken ince şerittir, ad
- * üstüne gelince ipucu olarak çıkar. Seçili öğe baret sarısında. Üstte firmanın kimliği (logosu, adı), en altta kişinin
+ * üstüne gelince ipucu olarak çıkar. Seçili öğe ince sarı işaretle ayrılır. Üstte firmanın kimliği (logosu, adı), en altta kişinin
  * kendisi: Hesabım panelini açar.
  */
 const route = useRoute()
@@ -155,14 +155,12 @@ function go(item: NavItem) {
   color: var(--brand-on-deep);
 }
 
-/*
- * Seçili öğe baret sarısıyla dolu: "neredeyim" tek bakışta. İkon lacivert, beyaz değil: sarı üstünde beyaz
- * okunmaz. Logodaki KŞ rozetiyle aynı ikili (sarı zemin, lacivert harf).
- */
+/* İmza rengi ince bir işaret olarak kalır; uzun menü başlıkları sakin yüzeyde okunur. */
 .side-nav__item--active,
 .side-nav__item--active:hover {
-  background: var(--brand-signature);
-  color: var(--brand-deep);
+  background: rgb(255 255 255 / 0.09);
+  box-shadow: inset 3px 0 var(--brand-signature);
+  color: var(--brand-on-deep);
 }
 
 .side-nav__user {

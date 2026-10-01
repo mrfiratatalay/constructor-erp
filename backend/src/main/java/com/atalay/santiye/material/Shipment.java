@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
@@ -65,6 +66,23 @@ class Shipment {
 
     void cancel() {
         this.status = ShipmentStatus.CANCELLED;
+    }
+
+    void edit(LocalDate day, String description) {
+        this.day = day;
+        this.description = description;
+    }
+
+    boolean hasDetails(LocalDate day, String description) {
+        return Objects.equals(this.day, day) && Objects.equals(this.description, description);
+    }
+
+    LocalDate getDay() {
+        return day;
+    }
+
+    String getDescription() {
+        return description;
     }
 
     UUID getId() {

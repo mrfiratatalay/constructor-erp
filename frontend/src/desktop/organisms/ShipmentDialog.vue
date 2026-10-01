@@ -1,150 +1,133 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { ElMessage, type UploadUserFile } from 'element-plus'
+import { ElMessage, ElMessageBox, type UploadUserFile } from 'element-plus'
 import { errorMessage } from '@/core/api/errors'
-import { withUnit } from '@/core/shipments/quantity'
-import { draftProblem, emptyDraft, newLine, requestOf, type ShipmentDraft } from '@/core/shipments/shipmentForm'
-import { useShipmentOptions } from '@/core/shipments/useShipmentOptions'
-import { useShipmentSave } from '@/core/shipments/useShipmentSave'
-import { useStockAt } from '@/core/shipments/useStockAt'
+import type { MovementKind } from '@/core/shipments/movementPresentation'
+import { MOVEMENT_COPY } from '@/core/shipments/movementForm'
+import { shipmentNumber, withUnit } from '@/core/shipments/quantity'
+import { newLine } from '@/core/shipments/shipmentForm'
+import { useMovementComposer } from '@/core/shipments/useMovementComposer'
 import NewMaterialDialog from '@/desktop/molecules/NewMaterialDialog.vue'
+import MovementLines from '@/desktop/molecules/MovementLines.vue'
+import MovementDocuments from '@/desktop/molecules/MovementDocuments.vue'
+import ReturnSelection from '@/desktop/molecules/ReturnSelection.vue'
 
-/**
- * Sevkiyat çıkarmak, geniş ekranda. Telefondaki üç soru burada da aynıdır: nereye, ne kadar, irsaliye.
- * "Nereden" ve "hareket türü" sorulmaz; çıkış ana depodur, türü sunucu hesaplar. Listede olmayan malzeme
- * seçicinin altındaki bağlantıyla oracıkta açılır.
- */
 const show = defineModel<boolean>('show', { required: true })
+const { initialKind = 'SITE' } = defineProps<{ initialKind?: MovementKind }>()
 const emit = defineEmits<{ saved: [shipmentId: string] }>()
-
-const { sites, mainDepot, materials } = useShipmentOptions()
-const { save, isSaving } = useShipmentSave()
-const stock = useStockAt(() => mainDepot.value?.id ?? null)
-
-const draft = ref<ShipmentDraft>(emptyDraft())
+const { draft, returnId, original, awaiting, returnsLoading, returnsError, refetch, reset,
+  sites, mainDepot, materials, create, receive, isSaving } = useMovementComposer()
 const files = ref<UploadUserFile[]>([])
-const outside = computed(() => draft.value.targetKind === 'OUTSIDE')
-const inbound = computed(() => draft.value.targetKind === 'INBOUND')
-const elsewhere = computed(() => outside.value || inbound.value)
-/** Yeni malzeme hangi kalem için açılıyor: eklenince o satıra yerleşir. */
 const addingFor = ref<number | null>(null)
+const submitting = ref(false)
+const busy = computed(() => submitting.value || isSaving.value)
+const copy = computed(() => MOVEMENT_COPY[initialKind])
+const returning = computed(() => initialKind === 'RETURN')
+const inbound = computed(() => initialKind === 'INBOUND')
 
 watch(show, (open) => {
-  if (open) {
-    draft.value = emptyDraft()
-    files.value = []
-  }
-})
+  if (!open) return
+  reset(initialKind)
+  files.value = []
+  addingFor.value = null
+}, { immediate: true })
 
-/** Hedef seçimi tek listedir: şantiyeler, "Başka firmaya" ve "Depoya mal geldi". */
-function onTarget(value: string) {
-  const special = value === 'OUTSIDE' || value === 'INBOUND'
-  draft.value.targetKind = special ? (value as 'OUTSIDE' | 'INBOUND') : 'SITE'
-  draft.value.destinationId = special ? null : value
-}
-
-function onMaterialCreated(materialId: string) {
+function onMaterialCreated(id: string) {
   const line = draft.value.lines[addingFor.value ?? 0]
-  if (line) line.materialId = materialId
+  if (line) line.materialId = id
   addingFor.value = null
 }
 
-const unitOf = (materialId: string) => materials.value.find((item) => item.id === materialId)?.unit ?? ''
+async function confirmReturn() {
+  if (!original.value) throw new Error('Geri beklenen bir hareket seçin.')
+  const lines = original.value.lines.map((line) => `${line.materialName}: ${withUnit(line.quantity, line.unit)}`)
+  const message = `${shipmentNumber(original.value.number)} · ${original.value.toName}\n\n${lines.join('\n')}\n\nTüm malzemeler tam miktarıyla geri geldi mi?`
+  await ElMessageBox.confirm(message, 'Geri dönüşü onaylayın', {
+    confirmButtonText: 'Tamamı geri geldi', cancelButtonText: 'Vazgeç', type: 'warning',
+    customClass: 'movement-return-confirm',
+  })
+  return receive()
+}
 
 async function submit() {
-  const problem = draftProblem(draft.value)
-  if (problem) return ElMessage.warning(problem)
-  if (!mainDepot.value) return ElMessage.error('Depo bulunamadı.')
+  if (busy.value) return
+  submitting.value = true
   try {
-    const documents = files.value.flatMap((item) => (item.raw ? [item.raw as File] : []))
-    const detail = await save(requestOf(draft.value, mainDepot.value.id), documents)
-    ElMessage.success('Sevkiyat kaydedildi')
+    const documents = files.value.flatMap((file) => file.raw ? [file.raw] : [])
+    const detail = await (returning.value ? confirmReturn() : create(documents))
+    ElMessage.success(returning.value ? 'Malzemelerin geri dönüşü kaydedildi.' : 'Malzeme hareketi kaydedildi.')
     show.value = false
     emit('saved', detail.row.id)
   } catch (error) {
-    ElMessage.error(errorMessage(error))
+    if (error !== 'cancel' && error !== 'close') ElMessage.error(errorMessage(error))
+  } finally {
+    submitting.value = false
   }
 }
 </script>
 
 <template>
-  <el-drawer v-model="show" size="520px" title="Sevkiyat çıkar">
-    <el-form label-position="top">
-      <el-form-item label="1 · Nereye gidiyor?">
-        <el-select :model-value="elsewhere ? draft.targetKind : draft.destinationId" placeholder="Şantiye seç"
-          style="width: 100%" @update:model-value="onTarget">
-          <el-option v-for="site in sites" :key="site.id" :label="site.name" :value="site.id" />
-          <el-option label="Başka firmaya" value="OUTSIDE" />
-          <el-option label="Depoya mal geldi" value="INBOUND" />
-        </el-select>
-      </el-form-item>
-      <template v-if="elsewhere">
-        <el-form-item :label="inbound ? 'Kimden' : 'Kime'">
-          <el-input v-model="draft.partyName" placeholder="Firma ya da kişi adı" />
-        </el-form-item>
-        <el-form-item v-if="outside" label="Geri gelecek mi?">
-          <el-switch v-model="draft.expectsReturn" active-text="Geri gelecek" inactive-text="Gelmeyecek" />
-        </el-form-item>
+  <el-drawer v-model="show" size="540px" class="movement-form" :close-on-click-modal="!busy"
+    :close-on-press-escape="!busy" :show-close="!busy">
+    <template #header="{ titleId }">
+      <div class="movement-form__title"><h2 :id="titleId">{{ copy.title }}</h2><p>{{ copy.subtitle }}</p></div>
+    </template>
+    <el-form label-position="top" :disabled="busy" class="movement-form__body">
+      <ReturnSelection v-if="returning" v-model="returnId" :awaiting="awaiting" :original="original"
+        :loading="returnsLoading" :failed="returnsError" @retry="refetch()" />
+      <template v-else>
+        <section>
+          <h3>{{ inbound ? 'Kaynak' : 'Hedef' }}</h3>
+          <el-form-item v-if="initialKind === 'SITE'" label="Şantiye" required>
+            <el-select v-model="draft.destinationId" filterable placeholder="Şantiye seçin" class="movement-form__select">
+              <el-option v-for="site in sites" :key="site.id" :label="site.name" :value="site.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-else :label="inbound ? 'Kimden geldi?' : 'Firma veya kişi'" required>
+            <el-input v-model="draft.partyName" placeholder="Firma veya kişi adı" maxlength="120" />
+          </el-form-item>
+          <el-form-item v-if="initialKind === 'OUTSIDE'" class="movement-form__return-option">
+            <el-switch v-model="draft.expectsReturn" /><span>Malzemelerin geri gelmesini bekliyorum</span>
+          </el-form-item>
+          <p class="movement-form__depot">{{ inbound ? 'Hedef' : 'Kaynak' }}: {{ mainDepot?.name ?? 'Ana depo yükleniyor…' }}</p>
+        </section>
+        <section>
+          <h3>Malzemeler</h3>
+          <MovementLines v-model="draft.lines" :materials="materials" @add="draft.lines.push(newLine())"
+            @create-material="addingFor = $event" />
+        </section>
+        <section><h3>İrsaliye <span>İsteğe bağlı</span></h3><MovementDocuments v-model="files" /></section>
+        <section>
+          <h3>Açıklama <span>İsteğe bağlı</span></h3>
+          <el-input v-model="draft.description" type="textarea" :rows="3" maxlength="500" show-word-limit
+            placeholder="Teslim alan kişi veya not…" aria-label="Açıklama" />
+        </section>
       </template>
-
-      <el-form-item label="2 · Ne, ne kadar?">
-        <div v-for="(line, index) in draft.lines" :key="line.key" class="dialog__line">
-          <el-select v-model="line.materialId" placeholder="Malzeme" filterable class="dialog__material">
-            <el-option v-for="material in materials" :key="material.id" :label="material.name" :value="material.id" />
-            <template #footer>
-              <el-button link type="primary" @click="addingFor = index">+ Listede yok, yeni malzeme ekle</el-button>
-            </template>
-          </el-select>
-          <el-input-number v-model="line.quantity" :min="0" :controls="false" placeholder="0" class="dialog__amount">
-            <template #suffix>{{ unitOf(line.materialId) }}</template>
-          </el-input-number>
-          <el-button link type="danger" :disabled="draft.lines.length === 1" @click="draft.lines.splice(index, 1)">
-            Sil
-          </el-button>
-          <el-text v-if="stock.quantityOf(line.materialId) > 0" size="small" type="info" class="dialog__stock">
-            Depoda: {{ withUnit(stock.quantityOf(line.materialId), unitOf(line.materialId)) }}
-          </el-text>
-        </div>
-        <el-button link type="primary" @click="draft.lines.push(newLine())">
-          + Bir şey daha ekle
-        </el-button>
-      </el-form-item>
-
-      <el-form-item label="3 · İrsaliye">
-        <el-upload v-model:file-list="files" :auto-upload="false" accept="image/*,application/pdf" :limit="3" drag>
-          <div>İrsaliyeyi buraya bırak ya da seç</div>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="Açıklama">
-        <el-input v-model="draft.description" type="textarea" :rows="2" placeholder="Anlaşma, kim teslim aldı…" />
-      </el-form-item>
     </el-form>
-
     <NewMaterialDialog :show="addingFor !== null" @created="onMaterialCreated"
       @update:show="(open: boolean) => !open && (addingFor = null)" />
-
     <template #footer>
-      <el-button @click="show = false">Vazgeç</el-button>
-      <el-button type="primary" :loading="isSaving" @click="submit">Gönder</el-button>
+      <el-button :disabled="busy" @click="show = false">Vazgeç</el-button>
+      <el-button type="primary" :loading="busy" :disabled="returning && !original" @click="submit">{{ copy.submit }}</el-button>
     </template>
   </el-drawer>
 </template>
 
 <style scoped>
-.dialog__line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px auto;
-  gap: var(--space-2);
-  width: 100%;
-  margin-block-end: var(--space-2);
-}
+.movement-form__title h2 { margin: 0; font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--text-strong); }
+.movement-form__title p { margin: var(--space-2) 0 0; color: var(--text-muted); font-size: var(--text-sm); line-height: 1.6; }
+.movement-form__body { display: grid; gap: var(--space-6); }
+.movement-form__body h3 { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-4); font-size: var(--text-xs); letter-spacing: .08em; text-transform: uppercase; }
+.movement-form__body h3 span { color: var(--text-subtle); font-size: 11px; letter-spacing: normal; font-weight: var(--weight-medium); text-transform: none; }
+.movement-form__select { width: 100%; }
+.movement-form__depot { margin: 0; font-size: var(--text-xs); color: var(--text-muted); }
+.movement-form__return-option :deep(.el-form-item__content) { gap: var(--space-3); font-size: var(--text-sm); }
+</style>
 
-/* el-input-number kendi 150 px genişliğinde kalıp 120 px'lik sütundan taşıyor, Sil düğmesinin üstüne biniyordu. */
-.dialog__amount {
-  width: 100%;
-}
-
-.dialog__stock {
-  grid-column: 1 / -1;
-}
+<style>
+.movement-form.el-drawer { max-width: 100vw; }
+.movement-form .el-drawer__header { margin-bottom: 0; padding: var(--space-6); border-bottom: 1px solid var(--border-soft); }
+.movement-form .el-drawer__body { padding: var(--space-6); }
+.movement-form .el-drawer__footer { border-top: 1px solid var(--border-soft); padding: var(--space-4) var(--space-6); }
+.movement-return-confirm .el-message-box__message { white-space: pre-line; }
 </style>

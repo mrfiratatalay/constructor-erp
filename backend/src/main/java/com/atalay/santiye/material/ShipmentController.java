@@ -8,6 +8,7 @@ import com.atalay.santiye.material.dto.DocumentUploadForm;
 import com.atalay.santiye.material.dto.DocumentView;
 import com.atalay.santiye.material.dto.FieldShipmentRef;
 import com.atalay.santiye.material.dto.ShipmentDetail;
+import com.atalay.santiye.material.dto.ShipmentEditRequest;
 import com.atalay.santiye.material.dto.ShipmentRequest;
 import com.atalay.santiye.material.dto.ShipmentRow;
 import com.atalay.santiye.material.dto.StockLevel;
@@ -23,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +79,14 @@ public class ShipmentController {
     public ShipmentDetail createShipment(@AuthenticationPrincipal CurrentUser user,
         @Valid @RequestBody ShipmentRequest request) {
         return details.of(user, shipments.create(user, request));
+    }
+
+    @PatchMapping("/{shipmentId}")
+    @PreAuthorize("hasAuthority('CREATE_MATERIAL_MOVEMENT')")
+    public ShipmentDetail editShipment(@AuthenticationPrincipal CurrentUser user, @PathVariable UUID shipmentId,
+        @Valid @RequestBody ShipmentEditRequest request) {
+        actions.edit(user, shipmentId, request);
+        return details.of(user, shipmentId);
     }
 
     @PostMapping("/{shipmentId}/cancellation")

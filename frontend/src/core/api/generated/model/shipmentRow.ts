@@ -17,7 +17,13 @@ export interface ShipmentRow {
   fromName?: string | null
   /** @nullable */
   toName?: string | null
+  /** @nullable */
+  fromKind?: string | null
+  /** @nullable */
+  toKind?: string | null
   day: string
+  createdAt: string
+  createdByName: string
   expectsReturn: boolean
   awaitingReturn: boolean
   /** @nullable */

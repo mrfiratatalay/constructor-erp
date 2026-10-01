@@ -1,0 +1,21 @@
+.movement-detail__heading { width: 100%; }
+.movement-detail__number { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); color: var(--text-muted); font-size: var(--text-xs); }
+.movement-detail__heading h2 { margin: var(--space-4) 0 var(--space-2); color: var(--text-strong); font-size: var(--text-lg); }
+.movement-detail__heading p { margin: 0; color: var(--text-muted); font-size: var(--text-xs); }
+.movement-detail__body { display: grid; gap: var(--space-6); }
+.movement-detail__route { padding: var(--space-5); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface-muted); }
+.movement-detail__waiting { margin: -8px 0 0; color: var(--status-warning); font-size: var(--text-xs); }
+.movement-detail__body h3 { margin: 0 0 var(--space-3); color: var(--text-muted); font-size: 10px; letter-spacing: .08em; font-weight: var(--weight-bold); }
+.movement-detail__documents { display: grid; gap: var(--space-2); }
+.movement-detail__document { display: flex; justify-content: flex-start; padding: var(--space-3); border: 1px solid var(--border-soft); border-radius: 8px; background: var(--surface); }
+.movement-detail__document :deep(.el-link__inner) { display: flex; gap: var(--space-2); min-width: 0; }
+.movement-detail__document svg { flex: none; color: var(--text-subtle); }
+.movement-detail__document span { overflow-wrap: anywhere; font-size: var(--text-xs); }
+.movement-detail__muted { margin: 0; color: var(--text-subtle); font-size: var(--text-xs); }
+.movement-detail__description { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-muted); font-size: var(--text-sm); }
+.movement-detail__metadata { display: grid; gap: var(--space-3); margin: 0; padding-block: var(--space-4); border-top: 1px solid var(--border-soft); }
+.movement-detail__metadata > div { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); font-size: var(--text-xs); }
+.movement-detail__metadata dt { color: var(--text-subtle); }
+.movement-detail__metadata dd { margin: 0; color: var(--text-muted); text-align: right; }
+.movement-detail__footer { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.movement-detail__footer-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }

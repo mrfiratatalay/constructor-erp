@@ -7,7 +7,9 @@ package com.atalay.santiye.material;
 public enum ShipmentEventKind {
     CREATED,
     DELIVERED,
+    UPDATED,
     RETURN_ADDED,
     CANCELLED,
+    EDITED,
     DOCUMENT_ADDED
 }

@@ -1,8 +1,15 @@
-/**
- * Excel dökümünün adresi. Tarayıcı bu bağlantıya doğrudan gider (oturum çerezle taşınır), dosyayı indirir;
- * ekrandaki arama döküme de geçer.
- */
-export function shipmentExportUrl(search: string): string {
-  const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ''
-  return `/api/shipment-reports/export${query}`
+import type { MovementFilter } from '@/core/shipments/movementFilters'
+
+/** Excel, sayfalamadan bağımsız olarak arama ve tüm etkin süzgeçlerdeki hareketleri içerir. */
+export function shipmentExportUrl(search: string, filter?: MovementFilter): string {
+  const query = new URLSearchParams()
+  if (search.trim()) query.set('search', search.trim())
+  if (filter?.scope && filter.scope !== 'all') query.set('scope', filter.scope)
+  if (filter?.type) query.set('type', filter.type)
+  if (filter?.point) query.set('point', filter.point)
+  if (filter?.dates) {
+    query.set('fromDay', filter.dates[0])
+    query.set('toDay', filter.dates[1])
+  }
+  return `/api/shipment-reports/export${query.size ? `?${query}` : ''}`
 }

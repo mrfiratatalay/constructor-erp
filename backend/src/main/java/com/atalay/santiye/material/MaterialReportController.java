@@ -3,8 +3,8 @@ package com.atalay.santiye.material;
 import com.atalay.santiye.billing.Features;
 import com.atalay.santiye.billing.RequiresFeature;
 import com.atalay.santiye.auth.CurrentUser;
+import com.atalay.santiye.material.dto.ShipmentReportFilter;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.annotation.Nullable;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,11 +35,11 @@ class MaterialReportController {
     @GetMapping(value = "/shipment-reports/export", produces = XLSX)
     @PreAuthorize("hasAuthority('EXPORT_MATERIALS')")
     ResponseEntity<byte[]> exportShipmentReport(@AuthenticationPrincipal CurrentUser user,
-        @RequestParam(required = false) @Nullable String search) {
+        @ModelAttribute ShipmentReportFilter filter) {
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(XLSX))
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 ContentDisposition.attachment().filename(report.fileName()).build().toString())
-            .body(report.workbook(user, search));
+            .body(report.workbook(user, filter));
     }
 }
