@@ -26,7 +26,7 @@ const cards = computed<Card[]>(() => [
     icon: CircleCheck, color: 'success' },
   { title: 'Geciken', value: summary.delayed, unit: 'kayıt', note: 'Planın gerisinde', icon: Clock,
     color: summary.delayed ? 'danger' : 'info' },
-  { title: 'Bugün güncellenen', value: summary.updatedToday, unit: 'iş kalemi', note: 'Son 24 saat', icon: ChartColumn,
+  { title: 'Güncellenen', value: summary.updatedToday, unit: 'iş kalemi', note: 'Son 24 saat', icon: ChartColumn,
     color: 'primary' },
 ])
 </script>
