@@ -4,6 +4,7 @@ import com.atalay.santiye.auth.CurrentUser;
 import com.atalay.santiye.auth.SessionCookies;
 import com.atalay.santiye.auth.SessionService;
 import com.atalay.santiye.auth.SignIn;
+import com.atalay.santiye.common.web.ClientAddress;
 import com.atalay.santiye.join.dto.JoinInvite;
 import com.atalay.santiye.join.dto.JoinLink;
 import com.atalay.santiye.join.dto.JoinRequest;
@@ -31,11 +32,14 @@ public class CompanyJoinController {
     private final CompanyJoinService joins;
     private final SessionService sessions;
     private final SessionCookies cookies;
+    private final JoinThrottle throttle;
 
-    CompanyJoinController(CompanyJoinService joins, SessionService sessions, SessionCookies cookies) {
+    CompanyJoinController(CompanyJoinService joins, SessionService sessions, SessionCookies cookies,
+        JoinThrottle throttle) {
         this.joins = joins;
         this.sessions = sessions;
         this.cookies = cookies;
+        this.throttle = throttle;
     }
 
     /** Bağlantıyı firmadaki herkes görür ve paylaşır: çalışan da yeni gelen arkadaşını getirebilsin. */
@@ -60,6 +64,7 @@ public class CompanyJoinController {
     @PostMapping("/join/{token}")
     public ResponseEntity<Void> acceptJoinInvite(@PathVariable String token,
         @AuthenticationPrincipal CurrentUser viewer, @Valid @RequestBody JoinRequest request, HttpServletRequest http) {
+        throttle.check(token, ClientAddress.of(http));
         Joined joined = joins.accept(token, viewer, request);
         ResponseEntity.BodyBuilder response = ResponseEntity.ok();
         if (joined.newcomer() != null) {
