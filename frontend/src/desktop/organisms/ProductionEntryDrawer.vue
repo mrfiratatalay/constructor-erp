@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
-import { ElMessage, ElMessageBox, ElNotification, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
+import { ElMessage, ElMessageBox, type UploadFile, type UploadInstance, type UploadUserFile } from 'element-plus'
 import { FileText, ImagePlus, Trash2 } from 'lucide-vue-next'
 import { errorMessage } from '@/core/api/errors'
 import type { ProductionItemView } from '@/core/api/generated/model'
@@ -52,7 +52,8 @@ async function submit() {
     await save(item, files.value.flatMap((file) => (file.raw ? [file.raw] : [])))
     const field = form.onField ? ' Saha akışına da eklendi.' : ''
     const message = `${item.name} için ${entryAmount(quantity.value, item.unit)} kaydedildi.${field}`
-    ElNotification.success({ title: 'İlerleme kaydedildi', message })
+    // Platformdaki her başarı bildirimi gibi üstte ortada: burada tek başına sağ üstte bildirim kartı açılıyordu.
+    ElMessage.success(message)
     show.value = false
   } catch (error) {
     ElMessage.error(errorMessage(error))
