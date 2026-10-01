@@ -88,6 +88,12 @@ html .el-table {
   --el-table-row-hover-bg-color: var(--brand-tint);
 }
 
+/* Tam sayfaların kenar boşluğu tek yerden: Yoklama ve Puantajım Element Plus'ın 20 px'ini, Malzemeler 24 px'i, Firma
+ * ve platform 32 px'i kullanıyordu; sayfa değişince başlık sağa sola kayıyordu. */
+html .el-main {
+  --el-main-padding: var(--layout-page-padding);
+}
+
 /* Kartlar yumuşak köşeli; sayılar okunaklı ve kalın (özet kartları, kişinin ayı). */
 html .el-card {
   --el-card-border-radius: var(--radius-md);

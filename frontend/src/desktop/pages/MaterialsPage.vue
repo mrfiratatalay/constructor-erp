@@ -48,7 +48,7 @@ const notice = computed(() =>
   display: grid;
   align-content: start;
   gap: var(--space-4);
-  padding: var(--space-6);
+  padding: var(--layout-page-padding);
 }
 
 .materials__head {
