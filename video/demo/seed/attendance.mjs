@@ -2,7 +2,7 @@
 // yarım gün, gelmedi ve mesai). Bugün: canlı çekimde işaretlenecek dört kişi boş, diğerleri sabah işaretli.
 import { rng } from './random.mjs'
 import { demoToday, workdaysThisMonthBeforeToday } from './clock.mjs'
-import { LIVE_ROLL_CALL, ROSTER } from './content.mjs'
+import { LIVE_ROLL_CALL } from './content.mjs'
 
 function statusOf(random, kind) {
   const roll = random()
@@ -24,17 +24,24 @@ async function markDay(owner, day, marks) {
   }
 }
 
-export async function seedAttendance(owner, rosterIds) {
+/** Cetvelin tamamı: seed'in eklediği ustalar ve ekipler, bir de uygulamayı kullanan çalışanlar (ör. Musa). */
+async function rosterOf(owner) {
+  const today = demoToday()
+  const { entries } = await owner.get(`/api/puantaj?from=${today.slice(0, 8)}01&to=${today}`)
+  return entries.filter((entry) => !entry.archived)
+}
+
+export async function seedAttendance(owner) {
   const random = rng(2026)
+  const roster = await rosterOf(owner)
   for (const day of workdaysThisMonthBeforeToday()) {
-    const marks = ROSTER.map(({ name, kind }) => {
+    const marks = roster.map(({ id, kind }) => {
       const status = statusOf(random, kind)
       const overtime = status === 'PRESENT' && kind === 'PERSON' && random() < 0.12 ? 2 : null
-      return { id: rosterIds[name], status, overtime }
+      return { id, status, overtime }
     })
     await markDay(owner, day, marks)
   }
-  const morning = ROSTER.filter(({ name }) => !LIVE_ROLL_CALL.includes(name))
-    .map(({ name }) => ({ id: rosterIds[name], status: 'PRESENT' }))
+  const morning = roster.filter(({ name }) => !LIVE_ROLL_CALL.includes(name)).map(({ id }) => ({ id, status: 'PRESENT' }))
   await markDay(owner, demoToday(), morning)
 }

@@ -1,6 +1,7 @@
 // Satıştan kuruluma, API ile (yalnızca geliştirme denemeleri için): reklamda aynı akış arayüzden çekilir
 // (capture/onboarding.mjs). Başvuru → platform firmayı açar, ödemeyi kaydeder → patron kurulum linkiyle firmayı kurar.
-import { Session } from './api.mjs'
+import { fileURLToPath } from 'node:url'
+import { fileOf, form, Session } from './api.mjs'
 import { demoToday } from './clock.mjs'
 import { COMPANY, LEAD, OWNER, SITES } from './content.mjs'
 
@@ -35,6 +36,8 @@ export async function openTenant() {
 export async function completeSetup(inviteUrl) {
   const token = inviteUrl.split('/kurulum/')[1]
   const owner = new Session('owner')
+  const logo = fileURLToPath(new URL('../../out/assets/atalay-yapi-logo.png', import.meta.url))
+  await owner.post(`/api/setup/${token}/logo`, form({ file: await fileOf(logo) }))
   await owner.post(`/api/setup/${token}`, {
     company: { name: COMPANY.name, phone: COMPANY.phone, email: COMPANY.email, city: COMPANY.city },
     owner: OWNER,

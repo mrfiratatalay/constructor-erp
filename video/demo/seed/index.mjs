@@ -5,7 +5,7 @@ import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { Session } from './api.mjs'
 import { seedAttendance } from './attendance.mjs'
-import { backdatePosts, backdateShipmentPosts, settleVisits } from './backdate.mjs'
+import { backdatePosts, settleHistory, settleVisits } from './backdate.mjs'
 import { OWNER } from './content.mjs'
 import { seedMaterials } from './materials.mjs'
 import { onboardByApi } from './onboard.mjs'
@@ -29,13 +29,13 @@ const sessions = { kemal: owner, ...Object.fromEntries(Object.entries(people).ma
 const rosterIds = await step('puantaj cetveli', () => seedRoster(owner))
 const siteIds = await step('şantiyeler ve kapak fotoğrafları', () => seedSites(owner))
 const posted = await step('sohbet ve saha geçmişi', () => seedThreads(sessions, siteIds))
-await step('ayın yoklaması', () => seedAttendance(owner, rosterIds))
+await step('ayın yoklaması', () => seedAttendance(owner))
 await step('malzeme hareketleri', () => seedMaterials(sessions.mehmet, siteIds))
 await step('imalat panosu', () => seedProduction(sessions.ayse, siteIds.yomra))
 await step('görevler', () => seedTasks(sessions.ayse, siteIds.yomra, people))
 await step('saatler yerine oturdu', () => {
   backdatePosts(posted)
-  backdateShipmentPosts()
+  settleHistory()
   settleVisits()
 })
 const cookies = Object.fromEntries(Object.entries(sessions).map(([key, session]) => [key, session.cookie]))

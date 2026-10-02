@@ -8,7 +8,7 @@ import { rng } from './random.mjs'
 /** done: bugüne kadar yapılan; perDay: günlük ortalama. Girişler startDay'den dünkü iş gününe kadar dağılır. */
 export const ITEMS = [
   { trade: 'Alçı', title: '3. kat iç cephe', crew: 'Alçı Ekibi', total: 1240, unit: 'm²', startDay: -10, endDay: 9, perDay: 64, workers: 6 },
-  { trade: 'Kalıp', title: '2. kat kolon kalıpları', crew: 'Kalıp Ekibi', total: 24, unit: 'adet', startDay: -8, endDay: 0, perDay: 3, workers: 5 },
+  { trade: 'Kalıp', title: '2. kat kolon kalıpları', crew: 'Kalıp Ekibi', total: 24, unit: 'adet', startDay: -8, endDay: 0, perDay: 3, workers: 5, finishToday: true },
   { trade: 'Demir', title: '3. kat döşeme donatısı', crew: null, total: 18, unit: 'ton', startDay: -6, endDay: 4, perDay: 2.2, workers: 4 },
   { trade: 'Elektrik', title: '1. kat tesisat', crew: 'Elektrik Ekibi', total: 2400, unit: 'm', startDay: -16, endDay: 6, perDay: 120, workers: 3 },
   { trade: 'Seramik', title: 'Zemin kat ıslak hacimler', crew: 'Seramik Ekibi', total: 420, unit: 'm²', startDay: -5, endDay: 12, perDay: 32, workers: 3 },
@@ -22,13 +22,21 @@ async function addEntries(lead, itemId, item, random) {
   for (let n = item.startDay; n < 0 && done < item.total; n++) {
     const day = dayOffset(n)
     if (weekday(day) === 0) continue
-    const quantity = Math.min(item.total - done, Math.round(item.perDay * (0.75 + random() * 0.5) * 10) / 10)
+    const step = item.unit === 'adet' ? 1 : 10
+    const quantity = Math.min(item.total - done - (item.finishToday ? 3 : 0), Math.round(item.perDay * (0.75 + random() * 0.5) * step) / step)
+    if (quantity <= 0) break
     done += quantity
-    await lead.post(`/api/production/items/${itemId}/entries`, form({
-      id: randomUUID(), day, quantity: String(quantity), workerCount: String(item.workers),
-      note: NOTES[Math.floor(random() * NOTES.length)], onField: 'false',
-    }))
+    await entry(lead, itemId, { day, quantity, workers: item.workers, note: NOTES[Math.floor(random() * NOTES.length)] })
   }
+  if (item.finishToday) {
+    await entry(lead, itemId, { day: dayOffset(0), quantity: item.total - done, workers: item.workers, note: 'Son kolonlar kapatıldı.' })
+  }
+}
+
+function entry(lead, itemId, { day, quantity, workers, note }) {
+  return lead.post(`/api/production/items/${itemId}/entries`, form({
+    id: randomUUID(), day, quantity: String(quantity), workerCount: String(workers), note, onField: 'false',
+  }))
 }
 
 export async function seedProduction(lead, siteId) {
