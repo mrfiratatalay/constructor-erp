@@ -6,7 +6,8 @@ VIDEO_ROOT = Path(__file__).resolve().parent.parent
 FILM_DIR = VIDEO_ROOT / "src" / "film"
 PUBLIC_AUDIO = VIDEO_ROOT / "public" / "audio"
 VO_DIR = PUBLIC_AUDIO / "vo"
-STEM_DIR = PUBLIC_AUDIO / "stems"
+# Stem'ler teslim dosyasıdır, kompozisyon kullanmaz: public/ dışında durur (her render public/'i kopyalar).
+STEM_DIR = VIDEO_ROOT / "out" / "stems"
 CACHE_DIR = VIDEO_ROOT / ".cache"
 OUT_DIR = VIDEO_ROOT / "out"
 
