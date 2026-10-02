@@ -11,6 +11,12 @@ const FPS = 30
 /** Part'lar filmin saniye aralıklarıdır; final film bunların hepsidir (0–120). */
 const PARTS = {
   1: { from: 0, to: 23, name: 'kaos-marka' },
+  2: { from: 23, to: 37.5, name: 'kurulum' },
+  3: { from: 37.5, to: 50.6, name: 'santiye-saha' },
+  4: { from: 50.6, to: 62.5, name: 'yoklama-puantaj' },
+  5: { from: 62.5, to: 76.5, name: 'malzeme' },
+  6: { from: 76.5, to: 95.5, name: 'ilerleme-gorev' },
+  7: { from: 95.5, to: 120, name: 'tek-calisma-alani-kapanis' },
 }
 
 const run = (command, args, cwd = ROOT) => execFileSync(command, args, { cwd, stdio: 'inherit', shell: process.platform === 'win32' && command === 'npx' })
