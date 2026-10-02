@@ -1,0 +1,10 @@
+# Bağımlılıklar ve ortamlar
+node_modules/
+.venv/
+__pycache__/
+
+# Üretilen her şey yeniden üretilebilir: betikler kaynaktır, çıktılar değil.
+.cache/
+out/
+public/audio/
+public/capture/

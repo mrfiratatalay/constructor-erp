@@ -1,0 +1,27 @@
+{
+  "name": "iskele-erp-reklam-filmi",
+  "version": "0.0.0",
+  "private": true,
+  "description": "İskele ERP 120 saniyelik reklam filmi: kodla çizilen sahneler, gerçek ürün çekimleri, ses ve render hattı.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:part": "node scripts/renderPart.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@remotion/cli": "4.0.532",
+    "@remotion/fonts": "4.0.532",
+    "lucide-react": "^1.49.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "4.0.532"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.4",
+    "@types/react": "^19.3.0",
+    "playwright": "1.63.0",
+    "typescript": "~6.0.0"
+  }
+}
