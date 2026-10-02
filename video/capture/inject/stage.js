@@ -41,6 +41,18 @@
     if (document.title.includes('Constructor')) document.title = rename(document.title)
   }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['title', 'placeholder', 'aria-label', 'alt'] })
 
+  // Kurulum bağlantısı gizlidir: ekranda yalnızca "…/kurulum/••••" görünür; gerçeği bir sonraki çekim için saklanır.
+  const SECRET = /https?:\/\/[^\s"']*\/kurulum\/[A-Za-z0-9_-]{6,}/
+  window.__stageSecrets = {}
+  window.__stageMask = () => {
+    for (const input of document.querySelectorAll('input, textarea')) {
+      const found = input.value.match(SECRET)
+      if (!found) continue
+      window.__stageSecrets.setupUrl = found[0]
+      input.value = input.value.replace(SECRET, '…/kurulum/••••••••••••')
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     const layer = document.createElement('div')
     layer.id = 'stage-pointer'
