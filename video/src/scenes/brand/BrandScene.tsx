@@ -31,7 +31,7 @@ export const BrandScene = () => {
   return (
     <AbsoluteFill style={{ background: '#000' }}>
       <AbsoluteFill style={{ opacity: progress(t, cues.gridIn[0], cues.gridIn[1] - cues.gridIn[0]) }}>
-        <BlueprintGrid drift={(t - cues.start) * -6} />
+        <BlueprintGrid drift={-t * 4} />
       </AbsoluteFill>
       <ScaffoldTubes opacity={1 - progress(t, cues.appSilhouette[0], 0.6)} />
       <GhostModules targets={targets} opacity={silhouette} />

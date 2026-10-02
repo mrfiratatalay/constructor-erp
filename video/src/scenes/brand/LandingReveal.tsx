@@ -5,7 +5,8 @@ import { DESKTOP_STAGE } from '../../film/stage'
 import { easeOutCubic, mix, progress } from '../../motion/ease'
 import { AppWindow } from '../../ui/AppWindow'
 import { Cursor } from '../../ui/Cursor'
-import { cursorAt } from '../onboarding/cursorPath'
+import { cursorOn } from '../../ui/cursorPath'
+import { ONBOARDING_LEGS } from '../plans/onboarding'
 
 /**
  * 22,3 – 23,0: gerçek tanıtım sitesi, iskeleden doğan pencerenin içinde bulanıklıktan netliğe gelir.
@@ -17,7 +18,7 @@ export const LandingReveal = ({ src }: { src: string }) => {
   if (t < start) return null
   const shown = progress(t, start, 0.45)
   const focus = progress(t, start, end - start, easeOutCubic)
-  const cursor = cursorAt(t)
+  const cursor = cursorOn(t, ONBOARDING_LEGS)
   return (
     <AbsoluteFill>
       <AppWindow placement={{ ...DESKTOP_STAGE, scale: mix(0.985, 1, focus) * DESKTOP_STAGE.scale }} src={src}
