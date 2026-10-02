@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { AbsoluteFill } from 'remotion'
+import { AbsoluteFill, Audio, getRemotionEnvironment, staticFile } from 'remotion'
 import { FilmClock, useFilmTime } from './film/clock'
 import { FilmGrain } from './effects/FilmGrain'
 import { BrandScene } from './scenes/brand/BrandScene'
@@ -33,6 +33,8 @@ export const Film = () => (
     <FilmClock>
       <ActiveScenes />
       <FilmGrain />
+      {/* Studio'da önizleme sesli çalsın. Render'da ses ayrıca (mix.py) üretilip birleştirilir. */}
+      {getRemotionEnvironment().isStudio && <Audio src={staticFile('audio/mix/film.wav')} />}
     </FilmClock>
   </AbsoluteFill>
 )

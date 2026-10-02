@@ -14,5 +14,5 @@
     "lib": ["DOM", "ES2022"],
     "types": ["node"]
   },
-  "include": ["src", "remotion.config.ts", "capture"]
+  "include": ["src", "remotion.config.ts"]
 }

@@ -1,0 +1,25 @@
+{
+  "start": 15.95,
+  "end": 23.0,
+  "gridIn": [15.95, 16.6],
+  "firstLine": [16.05, 16.6],
+  "headlineOne": { "in": 16.2, "out": 18.15, "text": "İnşaat zaten karmaşık." },
+  "scatter": [16.3, 18.05],
+  "snap": [18.05, 18.6],
+  "scaffoldDraw": [18.1, 18.9],
+  "headlineTwo": { "in": 18.3, "out": 20.25, "text": "Yönetimi olmak zorunda değil." },
+  "appSilhouette": [20.2, 21.0],
+  "logo": { "mark": 21.05, "word": 21.3 },
+  "toLanding": [22.3, 23.0],
+  "cursorIn": [22.55, 23.3],
+  "music": { "firstNote": 18.05, "barSeconds": 3.0 },
+  "sfx": [
+    { "t": 15.95, "kind": "bed", "dur": 2.1 },
+    { "t": 16.05, "kind": "line" },
+    { "t": 18.05, "kind": "snap" },
+    { "t": 20.2, "kind": "rise", "dur": 0.85 },
+    { "t": 21.05, "kind": "shimmer" },
+    { "t": 22.35, "kind": "glide", "dur": 0.6 },
+    { "t": 22.95, "kind": "settle" }
+  ]
+}
