@@ -72,11 +72,11 @@ const Papers = () => (
 )
 
 /** Masadaki sessiz kalabalık: kahve, baret, plan, kâğıt. */
-export const DeskProps = () => (
+export const DeskProps = ({ calm = false }: { calm?: boolean }) => (
   <svg viewBox="0 0 1920 1080" width={1920} height={1080} style={{ position: 'absolute' }}>
     <Mug />
     <HardHat />
-    <Papers />
-    <Blueprints />
+    {!calm && <Papers />}
+    {!calm && <Blueprints />}
   </svg>
 )

@@ -77,7 +77,7 @@ const Corkboard = () => {
 }
 
 /** Duvar saati: 06:52. Gün yeni başlamış; kaos çoktan başlamış. */
-const Clock = () => {
+const Clock = ({ calm }: { calm: boolean }) => {
   const t = useFilmTime()
   const second = (Math.floor(t) * 6 + 180) % 360
   return (
@@ -87,8 +87,8 @@ const Clock = () => {
       {Array.from({ length: 12 }, (_, index) => (
         <rect key={index} x={-1.2} y={-45} width={2.4} height={7} fill="#2c2f38" transform={`rotate(${index * 30})`} />
       ))}
-      <rect x={-2.2} y={-26} width={4.4} height={28} rx={2} fill="#22252e" transform="rotate(206)" />
-      <rect x={-1.6} y={-40} width={3.2} height={42} rx={1.5} fill="#22252e" transform="rotate(312)" />
+      <rect x={-2.2} y={-26} width={4.4} height={28} rx={2} fill="#22252e" transform={`rotate(${calm ? 160 : 206})`} />
+      <rect x={-1.6} y={-40} width={3.2} height={42} rx={1.5} fill="#22252e" transform={`rotate(${calm ? 120 : 312})`} />
       <rect x={-0.6} y={-42} width={1.2} height={48} fill="#8f2d2d" transform={`rotate(${second})`} />
       <circle r={3} fill="#22252e" />
     </g>
@@ -96,12 +96,12 @@ const Clock = () => {
 }
 
 /** Şantiye ofisinin içi: karanlık duvar, geniş pencere, pano ve saat. */
-export const OfficeWall = () => (
+export const OfficeWall = ({ calm = false }: { calm?: boolean }) => (
   <svg viewBox="0 0 1920 1080" width={1920} height={1080} style={{ position: 'absolute', overflow: 'visible' }}>
     <Blinds />
     <Wall />
     <WindowFrame />
     <Corkboard />
-    <Clock />
+    <Clock calm={calm} />
   </svg>
 )

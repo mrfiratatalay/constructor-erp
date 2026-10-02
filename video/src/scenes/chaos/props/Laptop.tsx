@@ -1,3 +1,4 @@
+import { Img, staticFile } from 'remotion'
 import { LaptopScreen } from './LaptopScreen'
 
 export const SCREEN = { x: 612, y: 410, width: 466, height: 284 }
@@ -26,7 +27,7 @@ const Base = () => (
 )
 
 /** Laptop: ekran izleyiciye dönük, odadaki en parlak yüzey. Etrafına hafif ışık taşar. */
-export const Laptop = () => (
+export const Laptop = ({ calm = false }: { calm?: boolean }) => (
   <>
     <div style={{ position: 'absolute', left: SCREEN.x - 40, top: SCREEN.y - 30, width: SCREEN.width + 80,
       height: SCREEN.height + 60, background: '#a9c2ff', opacity: 0.18, filter: 'blur(40px)', borderRadius: 40 }} />
@@ -35,7 +36,7 @@ export const Laptop = () => (
       boxShadow: '0 0 0 1px #2a2f3a' }} />
     <div style={{ position: 'absolute', left: SCREEN.x, top: SCREEN.y, width: SCREEN.width, height: SCREEN.height,
       overflow: 'hidden', borderRadius: 3 }}>
-      <LaptopScreen />
+      {calm ? <Img src={staticFile('capture/devices/desktop-sites.png')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <LaptopScreen />}
     </div>
     <Base />
   </>

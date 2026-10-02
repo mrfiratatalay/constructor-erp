@@ -15,7 +15,8 @@ import { TowerCrane } from './TowerCrane'
  * Şantiye ofisinin geniş planı, derinlik sırasıyla: gökyüzü, vinç, bina, çit, duvar ve pencere, ışık, masa,
  * nesneler, toz, önde patron. Uzak katmanlar hafif bulanık (alan derinliği), patron daha da bulanık.
  */
-export const WideWorld = () => (
+/** calm: kapanıştaki aynı ofis, karmaşa yok (laptopta İskele ERP, masada yalnızca gerekenler, saat 17:20). */
+export const WideWorld = ({ calm = false }: { calm?: boolean }) => (
   <>
     <Layer depth={0.12} blur={1.6}>
       <Sky />
@@ -33,7 +34,7 @@ export const WideWorld = () => (
       <SunBloom />
     </Layer>
     <Layer depth={0.55}>
-      <OfficeWall />
+      <OfficeWall calm={calm} />
     </Layer>
     <Layer depth={0.6}>
       <LightRays />
@@ -42,15 +43,15 @@ export const WideWorld = () => (
       <Desk />
     </Layer>
     <Layer depth={0.9}>
-      <Laptop />
-      <DeskProps />
+      <Laptop calm={calm} />
+      <DeskProps calm={calm} />
       <DeskPhone />
     </Layer>
     <Layer depth={0.95}>
       <DustMotes />
     </Layer>
     <Layer depth={1.3} blur={5}>
-      <BossSilhouette />
+      <BossSilhouette calm={calm} />
     </Layer>
   </>
 )

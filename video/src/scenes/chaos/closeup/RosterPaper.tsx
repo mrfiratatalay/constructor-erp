@@ -9,7 +9,7 @@ const INK = '#1f3a8a'
 
 type Mark = 'tick' | 'cross' | 'half' | 'izin' | '?' | ''
 const MARKS: Mark[] = ['tick', 'tick', 'half', 'tick', 'cross', 'tick', 'izin', 'tick', '?', 'tick', 'tick', 'cross']
-const markFor = (row: number, day: number): Mark => (day >= 3 ? '' : MARKS[(row * 5 + day * 2) % MARKS.length])
+const markFor = (row: number, day: number): Mark => (day >= 4 ? '' : MARKS[(row * 5 + day * 2) % MARKS.length])
 
 /** Elle çizilmiş işaret: tik, çarpı ya da yazı. Yol biraz eğri, kalem baskısı biraz değişken. */
 const HandMark = ({ mark, x, y }: { mark: Mark; x: number; y: number }) => {
@@ -20,11 +20,11 @@ const HandMark = ({ mark, x, y }: { mark: Mark; x: number; y: number }) => {
   return <text x={x} y={y + 12} textAnchor="middle" fontFamily={HAND} fontSize={36} fill={INK}>{label}</text>
 }
 
-/** Şu an çizilen tik: Murat, Perşembe. Kalemin ucu çizgiyi izler. */
+/** Şu an çizilen tik: Murat, Cuma (bugün). Kalemin ucu çizgiyi izler. */
 const LiveTick = ({ from }: { from: number }) => {
   const t = useFilmTime()
   const drawn = progress(t, from, 0.32)
-  const x = GRID.left + GRID.nameWidth + GRID.column * 3.5
+  const x = GRID.left + GRID.nameWidth + GRID.column * 4.5
   const y = GRID.top + GRID.row * 1.5
   return (
     <path d={`M${x - 16} ${y} l10 13 l22 -30`} stroke={INK} strokeWidth={4.5} fill="none" strokeLinecap="round"
@@ -37,7 +37,7 @@ export const RosterPaper = ({ tickAt }: { tickAt: number }) => (
   <svg viewBox="0 0 860 820" width={860} height={820}>
     <rect width={860} height={820} fill="#f3eee2" />
     <text x={70} y={92} fontFamily={SANS} fontWeight={800} fontSize={30} fill="#3c4558" letterSpacing={2}>GÜNLÜK YOKLAMA</text>
-    <text x={560} y={92} fontFamily={HAND} fontSize={40} fill={INK}>39. hafta</text>
+    <text x={560} y={92} fontFamily={HAND} fontSize={40} fill={INK}>40. hafta</text>
     <g stroke="#9aa7bd" strokeWidth={1.5}>
       {Array.from({ length: NAMES.length + 2 }, (_, index) => (
         <line key={index} x1={GRID.left} x2={800} y1={GRID.top - GRID.row + index * GRID.row} y2={GRID.top - GRID.row + index * GRID.row} />

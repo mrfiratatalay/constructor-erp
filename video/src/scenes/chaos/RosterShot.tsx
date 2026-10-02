@@ -15,7 +15,7 @@ const Pen = () => {
   const x = keyframes(t, [[SCRIBBLE, 0], [SCRIBBLE + 0.12, 10], [SCRIBBLE + 0.32, 32], [SCRIBBLE + 0.6, 60]])
   const y = keyframes(t, [[SCRIBBLE, 0], [SCRIBBLE + 0.12, 13], [SCRIBBLE + 0.32, -17], [SCRIBBLE + 0.6, -40]])
   return (
-    <div style={{ position: 'absolute', left: 1086 + x, top: 482 + y, width: 420, height: 18, borderRadius: 9,
+    <div style={{ position: 'absolute', left: 1178 + x, top: 482 + y, width: 420, height: 18, borderRadius: 9,
       background: 'linear-gradient(180deg, #334155, #0f172a)', transform: 'rotate(-34deg)', transformOrigin: '0 50%',
       boxShadow: '12px 22px 18px rgb(0 0 0 / 0.45)' }}>
       <div style={{ position: 'absolute', left: -14, top: 3, width: 18, height: 12, background: '#cbd5e1',

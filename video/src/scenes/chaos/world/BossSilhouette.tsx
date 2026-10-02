@@ -10,10 +10,10 @@ const HEAD = 'M250 742 C150 750 92 680 90 598 C88 500 150 438 236 436 C322 434 3
  * Patron: omuz üstü, sırtı kameraya dönük, odak dışında. Yüz yok; odak onun karşısındaki bilgi karmaşasında.
  * Pencereden gelen ışık başının ve omzunun kenarını sıcak bir çizgiyle ayırır. Kaos arttıkça başı hafifçe eğilir.
  */
-export const BossSilhouette = () => {
+export const BossSilhouette = ({ calm = false }: { calm?: boolean }) => {
   const t = useFilmTime()
   const breath = Math.sin(t * 1.6) * 2.2
-  const tilt = keyframes(t, [[11.4, 0], [13.2, 4.5]])
+  const tilt = calm ? 0 : keyframes(t, [[11.4, 0], [13.2, 4.5]])
   return (
     <svg viewBox="0 0 1920 1080" width={1920} height={1080} style={{ position: 'absolute' }}>
       <defs>

@@ -10,7 +10,7 @@ const LockScreen = ({ t }: { t: number }) => {
     <div style={{ position: 'absolute', inset: 0, padding: '34px 12px', fontFamily: OLD_WORLD_FONT,
       background: 'linear-gradient(170deg, #2c3a58, #172036 60%, #0f1524)' }}>
       <div style={{ color: '#f1f5f9', fontSize: 42, fontWeight: 300, textAlign: 'center' }}>06:52</div>
-      <div style={{ color: '#cbd5e1', fontSize: 11, textAlign: 'center', marginBottom: 18 }}>Perşembe, 2 Ekim</div>
+      <div style={{ color: '#cbd5e1', fontSize: 11, textAlign: 'center', marginBottom: 18 }}>Cuma, 2 Ekim</div>
       {arrived.reverse().map((note) => (
         <div key={note.t} style={{ background: 'rgb(226 232 240 / 0.72)', borderRadius: 12, padding: '7px 9px',
           marginBottom: 6, fontSize: 9.5, color: '#0f172a' }}>
