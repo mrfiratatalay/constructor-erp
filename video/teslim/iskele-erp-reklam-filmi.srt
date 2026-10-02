@@ -1,0 +1,142 @@
+1
+00:00:00,900 --> 00:00:04,850
+Bir şantiyede gün, hiçbir
+zaman tek yerden başlamaz.
+
+2
+00:00:04,900 --> 00:00:06,650
+Mesajlar başka yerde.
+
+3
+00:00:06,700 --> 00:00:08,300
+Yoklama başka yerde.
+
+4
+00:00:08,350 --> 00:00:10,000
+Malzeme başka yerde.
+
+5
+00:00:10,050 --> 00:00:12,000
+Yapılan iş başka yerde.
+
+6
+00:00:12,050 --> 00:00:14,900
+Ve sonunda herkes aynı soruyu sorar:
+
+7
+00:00:14,950 --> 00:00:16,760
+Şu an ne durumdayız?
+
+8
+00:00:17,050 --> 00:00:19,500
+İnşaat zaten karmaşık.
+
+9
+00:00:19,550 --> 00:00:22,166
+Yönetimi olmak zorunda değil.
+
+10
+00:00:22,250 --> 00:00:24,464
+İskele ERP.
+
+11
+00:00:24,750 --> 00:00:27,795
+Firmanızı anlatın, paketinizi seçin.
+
+12
+00:00:27,950 --> 00:00:32,652
+Başvurunuz onaylandığında, size
+özel kurulum bağlantısıyla,
+
+13
+00:00:32,750 --> 00:00:38,573
+firma bilgilerinizi, patron hesabınızı ve
+ilk şantiyenizi birkaç adımda oluşturun.
+
+14
+00:00:38,750 --> 00:00:42,079
+Artık her şantiye, kendi çalışma alanında.
+
+15
+00:00:42,300 --> 00:00:49,191
+Fotoğraflar, videolar, sesli notlar ve günlük
+saha gelişmeleri, ait olduğu yerde kalır.
+
+16
+00:00:51,400 --> 00:00:53,583
+Şef yoklamayı sahada alır.
+
+17
+00:00:56,700 --> 00:01:00,397
+Ofis, aylık puantajı aynı
+kayıtlardan görür.
+
+18
+00:01:00,550 --> 00:01:02,918
+Gerektiğinde Excel’e aktarır.
+
+19
+00:01:03,400 --> 00:01:09,282
+Depodan ne çıktı, hangi şantiyeye gitti,
+ne iade edildi, ne geri bekleniyor…
+
+20
+00:01:11,200 --> 00:01:14,038
+Malzeme hareketleri, tek kayıtta.
+
+21
+00:01:14,900 --> 00:01:19,046
+İmalatta yapılan işi, kalan
+işi ve ilerlemeyi görün.
+
+22
+00:01:20,400 --> 00:01:24,516
+Taşeronların durumunu tahminle
+değil, kayıtla takip edin.
+
+23
+00:01:25,400 --> 00:01:26,800
+Görevi oluşturun.
+
+24
+00:01:26,850 --> 00:01:29,961
+Sorumlusunu ve teslim tarihini belirleyin.
+
+25
+00:01:30,400 --> 00:01:33,721
+İşin ne durumda olduğunu,
+tek bakışta görün.
+
+26
+00:01:34,200 --> 00:01:36,400
+Saha telefondan günceller.
+
+27
+00:01:36,450 --> 00:01:38,650
+Depo, hareketi kaydeder.
+
+28
+00:01:38,700 --> 00:01:41,983
+Ofis, bilgisayardan bütünü takip eder.
+
+29
+00:01:42,050 --> 00:01:46,338
+Herkes rolü kadar görür; herkes
+aynı işin içinde kalır.
+
+30
+00:01:46,750 --> 00:01:50,945
+Şantiyeler farklı olabilir.
+Ekipler farklı olabilir.
+
+31
+00:01:51,000 --> 00:01:53,609
+Ama kontrol, tek yerde olabilir.
+
+32
+00:01:53,950 --> 00:01:56,164
+İskele ERP.
+
+33
+00:01:56,400 --> 00:01:59,851
+Saha hareketli. Kontrol sizde.

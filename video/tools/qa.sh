@@ -11,7 +11,8 @@ ffmpeg -hide_banner -loglevel error -i "$VIDEO" -vf "fps=0.5,scale=384:-1,tile=6
 found=0
 for frame in "$QA"/frames/*.jpg; do
   text=$(tesseract "$frame" - -l tur+eng --psm 11 2>/dev/null | tr '\n' ' ')
-  if echo "$text" | grep -qiE "constructor|localhost|kurulum/[A-Za-z0-9_-]{6,}"; then
+  # Maskelenmiş bağlantının noktalarını OCR "eseee" diye okur: yalnız e/s/o/• harflerinden oluşan belirteç maskedir.
+  if echo "$text" | grep -iE "constructor|localhost|kurulum/[A-Za-z0-9_-]{6,}" | grep -qviE "kurulum/[eso•]+( |$)"; then
     echo "BULUNDU $(basename "$frame"): $(echo "$text" | grep -oiE '.{0,30}(constructor|localhost|kurulum/).{0,30}' | head -1)"
     found=1
   fi
