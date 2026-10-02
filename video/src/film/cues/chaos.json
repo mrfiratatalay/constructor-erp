@@ -1,0 +1,66 @@
+{
+  "fadeIn": [0.9, 1.7],
+  "shots": {
+    "wide": [0.9, 4.72],
+    "chat": [4.72, 6.4],
+    "sheet": [6.4, 7.15],
+    "roster": [7.15, 7.9],
+    "depot": [7.9, 9.4],
+    "photo": [9.4, 11.15],
+    "overload": [11.15, 13.95]
+  },
+  "freeze": 13.3,
+  "black": 13.95,
+  "phoneNotifications": [
+    { "t": 1.98, "app": "Şantiye Grubu", "from": "Hakan", "text": "Beton saat kaçta geliyor?", "tone": "blue" },
+    { "t": 2.95, "app": "Demir Ekibi", "from": "Bayram Usta", "text": "Demirciler bugün gelmedi.", "tone": "orange" },
+    { "t": 3.55, "app": "Muhasebe", "from": "Selin", "text": "Eylül puantajı ne zaman gelir?", "tone": "violet" }
+  ],
+  "chatMessages": [
+    { "t": 4.72, "from": "Hakan", "text": "Pompa 10:30'da mı?", "tone": "blue" },
+    { "t": 4.9, "from": "Bayram Usta", "text": "Kalıpçılar kaç kişi geldi?", "tone": "orange" },
+    { "t": 5.22, "from": "Ayşe", "voice": "0:42", "tone": "teal" },
+    { "t": 5.5, "from": "Hakan", "text": "Foto atıyorum, bakar mısınız", "tone": "blue" }
+  ],
+  "callBanner": { "t": 5.72, "name": "Şantiye Şefi", "detail": "arıyor…" },
+  "depotMessage": { "t": 8.05, "from": "Mehmet · Depo", "text": "24 panel çıktı. Nereye yazayım?" },
+  "photoThread": [
+    { "t": 9.95, "from": "Bayram Usta", "text": "👍", "tone": "orange" },
+    { "t": 10.25, "from": "Selin", "text": "Bu hangi blok?", "tone": "violet" },
+    { "t": 10.52, "from": "Hakan", "text": "Pompa geldi mi?", "tone": "blue" },
+    { "t": 10.78, "from": "Selin", "text": "Fotoğrafı bulamadım, tekrar atar mısın?", "tone": "violet" },
+    { "t": 10.97, "from": "Bayram Usta", "text": "Kalıpçılar nerede?", "tone": "orange" }
+  ],
+  "overloadCards": [11.3, 11.58, 11.84, 12.06, 12.26, 12.43, 12.58, 12.71, 12.83, 12.94, 13.04, 13.13, 13.21],
+  "sfx": [
+    { "t": 0.15, "kind": "ambience", "dur": 13.8 },
+    { "t": 1.9, "kind": "vibrate", "dur": 0.42 },
+    { "t": 1.98, "kind": "ping", "variant": 0 },
+    { "t": 2.9, "kind": "vibrate", "dur": 0.3 },
+    { "t": 2.95, "kind": "ping", "variant": 1 },
+    { "t": 3.5, "kind": "vibrate", "dur": 0.3 },
+    { "t": 3.55, "kind": "ping", "variant": 2 },
+    { "t": 4.22, "kind": "ring", "dur": 2.15 },
+    { "t": 4.22, "kind": "vibrate", "dur": 2.1 },
+    { "t": 4.72, "kind": "ping", "variant": 0 },
+    { "t": 4.9, "kind": "ping", "variant": 1 },
+    { "t": 5.22, "kind": "ping", "variant": 3 },
+    { "t": 5.5, "kind": "ping", "variant": 0 },
+    { "t": 6.4, "kind": "keys", "dur": 0.72 },
+    { "t": 7.15, "kind": "paper", "dur": 0.5 },
+    { "t": 7.32, "kind": "scribble", "dur": 0.42 },
+    { "t": 7.9, "kind": "paper", "dur": 0.35 },
+    { "t": 8.05, "kind": "sms" },
+    { "t": 9.4, "kind": "ping", "variant": 3 },
+    { "t": 9.95, "kind": "ping", "variant": 1 },
+    { "t": 10.25, "kind": "ping", "variant": 2 },
+    { "t": 10.52, "kind": "ping", "variant": 0 },
+    { "t": 10.78, "kind": "ping", "variant": 2 },
+    { "t": 10.97, "kind": "ping", "variant": 1 },
+    { "t": 11.15, "kind": "vibrate", "dur": 2.15 },
+    { "t": 11.4, "kind": "keys", "dur": 1.5 },
+    { "t": 11.8, "kind": "ring", "dur": 1.5 },
+    { "t": 10.0, "kind": "pulse", "dur": 3.3 },
+    { "t": 13.3, "kind": "freeze", "dur": 0.65 }
+  ]
+}
