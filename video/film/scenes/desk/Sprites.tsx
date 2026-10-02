@@ -1,6 +1,6 @@
 // Ekran düzlemindeki nesneler: baret, kahve, omuz üstü patron silueti (bulanık, ön plan: yüz yok, derinlik var),
 // pencereden süzülen tozlar.
-import { random, useCurrentFrame } from 'remotion'
+import { Img, random, staticFile, useCurrentFrame } from 'remotion'
 
 export const HardHat: React.FC<{ x: number; y: number; scale?: number }> = ({ x, y, scale = 1 }) => (
   <svg viewBox="0 0 300 200" width={300 * scale} height={200 * scale} style={{ position: 'absolute', left: x, top: y }}>
@@ -30,13 +30,10 @@ export const CoffeeCup: React.FC<{ x: number; y: number }> = ({ x, y }) => {
   )
 }
 
-/** Omuz üstü siluet: sol ön planda koyu, bulanık; kamera hareketinde biraz daha fazla kayar (paralaks). */
-export const Patron: React.FC<{ shift?: number; calm?: boolean }> = ({ shift = 0, calm = false }) => (
-  <svg viewBox="0 0 800 1080" width={800} height={1080} style={{ position: 'absolute', left: -330 + shift, top: 110, filter: 'blur(7px)', transform: 'scale(0.92)', transformOrigin: '0% 100%' }}>
-    <path d="M120 1080 C120 850 200 760 330 730 C300 690 280 640 282 585 C284 470 360 410 440 410 C530 410 600 480 596 590
-      C594 650 570 700 530 730 C660 760 760 860 790 1080 Z" fill={calm ? '#0d121c' : '#0a0e16'} />
-    <path d="M440 410 C520 410 590 470 596 560" stroke="rgba(255,214,160,0.35)" strokeWidth={6} fill="none" />
-  </svg>
+/** Omuz üstü siluet: sol ön planda koyu, bulanık (önceden çizilmiş plaka); kamera hareketinde biraz daha kayar. */
+export const Patron: React.FC<{ shift?: number; calm?: boolean }> = ({ shift = 0 }) => (
+  <Img src={staticFile('plates/patron.png')} style={{ position: 'absolute', left: -330 + shift, top: 110, width: 800, height: 1080,
+    transform: 'scale(0.92)', transformOrigin: '0% 100%' }} />
 )
 
 export const Dust: React.FC<{ count?: number; seed?: string }> = ({ count = 40, seed = 'dust' }) => {
@@ -48,7 +45,7 @@ export const Dust: React.FC<{ count?: number; seed?: string }> = ({ count = 40, 
         const y = (random(`${seed}y${i}`) * 1080 - t * (6 + random(`${seed}s${i}`) * 10)) % 1080
         const size = 2 + random(`${seed}r${i}`) * 4
         return <div key={i} style={{ position: 'absolute', left: x, top: (y + 1080) % 1080, width: size, height: size, borderRadius: '50%',
-          background: 'rgba(255,236,200,0.5)', filter: 'blur(1px)' }} />
+          background: 'rgba(255,236,200,0.45)' }} />
       })}
     </div>
   )

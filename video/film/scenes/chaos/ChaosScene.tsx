@@ -41,7 +41,7 @@ export const ChaosScene: React.FC = () => {
   const jitter = overload * (1 - frozen) * 3
   return (
     <AbsoluteFill style={{ background: '#000', opacity: interpolate(t, [0.5, 1.5], [0, 1], { extrapolateRight: 'clamp' }),
-      filter: `saturate(${1 - frozen * 0.55}) brightness(${1 - frozen * 0.22})` }}>
+      filter: frozen > 0 ? `saturate(${1 - frozen * 0.55}) brightness(${1 - frozen * 0.22})` : undefined }}>
       <div style={{ position: 'absolute', inset: 0, transform: `translate(${Math.sin(t * 40) * jitter}px, ${Math.cos(t * 37) * jitter}px)` }}>
         <Camera keys={{ scale: [[0, 1.05], [6.4, 1.07], [7.0, 1.36], [8.1, 1.36], [8.6, 1.34], [9.8, 1.34], [10.3, 1.08], [FREEZE, 1.1], [14.85, 1.24]],
           x: [[0, 0], [6.4, 0], [7.0, 285], [8.1, 285], [8.6, -310], [9.8, -310], [10.3, 0]],

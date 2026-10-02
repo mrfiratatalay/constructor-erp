@@ -1,16 +1,15 @@
 // Şantiye ofisindeki masa, gerçek perspektifle (CSS 3B): arkada pencere ve şantiye, masa düzleminde dizüstü (ekranı
 // açılı durur), telefon, proje paftası ve kâğıtlar. Ekran içerikleri dışarıdan verilir: açılışta dağınık eski dünya,
 // kapanışta gerçek İskele ERP ekranı.
-import { useCurrentFrame } from 'remotion'
+import { Img, staticFile, useCurrentFrame } from 'remotion'
 import { COLOR } from '../../theme'
-import { SiteWindow } from './SiteWindow'
 
 const abs = (style: React.CSSProperties): React.CSSProperties => ({ position: 'absolute', ...style })
 
 const Room: React.FC<{ calm: boolean }> = ({ calm }) => (
   <div style={abs({ inset: 0, background: 'linear-gradient(180deg, #313a4b 0%, #262d3b 60%, #1c222d 100%)' })}>
     <div style={abs({ left: 150, top: 46, width: 1620, height: 600, overflow: 'hidden', borderRadius: 6 })}>
-      <SiteWindow calm={calm} viewBox="0 300 1920 711" width={1620} height={600} />
+      <Img src={staticFile(`plates/${calm ? 'window-calm' : 'window'}.png`)} style={abs({ inset: 0, width: 1620, height: 600 })} />
       <div style={abs({ left: 0, top: 0, right: 0, bottom: 0, boxShadow: 'inset 0 0 0 14px #1b212c, inset 0 0 60px rgba(0,0,0,0.35)' })} />
       <div style={abs({ left: 795, top: 0, width: 16, height: 600, background: '#1b212c' })} />
       <div style={abs({ left: 0, top: 290, width: 1620, height: 12, background: '#1b212c' })} />
