@@ -1,0 +1,27 @@
+{
+  "name": "iskele-erp-reklam-filmi",
+  "private": true,
+  "type": "module",
+  "description": "İskele ERP 120 sn reklam filmi: demo verisi, ürün çekimi (Playwright), kompozisyon (Remotion), ses.",
+  "scripts": {
+    "seed": "node demo/seed/index.mjs",
+    "studio": "remotion studio film/index.ts",
+    "render": "remotion render film/index.ts Film out/film-video.mp4"
+  },
+  "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "5.3.0",
+    "@remotion/bundler": "4.0.532",
+    "@remotion/cli": "4.0.532",
+    "@remotion/renderer": "4.0.532",
+    "playwright-core": "1.63.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.532",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/three": "0.180.0",
+    "typescript": "5.9.3"
+  }
+}

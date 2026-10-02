@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Fotoğraf stüdyosu</title>
+  <script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+  <style>html, body { margin: 0; background: #111; }</style>
+</head>
+<body>
+  <script type="module">
+    import { SHOTS } from './js/shots.js'
+    import { createWorld, develop, phoneCamera } from './js/world.js'
+
+    /** Bir çekimi kurar, render eder, banyodan geçirir; JPEG veri adresi döner. */
+    window.renderShot = (name, width, height, orbit = 0) => {
+      const shot = SHOTS[name]
+      const world = createWorld({ width, height, sun: shot.sun })
+      const view = shot.build(world.scene)
+      const [px, py, pz] = view.position
+      const [tx, , tz] = view.target
+      const angle = orbit
+      const position = [tx + (px - tx) * Math.cos(angle) - (pz - tz) * Math.sin(angle), py, tz + (px - tx) * Math.sin(angle) + (pz - tz) * Math.cos(angle)]
+      const camera = phoneCamera({ width, height, ...view, position })
+      world.renderer.render(world.scene, camera)
+      const photo = develop(world.renderer.domElement, { seed: name.length * 31 + Math.round(orbit * 1000) })
+      world.renderer.dispose()
+      return photo.toDataURL('image/jpeg', 0.9)
+    }
+    window.studioReady = true
+  </script>
+</body>
+</html>
