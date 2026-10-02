@@ -10,11 +10,13 @@ import numpy as np
 import ambience
 import sfx_brand
 import sfx_chaos
+import sfx_ui
 from dsp import db, place, silence
 from paths import FILM_DIR, FILM_SECONDS
 
 CHAOS = json.loads((FILM_DIR / "cues" / "chaos.json").read_text(encoding="utf-8"))
 BRAND = json.loads((FILM_DIR / "cues" / "brand.json").read_text(encoding="utf-8"))
+UI = json.loads((FILM_DIR / "cues" / "ui.json").read_text(encoding="utf-8"))
 
 # Her ses türü: üretici ve seviye (dB). Seviyeler seslendirme -20 LUFS'e göre ayarlıdır: ses her zaman önde.
 CHAOS_SOUNDS = {
@@ -36,6 +38,24 @@ BRAND_SOUNDS = {
     "shimmer": (lambda cue: sfx_brand.shimmer(), -13),
     "glide": (lambda cue: sfx_brand.glide(cue["dur"]), -26),
     "settle": (lambda cue: sfx_brand.settle(), -22),
+}
+
+
+# Ürün part'larının (2–7) arayüz sesleri: seyrek ve çok alçak; final logo ışıltısı ise bilinçli olarak belirgin.
+UI_SOUNDS = {
+    "click": (lambda cue: sfx_ui.click(), -31),
+    "tab": (lambda cue: sfx_ui.tab(), -29),
+    "tap": (lambda cue: sfx_ui.tap(), -29),
+    "mark": (lambda cue: sfx_ui.mark(), -27),
+    "keys": (lambda cue: sfx_chaos.keys(cue["dur"], int(cue["t"] * 10)), -31),
+    "success": (lambda cue: sfx_ui.success(), -24),
+    "confirm": (lambda cue: sfx_ui.confirm(), -26),
+    "complete": (lambda cue: sfx_ui.complete(), -23),
+    "grow": (lambda cue: sfx_ui.grow(cue["dur"]), -28),
+    "whoosh": (lambda cue: sfx_brand.glide(cue["dur"]), -28),
+    "settle": (lambda cue: sfx_brand.settle(), -26),
+    "rise": (lambda cue: sfx_brand.rise(cue["dur"]), -24),
+    "final": (lambda cue: sfx_brand.shimmer(), -14),
 }
 
 
@@ -61,6 +81,12 @@ def freeze_sound() -> np.ndarray:
     canvas = silence(FILM_SECONDS + 1)
     cue = next(cue for cue in CHAOS["sfx"] if cue["kind"] == "freeze")
     place(canvas, sfx_chaos.freeze(cue["dur"]), cue["t"], db(-12))
+    return canvas
+
+
+def ui_bus() -> np.ndarray:
+    canvas = silence(FILM_SECONDS + 1)
+    _render(canvas, UI["sfx"], UI_SOUNDS)
     return canvas
 
 

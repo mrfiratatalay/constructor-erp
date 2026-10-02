@@ -15,8 +15,8 @@ const DEPOT = { x: 810, y: 548, scale: 0.9 }
 const OFFICE = { x: 1110, y: 330, scale: 0.52 }
 
 /** Rolün adı, cihazın altında. "Herkes rolü kadar görür" derken sırayla parlar. */
-const RoleChip = ({ x, y, label, glow }: { x: number; y: number; label: string; glow: number }) => (
-  <div style={{ position: 'absolute', left: x, top: y, transform: 'translateX(-50%)', padding: '10px 20px', borderRadius: 999,
+const RoleChip = ({ x, y, label, glow, shown }: { x: number; y: number; label: string; glow: number; shown: number }) => (
+  <div style={{ position: 'absolute', left: x, top: y, transform: 'translateX(-50%)', padding: '10px 20px', borderRadius: 999, opacity: shown,
     fontFamily: SANS, fontSize: 22, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', background: 'rgb(16 30 59 / 0.85)',
     border: `2px solid rgb(250 204 21 / ${0.25 + glow * 0.75})`, boxShadow: `0 0 ${glow * 28}px rgb(250 204 21 / ${glow * 0.5})` }}>
     {label}
@@ -48,9 +48,9 @@ export const DevicesScene = () => {
         <div style={{ opacity: office, transform: `translateY(${(1 - office) * 60}px)` }}>
           <AppWindow placement={OFFICE}><FrameTrack frames={[{ at: 0, src: 'devices/desktop-field' }]} /></AppWindow>
         </div>
-        <RoleChip x={LEAD.x} y={970} label="Şef · saha" glow={pulse(102.6)} />
-        <RoleChip x={DEPOT.x} y={970} label="Depo sorumlusu" glow={pulse(103.2)} />
-        <RoleChip x={OFFICE.x + 375} y={850} label="Patron · ofis" glow={pulse(103.8)} />
+        <RoleChip x={LEAD.x} y={970} label="Şef · saha" glow={pulse(102.6)} shown={lead} />
+        <RoleChip x={DEPOT.x} y={970} label="Depo sorumlusu" glow={pulse(103.2)} shown={depot} />
+        <RoleChip x={OFFICE.x + 375} y={850} label="Patron · ofis" glow={pulse(103.8)} shown={office} />
         <Highlight box={{ x: LEAD.x - 145, y: LEAD.y - 108, width: 310, height: 150 }} from={104.3} to={106.4} />
         <Highlight box={{ x: DEPOT.x - 168, y: DEPOT.y + 110, width: 324, height: 180 }} from={104.45} to={106.4} />
         <Highlight box={{ x: OFFICE.x + 345, y: OFFICE.y + 196, width: 380, height: 58 }} from={104.6} to={106.4} />

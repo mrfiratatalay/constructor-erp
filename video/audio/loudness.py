@@ -12,7 +12,8 @@ from scipy.ndimage import minimum_filter1d, uniform_filter1d
 from dsp import SR, db
 
 TARGET_LUFS = -14.0
-CEILING_DBTP = -1.0
+# AAC kodlayıcısı tepeyi ~0,1 dB aşırabilir (ilk renderda -0,95 ölçüldü): sınır -1,5'te tutulur, teslimde -1'in altında kalır.
+CEILING_DBTP = -1.5
 
 
 def lufs(sound: np.ndarray) -> float:

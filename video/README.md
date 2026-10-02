@@ -8,15 +8,18 @@ ile çekilir, müzik ve efektler Python ile sentezlenir, hepsi Remotion'da birle
 
 Film part part üretilir; her part kendi başına izlenebilir bir MP4'tür, final film hepsinin birleşimidir.
 
-| Part | Aralık | İçerik | Durum |
-|---|---|---|---|
-| 1 | 0 – 23 sn | Kaos (kodla çizilmiş şantiye ofisi) + marka kırılması + landing | Hazır |
-| 2 | 23 – 38 sn | Başvuru → platform yönetimi → ödeme → kurulum bağlantısı → sihirbaz | |
-| 3 | 38 – 53 sn | Şantiyeler, sohbet, saha | |
-| 4 | 53 – 67 sn | Yoklama (telefon) → puantaj (ofis) → Excel | |
-| 5 | 67 – 83 sn | Malzeme hareketleri | |
-| 6 | 83 – 105 sn | İmalat/ilerleme, görevler | |
-| 7 | 105 – 120 sn | Saha + depo + ofis, kapanış | |
+| Part | Aralık | İçerik |
+|---|---|---|
+| 1 | 0 – 23 sn | Kaos (kodla çizilmiş şantiye ofisi) + marka kırılması + landing |
+| 2 | 23 – 37,5 sn | Başvuru → platform yönetimi → Havale/EFT ödemesi → kurulum bağlantısı → sihirbaz |
+| 3 | 37,5 – 50,6 sn | Şantiyeler, sohbet (fotoğraf, sesli not), saha akışı (şef Ayşe) |
+| 4 | 50,6 – 62,5 sn | Yoklama (şefin telefonu) → aynı kayıtlar ofiste → aylık puantaj → Excel |
+| 5 | 62,5 – 76,5 sn | Malzeme: şantiyeye sevkiyat, iade, geri beklenenler (depo sorumlusu Mehmet) |
+| 6 | 76,5 – 95,5 sn | İlerleme (günlük giriş, çubuk gerçekten uzar) ve görev (oluştur → tamamla) |
+| 7 | 95,5 – 120 sn | Saha + depo + ofis aynı kayıtta; kapanış: sakin ofis, logo, slogan |
+
+Spesifikasyondaki son 15 saniye (01:45–02:00) ~21 sn konuşma içeriyordu; doğal hızda sığmadığı için ara bölümler
+1–4 sn kısaltıldı ve kapanışa yer açıldı.
 
 ## Kurulum (bir kez)
 
@@ -34,10 +37,15 @@ FFmpeg ayrıca kurulmaz: Remotion'ın getirdiği derleme kullanılır (loudnorm,
 | Adım | Komut | Ne yapar |
 |---|---|---|
 | Seslendirme | `cd audio && ../.venv/Scripts/python tts.py` | `src/film/voiceover.json` → cümle cümle Türkçe nöral ses, süreler ve kelime zamanları |
-| Ürün çekimi | `node capture/landing.mjs` | Gerçek arayüzden 2x PNG + öğe kutuları (`public/capture/`) |
+| Yığın | `node scripts/stack.mjs reset` | İzole Docker yığını sıfırdan, rastgele şifrelerle (`.cache/stack.json`) |
+| Kurulum çekimi | `node capture/onboarding.mjs` | Gerçek akış: başvuru → firmaya dönüştürme → ödeme → bağlantı → sihirbaz (Part 2) |
+| Demo veri | `node capture/seed.mjs` | Ekip (katılma bağlantısıyla), şantiyeler, sohbet, puantaj, malzeme, imalat, görev; saatler SQL'le |
+| Ürün çekimleri | `node capture/landing.mjs`, `sites.mjs`, `attendance.mjs`, `materials.mjs`, `work.mjs`, `devices.mjs` | Her kişi kendi rolüyle; 2x PNG + öğe kutuları (`public/capture/`) |
+| Kutular | `node scripts/boxes.mjs` | Çekimlerin öğe kutularını `src/film/boxes.json`'a toplar |
 | Ses | `cd audio && ../.venv/Scripts/python mix.py` | Müzik + efekt + ambiyans + seslendirme → `public/audio/mix/film.wav` (-14 LUFS, -1 dBTP), stem'ler `out/stems/` |
 | Önizleme | `npm run studio` | Tarayıcıda zaman çizelgesiyle, sesli |
-| Part render | `node scripts/renderPart.mjs 1` | `out/parts/iskele-erp-part-01-….mp4` + `.srt` |
+| Kontrol kareleri | `node scripts/stills.mjs 24.5 60 118` | Bir kez paketler, verilen saniyelerin karelerini alır |
+| Final | `node scripts/renderFilm.mjs` | Master + 1080p teslim, ses kanalları (24 bit WAV), SRT, 7 part dilimi (`out/final`, `out/parts`) |
 
 Ürün çekimleri izole bir Docker yığınından alınır (kullanıcının verisine dokunmaz): arayüz 5190, API 8090,
 veritabanı 5440, compose projesi `iskele-video`.

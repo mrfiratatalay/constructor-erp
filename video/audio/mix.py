@@ -64,9 +64,12 @@ def build() -> dict[str, np.ndarray]:
     score[: int(cuesheet.CHAOS["black"] * SR)] = 0
     score *= db(MUSIC_LUFS - lufs(score[int(15.95 * SR):]))
     score *= ducking(vo)[:, None]
+    # Final slogan (115,9 – 120): müzik bir kademe daha çekilir, son cümle tek başına duyulsun (spesifikasyon Madde 33).
+    t = np.arange(len(score)) / SR
+    score *= (1 - (1 - db(-5)) * np.clip((t - 115.6) / 0.5, 0, 1))[:, None]
     freeze = cuesheet.freeze_sound()
     freeze[int(cuesheet.CHAOS["black"] * SR):] = 0
-    effects = chaos_ending(cuesheet.chaos_bus()) + freeze + cuesheet.brand_bus()
+    effects = chaos_ending(cuesheet.chaos_bus()) + freeze + cuesheet.brand_bus() + cuesheet.ui_bus()
     effects *= ducking(vo, depth_db=-4.0)[:, None]
     return {"vo": vo[:LENGTH], "music": score[:LENGTH], "sfx": effects[:LENGTH]}
 

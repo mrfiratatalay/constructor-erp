@@ -6,8 +6,8 @@ Yapı (spesifikasyon Madde 13):
   21,05  logo: ev tonuna varış (Re majör), alt bas kabarır
   24,05  yumuşak arpejler ve alt bas
   39,05  ritim açılır: davul, shaker, hareketli bas
-  111,05 davullar çekilir, armonik çözülme (Sol → La → Re)
-  117,05 son akor, kuyruk 120'de biter
+  105,05 davullar çekilir, armonik çözülme (Re → Sol → La)
+  114,05 "İskele ERP": son akor (Re), kuyruk 120'de biter
 """
 
 import numpy as np
@@ -17,7 +17,7 @@ from instruments import epiano, kick, pad, pluck, rim, shaker, spread, sub
 
 BED, DOWNBEAT, BAR = 15.95, 18.05, 3.0
 BEAT = BAR / 4
-RHYTHM, RESOLVE, FINAL, END = 39.05, 111.05, 117.05, 120.0
+RHYTHM, RESOLVE, FINAL, END = 39.05, 105.05, 114.05, 120.0
 
 CHORDS = {
     "D": [50, 57, 66, 73, 76],
@@ -33,8 +33,14 @@ def bar_start(index: int) -> float:
     return DOWNBEAT + index * BAR
 
 
+# Kapanış kadansı: davullar çekildikten sonra Re → Sol → La → Re ("İskele ERP" eve dönüşe denk gelir).
+ENDING = {29: "D", 30: "G", 31: "A", 32: "D"}
+
+
 def chord_of(index: int) -> str:
-    """0. ölçü Sol (beklenti), 1. ölçü logo ile Re (varış); sonra Re–Si minör–Sol–La döngüsü."""
+    """0. ölçü Sol (beklenti), 1. ölçü logo ile Re (varış); sonra Re–Si minör–Sol–La döngüsü; sonda kadans."""
+    if index in ENDING:
+        return ENDING[index]
     return "G" if index == 0 else ["D", "Bm", "G", "A"][(index - 1) % 4]
 
 
@@ -52,7 +58,8 @@ def keys(canvas: np.ndarray) -> None:
     """Elektrik piyano: ilk temiz nota, logo akoru ve finaldeki çözülme akorları (hafif arpejli vuruş)."""
     for at, note, gain in [(18.05, 74, -7), (19.55, 69, -15), (20.3, 71, -14)]:
         place(canvas, spread(epiano(note), 0.1, seed=note), at, db(gain))
-    for at, name, gain in [(21.05, "D", -14), (RESOLVE, "G", -16), (RESOLVE + BAR, "A", -16), (FINAL, "D", -12)]:
+    ending = [(RESOLVE + BAR * step, chord_of(29 + step), -16) for step in range(3)]
+    for at, name, gain in [(21.05, "D", -14), *ending, (FINAL, "D", -17)]:
         for order, note in enumerate(CHORDS[name][1:]):
             pan = -0.3 + order * 0.2
             place(canvas, spread(epiano(note, 3.2, 0.8), pan, seed=order), at + order * 0.014, db(gain))
@@ -78,7 +85,7 @@ def bass(canvas: np.ndarray) -> None:
         for beat, length in hits:
             place(canvas, spread(sub(root, length), 0, 0), start + beat * BEAT, db(-15))
     place(canvas, spread(sub(ROOTS["D"], 3.0), 0, 0), 21.05, db(-15))
-    place(canvas, spread(sub(ROOTS["D"], END - FINAL), 0, 0), FINAL, db(-13))
+    place(canvas, spread(sub(ROOTS["D"], END - FINAL), 0, 0), FINAL, db(-18))
 
 
 def drums(canvas: np.ndarray) -> None:
