@@ -10,7 +10,7 @@ export function loadFonts() {
   const handle = delayRender('font')
   const faces = FILES.map((file) => new FontFace('Plus Jakarta Sans Variable', `url(${staticFile(`fonts/${file}`)}) format('woff2')`, { weight: '200 800' }))
   Promise.all(faces.map((face) => face.load())).then((ready) => {
-    ready.forEach((face) => document.fonts.add(face))
+    ready.forEach((face) => (document.fonts as unknown as { add: (f: FontFace) => void }).add(face))
     continueRender(handle)
   })
 }

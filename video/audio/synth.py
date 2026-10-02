@@ -1,7 +1,7 @@
 """Enstrümanlar, sıfırdan sentez (numpy): keçe piyano, sıcak pad, koparma (Karplus-Strong), bas, yumuşak davul.
 Her fonksiyon mono float32 dizisi döner (48 kHz). Aranjman audio/music.py'dedir."""
 import numpy as np
-from scipy.signal import butter, sosfilt
+from scipy.signal import butter, lfilter, sosfilt
 
 SR = 48000
 RNG = np.random.default_rng(2026)
@@ -65,15 +65,14 @@ def pad(midis, seconds, brightness=1400.0):
 
 
 def pluck(midi, seconds=1.4, brightness=0.5):
-    """Karplus-Strong: tel gibi doğal, sıcak bir koparma."""
+    """Karplus-Strong (lfilter ile, C hızında): tel gibi doğal, sıcak bir koparma."""
     n = int(seconds * SR)
     period = int(SR / hz(midi))
-    buffer = lowpass(RNG.uniform(-1, 1, period), 1500 + 5000 * brightness)
-    out = np.zeros(n)
-    for i in range(n):
-        value = buffer[i % period]
-        out[i] = value
-        buffer[i % period] = 0.497 * (value + buffer[(i + 1) % period])
+    burst = np.zeros(n)
+    burst[:period] = lowpass(RNG.uniform(-1, 1, period), 1500 + 5000 * brightness)
+    denominator = np.zeros(period + 2)
+    denominator[0], denominator[period], denominator[period + 1] = 1.0, -0.497, -0.497
+    out = lfilter([1.0], denominator, burst)
     return (lowpass(out, 4200) * envelope(n, 0.002, 0.3)).astype(np.float32)
 
 
