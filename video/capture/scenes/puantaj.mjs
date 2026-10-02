@@ -15,7 +15,7 @@ export async function play({ page, hand, rec, tl }) {
   await settle(page, { quiet: 100, tl })
   await hand.wait(900)
   rec.mark('row')
-  const row = page.locator('.el-table__row', { hasText: 'Ali Yılmaz' }).first()
+  const row = page.locator('.el-table__row:visible', { hasText: 'Ali Yılmaz' }).first()
   await hand.move(row, { dx: 0.35, dy: 0.5, duration: 700 })
   await hand.move(row, { dx: 0.8, dy: 0.5, duration: 1300 })
   await hand.wait(300)
