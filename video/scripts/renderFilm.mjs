@@ -27,7 +27,8 @@ const master = join(OUT, `${NAME}-120s-master.mp4`)
 const delivery = join(OUT, `${NAME}-120s-1080p.mp4`)
 const mix = join(ROOT, 'public', 'audio', 'mix', 'film.wav')
 
-run('npx', ['remotion', 'render', 'src/index.ts', 'Film', silentMaster, '--muted', '--crf=10'])
+// 8 paralel tarayıcı 2880 px'lik çekimlerle belleği zorlayıp bir kez çöktü (kare 2540): 5 yeterli ve kararlı.
+run('npx', ['remotion', 'render', 'src/index.ts', 'Film', silentMaster, '--muted', '--crf=10', '--concurrency=5'])
 encode(['-i', silentMaster, '-i', mix, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'libfdk_aac', '-b:a', '320k',
   '-ar', '48000', '-movflags', '+faststart', master])
 encode(['-i', master, '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', '-c:a', 'copy',
