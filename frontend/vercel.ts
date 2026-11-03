@@ -57,7 +57,8 @@ const demoDownloads = [
 
 export const config: VercelConfig = {
   framework: 'vite',
-  buildCommand: demo ? 'npm run build -- --mode demo' : 'npm run build',
+  // `npm run build -- --mode demo` olmaz: run-p bayrağı alt betiğe geçirirken npm onu kendi ayarı sanıp yutar.
+  buildCommand: demo ? 'npm run build:demo' : 'npm run build',
   outputDirectory: 'dist',
   routes: [
     { src: '^/(?!api/).*$', headers: SECURITY_HEADERS, continue: true },
