@@ -154,8 +154,7 @@ mesai" sorusunun kavgasız cevabıdır**: o günün gerçeğini o gün, sahada o
 
 > **"Şef her sabah defteri dolduruyor, sen ay sonunda puantajı görüyorsun."**
 
-Tanıdık kalıp burada WhatsApp değil, şefin kâğıt **puantaj defteridir**: satırda kişi, sütunda gün. Görsel
-referanslar ve neyin neden alındığı: `docs/referanslar/yoklama/`.
+Tanıdık kalıp burada WhatsApp değil, şefin kâğıt **puantaj defteridir**: satırda kişi, sütunda gün.
 
 | Karar | Neden |
 |---|---|

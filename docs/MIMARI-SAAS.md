@@ -2,7 +2,7 @@
 
 Bu doküman, tek firmaya (Kızılkan İnşaat) yazılmış gibi çalışan uygulamanın, birden çok müteahhit firmasına satılan
 **Constructor ERP** ürününe nasıl dönüştüğünü ve bundan sonra her yeni modülün uyacağı kuralları anlatır.
-Kural niteliğindeki kısım (Bölüm 6) [ANAYASA.md](ANAYASA.md) Madde 9'un ayrıntısıdır.
+Kural niteliğindeki kısım (Bölüm 6) [ANAYASA.md](../ANAYASA.md) Madde 9'un ayrıntısıdır.
 
 ## 1. Üç yüzey
 
