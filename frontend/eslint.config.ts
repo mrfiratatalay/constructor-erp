@@ -14,7 +14,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
 
-  // Otomatik üretilen dosyalar (bileşen tipleri, API istemcisi) elle yazılmaz; anayasaya tabi değildir.
+  // Otomatik üretilen dosyalar (bileşen tipleri, API istemcisi) elle yazılmaz; kod kurallarına tabi değildir.
   globalIgnores(['**/dist/**', '**/coverage/**', 'src/app/components.d.ts', 'src/core/api/generated/**']),
 
   ...pluginVue.configs['flat/essential'],
