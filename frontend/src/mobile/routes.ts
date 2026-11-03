@@ -16,6 +16,7 @@ export const routes = buildRoutes({
   platformPlans: { redirectTo: 'platformDashboard' },
   platformAudit: { redirectTo: 'platformDashboard' },
   login: () => import('./pages/LoginPage.vue'),
+  demo: import.meta.env.MODE === 'demo' ? () => import('./pages/DemoPage.vue') : { redirectTo: 'landing' },
   invite: () => import('./pages/InviteAcceptPage.vue'),
   join: () => import('./pages/JoinPage.vue'),
   sites: () => import('./pages/SitesPage.vue'),

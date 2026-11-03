@@ -18,6 +18,8 @@ export const ROUTES = {
   // POS yok: "Paketi seç" buraya gelir (?paket=professional); başvuru platform yönetiminde karşılanır.
   apply: { path: '/basvuru', meta: { public: true, marketing: true, title: 'Başvuru' } },
   login: { path: '/giris', meta: { public: true, guestOnly: true, title: 'Giriş' } },
+  // Canlı demonun kapısı: rol seçip şifresiz girilir (core/demo). Gerçek derlemede tanıtım sitesine yönlenir.
+  demo: { path: '/demo', meta: { public: true, title: 'Canlı demo' } },
   invite: { path: '/davet/:token', meta: { public: true, title: 'Davet' } },
   // Firmaya katılma bağlantısı: tıklayan adını ve numarasını yazıp katılır; zaten içerideyse listeye gider.
   join: { path: '/katil/:token', meta: { public: true, title: 'Katıl' } },

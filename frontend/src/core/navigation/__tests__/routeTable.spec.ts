@@ -8,6 +8,7 @@ const PAGES: PageSet = {
   pricing: page,
   apply: page,
   login: page,
+  demo: page,
   setup: page,
   invite: page,
   join: page,

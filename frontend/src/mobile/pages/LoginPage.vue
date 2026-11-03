@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
+import { isDemo } from '@/core/demo/demoMode'
 import BrandLogo from '@/shared/atoms/BrandLogo.vue'
 
 const email = ref('')
@@ -21,6 +22,10 @@ function fillDevAccount() {
   <main class="login-page">
     <BrandLogo class="login-page__logo" size="lg" />
     <p class="login-page__lead">Firmanızın çalışma alanına girin.</p>
+    <van-cell-group v-if="isDemo" inset>
+      <van-cell icon="exchange" title="Canlı demo: şifre gerekmez" label="Rol seçip girin (demo şifresi: demo)" is-link
+        :to="{ name: 'demo' }" />
+    </van-cell-group>
     <van-form class="login-page__form" @submit="login(email, password)">
       <van-cell-group inset>
         <van-field v-model="email" name="email" label="E-posta" type="email" autocomplete="username"

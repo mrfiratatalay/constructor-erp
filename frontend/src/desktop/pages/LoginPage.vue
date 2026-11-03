@@ -3,6 +3,7 @@ import { reactive, ref, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { devLogin } from '@/core/auth/devLogin'
 import { usePasswordLogin } from '@/core/auth/usePasswordLogin'
+import { isDemo } from '@/core/demo/demoMode'
 import AuthLayout from '@/desktop/templates/AuthLayout.vue'
 
 const form = reactive({ email: '', password: '' })
@@ -27,6 +28,11 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
     <el-card class="login-page__card" shadow="never">
       <h2 class="login-page__title">Giriş yap</h2>
       <p class="login-page__lead">Firmanızın çalışma alanına ya da platform yönetimine girin.</p>
+      <el-alert v-if="isDemo" type="success" :closable="false" show-icon class="login-page__demo"
+        title="Bu bir canlı demo: şifre gerekmez.">
+        <RouterLink :to="{ name: 'demo' }">Rol seçip girin</RouterLink> ya da bir demo hesabını şifre
+        <strong>demo</strong> ile yazın.
+      </el-alert>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="login-page__form"
         @submit.prevent="submit">
         <el-form-item label="E-posta" prop="email">
@@ -73,6 +79,10 @@ const fillDevAccount = () => devAccount && Object.assign(form, devAccount)
 .login-page__lead {
   margin: var(--space-2) 0 var(--space-6);
   color: var(--text-muted);
+}
+
+.login-page__demo {
+  margin-bottom: var(--space-4);
 }
 
 .login-page__form {

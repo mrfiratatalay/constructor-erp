@@ -8,11 +8,15 @@ import { createAppQueryClient } from './app/queryClient'
 import { createAppRouter } from './app/router'
 import { installServiceWorker } from './app/serviceWorker'
 import { installUploadQueue } from './app/uploadQueue'
+import { isDemo } from './core/demo/demoMode'
 import './shared/styles/tokens.css'
 import './shared/styles/base.css'
 import './shared/styles/blueprint.css'
 
 async function bootstrap() {
+  // Demo derlemesinde istekler tarayıcıdaki sahte backend'e gider; gerçek derlemede bu dal pakete hiç girmez
+  // (koşul burada yazılır, bkz. core/demo/demoMode.ts).
+  if (import.meta.env.MODE === 'demo') await (await import('./core/demo/installDemo')).installDemo()
   const platform = await loadPlatform()
   const app = createApp(platform.shell)
   const queryClient = createAppQueryClient()
@@ -29,7 +33,8 @@ async function bootstrap() {
   installUploadQueue(pinia, queryClient)
 
   app.mount('#app')
-  installServiceWorker()
+  // Demoda service worker yok: bildirim gönderilmiyor, önbellek de yeni sürümü bir ziyaret geciktirirdi.
+  if (!isDemo) installServiceWorker()
 }
 
 void bootstrap()

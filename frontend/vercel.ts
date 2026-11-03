@@ -10,8 +10,13 @@ import { deploymentEnv, routes, type VercelConfig } from '@vercel/config/v1'
  * önce yanıt başlıkları (continue: sonraki kurala devam eder), sonra /api vekili, sonra var olan dosya (filesystem),
  * en son tek sayfalık uygulamanın index.html'i. Sıra bozulursa /assets'teki dosyalar bile index.html döner.
  */
+/**
+ * Canlı demo (Vercel'de VITE_DEMO=true): arayüz `--mode demo` ile derlenir, backend yoktur; istekleri tarayıcıdaki
+ * sahte backend karşılar (src/core/demo). Vekil kurulmaz, API_ORIGIN ve PROXY_SECRET gerekmez.
+ */
+const demo = process.env.VITE_DEMO === 'true'
 const apiOrigin = process.env.API_ORIGIN?.replace(/\/+$/, '')
-if (!apiOrigin) {
+if (!demo && !apiOrigin) {
   throw new Error('API_ORIGIN gerekli: Render servisinin adresi, ör. https://constructor-erp-api.onrender.com')
 }
 
@@ -28,13 +33,31 @@ const SECURITY_HEADERS = {
 }
 
 /** Değer derlemeye girmez: $PROXY_SECRET istek anında Vercel'in ortam değişkeninden dolar. */
-const apiProxy = routes.rewrite('/api/(.*)', `${apiOrigin}/api/$1`, {
-  requestHeaders: { 'x-proxy-secret': deploymentEnv('PROXY_SECRET') },
-})
+const apiProxy = apiOrigin
+  ? [
+      routes.rewrite('/api/(.*)', `${apiOrigin}/api/$1`, {
+        requestHeaders: { 'x-proxy-secret': deploymentEnv('PROXY_SECRET') },
+      }),
+    ]
+  : []
+
+/**
+ * Demoda Excel düğmeleri (düz bağlantılar: /api/…/export) sahte backend'e uğramaz, tarayıcı adresi doğrudan açar.
+ * Bu adresler public/demo'daki örnek dökümlere gider; dosya iner, sayfa yerinde kalır.
+ */
+const demoDownloads = [
+  ['^/api/puantaj/export.*$', 'puantaj-ornek.xlsx'],
+  ['^/api/sites/[^/]+/production/export$', 'ilerleme-ornek.xlsx'],
+  ['^/api/shipment-reports/export.*$', 'sevkiyat-ornek.xlsx'],
+].map(([src, file]) => ({
+  src,
+  dest: `/demo/${file}`,
+  headers: { 'Content-Disposition': `attachment; filename="${file}"` },
+}))
 
 export const config: VercelConfig = {
   framework: 'vite',
-  buildCommand: 'npm run build',
+  buildCommand: demo ? 'npm run build -- --mode demo' : 'npm run build',
   outputDirectory: 'dist',
   routes: [
     { src: '^/(?!api/).*$', headers: SECURITY_HEADERS, continue: true },
@@ -43,7 +66,7 @@ export const config: VercelConfig = {
     { src: '^/sw\\.js$', headers: { 'Cache-Control': 'no-cache' }, continue: true },
     // API cevapları kişiye ve firmaya özeldir: CDN hiçbirini saklamaz. Güvenlik başlıklarını backend yazar.
     { src: '^/api/.*$', headers: { 'x-vercel-enable-rewrite-caching': '0' }, continue: true },
-    apiProxy,
+    ...(demo ? demoDownloads : apiProxy),
     { handle: 'filesystem' },
     { src: '^/.*$', dest: '/index.html' },
   ],

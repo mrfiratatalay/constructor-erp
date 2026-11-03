@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronRight, Menu } from 'lucide-vue-next'
 import { useCurrentUser } from '@/core/auth/currentUser'
@@ -27,6 +27,9 @@ const items = computed<NavItem[]>(() => (viewer.value ? mainNavItems(viewer.valu
 const workItems = computed(() => items.value.filter((item) => !item.section))
 const managementItems = computed(() => items.value.filter((item) => item.section === 'management'))
 const accountOpen = ref(false)
+// Demo menüsü (rol değiştir, sıfırla) yalnızca demo derlemesinde yüklenir; koşul burada yazılır ki gerçek pakete girmesin.
+const DemoNavMenu =
+  import.meta.env.MODE === 'demo' ? defineAsyncComponent(() => import('@/desktop/molecules/DemoNavMenu.vue')) : null
 /** Seçili öğe adresten gelir: şantiye sayfası da "Şantiyeler"i yakar. */
 const active = computed(() => navRouteOf(route.name as RouteName))
 
@@ -58,6 +61,7 @@ function go(item: NavItem) {
         </el-tooltip>
       </nav>
       <footer class="side-nav__footer">
+        <component :is="DemoNavMenu" v-if="DemoNavMenu" :expanded="open" />
         <nav v-if="managementItems.length" class="side-nav__management" aria-label="Firma yönetimi">
           <el-tooltip v-for="item in managementItems" :key="item.route" :content="item.label" placement="right" :disabled="open">
             <button type="button" class="side-nav__item" :class="{ 'side-nav__item--active': active === item.route }"
