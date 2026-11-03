@@ -84,8 +84,8 @@ sahnelerden (three.js) çekildi; telif ya da kişisel veri sorunu yok.
 **Kalıcılık.** Yapılan her değişiklik tarayıcının deposuna (localStorage) yazılıyor. Sayfa yenilense de demo kaldığı
 yerden sürüyor; "Demoyu sıfırla" her şeyi ilk haline döndürüyor.
 
-**Giriş kanalı.** `/demo` sayfasında beş rol kartı var: Patron, Şantiye şefi, Depo sorumlusu, Çalışan ve Platform
-yöneticisi. Her kart rolü bir cümleyle anlatıyor ve ilk bakılacak üç şeyi öneriyor. Bir tıkla, şifresiz giriliyor.
+**Giriş kanalı.** [iskeleerp.vercel.app/demo](https://iskeleerp.vercel.app/demo) sayfasında beş rol kartı var:
+Patron, Şantiye şefi, Depo sorumlusu, Çalışan ve Platform yöneticisi. Her kart rolü bir cümleyle anlatıyor ve ilk bakılacak üç şeyi öneriyor. Bir tıkla, şifresiz giriliyor.
 Uygulamanın içindeki "Demo" düğmesiyle rol değiştirilebiliyor; telefon ve bilgisayar arayüzü arasında geçilebiliyor.
 
 **Paketten ayrı.** Demo, Vite'ın derleme kipiyle açılıyor (`--mode demo`). Burada bir şey öğrendim: bayrağı tek bir
