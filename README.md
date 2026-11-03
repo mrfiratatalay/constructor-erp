@@ -3,12 +3,14 @@
 Müteahhitlerin şantiyelerini WhatsApp grupları yerine tek yerden yönettiği, çok firmalı (multi-tenant) SaaS ERP.
 Telefonda sade bir saha arayüzü, bilgisayarda yönetim paneli. İlk müşterisi Kızılkan İnşaat'tır.
 
-**[Canlı demo nasıl çalışır](docs/09-yayina-alma.md#çözüm-tarayıcıda-çalışan-canlı-demo)** · [Dokümanlar](docs/README.md) · [Mimari](docs/02-mimari.md) ·
+**[Canlı demo](https://iskeleerp.vercel.app/demo)** · [Dokümanlar](docs/README.md) · [Mimari](docs/02-mimari.md) ·
 [Ürün kararları](docs/08-urun-kararlari.md) · [Sorular ve cevaplar](docs/10-sorular.md)
 
 ![Canlı demonun giriş sayfası: beş rol, şifresiz giriş](docs/ekran-goruntuleri/demo/01-demo-giris.jpg)
 
 ## Canlı demo
+
+**https://iskeleerp.vercel.app/demo**
 
 Demo backend'siz, tarayıcının içinde çalışır: bekleme yok, kurulum yok. Bir rol seçip şifresiz girersiniz.
 
