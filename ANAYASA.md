@@ -90,7 +90,7 @@ Yeni bir kütüphane yalnızca ihtiyaç duyulduğu anda eklenir, "belki lazım o
 ## Madde 9 — Çok firmalı yapı (multi-tenant)
 
 Constructor ERP birden fazla firmaya hizmet verir; bir firmanın verisi başka bir firmaya hiçbir yoldan görünmez.
-Ayrıntı ve yeni modül listesi [MIMARI-SAAS.md](MIMARI-SAAS.md)'dedir.
+Ayrıntı ve yeni modül listesi [MIMARI-SAAS.md](docs/MIMARI-SAAS.md)'dedir.
 
 - Firmaya ait her tabloda `company_id` vardır ve tabloya satır seviyesinde güvenlik (RLS) açılır. Açılmamış tablo
   uygulamanın açılışında hata verir.

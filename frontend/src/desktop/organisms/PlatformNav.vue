@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeftRight, LogOut } from 'lucide-vue-next'
 import { useLogout } from '@/core/auth/useLogout'
@@ -19,6 +19,9 @@ const { context, workspace } = useWorkspace()
 const { logout, isPending } = useLogout()
 const items = platformNavItems('desktop')
 const active = computed(() => navRouteOf(route.name as RouteName))
+// Demo menüsü yalnızca demo derlemesinde yüklenir (bkz. SideNav).
+const DemoNavMenu =
+  import.meta.env.MODE === 'demo' ? defineAsyncComponent(() => import('@/desktop/molecules/DemoNavMenu.vue')) : null
 </script>
 
 <template>
@@ -32,6 +35,7 @@ const active = computed(() => navRouteOf(route.name as RouteName))
       </button>
     </nav>
     <div class="platform-nav__footer">
+      <component :is="DemoNavMenu" v-if="DemoNavMenu" expanded />
       <el-button v-if="workspace" text class="platform-nav__switch" @click="router.push({ name: 'sites' })">
         <ArrowLeftRight :size="16" /> {{ workspace.name }} çalışma alanı
       </el-button>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { isDemo } from '@/core/demo/demoMode'
 import { CONTACT } from '@/core/marketing/marketingCopy'
 import ProductMark from '@/shared/atoms/ProductMark.vue'
 import '@/shared/styles/marketing.css'
@@ -21,7 +22,10 @@ const links = [
         <RouterLink :to="{ name: 'landing' }" class="marketing-mobile__brand" aria-label="Constructor ERP ana sayfa">
           <ProductMark :size="28" /><strong>Constructor <b>ERP</b></strong>
         </RouterLink>
-        <RouterLink :to="{ name: 'login' }" class="marketing-mobile__login">Giriş</RouterLink>
+        <!-- Demoda giriş, rol seçilen demo sayfasından yapılır. -->
+        <RouterLink :to="{ name: isDemo ? 'demo' : 'login' }" class="marketing-mobile__login">
+          {{ isDemo ? 'Demo' : 'Giriş' }}
+        </RouterLink>
         <van-button class="marketing-mobile__menu-button" icon="wap-nav" aria-label="Menüyü aç" :aria-expanded="menuOpen"
           @click="menuOpen = true" />
       </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight, Mail, Phone } from 'lucide-vue-next'
+import { isDemo } from '@/core/demo/demoMode'
 import { CONTACT } from '@/core/marketing/marketingCopy'
 import ProductMark from '@/shared/atoms/ProductMark.vue'
 import '@/shared/styles/marketing.css'
@@ -23,7 +24,10 @@ const year = new Date().getFullYear()
           <RouterLink v-for="link in links" :key="link.label" :to="link.to">{{ link.label }}</RouterLink>
         </nav>
         <div class="marketing-top__actions">
-          <RouterLink :to="{ name: 'login' }" class="marketing-top__login">Giriş yap</RouterLink>
+          <!-- Demoda giriş, rol seçilen demo sayfasından yapılır. -->
+          <RouterLink :to="{ name: isDemo ? 'demo' : 'login' }" class="marketing-top__login">
+            {{ isDemo ? 'Canlı demo: rol seçip gir' : 'Giriş yap' }}
+          </RouterLink>
           <RouterLink v-slot="{ href, navigate }" :to="{ name: 'apply' }" custom><el-button tag="a" :href="href"
             type="primary" class="marketing-top__cta" @click="navigate">
             Tanıtım isteyin<ArrowRight :size="15" aria-hidden="true" />
