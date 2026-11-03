@@ -79,9 +79,9 @@ flowchart LR
 | `backend/` | Java 25, Spring Boot 4, PostgreSQL 18, Flyway, Testcontainers |
 | `docker/`, `docker-compose.yml`, `scripts/` | Kurulum: veritabanı, backend, arayüz |
 
-Kod yazmadan önce **[ANAYASA.md](ANAYASA.md)** okunur: boyut sınırları, atomik tasarım ve katman kuralları oradadır ve
-otomatik denetlenir. Firma ayrımı, abonelik ve yeni bir modül eklerken izlenecek liste
-**[MIMARI-SAAS.md](docs/MIMARI-SAAS.md)**'dedir.
+Kod kuralları (boyut sınırları, katmanlar, isimlendirme) **[docs/07-kod-kalitesi.md](docs/07-kod-kalitesi.md)**'dedir
+ve ESLint ile Checkstyle tarafından otomatik denetlenir. Firma ayrımı, abonelik ve yeni bir modül eklerken izlenecek
+liste **[MIMARI-SAAS.md](docs/MIMARI-SAAS.md)**'dedir.
 
 ## Çalıştırma: her şey Docker'da
 
@@ -143,8 +143,8 @@ Her değişiklikten sonra ilgili kontrol çalıştırılır; kırmızıyken iş 
 
 | Ne | Komut | İçerik |
 |---|---|---|
-| Backend | `cd backend && ./mvnw verify` | Checkstyle (anayasa) + testler (gerçek PostgreSQL, Testcontainers) |
-| Frontend | `cd frontend && npm run check` | ESLint (anayasa + mimari) + tip + unit test |
+| Backend | `cd backend && ./mvnw verify` | Checkstyle (kod kuralları) + testler (gerçek PostgreSQL, Testcontainers) |
+| Frontend | `cd frontend && npm run check` | ESLint (kod kuralları + mimari) + tip + unit test |
 | Frontend uçtan uca | `cd frontend && npm run test:e2e` | Telefon ve masaüstü ekranında Playwright |
 
 ## Üretim: Vercel (arayüz) + Render (backend, veritabanı)
@@ -185,6 +185,5 @@ geçerken aynı Docker imajları `prod` profiliyle çalışır; veritabanı adre
 
 ## Ekip
 
-Projeyi [Fırat Atalay](https://github.com/mrfiratatalay) ve Musa Kusbey geliştirdi; kodun önemli bir kısmı yapay zekâ
-(Claude Code) ile birlikte, [anayasanın](ANAYASA.md) otomatik denetlediği kurallar içinde yazıldı. Nasıl çalıştığımızı
-[07 · Kod kalitesi, ekip ve yapay zekâ](docs/07-kod-kalitesi.md)'da anlattım.
+Projeyi [Fırat Atalay](https://github.com/mrfiratatalay) ve Musa Kusbey geliştirdi. Ekip olarak nasıl çalıştığımızı,
+kod kurallarını ve yapay zekâyı nasıl kullandığımızı [07 · Kod kalitesi](docs/07-kod-kalitesi.md)'nde anlattım.

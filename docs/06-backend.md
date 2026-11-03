@@ -106,5 +106,5 @@ PostgreSQL'de** koşuyor. RLS, Türkçe sıralama ve satır kilidi gibi davranı
 edilebiliyor; bellekteki bir veritabanı bunları hiç bilmez.
 
 ```bash
-cd backend && ./mvnw verify    # Checkstyle (anayasa) + bütün testler
+cd backend && ./mvnw verify    # Checkstyle (kod kuralları) + bütün testler
 ```

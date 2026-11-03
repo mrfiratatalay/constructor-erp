@@ -60,7 +60,7 @@ bölmeyi zorunlu kılıyor. Kural derlemeye bağlı olduğu için kimse kimseye 
 Projeyi ekip arkadaşım Musa ile birlikte geliştirdik ve kodun önemli bir kısmını yapay zekâ (Claude Code) ile birlikte
 yazdık; bunu GitHub'daki geçmişte de görebilirsiniz. Benim rolüm ne yapılacağına ve nedenine karar vermek, kuralları
 koymak, her değişikliği tarayıcıda deneyip kabul ya da reddetmek, dalları birleştirmek ve ürünü yayına almaktı. Bence
-asıl beceri yapay zekâyı kontrol altında tutmaktı; bunun için anayasa yazdım ve derlemeye bağladım. Ayrıntısı
+asıl beceri yapay zekâyı kontrol altında tutmaktı; bunun için kod kuralları yazdım ve derlemeye bağladım. Ayrıntısı
 [07 · Kod kalitesi](07-kod-kalitesi.md)'nde.
 
 ### Yaşadığın en ilginç hata neydi?
@@ -86,7 +86,8 @@ açılışta dururdu; birleştirirken birini yeniden numaralandırdık.
 
 Backend testleri Testcontainers ile gerçek bir PostgreSQL'de koşuyor, çünkü RLS, Türkçe sıralama ve satır kilidi
 bellekteki bir veritabanında test edilemez. Arayüzde iş mantığının birim testleri (Vitest) ve telefon, tablet ve
-masaüstü ekranında uçtan uca testler (Playwright) var. Anayasa da bir test gibi çalışıyor: ihlal eden kod derlenmiyor.
+masaüstü ekranında uçtan uca testler (Playwright) var. Kod kuralları da bir test gibi çalışıyor: ihlal eden kod
+derlenmiyor.
 
 ### Canlı demo nasıl çalışıyor?
 
@@ -109,5 +110,5 @@ Firma ayrımı zaten veritabanında olduğu için o tarafta bir değişiklik ger
 ### Baştan yapsan neyi farklı yapardın?
 
 Ürün kararlarını daha erken, gerçek kullanıcıyla doğrulardım. Birkaç modülü ancak yazdıktan sonra "bu gerçeğe uymuyor"
-diyerek baştan yaptım. Uçtan uca testleri de daha erken kurardım. İyi ki yaptığım şey ise anayasayı ilk gün yazıp
-derlemeye bağlamak oldu; proje büyüdükçe en çok o işe yaradı.
+diyerek baştan yaptım. Uçtan uca testleri de daha erken kurardım. İyi ki yaptığım şey ise kod kurallarını ilk gün
+yazıp derlemeye bağlamak oldu; proje büyüdükçe en çok o işe yaradı.

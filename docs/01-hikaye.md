@@ -66,7 +66,7 @@ kurduğu bir kurulum sihirbazı var.
 
 ## Ekip
 
-Projeyi iki kişi geliştirdik: ben ve ekip arkadaşım **Musa Kusbey**. Ürünün yönü, kuralları (anayasa) ve modüllerin
+Projeyi iki kişi geliştirdik: ben ve ekip arkadaşım **Musa Kusbey**. Ürünün yönü, kod kuralları ve modüllerin
 çoğunun tasarım kararları benden çıktı. Görevler, yoklamanın ilk sürümü, İlerleme modülü, uçtan uca testler ve güvenlik
 denetiminin büyük kısmı Musa'nın işi. Kodun önemli bir bölümünü yapay zekâ (Claude Code) ile birlikte yazdık; bunu nasıl
 disiplin altında tuttuğumuzu [07 · Kod kalitesi](07-kod-kalitesi.md)'nde anlattım.

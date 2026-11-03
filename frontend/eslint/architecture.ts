@@ -1,6 +1,6 @@
 import type { Linter } from 'eslint'
 
-// ANAYASA.md Madde 4: katman ve platform sınırlarını import seviyesinde denetler.
+// Katman ve platform sınırlarını import seviyesinde denetler (kurallar: docs/07-kod-kalitesi.md).
 const VANT = ['vant', 'vant/*', '@vant/*']
 const ELEMENT_PLUS = ['element-plus', 'element-plus/*', '@element-plus/*']
 const LAYERS = ['atoms', 'molecules', 'organisms', 'templates', 'pages']
@@ -33,8 +33,8 @@ function restrictImports(forbidden: string[]): Linter.RuleEntry {
     'error',
     {
       patterns: [
-        { group: forbidden, message: 'Mimari sınır ihlali: ANAYASA.md Madde 4.' },
-        { group: ['../*'], message: 'Klasör dışına import @/ ile yazılır: ANAYASA.md Madde 4.' },
+        { group: forbidden, message: 'Mimari sınır ihlali: katman kuralları docs/07-kod-kalitesi.md içinde.' },
+        { group: ['../*'], message: 'Klasör dışına import @/ ile yazılır (docs/07-kod-kalitesi.md).' },
       ],
     },
   ]

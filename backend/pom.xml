@@ -135,7 +135,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Anayasa Madde 1: boyut sınırlarını her build'de denetler -->
+            <!-- Kod kuralları: boyut sınırlarını her build'de denetler (docs/07-kod-kalitesi.md) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -155,7 +155,7 @@
                 </dependencies>
                 <executions>
                     <execution>
-                        <id>anayasa</id>
+                        <id>kod-kurallari</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>check</goal>

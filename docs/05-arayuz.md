@@ -40,7 +40,7 @@ Bir puantaj hesabı, bir tarih biçimi ya da bir "bu kişi bu sayfayı görebili
 iki kabuk aynı fonksiyonu kullanıyor. Kabuklar yalnızca görüntüden sorumlu.
 
 Bu kurallar belgede kalsaydı bir gün çiğnenirdi. O yüzden ESLint'e yazdım: `core/` içinden Vant import eden kod build'den
-geçmiyor ve hata mesajı hangi kuralın çiğnendiğini söylüyor (`Mimari sınır ihlali: ANAYASA.md Madde 4`).
+geçmiyor ve hata mesajı hangi kuralın çiğnendiğini söylüyor (`Mimari sınır ihlali: katman kuralları docs/07-kod-kalitesi.md içinde.`).
 
 ## Atomik tasarım
 
